@@ -91,7 +91,7 @@ class ProductTable extends TableAbstract
                 'product_type',
             ])
             ->where('is_variation', 0)
-            ->where('store_id', auth('customer')->user()->store->id);
+            ->where('store_id', auth('customer')->user()->store?->id);
 
         return $this->applyScopes($query);
     }

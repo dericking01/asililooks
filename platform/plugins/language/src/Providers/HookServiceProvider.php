@@ -102,7 +102,16 @@ class HookServiceProvider extends ServiceProvider
         }, 50);
 
         add_filter('core_available_locales', function (array $availableLocales) {
-            if (Route::currentRouteName() === 'translations.locales') {
+            if (in_array(
+                Route::currentRouteName(),
+                [
+                    'translations.locales',
+                    'translations.index',
+                    'translations.theme-translations',
+                    'tools.data-synchronize.export.theme-translations.index',
+                    'tools.data-synchronize.export.other-translations.index',
+                ]
+            )) {
                 return $availableLocales;
             }
 

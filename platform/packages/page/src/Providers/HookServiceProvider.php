@@ -78,7 +78,7 @@ class HookServiceProvider extends ServiceProvider
             if (defined('THEME_FRONT_HEADER')) {
                 add_action(BASE_ACTION_PUBLIC_RENDER_SINGLE, function ($screen, $page): void {
                     add_filter(THEME_FRONT_HEADER, function (?string $html) use ($page): string|null {
-                        if (get_class($page) != Page::class) {
+                        if ($page::class != Page::class) {
                             return $html;
                         }
 
@@ -123,7 +123,7 @@ class HookServiceProvider extends ServiceProvider
 
     public function addPageStatsWidget(array $widgets, Collection $widgetSettings): array
     {
-        $pages = Page::query()->wherePublished()->count();
+        $pages = fn () => Page::query()->wherePublished()->count();
 
         return (new DashboardWidgetInstance())
             ->setType('stats')

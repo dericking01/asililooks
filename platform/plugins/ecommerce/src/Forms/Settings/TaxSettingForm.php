@@ -63,6 +63,13 @@ class TaxSettingForm extends SettingForm
                     ->value(EcommerceHelper::isDisplayTaxFieldsAtCheckoutPage())
                     ->helperText(trans('plugins/ecommerce::setting.tax.form.display_company_invoice_information_fields_at_checkout_page_helper'))
             )
+            ->add('display_tax_description', 'onOffCheckbox', [
+                'label' => trans('plugins/ecommerce::setting.tax.display_tax_description'),
+                'value' => get_ecommerce_setting('display_tax_description', false),
+                'help_block' => [
+                    'text' => trans('plugins/ecommerce::setting.tax.display_tax_description_help'),
+                ],
+            ])
             ->add('close_fieldset_tax_settings', 'html', [
                 'html' => '</fieldset>',
             ]);

@@ -2,6 +2,7 @@
 
 namespace Botble\Marketplace\Http\Controllers\Settings;
 
+use Botble\Base\Facades\DashboardMenu;
 use Botble\Base\Supports\Helper;
 use Botble\Ecommerce\Models\ProductCategory;
 use Botble\Marketplace\Facades\MarketplaceHelper;
@@ -53,6 +54,8 @@ class MarketplaceSettingController extends SettingController
         if ($preVerifyVendor != MarketplaceHelper::getSetting('verify_vendor', 1)) {
             Helper::clearCache();
         }
+
+        DashboardMenu::clearCachesForCurrentUser();
 
         return $this
             ->httpResponse()

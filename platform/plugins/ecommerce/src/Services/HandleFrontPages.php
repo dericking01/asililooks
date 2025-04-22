@@ -270,7 +270,8 @@ class HandleFrontPages
                     $request = request();
                 }
 
-                $request->merge(['brands' => array_merge((array) $request->input('brands', []), [$brand->getKey()])]);
+                $brands = EcommerceHelper::parseFilterParams($request, 'brands');
+                $request->merge(['brands' => array_merge($brands, [$brand->getKey()])]);
 
                 $products = app(GetProductService::class)->getProduct(
                     $request,
@@ -339,8 +340,9 @@ class HandleFrontPages
 
                 $with = EcommerceHelper::withProductEagerLoadingRelations();
 
+                $tags = EcommerceHelper::parseFilterParams($request, 'tags');
                 $request->merge([
-                    'tags' => [$tag->getKey()],
+                    'tags' => array_merge($tags, [$tag->getKey()]),
                 ]);
 
                 $products = app(GetProductService::class)->getProduct($request, null, null, $with);

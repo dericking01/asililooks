@@ -1,4 +1,4 @@
-@if (MarketplaceHelper::isEnabledMessagingSystem() && (! auth('customer')->check() || $store->id != auth('customer')->user()->store->id))
+@if (MarketplaceHelper::isEnabledMessagingSystem() && (! auth('customer')->check() || $store->id != auth('customer')->user()->store?->id))
     <div class="mb-4 row">
         <div class="col-md-6">
             <h3 class="fs-4">{{ __('Email :store', ['store' => $store->name]) }}</h3>

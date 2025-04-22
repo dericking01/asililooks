@@ -34,7 +34,6 @@ use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
 use Intervention\Image\Encoders\AutoEncoder;
 use Intervention\Image\Encoders\WebpEncoder;
 use Intervention\Image\ImageManager;
-use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToWriteFile;
 use Symfony\Component\Mime\MimeTypes;
 use Throwable;
@@ -422,6 +421,14 @@ class RvMedia
             ->header('Content-Type', 'text/html');
     }
 
+    protected function getCustomS3Path(): string
+    {
+        $customPath = trim(setting('media_s3_path', $this->getConfig('custom_s3_path')), '/');
+        $customPath = apply_filters('core_media_custom_s3_path', $customPath);
+
+        return $customPath ? $customPath . '/' : '';
+    }
+
     public function handleUpload(
         ?UploadedFile $fileUpload,
         int|string|null $folderId = 0,
@@ -553,6 +560,11 @@ class RvMedia
 
             if ($folderPath) {
                 $filePath = $folderPath . '/' . $filePath;
+            }
+
+            // Add custom S3 path if using S3 driver
+            if ($this->getMediaDriver() === 's3') {
+                $filePath = $this->getCustomS3Path() . $filePath;
             }
 
             if ($this->canGenerateThumbnails($fileUpload->getMimeType())) {
@@ -801,13 +813,26 @@ class RvMedia
         return true;
     }
 
-    public function getRealPath(?string $url): string
+    public function getRealPath(?string $url): ?string
     {
-        $path = $this->isUsingCloud()
-            ? Storage::url($url)
-            : Storage::path($url);
+        if (empty($url)) {
+            return null;
+        }
 
-        return Arr::first(explode('?v=', $path));
+        try {
+            $path = $this->isUsingCloud()
+                ? Storage::url($url)
+                : Storage::path($url);
+
+            return Arr::first(explode('?v=', $path));
+        } catch (Throwable $exception) {
+            logger()->error('Failed to get real path: ' . $exception->getMessage(), [
+                'url' => $url,
+                'exception' => $exception,
+            ]);
+
+            return null;
+        }
     }
 
     public function isImage(string $mimeType): bool
@@ -958,7 +983,7 @@ class RvMedia
         return $this;
     }
 
-    public function getMimeType(string $url): ?string
+    public function getMimeType(?string $url): ?string
     {
         if (! $url) {
             return null;
@@ -966,6 +991,10 @@ class RvMedia
 
         try {
             $realPath = $this->getRealPath($url);
+
+            if (empty($realPath)) {
+                return null;
+            }
 
             $fileExtension = File::extension($realPath);
 
@@ -980,7 +1009,12 @@ class RvMedia
             $mimeTypeDetection = new MimeTypes();
 
             return Arr::first($mimeTypeDetection->getMimeTypes($fileExtension));
-        } catch (UnableToRetrieveMetadata) {
+        } catch (Throwable $exception) {
+            logger()->error('Failed to get MIME type: ' . $exception->getMessage(), [
+                'url' => $url,
+                'exception' => $exception,
+            ]);
+
             return null;
         }
     }
@@ -1415,5 +1449,36 @@ class RvMedia
             && ! App::runningInConsole()
             && auth()->check()
             && ! auth()->user()->isSuperUser();
+    }
+
+    public function responseDownloadFile(string $filePath)
+    {
+        $filePath = $this->getRealPath($filePath);
+
+        if (! $this->isUsingCloud()) {
+            if (! File::exists($filePath)) {
+                return RvMedia::responseError(trans('core/media::media.file_not_exists'));
+            }
+
+            return response()->download($filePath, File::name($filePath));
+        }
+
+        return response()->make(Http::withoutVerifying()->get($filePath)->body(), 200, [
+            'Content-type' => $this->getMimeType($filePath),
+            'Content-Disposition' => sprintf('attachment; filename="%s"', File::basename($filePath)),
+        ]);
+    }
+
+    public function getAvailableDrivers(): array
+    {
+        return apply_filters('core_media_drivers', [
+            'public' => trans('core/setting::setting.media.local_disk'),
+            's3' => 'Amazon S3',
+            'r2' => 'Cloudflare R2',
+            'do_spaces' => 'DigitalOcean Spaces',
+            'wasabi' => 'Wasabi',
+            'bunnycdn' => 'BunnyCDN',
+            'backblaze' => 'Backblaze B2',
+        ]);
     }
 }

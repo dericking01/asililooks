@@ -4,6 +4,7 @@ namespace Botble\Ecommerce\Http\Controllers\Customers;
 
 use Botble\Base\Facades\EmailHandler;
 use Botble\Base\Http\Controllers\BaseController;
+use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Http\Requests\Fronts\UploadProofRequest;
 use Botble\Ecommerce\Models\Customer;
 use Botble\Ecommerce\Models\Order;
@@ -13,6 +14,13 @@ class UploadProofController extends BaseController
 {
     public function upload(int|string $id, UploadProofRequest $request)
     {
+        if (! EcommerceHelper::isPaymentProofEnabled()) {
+            return $this
+                ->httpResponse()
+                ->setError()
+                ->setMessage(__('Payment proof upload is currently disabled.'));
+        }
+
         /**
          * @var Customer $customer
          */

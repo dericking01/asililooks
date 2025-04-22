@@ -503,10 +503,17 @@ class Product extends BaseModel
 
     protected function totalTaxesPercentage(): Attribute
     {
-        return Attribute::get(fn () => $this->taxes
-            ->where(fn ($item) => ! $item->rules || $item->rules->isEmpty())
-            ->where('status', BaseStatusEnum::PUBLISHED)
-            ->sum('percentage'));
+        return Attribute::get(function () {
+            $taxes = $this->taxes
+                ->where(fn ($item) => ! $item->rules || $item->rules->isEmpty())
+                ->where('status', BaseStatusEnum::PUBLISHED);
+
+            if ($taxes->isEmpty() && $defaultTaxRate = get_ecommerce_setting('default_tax_rate')) {
+                return Tax::query()->where('id', $defaultTaxRate)->value('percentage') ?: 0;
+            }
+
+            return $taxes->sum('percentage');
+        });
     }
 
     public function variationProductAttributes(): HasMany

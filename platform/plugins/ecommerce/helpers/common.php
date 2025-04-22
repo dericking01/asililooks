@@ -30,7 +30,21 @@ if (! function_exists('rv_get_image_list')) {
             $images = [];
 
             foreach ($imagesList as $url) {
-                $images[] = RvMedia::getImageUrl($url, apply_filters('ecommerce_product_gallery_origin_image_size', $size));
+                if (empty($url)) {
+                    continue;
+                }
+
+                try {
+                    $images[] = RvMedia::getImageUrl($url, apply_filters('ecommerce_product_gallery_origin_image_size', $size));
+                } catch (Throwable $exception) {
+                    logger()->error('Failed to get image URL: ' . $exception->getMessage(), [
+                        'url' => $url,
+                        'size' => $size,
+                        'exception' => $exception,
+                    ]);
+
+                    $images[] = RvMedia::getDefaultImage(false, $size);
+                }
             }
 
             $result[$size] = $images;

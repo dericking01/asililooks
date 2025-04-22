@@ -16,7 +16,7 @@ class ProductExporter extends BaseProductExporter
     {
         parent::__construct();
 
-        $this->storeId = auth('customer')->user()->store->id;
+        $this->storeId = auth('customer')->user()->store?->id;
     }
 
     public function getLayout(): string

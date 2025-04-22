@@ -981,6 +981,8 @@ class HookServiceProvider extends ServiceProvider
         add_filter('core_slug_can_be_reviewed', function (bool $canBeReviewed) {
             return $canBeReviewed || (auth('customer')->check() && AdminHelper::isInAdmin());
         }, 999, 2);
+
+        add_filter('facebook_comment_html', [$this, 'renderProductFacebookComments'], 99, 2);
     }
 
     protected function convertOrderAmount(float $amount): float
@@ -1107,6 +1109,19 @@ class HookServiceProvider extends ServiceProvider
                                 'class' => 'form-control',
                             ],
                         ],
+                    ],
+                    [
+                        'id' => 'number_of_related_product',
+                        'type' => 'number',
+                        'label' => trans('plugins/ecommerce::ecommerce.theme_options.number_of_related_product'),
+                        'attributes' => [
+                            'name' => 'number_of_related_product',
+                            'value' => 4,
+                            'options' => [
+                                'class' => 'form-control',
+                            ],
+                        ],
+                        'helper' => trans('plugins/ecommerce::ecommerce.theme_options.number_of_related_product_helper'),
                     ],
                     [
                         'id' => 'max_filter_price',
@@ -1347,5 +1362,14 @@ class HookServiceProvider extends ServiceProvider
     public function handleSingleView(Slug|array $slug): BaseHttpResponse|array|Slug|RedirectResponse
     {
         return app(HandleFrontPages::class)->handle($slug);
+    }
+
+    public function renderProductFacebookComments(string $html, ?object $object = null): string
+    {
+        if ($object instanceof Product && theme_option('facebook_comment_enabled_in_product', 'no') === 'yes') {
+            return view('packages/theme::partials.facebook-comments')->render();
+        }
+
+        return $html;
     }
 }

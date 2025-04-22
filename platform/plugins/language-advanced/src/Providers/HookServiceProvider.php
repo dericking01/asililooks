@@ -76,7 +76,7 @@ class HookServiceProvider extends ServiceProvider
                 'language_advanced_wrap',
                 trans('plugins/language::language.name'),
                 [$this, 'languageMetaField'],
-                get_class($object),
+                $object::class,
                 'top'
             );
         }

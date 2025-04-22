@@ -32,7 +32,7 @@
                     class="btn btn-primary mb-2 add-to-cart-button @if ($product->isOutOfStock()) disabled @endif"
                     name="add_to_cart"
                     type="submit"
-                    value="1"
+                    value="{{ $product->min_cart_quantity }}"
                     title="{{ __('Add to cart') }}"
                     @if ($product->isOutOfStock()) disabled @endif
                 >
@@ -52,7 +52,7 @@
                         class="btn btn-primary btn-black mb-2 add-to-cart-button @if ($product->isOutOfStock()) disabled @endif"
                         name="checkout"
                         type="submit"
-                        value="1"
+                        value="{{ $product->min_cart_quantity }}"
                         title="{{ __('Buy Now') }}"
                         @if ($product->isOutOfStock()) disabled @endif
                     >

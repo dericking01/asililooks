@@ -50,6 +50,7 @@ class PublicUpdateTaxCheckoutController extends BaseController
                     'shippingAmount' => $checkoutOrderData->shippingAmount,
                     'promotionDiscountAmount' => $checkoutOrderData->promotionDiscountAmount,
                     'couponDiscountAmount' => $checkoutOrderData->couponDiscountAmount,
+                    'paymentFee' => $checkoutOrderData->paymentFee,
                 ])->render(),
             ]);
     }

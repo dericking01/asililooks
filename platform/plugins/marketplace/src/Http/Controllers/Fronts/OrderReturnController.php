@@ -19,13 +19,10 @@ use Illuminate\Http\Request;
 
 class OrderReturnController extends BaseController
 {
-    public function __construct()
-    {
-        abort_unless(EcommerceHelper::isOrderReturnEnabled(), 404);
-    }
-
     public function index(OrderReturnTable $orderReturnTable)
     {
+        abort_unless(EcommerceHelper::isOrderReturnEnabled(), 404);
+
         $this->pageTitle(trans('plugins/ecommerce::order.order_return'));
 
         return $orderReturnTable->renderTable();
@@ -38,6 +35,8 @@ class OrderReturnController extends BaseController
 
     public function edit(int|string $id)
     {
+        abort_unless(EcommerceHelper::isOrderReturnEnabled(), 404);
+
         $returnRequest = $this->findOrFail($id);
 
         $returnRequest->load(['items', 'customer', 'order']);
@@ -67,6 +66,8 @@ class OrderReturnController extends BaseController
 
     public function update(int|string $id, UpdateOrderReturnRequest $request)
     {
+        abort_unless(EcommerceHelper::isOrderReturnEnabled(), 404);
+
         /**
          * @var OrderReturn $returnRequest
          */
@@ -102,6 +103,8 @@ class OrderReturnController extends BaseController
 
     public function destroy(int|string $id, Request $request)
     {
+        abort_unless(EcommerceHelper::isOrderReturnEnabled(), 404);
+
         $orderReturn = $this->findOrFail($id);
 
         try {

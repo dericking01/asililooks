@@ -166,7 +166,7 @@ class ShipmentController extends BaseController
         return Shipment::query()
             ->where('id', $id)
             ->whereHas('order', function ($query): void {
-                $query->where('store_id', auth('customer')->user()->store->id);
+                $query->where('store_id', auth('customer')->user()->store?->id);
             })
             ->firstOrFail();
     }

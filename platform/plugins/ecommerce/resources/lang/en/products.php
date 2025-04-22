@@ -65,6 +65,7 @@ return [
         ],
         'tax' => 'Tax',
         'taxes' => 'Taxes',
+        'taxes_helper' => 'The default tax rate is configured in <a href=":url">Settings -> Tax</a>. If no specific tax is selected for this product, the default rate will be applied. To disable tax for this product, remove the default tax rate from the tax settings.',
         'is_default' => 'Is default',
         'action' => 'Action',
         'restock_quantity' => 'Restock quantity',

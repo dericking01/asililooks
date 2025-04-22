@@ -26,7 +26,7 @@ class OrderCreatedEmailNotification
                 continue;
             }
 
-            if ($product->original_product->store_id && $product->original_product->store->id) {
+            if ($product->original_product->store_id && $product->original_product->store?->id) {
                 $storeIds[] = $product->original_product->store_id;
             }
         }
@@ -42,7 +42,7 @@ class OrderCreatedEmailNotification
             'order_id' => $order->getKey(),
             'user_id' => 0,
             'weight' => $order->products_weight,
-            'cod_amount' => $order->payment->status != PaymentStatusEnum::COMPLETED ? $order->amount : 0,
+            'cod_amount' => is_plugin_active('payment') ? ($order->payment->status != PaymentStatusEnum::COMPLETED ? $order->amount : 0) : null,
             'cod_status' => ShippingCodStatusEnum::PENDING,
             'type' => $order->shipping_method,
             'status' => ShippingStatusEnum::PENDING,

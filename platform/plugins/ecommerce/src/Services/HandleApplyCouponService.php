@@ -473,9 +473,12 @@ class HandleApplyCouponService
             case DiscountTypeOptionEnum::PERCENTAGE:
                 switch ($discount->target) {
                     case DiscountTargetEnum::MINIMUM_ORDER_AMOUNT:
+                        $couponDiscountAmount = ($rawTotal - (float) Arr::get($sessionData, 'shipping_amount', 0)) * $discountValue / 100;
+
+                        break;
                     case DiscountTargetEnum::ONCE_PER_CUSTOMER:
                     case DiscountTargetEnum::ALL_ORDERS:
-                        $couponDiscountAmount = ($rawTotal - (float) Arr::get($sessionData, 'shipping_amount', 0)) * $discountValue / 100;
+                        $couponDiscountAmount = $rawTotal * $discountValue / 100;
 
                         break;
                     case DiscountTargetEnum::SPECIFIC_PRODUCT:

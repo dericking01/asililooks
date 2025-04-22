@@ -43,6 +43,10 @@
             color: #fb7578;
         }
 
+        .large.total img {
+            width: 14px;
+        }
+
         .logo-container {
             margin: 20px 0 50px;
         }
@@ -323,6 +327,17 @@
         </tr>
     {% endif %}
 
+    {% if invoice.payment_fee > 0 %}
+        <tr>
+            <td colspan="4" class="right">
+                {{ 'plugins/payment::payment.payment_fee'|trans }}
+            </td>
+            <td class="bold">
+                {{ invoice.payment_fee|price_format }}
+            </td>
+        </tr>
+    {% endif %}
+
     {% if invoice.shipping_amount > 0 %}
         <tr>
             <td colspan="4" class="right">
@@ -377,7 +392,7 @@
 
             {{ invoice_payment_info_filter | raw }}
         </td>
-        <td class="large total">{{ invoice.amount|price_format }}</td>
+        <td class="large total"><p>{{ invoice.amount|price_format }}</p></td>
     </tr>
     </tbody>
 </table>

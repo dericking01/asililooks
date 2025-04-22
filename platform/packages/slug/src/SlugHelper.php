@@ -229,7 +229,7 @@ class SlugHelper
         }
 
         if (is_object($model)) {
-            $model = get_class($model);
+            $model = $model::class;
         }
 
         $config = Arr::get(config('packages.slug.general.slug_generated_columns', []), $model);

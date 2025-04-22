@@ -4,6 +4,7 @@ namespace Botble\Marketplace\Http\Controllers\Fronts;
 
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Ecommerce\Models\Customer;
+use Botble\Marketplace\Enums\WithdrawalFeeTypeEnum;
 use Botble\Marketplace\Enums\WithdrawalStatusEnum;
 use Botble\Marketplace\Events\WithdrawalRequested;
 use Botble\Marketplace\Facades\MarketplaceHelper;
@@ -29,9 +30,21 @@ class WithdrawalController extends BaseController
     public function create()
     {
         $user = auth('customer')->user();
-        $fee = MarketplaceHelper::getSetting('fee_withdrawal', 0);
+        $fee = $this->calculateWithdrawalFee($user->balance);
+        $minimumWithdrawal = MarketplaceHelper::getMinimumWithdrawalAmount();
 
-        if ($user->balance <= $fee || ! $user->bank_info) {
+        // Calculate maximum withdrawal amount
+        $feeType = MarketplaceHelper::getSetting('withdrawal_fee_type', WithdrawalFeeTypeEnum::FIXED);
+        $feeValue = MarketplaceHelper::getSetting('fee_withdrawal', 0);
+
+        if ($feeType === WithdrawalFeeTypeEnum::PERCENTAGE) {
+            $maximum = $feeValue > 0 ? floor($user->balance / (1 + $feeValue / 100)) : $user->balance;
+        } else {
+            $maximum = $user->balance - $feeValue;
+        }
+        $maximum = max(0, $maximum);
+
+        if ($maximum < $minimumWithdrawal || ! $user->bank_info) {
             return $this
                 ->httpResponse()
                 ->setError()
@@ -46,7 +59,9 @@ class WithdrawalController extends BaseController
 
     public function store(VendorWithdrawalRequest $request)
     {
-        $fee = MarketplaceHelper::getSetting('fee_withdrawal', 0);
+        $amount = $request->input('amount');
+        $fee = $this->calculateWithdrawalFee($amount);
+        $total = $amount + $fee;
 
         /**
          * @var Customer $vendor
@@ -54,13 +69,12 @@ class WithdrawalController extends BaseController
         $vendor = auth('customer')->user();
         $vendorInfo = $vendor->vendorInfo;
 
-        if ($request->input('amount') < MarketplaceHelper::getMinimumWithdrawalAmount()) {
+        // Double check if the total amount (including fee) exceeds the balance
+        if ($total > $vendorInfo->balance) {
             return $this
                 ->httpResponse()
                 ->setError()
-                ->setMessage(__('The minimum withdrawal amount is :amount', [
-                    'amount' => format_price(MarketplaceHelper::getMinimumWithdrawalAmount()),
-                ]));
+                ->setMessage(__('The total amount (including fee) exceeds your current balance'));
         }
 
         try {
@@ -71,7 +85,7 @@ class WithdrawalController extends BaseController
              */
             $withdrawal = Withdrawal::query()->create([
                 'fee' => $fee,
-                'amount' => $request->input('amount'),
+                'amount' => $amount,
                 'customer_id' => $vendor->getKey(),
                 'currency' => get_application_currency()->title,
                 'bank_info' => $vendorInfo->bank_info,
@@ -80,7 +94,7 @@ class WithdrawalController extends BaseController
                 'payment_channel' => $vendorInfo->payout_payment_method,
             ]);
 
-            $vendorInfo->balance -= $request->input('amount') + $fee;
+            $vendorInfo->balance -= $total;
 
             /**
              * @var VendorInfo $vendorInfo
@@ -101,9 +115,20 @@ class WithdrawalController extends BaseController
 
         return $this
             ->httpResponse()
-            ->setPreviousUrl(route('marketplace.vendor.withdrawals.index'))
-            ->setNextUrl(route('marketplace.vendor.withdrawals.show', $withdrawal->getKey()))
-            ->withCreatedSuccessMessage();
+            ->setNextUrl(route('marketplace.vendor.withdrawals.show', $withdrawal->id))
+            ->setMessage(trans('plugins/marketplace::withdrawal.created_success_message'));
+    }
+
+    protected function calculateWithdrawalFee(float $amount): float
+    {
+        $fee = MarketplaceHelper::getSetting('fee_withdrawal', 0);
+        $feeType = MarketplaceHelper::getSetting('withdrawal_fee_type', WithdrawalFeeTypeEnum::FIXED);
+
+        if ($feeType === WithdrawalFeeTypeEnum::PERCENTAGE) {
+            return $amount * $fee / 100;
+        }
+
+        return $fee;
     }
 
     public function edit(int|string $id)

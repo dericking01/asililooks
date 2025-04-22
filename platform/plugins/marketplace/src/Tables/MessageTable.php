@@ -44,7 +44,7 @@ class MessageTable extends TableAbstract
                 return $this->toJson(
                     $this
                         ->table
-                        ->eloquent($this->query()->where('store_id', auth('customer')->user()->store->id))
+                        ->eloquent($this->query()->where('store_id', auth('customer')->user()->store?->id))
                 );
             });
     }

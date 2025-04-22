@@ -24,7 +24,7 @@ class MessageController extends BaseController
         abort_unless(MarketplaceHelper::isEnabledMessagingSystem(), 404);
 
         $message = Message::query()
-            ->where('store_id', auth('customer')->user()->store->id)
+            ->where('store_id', auth('customer')->user()->store?->id)
             ->with(['store', 'customer'])
             ->findOrFail($id);
 
@@ -38,7 +38,7 @@ class MessageController extends BaseController
         abort_unless(MarketplaceHelper::isEnabledMessagingSystem(), 404);
 
         $message = Message::query()
-            ->where('store_id', auth('customer')->user()->store->id)
+            ->where('store_id', auth('customer')->user()->store?->id)
             ->findOrFail($id);
 
         return DeleteResourceAction::make($message);

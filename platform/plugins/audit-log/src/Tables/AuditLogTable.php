@@ -9,7 +9,6 @@ use Botble\Table\BulkActions\DeleteBulkAction;
 use Botble\Table\Columns\FormattedColumn;
 use Botble\Table\Columns\IdColumn;
 use Botble\Table\HeaderActions\HeaderAction;
-use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class AuditLogTable extends TableAbstract
 {
@@ -24,6 +23,10 @@ class AuditLogTable extends TableAbstract
                     ->title(trans('plugins/audit-log::history.action'))
                     ->alignStart()
                     ->renderUsing(function (FormattedColumn $column) {
+                        if (! class_exists($column->getItem()->user_type)) {
+                            return trans('plugins/audit-log::history.activity_has_been_deleted');
+                        }
+
                         return view('plugins/audit-log::activity-line', ['history' => $column->getItem()])->render();
                     }),
             ])
@@ -36,7 +39,6 @@ class AuditLogTable extends TableAbstract
             ])
             ->addAction(DeleteAction::make()->route('audit-log.destroy'))
             ->addBulkAction(DeleteBulkAction::make()->permission('audit-log.destroy')->silent())
-            ->queryUsing(fn (Builder $query) => $query->with('user'))
             ->onAjax(function (AuditLogTable $table) {
                 return $table->toJson(
                     $table

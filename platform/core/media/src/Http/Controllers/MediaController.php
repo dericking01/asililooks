@@ -25,7 +25,6 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use League\Flysystem\UnableToWriteFile;
 use Throwable;
@@ -348,6 +347,45 @@ class MediaController extends BaseController
                 }
 
                 $response = RvMedia::responseSuccess([], trans('core/media::media.restore_success'));
+
+                break;
+
+            case 'move':
+                $error = false;
+                $newFolderId = $request->input('destination');
+
+                foreach ($request->input('selected') as $item) {
+                    if (! $item['is_folder']) {
+                        try {
+                            $file = $this->fileRepository->getFirstBy(['id' => $item['id']]);
+                            if ($file) {
+                                $this->moveFile($file, $newFolderId);
+                            }
+                        } catch (Exception $exception) {
+                            BaseHelper::logError($exception);
+                            $error = true;
+                        }
+                    } else {
+                        try {
+                            $folder = $this->folderRepository->getFirstBy(['id' => $item['id']]);
+                            if ($folder) {
+                                $folder->parent_id = $newFolderId;
+                                $folder->save();
+                            }
+                        } catch (Exception $exception) {
+                            BaseHelper::logError($exception);
+                            $error = true;
+                        }
+                    }
+                }
+
+                if ($error) {
+                    $response = RvMedia::responseError(trans('core/media::media.move_error'));
+
+                    break;
+                }
+
+                $response = RvMedia::responseSuccess([], trans('core/media::media.move_success'));
 
                 break;
 
@@ -704,6 +742,30 @@ class MediaController extends BaseController
         return $file;
     }
 
+    protected function moveFile(MediaFile $file, int|string|null $newFolderId = null)
+    {
+        if ($newFolderId === null) {
+            return $file;
+        }
+
+        $oldPath = RvMedia::getRealPath($file->url);
+        $newFolderPath = RvMedia::getRealPath($this->folderRepository->getFullPath($newFolderId));
+        $newPath = $newFolderPath . '/' . File::basename($file->url);
+
+        if (Storage::exists($oldPath)) {
+            Storage::move($oldPath, $newPath);
+            $file->url = str_replace(
+                RvMedia::getRealPath(File::dirname($file->url)),
+                RvMedia::getRealPath($this->folderRepository->getFullPath($newFolderId)),
+                $file->url
+            );
+            $file->folder_id = $newFolderId;
+            $file->save();
+        }
+
+        return $file;
+    }
+
     public function download(Request $request)
     {
         $items = $request->input('selected', []);
@@ -711,20 +773,7 @@ class MediaController extends BaseController
         if (count($items) == 1 && ! $items[0]['is_folder']) {
             $file = MediaFile::query()->withTrashed()->find($items[0]['id']);
             if (! empty($file) && $file->type != 'video') {
-                $filePath = RvMedia::getRealPath($file->url);
-
-                if (! RvMedia::isUsingCloud()) {
-                    if (! File::exists($filePath)) {
-                        return RvMedia::responseError(trans('core/media::media.file_not_exists'));
-                    }
-
-                    return response()->download($filePath, Str::slug($file->name));
-                }
-
-                return response()->make(Http::withoutVerifying()->get($filePath)->body(), 200, [
-                    'Content-type' => $file->mime_type,
-                    'Content-Disposition' => sprintf('attachment; filename="%s"', File::basename($filePath)),
-                ]);
+                return RvMedia::responseDownloadFile($file->url);
             }
         } else {
             $fileName = Storage::disk('local')->path('download-' . Carbon::now()->format('Y-m-d-h-i-s') . '.zip');

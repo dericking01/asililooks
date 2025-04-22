@@ -14,18 +14,20 @@ Theme::registerRoutes(function (): void {
 
         Route::get('/', 'getIndex')->name('public.index');
 
-        // Main sitemap index
-        Route::get('sitemap.xml', 'getSiteMap')->name('public.sitemap');
+        if (setting('sitemap_enabled', true)) {
+            // Main sitemap index
+            Route::get('sitemap.xml', 'getSiteMap')->name('public.sitemap');
 
-        // Handle both standard and paginated sitemaps
-        Route::get('{key}.{extension}', 'getSiteMapIndex')
-            ->whereIn('extension', SiteMapManager::allowedExtensions())
-            ->name('public.sitemap.index');
+            // Handle both standard and paginated sitemaps
+            Route::get('{key}.{extension}', 'getSiteMapIndex')
+                ->whereIn('extension', SiteMapManager::allowedExtensions())
+                ->name('public.sitemap.index');
 
-        Route::get('{slug?}', 'getView')->name('public.single');
+            Route::get('{slug?}', 'getView')->name('public.single');
 
-        Route::get('{prefix}/{slug?}', 'getViewWithPrefix')
-            ->whereIn('prefix', SlugHelper::getAllPrefixes() ?: ['1437bcd2-d94e-4a5fd-9a39-b5d60225e9af']);
+            Route::get('{prefix}/{slug?}', 'getViewWithPrefix')
+                ->whereIn('prefix', SlugHelper::getAllPrefixes() ?: ['1437bcd2-d94e-4a5fd-9a39-b5d60225e9af']);
+        }
 
         event(new ThemeRoutingAfterEvent(app()->make('router')));
     });

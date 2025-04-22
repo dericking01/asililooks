@@ -903,7 +903,7 @@ class LanguageManager
                         $uniqueKey = LanguageMeta::query()
                             ->where([
                                 'reference_id' => $refFrom,
-                                'reference_type' => get_class($data),
+                                'reference_type' => $data::class,
                             ])
                             ->value('lang_meta_origin');
                     }
@@ -911,7 +911,7 @@ class LanguageManager
                     if (! $meta) {
                         $meta = new LanguageMeta();
                         $meta->reference_id = $data->getKey();
-                        $meta->reference_type = get_class($data);
+                        $meta->reference_type = $data::class;
                         $meta->lang_meta_origin = $uniqueKey;
                     }
 

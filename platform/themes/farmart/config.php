@@ -53,7 +53,7 @@ return [
             });
 
             // You may use this event to set up your assets.
-            $version = get_cms_version() . '.1';
+            $version = get_cms_version();
 
             $useCDN = theme_option('use_source_assets_from', 'cdn') == 'cdn';
 

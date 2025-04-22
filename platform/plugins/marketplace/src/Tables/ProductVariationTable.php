@@ -48,7 +48,7 @@ class ProductVariationTable extends EcommerceProductVariationTable
                 $query
                     ->where([
                         'configurable_product_id' => $this->productId,
-                        'store_id' => auth('customer')->user()->store->getKey(),
+                        'store_id' => auth('customer')->user()->store?->id,
                     ]);
             });
     }

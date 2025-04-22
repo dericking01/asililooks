@@ -961,6 +961,23 @@ class EcommerceHelper
             (! auth('customer')->check() && $this->allowGuestCheckoutForDigitalProducts());
     }
 
+    public function parseFilterParams(Request $request, string $paramName): array
+    {
+        $param = $request->input($paramName);
+
+        // If it's already an array, return it
+        if (is_array($param)) {
+            return $param;
+        }
+
+        // If it's a comma-separated string, split it
+        if (is_string($param) && $param !== '') {
+            return array_filter(explode(',', $param));
+        }
+
+        return [];
+    }
+
     public function productFilterParamsValidated(Request $request): bool
     {
         $validator = Validator::make($request->input(), [
@@ -970,10 +987,32 @@ class EcommerceHelper
             'price_ranges' => ['sometimes', 'array'],
             'price_ranges.*.from' => ['required', 'numeric'],
             'price_ranges.*.to' => ['required', 'numeric'],
-            'attributes' => ['nullable', 'array'],
-            'categories' => ['nullable', 'array'],
-            'tags' => ['nullable', 'array'],
-            'brands' => ['nullable', 'array'],
+            'attributes' => ['nullable', 'array', 'sometimes'],
+            'categories' => ['nullable', 'array', 'sometimes'],
+            'tags' => ['nullable', 'array', 'sometimes'],
+            'brands' => ['nullable', 'array', 'sometimes'],
+            'sort-by' => ['nullable', 'string', 'max:40'],
+            'page' => ['nullable', 'numeric', 'min:1'],
+            'per_page' => ['nullable', 'numeric', 'min:1'],
+        ]);
+
+        // Also validate comma-separated string format
+        if (! $validator->fails()) {
+            return true;
+        }
+
+        // Try validating with comma-separated strings
+        $validator = Validator::make($request->input(), [
+            'q' => ['nullable', 'string', 'max:255'],
+            'max_price' => ['nullable', 'numeric'],
+            'min_price' => ['nullable', 'numeric'],
+            'price_ranges' => ['sometimes', 'array'],
+            'price_ranges.*.from' => ['required', 'numeric'],
+            'price_ranges.*.to' => ['required', 'numeric'],
+            'attributes' => ['nullable', 'string', 'sometimes'],
+            'categories' => ['nullable', 'string', 'sometimes'],
+            'tags' => ['nullable', 'string', 'sometimes'],
+            'brands' => ['nullable', 'string', 'sometimes'],
             'sort-by' => ['nullable', 'string', 'max:40'],
             'page' => ['nullable', 'numeric', 'min:1'],
             'per_page' => ['nullable', 'numeric', 'min:1'],
@@ -1412,7 +1451,7 @@ class EcommerceHelper
 
     public function registerThemeAssets(): void
     {
-        $version = get_cms_version() . '.3';
+        $version = get_cms_version() . '.5';
 
         Theme::asset()
             ->add('front-ecommerce-css', 'vendor/core/plugins/ecommerce/css/front-ecommerce.css', version: $version);
@@ -1727,6 +1766,11 @@ class EcommerceHelper
     public function isProductSpecificationEnabled(): bool
     {
         return (bool) get_ecommerce_setting('enable_product_specification', false);
+    }
+
+    public function isPaymentProofEnabled(): bool
+    {
+        return (bool) get_ecommerce_setting('payment_proof_enabled', 1);
     }
 
     public function hasAnyProductFilters(): bool

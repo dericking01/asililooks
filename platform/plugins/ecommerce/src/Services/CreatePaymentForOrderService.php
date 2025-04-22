@@ -38,8 +38,12 @@ class CreatePaymentForOrderService
          */
         $user = Auth::user();
 
+        // Get payment fee directly from payment settings
+        $paymentFee = (float) get_payment_setting('fee', $paymentMethod, 0);
+
         $data = [
             'amount' => $order->amount,
+            'payment_fee' => $paymentFee,
             'currency' => cms_currency()->getDefaultCurrency()->title,
             'payment_channel' => $paymentMethod,
             'status' => $paymentStatus,

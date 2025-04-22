@@ -383,7 +383,7 @@ class Language
         return self::$flags;
     }
 
-    public static function getAvailableLocales(): array
+    public static function getAvailableLocales(bool $original = false): array
     {
         $languages = [];
         $locales = BaseHelper::scanFolder(lang_path());
@@ -429,9 +429,13 @@ class Language
                     'code' => $locale,
                     'name' => $locale,
                     'flag' => $locale,
-                    'is_rtl' => $languages[$locale][3] === 'rtl',
+                    'is_rtl' => Arr::get($languages, "$locale.3") === 'rtl',
                 ];
             }
+        }
+
+        if ($original) {
+            return $languages;
         }
 
         return apply_filters('core_available_locales', $languages);

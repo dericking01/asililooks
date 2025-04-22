@@ -45,8 +45,11 @@ class ContactRequest extends Request
             'phone' => ['nullable', new PhoneNumberRule()],
             'address' => ['nullable', 'string', 'max:500'],
             'subject' => ['nullable', 'string', 'max:500'],
-            'agree_terms_and_policy' => ['sometimes', 'accepted:1'],
         ];
+
+        if (setting('contact_form_show_terms_checkbox', true)) {
+            $rules['agree_terms_and_policy'] = ['required', 'accepted:1'];
+        }
 
         try {
             $rules = $this->applyRules(
@@ -165,7 +168,13 @@ class ContactRequest extends Request
 
     protected function alwaysMandatoryFields(): array
     {
-        return ['name', 'content', 'agree_terms_and_policy'];
+        $mandatoryFields = ['name', 'content'];
+
+        if (setting('contact_form_show_terms_checkbox', true)) {
+            $mandatoryFields[] = 'agree_terms_and_policy';
+        }
+
+        return $mandatoryFields;
     }
 
     public function applyRules(array $rules, ?string $displayFields, ?string $mandatoryFields): array

@@ -49,6 +49,7 @@ class BankTransferPaymentMethodForm extends PaymentMethodForm
                     ->value(get_payment_setting('description', PaymentMethodEnum::BANK_TRANSFER))
             )
             ->paymentMethodLogoField(PaymentMethodEnum::BANK_TRANSFER)
+            ->paymentFeeField(PaymentMethodEnum::BANK_TRANSFER)
             ->addAvailableCountriesField(PaymentMethodEnum::BANK_TRANSFER)
             ->when(
                 apply_filters(PAYMENT_METHOD_SETTINGS_CONTENT, null, PaymentMethodEnum::BANK_TRANSFER),

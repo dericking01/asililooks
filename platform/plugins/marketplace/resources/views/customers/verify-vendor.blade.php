@@ -20,8 +20,8 @@
                             />
                         </div>
 
-                        @if ($vendor->store->id)
-                            <a href="{{ route('marketplace.store.edit', $vendor->store->id) }}" target="_blank">
+                        @if ($vendor->store?->id)
+                            <a href="{{ route('marketplace.store.edit', $vendor->store?->id) }}" target="_blank">
                                 {{ $vendor->store->name }}
                                 <x-core::icon name="ti ti-external-link" />
                             </a>

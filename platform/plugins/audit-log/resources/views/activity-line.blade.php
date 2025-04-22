@@ -1,10 +1,10 @@
 <div class="row">
     <div class="col-auto">
-        @if ($history->user->id)
+        @if (class_exists($history->user_type) && $history->user)
             <img
                 src="{{ $history->user->avatar_url }}"
                 class="avatar"
-                alt="{{ $history->user->name }}"
+                alt="{{ $history->user_name }}"
             />
         @else
             <img
@@ -17,8 +17,9 @@
     <div class="col">
         <div class="text-truncate">
             <strong>
-                @if ($history->user->id)
-                    <a href="{{ Auth::guard()->user()->url }}">{{ $history->user->name }}</a>
+                @if (class_exists($history->user_type) && $user = $history->user)
+                    <a href="{{ $user->url ?? '#' }}">{{ $history->user_name }}</a>
+                    <span class="badge bg-primary text-white">{{ $history->user_type_label }}</span>
                 @else
                     {{ trans('plugins/audit-log::history.system') }}
                 @endif
@@ -30,7 +31,7 @@
                 {{ $history->action }}
             @endif
 
-            @if ($history->module != 'user' || empty($history->user) || $history->user->id != Auth::guard()->id())
+            @if ($history->module != 'user' || (class_exists($history->user_type) && empty($history->user)) || (class_exists($history->user_type) && $history->user->id != Auth::guard()->id()))
                 @if (Lang::has("plugins/audit-log::history.$history->module"))
                     {{ trans("plugins/audit-log::history.$history->module") }}
                 @else
@@ -38,7 +39,7 @@
                 @endif
             @endif
 
-            @if ($history->reference_name && (empty($history->user) || $history->user->name != $history->reference_name))
+            @if ($history->reference_name && $history->user_name != $history->reference_name)
                 <span title="{{ $history->reference_name }}">"{{ Str::limit($history->reference_name, 40) }}"</span>
             @endif
         </div>

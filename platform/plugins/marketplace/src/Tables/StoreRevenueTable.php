@@ -84,7 +84,7 @@ class StoreRevenueTable extends TableAbstract
         if (! $this->customerId) {
             $data
                 ->editColumn('customer_id', function (Revenue $item) {
-                    if (! $item->customer->id || ! $item->customer->store->id) {
+                    if (! $item->customer->id || ! $item->customer->store?->id) {
                         return '&mdash;';
                     }
 

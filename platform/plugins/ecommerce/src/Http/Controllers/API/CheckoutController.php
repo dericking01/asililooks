@@ -11,6 +11,27 @@ use Illuminate\Support\Facades\Auth;
 
 class CheckoutController extends BaseController
 {
+    /**
+     * Process Checkout
+     *
+     * Process the checkout for a specific cart ID. This endpoint restores the cart, generates an order token,
+     * and redirects the user to the checkout page.
+     *
+     * @urlParam id string required The ID of the cart to process. Example: 12345
+     * @authenticated
+     *
+     * @response 302 {}
+     * @response 401 {
+     *     "message": "Unauthenticated."
+     * }
+     * @response 404 {
+     *     "message": "Cart not found."
+     * }
+     *
+     * @param string $id
+     * @param Request $request
+     * @return mixed
+     */
     public function process(string $id, Request $request)
     {
         Cart::instance('cart')->restore($id);

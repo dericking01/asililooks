@@ -68,6 +68,13 @@
                     <td colspan="2" class="bb-text-right">{{ format_price($order->discount_amount) }}</td>
                 </tr>
             @endif
+
+            @if ((float)$order->payment_fee)
+                <tr>
+                    <td colspan="2" class="bb-text-right">{{ trans('plugins/payment::payment.payment_fee') }}</td>
+                    <td colspan="2" class="bb-text-right">{{ format_price($order->payment_fee) }}</td>
+                </tr>
+            @endif
             <tr>
                 <td colspan="2" class="bb-text-right bb-font-strong bb-h3 bb-m-0">{{ trans('plugins/ecommerce::products.form.total') }}</td>
                 <td colspan="2" class="bb-font-strong bb-h3 bb-m-0 bb-text-right">{{ format_price($order->amount) }}</td>

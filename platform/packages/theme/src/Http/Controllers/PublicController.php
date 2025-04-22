@@ -72,7 +72,7 @@ class PublicController extends BaseController
         }
 
         if (isset($result['slug']) && $result['slug'] !== $key) {
-            $prefix = SlugHelper::getPrefix(get_class(Arr::first($result['data'])));
+            $prefix = SlugHelper::getPrefix(Arr::first($result['data'])::class);
 
             return redirect()->route('public.single', empty($prefix) ? $result['slug'] : "$prefix/{$result['slug']}");
         }

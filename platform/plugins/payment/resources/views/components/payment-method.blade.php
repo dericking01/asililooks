@@ -26,6 +26,15 @@
 
     <div @class(['payment_collapse_wrap collapse mt-1', 'show' => $isSelected])>
         <p class="text-muted">{!! BaseHelper::clean($description ?: get_payment_setting('description', $name) ?: setting('payment_' . $name . '_description')) !!}</p>
+        @php
+            $fee = get_payment_setting('fee', $name, 0);
+        @endphp
+        @if ($fee > 0)
+            <p class="text-warning">
+                {{ __('plugins/payment::payment.payment_fee') }}: {{ format_price($fee) }}
+                <input type="hidden" name="payment_fee" value="{{ $fee }}" class="payment-fee-input" data-method="{{ $name }}">
+            </p>
+        @endif
 
         {{ $slot }}
 

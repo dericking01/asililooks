@@ -245,11 +245,13 @@ if (! function_exists('the_product_price')) {
 }
 
 if (! function_exists('get_related_products')) {
-    function get_related_products(Product $product, int $limit = 4): Collection|LengthAwarePaginator|Product|null
+    function get_related_products(Product $product, ?int $limit = null): Collection|LengthAwarePaginator|Product|null
     {
         if (! EcommerceHelper::isEnabledRelatedProducts()) {
             return new EloquentCollection();
         }
+
+        $limit = $limit ?: theme_option('number_of_related_product', 4);
 
         $params = [
             'condition' => [
@@ -259,7 +261,7 @@ if (! function_exists('get_related_products')) {
                 'ec_products.order' => 'ASC',
                 'ec_products.created_at' => 'DESC',
             ],
-            'take' => $limit,
+            'take' => (int) $limit,
             'select' => [
                 'ec_products.*',
             ],
@@ -284,18 +286,20 @@ if (! function_exists('get_related_products')) {
 }
 
 if (! function_exists('get_cross_sale_products')) {
-    function get_cross_sale_products(Product $product, int $limit = 4, array $with = []): EloquentCollection
+    function get_cross_sale_products(Product $product, ?int $limit = null, array $with = []): EloquentCollection
     {
         $with = array_merge(EcommerceHelper::withProductEagerLoadingRelations(), $with);
 
         $reviewParams = EcommerceHelper::withReviewsParams();
+
+        $limit = $limit ?: theme_option('number_of_cross_sale_product', 4);
 
         /**
          * @phpstan-ignore-next-line
          */
         return $product
             ->crossSales()
-            ->limit($limit)
+            ->limit((int) $limit)
             ->with($with)
             ->wherePublished()
             ->notOutOfStock()

@@ -71,12 +71,14 @@ class SendShippingStatusChangedNotification implements ShouldQueue
                         ->description(
                             trans('plugins/ecommerce::order.update_shipping_status_notifications.description', [
                                 'order' => $event->shipment->order->code,
-                                'description' => $event->previousShipment ? ' from ' . ShippingStatusEnum::getLabel(
-                                    $event->previousShipment['status']
-                                ) . ' to ' .
-                                    ShippingStatusEnum::getLabel(
-                                        $event->shipment->status
-                                    ) : ' to ' . ShippingStatusEnum::getLabel($event->shipment->status),
+                                'description' => $event->previousShipment
+                                    ? trans('plugins/ecommerce::order.update_shipping_status_notifications.changed_from_to', [
+                                        'old_status' => ShippingStatusEnum::getLabel($event->previousShipment['status']),
+                                        'new_status' => ShippingStatusEnum::getLabel($event->shipment->status),
+                                      ])
+                                    : trans('plugins/ecommerce::order.update_shipping_status_notifications.changed_to', [
+                                        'status' => ShippingStatusEnum::getLabel($event->shipment->status),
+                                      ]),
                             ])
                         )
                         ->action(

@@ -19,7 +19,7 @@ class ThemeTranslationExporter extends Exporter
     {
         $columns = [];
 
-        foreach (Language::getAvailableLocales() as $locale) {
+        foreach (Language::getAvailableLocales(true) as $locale) {
             $columns[] = ExportColumn::make($locale['locale'])->label($locale['locale'])->disabled();
         }
 
@@ -34,7 +34,7 @@ class ThemeTranslationExporter extends Exporter
             ->transform(fn ($value, $key) => ['en' => $value])
             ->toArray();
 
-        foreach (Language::getAvailableLocales() as $locale) {
+        foreach (Language::getAvailableLocales(true) as $locale) {
             if ($locale['locale'] === 'en') {
                 continue;
             }

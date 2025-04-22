@@ -20,7 +20,7 @@ class VendorStoreRequest extends StoreRequest
             'required',
             new EmailRule(),
             Rule::unique((new Store())->getTable(), 'email')
-                ->ignore(auth('customer')->user()->store->id),
+                ->ignore(auth('customer')->user()->store?->id),
         ];
 
         $rules['logo_input'] = ['nullable', new MediaImageRule()];

@@ -3,6 +3,7 @@
 namespace Botble\Contact\Http\Requests\Settings;
 
 use Botble\Base\Rules\EmailRule;
+use Botble\Base\Rules\OnOffRule;
 use Botble\Support\Http\Requests\Request;
 
 class ContactSettingRequest extends Request
@@ -30,6 +31,7 @@ class ContactSettingRequest extends Request
         $rules = [
             'blacklist_keywords' => ['nullable', 'string'],
             'receiver_emails' => ['nullable', 'string'],
+            'contact_form_show_terms_checkbox' => new OnOffRule(),
         ];
 
         $newRules = [];
@@ -58,7 +60,8 @@ class ContactSettingRequest extends Request
 
     protected function parseTagInputToArray(string $name): array
     {
-        $data = trim($this->input($name));
+        $data = $this->input($name);
+        $data = is_string($data) ? trim($data) : '';
 
         if (! $data) {
             return [];
@@ -80,6 +83,7 @@ class ContactSettingRequest extends Request
         return [
             'receiver_emails_for_validation.*' => trans('plugins/contact::contact.settings.receiver_emails'),
             'blacklist_keywords_for_validation.*' => trans('plugins/contact::contact.settings.blacklist_keywords'),
+            'contact_form_show_terms_checkbox' => trans('plugins/contact::contact.settings.show_terms_checkbox'),
         ];
     }
 }

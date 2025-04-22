@@ -7,7 +7,11 @@ use Botble\Base\PanelSections\PanelSectionItem;
 use Botble\Base\Supports\ServiceProvider;
 use Botble\Base\Traits\LoadAndPublishDataTrait;
 use Botble\Setting\PanelSections\SettingOthersPanelSection;
+use Botble\SocialLogin\Console\RefreshSocialTokensCommand;
 use Botble\SocialLogin\Facades\SocialService;
+use Botble\SocialLogin\Services\SocialLoginService;
+use Botble\SocialLogin\Supports\SocialService as SocialServiceSupport;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\AliasLoader;
 
 class SocialLoginServiceProvider extends ServiceProvider
@@ -22,6 +26,7 @@ class SocialLoginServiceProvider extends ServiceProvider
             ->loadAndPublishConfigurations(['permissions', 'general'])
             ->loadAndPublishViews()
             ->loadAndPublishTranslations()
+            ->loadMigrations()
             ->loadRoutes()
             ->publishAssets();
 
@@ -40,10 +45,22 @@ class SocialLoginServiceProvider extends ServiceProvider
         });
 
         $this->app->register(HookServiceProvider::class);
+
+        $this->app->afterResolving(Schedule::class, function (Schedule $schedule): void {
+            $schedule->command(RefreshSocialTokensCommand::class)->daily();
+        });
     }
 
     public function register(): void
     {
-        $this->app->bind(SocialService::class);
+        $this->app->singleton(SocialServiceSupport::class, function () {
+            return new SocialServiceSupport();
+        });
+
+        $this->app->singleton(SocialLoginService::class);
+
+        $this->commands([
+            RefreshSocialTokensCommand::class,
+        ]);
     }
 }

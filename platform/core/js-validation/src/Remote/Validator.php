@@ -52,7 +52,7 @@ class Validator
         return $newParams;
     }
 
-    protected function validateJsRemoteRequest(string $attribute, array $parameters): array|bool
+    protected function validateJsRemoteRequest(?string $attribute, array $parameters): array|bool
     {
         $this->setRemoteValidation($attribute, $parameters['validate_all']);
 

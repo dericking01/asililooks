@@ -284,16 +284,16 @@ class CheckoutForm extends FormFront
                                         HtmlField::class,
                                         HtmlFieldOption::make()->content(apply_filters('ecommerce_checkout_form_after_tax_information_form', null, $model['products']))
                                     )
-                                    ->when(Theme::termAndPrivacyPolicyUrl(), function (CheckoutForm $form, string $privacyPolicyUrl): void {
+                                    ->when(Theme::termAndPrivacyPolicyUrl() && get_ecommerce_setting('show_terms_and_policy_checkbox', true), function (CheckoutForm $form): void {
                                         $form->add(
                                             'agree_terms_and_policy',
                                             CheckboxField::class,
                                             CheckboxFieldOption::make()
                                                 ->label(BaseHelper::clean(__(
                                                     'I agree to the :link',
-                                                    ['link' => Html::link($privacyPolicyUrl, __('Terms and Privacy Policy'), attributes: ['class' => 'text-decoration-underline', 'target' => '_blank'])]
+                                                    ['link' => Html::link(Theme::termAndPrivacyPolicyUrl(), __('Terms and Privacy Policy'), attributes: ['class' => 'text-decoration-underline', 'target' => '_blank'])]
                                                 )))
-                                                ->checked(false),
+                                                ->checked(get_ecommerce_setting('terms_and_policy_checkbox_checked_by_default', false)),
                                         );
                                     })
                                     ->add(

@@ -21,12 +21,13 @@ class WidgetSeeder extends BaseSeeder
                 'position' => 0,
                 'data' => [
                     'id' => 'SiteInfoWidget',
-                    'name' => 'Farmart – Your Online Foods & Grocery',
-                    'about' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed finibus viverra iaculis. Etiam vulputate et justo eget scelerisque.',
-                    'phone' => '(+965) 7492-4277',
-                    'address' => '959 Homestead Street Eastlake, NYC',
-                    'email' => 'support@farmart.com',
-                    'working_time' => 'Mon - Fri: 07AM - 06PM',
+                    'name' => 'Asili-Looks – Your Online Beauty Store',
+                    'about' => 'We are a Tanzanian online beauty store that offers a wide range of beauty products, including skincare, haircare, and cosmetics. Our mission is to provide high-quality products at affordable prices, making beauty accessible to everyone.',
+                    'logo' => 'general/asiliog.png',
+                    'phone' => '0747-341-614',
+                    'address' => 'Mwenge Tower - Mlimani City, DSM',
+                    'email' => 'sales@asililooks.co.tz',
+                    'working_time' => 'Mon - Sat: 07AM - 09PM',
                 ],
             ],
             [
@@ -116,7 +117,7 @@ class WidgetSeeder extends BaseSeeder
                         1 => [
                             'icon' => 'general/icon-rocket.png',
                             'title' => 'Free Shipping',
-                            'subtitle' => 'For all orders over $200',
+                            'subtitle' => 'For all orders over 2M',
                         ],
                         2 => [
                             'icon' => 'general/icon-reload.png',
@@ -186,69 +187,69 @@ class WidgetSeeder extends BaseSeeder
                 'data' => [
                     'id' => 'SiteInfoWidget',
                     'name' => 'Store information',
-                    'phone' => '(+965) 7492-4277',
-                    'working_time' => 'Mon - Fri: 07AM - 06PM',
+                    'phone' => '0747-341-614',
+                    'working_time' => 'Mon - Sat: 07AM - 09PM',
                 ],
             ],
-            [
-                'widget_id' => 'BecomeVendorWidget',
-                'sidebar_id' => 'product_detail_sidebar',
-                'position' => 3,
-                'data' => [
-                    'id' => 'BecomeVendorWidget',
-                    'name' => 'Become a Vendor?',
-                ],
-            ],
-            [
-                'widget_id' => 'ProductCategoriesWidget',
-                'sidebar_id' => 'bottom_footer_sidebar',
-                'position' => 1,
-                'data' => [
-                    'id' => 'ProductCategoriesWidget',
-                    'name' => 'Consumer Electric',
-                    'categories' => [18, 2, 3, 4, 5, 6, 7],
-                ],
-            ],
-            [
-                'widget_id' => 'ProductCategoriesWidget',
-                'sidebar_id' => 'bottom_footer_sidebar',
-                'position' => 2,
-                'data' => [
-                    'id' => 'ProductCategoriesWidget',
-                    'name' => 'Clothing & Apparel',
-                    'categories' => [8, 9, 10, 11, 12],
-                ],
-            ],
-            [
-                'widget_id' => 'ProductCategoriesWidget',
-                'sidebar_id' => 'bottom_footer_sidebar',
-                'position' => 3,
-                'data' => [
-                    'id' => 'ProductCategoriesWidget',
-                    'name' => 'Home, Garden & Kitchen',
-                    'categories' => [13, 14, 15, 16, 17],
-                ],
-            ],
-            [
-                'widget_id' => 'ProductCategoriesWidget',
-                'sidebar_id' => 'bottom_footer_sidebar',
-                'position' => 4,
-                'data' => [
-                    'id' => 'ProductCategoriesWidget',
-                    'name' => 'Health & Beauty',
-                    'categories' => [20, 21, 22, 23, 24],
-                ],
-            ],
-            [
-                'widget_id' => 'ProductCategoriesWidget',
-                'sidebar_id' => 'bottom_footer_sidebar',
-                'position' => 5,
-                'data' => [
-                    'id' => 'ProductCategoriesWidget',
-                    'name' => 'Computer & Technologies',
-                    'categories' => [25, 26, 27, 28, 29, 19],
-                ],
-            ],
+            // [
+            //     'widget_id' => 'BecomeVendorWidget',
+            //     'sidebar_id' => 'product_detail_sidebar',
+            //     'position' => 3,
+            //     'data' => [
+            //         'id' => 'BecomeVendorWidget',
+            //         'name' => 'Become a Vendor?',
+            //     ],
+            // ],
+            // [
+            //     'widget_id' => 'ProductCategoriesWidget',
+            //     'sidebar_id' => 'bottom_footer_sidebar',
+            //     'position' => 1,
+            //     'data' => [
+            //         'id' => 'ProductCategoriesWidget',
+            //         'name' => 'Consumer Electric',
+            //         'categories' => [18, 2, 3, 4, 5, 6, 7],
+            //     ],
+            // ],
+            // [
+            //     'widget_id' => 'ProductCategoriesWidget',
+            //     'sidebar_id' => 'bottom_footer_sidebar',
+            //     'position' => 2,
+            //     'data' => [
+            //         'id' => 'ProductCategoriesWidget',
+            //         'name' => 'Clothing & Apparel',
+            //         'categories' => [8, 9, 10, 11, 12],
+            //     ],
+            // ],
+            // [
+            //     'widget_id' => 'ProductCategoriesWidget',
+            //     'sidebar_id' => 'bottom_footer_sidebar',
+            //     'position' => 3,
+            //     'data' => [
+            //         'id' => 'ProductCategoriesWidget',
+            //         'name' => 'Home, Garden & Kitchen',
+            //         'categories' => [13, 14, 15, 16, 17],
+            //     ],
+            // ],
+            // [
+            //     'widget_id' => 'ProductCategoriesWidget',
+            //     'sidebar_id' => 'bottom_footer_sidebar',
+            //     'position' => 4,
+            //     'data' => [
+            //         'id' => 'ProductCategoriesWidget',
+            //         'name' => 'Health & Beauty',
+            //         'categories' => [20, 21, 22, 23, 24],
+            //     ],
+            // ],
+            // [
+            //     'widget_id' => 'ProductCategoriesWidget',
+            //     'sidebar_id' => 'bottom_footer_sidebar',
+            //     'position' => 5,
+            //     'data' => [
+            //         'id' => 'ProductCategoriesWidget',
+            //         'name' => 'Computer & Technologies',
+            //         'categories' => [25, 26, 27, 28, 29, 19],
+            //     ],
+            // ],
         ];
 
         $this->createWidgets($data);

@@ -43,22 +43,25 @@ class CacheSettingForm extends SettingForm
                     ->helperText(trans('core/setting::setting.cache.form.cache_user_avatar_helper'))
                     ->value(setting('cache_user_avatar_enabled', true))
             )
-            ->add(
-                'enable_cache_site_map',
-                OnOffCheckboxField::class,
-                OnOffFieldOption::make()
-                    ->label(trans('core/setting::setting.cache.form.enable_cache_site_map'))
-                    ->helperText(trans('core/setting::setting.cache.form.enable_cache_site_map_helper', ['url' => url('sitemap.xml')]))
-                    ->value($targetValue = setting('enable_cache_site_map', true))
-            )
-            ->addOpenCollapsible('enable_cache_site_map', '1', $targetValue)
-            ->add(
-                'cache_time_site_map',
-                NumberField::class,
-                NumberFieldOption::make()
-                    ->label(trans('core/setting::setting.cache.form.cache_time_site_map'))
-                    ->value(setting('cache_time_site_map', 60))
-            )
-            ->addCloseCollapsible('enable_cache_site_map', '1');
+            ->when(setting('sitemap_enabled', true), function (CacheSettingForm $form) {
+                $form
+                    ->add(
+                        'enable_cache_site_map',
+                        OnOffCheckboxField::class,
+                        OnOffFieldOption::make()
+                            ->label(trans('core/setting::setting.cache.form.enable_cache_site_map'))
+                            ->helperText(trans('core/setting::setting.cache.form.enable_cache_site_map_helper', ['url' => url('sitemap.xml')]))
+                            ->value($targetValue = setting('enable_cache_site_map', true))
+                    )
+                    ->addOpenCollapsible('enable_cache_site_map', '1', $targetValue)
+                    ->add(
+                        'cache_time_site_map',
+                        NumberField::class,
+                        NumberFieldOption::make()
+                            ->label(trans('core/setting::setting.cache.form.cache_time_site_map'))
+                            ->value(setting('cache_time_site_map', 60))
+                    )
+                    ->addCloseCollapsible('enable_cache_site_map', '1');
+            });
     }
 }

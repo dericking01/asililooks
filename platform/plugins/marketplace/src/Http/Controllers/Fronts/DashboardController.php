@@ -116,7 +116,7 @@ class DashboardController extends BaseController
                 'shipping_amount',
                 'payment_id',
             ])
-            ->with(['user', 'payment'])
+            ->with(['user'])
             ->where([
                 'is_finished' => 1,
                 'store_id' => $store->id,

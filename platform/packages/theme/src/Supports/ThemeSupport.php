@@ -461,17 +461,19 @@ class ThemeSupport
             return $html;
         }, 1180);
 
-        add_filter(BASE_FILTER_PUBLIC_COMMENT_AREA, function ($html) {
-            if (
-                theme_option('facebook_comment_enabled_in_post', 'yes') == 'yes' ||
-                theme_option('facebook_comment_enabled_in_gallery', 'yes') == 'yes' ||
-                theme_option('facebook_comment_enabled_in_product', 'yes') == 'yes'
-            ) {
-                return $html . view('packages/theme::partials.facebook-comments')->render();
+        add_filter(BASE_FILTER_PUBLIC_COMMENT_AREA, function (?string $html, ?object $object = null): ?string {
+            if (! $object) {
+                return $html;
+            }
+
+            $commentHtml = apply_filters('facebook_comment_html', '', $object);
+
+            if (! empty($commentHtml)) {
+                return $html . $commentHtml;
             }
 
             return $html;
-        }, 1180);
+        }, 1180, 2);
     }
 
     public static function registerSocialLinks(): void

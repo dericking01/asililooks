@@ -54,13 +54,12 @@ class AdsSettingForm extends SettingForm
                     ->view('plugins/ads::partials.google-adsense.client-id')
             )
             ->add('ads_google_adsense_txt_file', 'file', [
-                'label' => __('Your Google Adsense ads.txt'),
+                'label' => trans('plugins/ads::ads.settings.google_adsense_txt_file'),
             ])
             ->add(
                 'ads_google_adsense_txt',
                 HtmlField::class,
                 HtmlFieldOption::make()->view('plugins/ads::partials.google-adsense.txt')
-            )
-        ;
+            );
     }
 }

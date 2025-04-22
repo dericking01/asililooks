@@ -59,10 +59,7 @@ class BecomeVendorForm extends FormAbstract
                     ->prepend(
                         sprintf(
                             '<span class="position-absolute top-0 end-0 shop-url-status"></span><div class="input-group"><span class="input-group-text">%s</span>',
-                            route(
-                                'public.store',
-                                ''
-                            )
+                            route('public.store', ['slug' => '/'])
                         )
                     )
                     ->append('</div>')

@@ -3,6 +3,7 @@
 namespace Botble\Ecommerce\Facades;
 
 use Botble\Ecommerce\Supports\EcommerceHelper as BaseEcommerceHelper;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Facade;
 
 /**
@@ -111,6 +112,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static void registerProductVideo()
  * @method static void registerProductGalleryOptions()
  * @method static bool isProductSpecificationEnabled()
+ * @method static bool isPaymentProofEnabled()
+ * @method static array parseFilterParams(Request $request, string $paramName)
  *
  * @see \Botble\Ecommerce\Supports\EcommerceHelper
  */

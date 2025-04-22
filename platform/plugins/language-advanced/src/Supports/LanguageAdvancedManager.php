@@ -116,7 +116,7 @@ class LanguageAdvancedManager
         }
 
         if (is_object($model)) {
-            $model = get_class($model);
+            $model = $model::class;
         }
 
         return Arr::get(self::getSupported(), $model, []);

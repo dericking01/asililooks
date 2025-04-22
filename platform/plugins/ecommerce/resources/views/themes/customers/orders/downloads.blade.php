@@ -84,7 +84,7 @@
                                 {!! render_product_options_html($orderProduct->product_options, $orderProduct->price) !!}
                             @endif
 
-                            @if (is_plugin_active('marketplace') && ($product = $orderProduct->product) && $product->original_product->store->id)
+                            @if (is_plugin_active('marketplace') && ($product = $orderProduct->product) && $product->original_product->store?->id)
                                 <p class="d-block mb-0 sold-by">
                                     <small>{{ __('Sold by') }}: <a href="{{ $product->original_product->store->url }}" class="text-primary">{{ $product->original_product->store->name }}</a>
                                     </small>

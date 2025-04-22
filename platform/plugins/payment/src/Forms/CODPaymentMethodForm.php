@@ -47,6 +47,7 @@ class CODPaymentMethodForm extends PaymentMethodForm
                     ->value(get_payment_setting('description', PaymentMethodEnum::COD))
             )
             ->paymentMethodLogoField(PaymentMethodEnum::COD)
+            ->paymentFeeField(PaymentMethodEnum::COD)
             ->addAvailableCountriesField(PaymentMethodEnum::COD)
             ->when(
                 apply_filters(PAYMENT_METHOD_SETTINGS_CONTENT, null, PaymentMethodEnum::COD),

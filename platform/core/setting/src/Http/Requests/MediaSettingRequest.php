@@ -12,12 +12,13 @@ class MediaSettingRequest extends Request
     public function rules(): array
     {
         $rules = [
-            'media_driver' => ['required', 'string', 'in:public,s3,r2,do_spaces,wasabi,bunnycdn,backblaze'],
+            'media_driver' => ['required', 'string', Rule::in(array_keys(RvMedia::getAvailableDrivers()))],
             'media_aws_access_key_id' => ['nullable', 'string', 'required_if:media_driver,s3'],
             'media_aws_secret_key' => ['nullable', 'string', 'required_if:media_driver,s3'],
             'media_aws_default_region' => ['nullable', 'string', 'required_if:media_driver,s3'],
             'media_aws_bucket' => ['nullable', 'string', 'required_if:media_driver,s3'],
             'media_aws_url' => ['nullable', 'string', 'required_if:media_driver,s3'],
+            'media_s3_path' => ['nullable', 'string', 'max:255'],
             'media_aws_endpoint' => ['nullable', 'string'],
             'media_aws_use_path_style_endpoint' => $onOffRule = new OnOffRule(),
 

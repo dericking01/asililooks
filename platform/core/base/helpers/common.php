@@ -91,7 +91,7 @@ if (! function_exists('get_cms_version')) {
 if (! function_exists('get_core_version')) {
     function get_core_version(): string
     {
-        return '7.5.3';
+        return '7.5.4';
     }
 }
 

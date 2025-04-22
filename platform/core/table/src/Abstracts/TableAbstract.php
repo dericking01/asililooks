@@ -427,9 +427,9 @@ abstract class TableAbstract extends DataTable implements ExtensibleContract
     /**
      * @param  \Botble\Table\Columns\Column[]  $columns
      */
-    public function addColumns(array $columns): static
+    public function addColumns(Closure|callable|array $columns): static
     {
-        foreach ($columns as $column) {
+        foreach (value($columns) as $column) {
             $this->addColumn($column);
         }
 

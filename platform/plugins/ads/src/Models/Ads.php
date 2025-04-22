@@ -2,15 +2,18 @@
 
 namespace Botble\Ads\Models;
 
+use Botble\Ads\Database\Factories\AdsFactory;
 use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Models\BaseModel;
 use Botble\Media\Facades\RvMedia;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Ads extends BaseModel
 {
+    use HasFactory;
     protected $table = 'ads';
 
     protected $fillable = [
@@ -104,5 +107,10 @@ class Ads extends BaseModel
             'size' => $size,
             'hashName' => md5($this->key),
         ]);
+    }
+
+    protected static function newFactory()
+    {
+        return AdsFactory::new();
     }
 }

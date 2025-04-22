@@ -55,6 +55,7 @@ class InvoiceHelper
             'paid_at' => Carbon::now(),
             'tax_amount' => $order->tax_amount,
             'shipping_amount' => $order->shipping_amount,
+            'payment_fee' => $order->payment_fee,
             'discount_amount' => $order->discount_amount,
             'sub_total' => $order->sub_total,
             'amount' => $order->amount,
@@ -349,12 +350,15 @@ class InvoiceHelper
             $invoice->sub_total = $invoice->amount;
         }
 
-        $payment = new Payment([
-            'payment_channel' => PaymentMethodEnum::BANK_TRANSFER,
-            'status' => PaymentStatusEnum::PENDING,
-        ]);
+        if (is_plugin_active('payment')) {
+            $payment = new Payment([
+                'payment_channel' => PaymentMethodEnum::BANK_TRANSFER,
+                'status' => PaymentStatusEnum::PENDING,
+            ]);
 
-        $invoice->setRelation('payment', $payment);
+            $invoice->setRelation('payment', $payment);
+        }
+
         $invoice->setRelation('items', collect($items));
 
         return $invoice;

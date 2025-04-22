@@ -59,7 +59,7 @@ class DiscountTable extends TableAbstract
             ->getModel()
             ->query()
             ->select(['*'])
-            ->where('store_id', auth('customer')->user()->store->id);
+            ->where('store_id', auth('customer')->user()->store?->id);
 
         return $this->applyScopes($query);
     }
@@ -94,7 +94,7 @@ class DiscountTable extends TableAbstract
                 foreach ($ids as $id) {
                     $discount = Discount::query()->findOrFail($id);
 
-                    abort_if($discount->store_id !== auth('customer')->user()->store->id, 403);
+                    abort_if($discount->store_id !== auth('customer')->user()->store?->id, 403);
                 }
             }),
         ];

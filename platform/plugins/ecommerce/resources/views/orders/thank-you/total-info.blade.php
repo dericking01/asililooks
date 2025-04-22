@@ -43,6 +43,13 @@
     ])
 @endif
 
+@if ((float) $order->payment_fee)
+    @include('plugins/ecommerce::orders.thank-you.total-row', [
+        'label' => __('plugins/payment::payment.payment_fee'),
+        'value' => format_price($order->payment_fee),
+    ])
+@endif
+
 {!! apply_filters('ecommerce_thank_you_total_info', null, $order) !!}
 
 <hr class="border-dark-subtle" />

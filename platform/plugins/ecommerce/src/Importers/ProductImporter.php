@@ -390,7 +390,7 @@ class ProductImporter extends Importer implements WithMapping
             }
 
             if ($this->isMarketplaceActive) {
-                $result['vendor'] = $product->store->id ? $product->store->name : null;
+                $result['vendor'] = $product->store?->id ? $product->store->name : null;
             }
 
             foreach ($this->supportedLocales as $properties) {

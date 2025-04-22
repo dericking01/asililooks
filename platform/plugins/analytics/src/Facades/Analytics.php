@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * @method static string getCredentials()
- * @method static \Google\Analytics\Data\V1beta\BetaAnalyticsDataClient getClient()
+ * @method static \Google\Analytics\Data\V1beta\Client\BetaAnalyticsDataClient getClient()
  * @method static \Botble\Analytics\AnalyticsResponse get()
  * @method static \Illuminate\Support\Collection fetchMostVisitedPages(\Botble\Analytics\Period $period, int $maxResults = 20)
  * @method static \Illuminate\Support\Collection fetchTopReferrers(\Botble\Analytics\Period $period, int $maxResults = 20)

@@ -32,6 +32,7 @@ use Botble\Ecommerce\Models\Order;
 use Botble\Ecommerce\Models\Product;
 use Botble\Ecommerce\Models\Shipment;
 use Botble\Ecommerce\Tables\CustomerTable;
+use Botble\Ecommerce\Tables\OrderIncompleteTable;
 use Botble\Ecommerce\Tables\ProductTable;
 use Botble\Language\Facades\Language;
 use Botble\LanguageAdvanced\Supports\LanguageAdvancedManager;
@@ -332,10 +333,7 @@ class HookServiceProvider extends ServiceProvider
                             ->prepend(
                                 sprintf(
                                     '<span class="position-absolute top-0 end-0 shop-url-status"></span><div class="input-group"><span class="input-group-text">%s</span>',
-                                    route(
-                                        'public.store',
-                                        ''
-                                    )
+                                    route('public.store', ['slug' => '/'])
                                 )
                             )
                             ->append('</div>')
@@ -723,7 +721,7 @@ class HookServiceProvider extends ServiceProvider
                     return '&mdash;';
                 }
 
-                return Html::link(route('marketplace.store.edit', $item->store->id), $item->store->name);
+                return Html::link(route('marketplace.store.edit', $item->store?->id), $item->store->name);
             });
         }
 
@@ -735,7 +733,7 @@ class HookServiceProvider extends ServiceProvider
 
                 return Html::tag('span', trans('core/base::base.yes'), ['class' => 'text-success']);
             }),
-            Order::class, Discount::class => $data
+            Discount::class => $data
                 ->addColumn('store_id', function ($item) {
                     $store = $item->original_product && $item->original_product->store->name ? $item->original_product->store : $item->store;
 
@@ -745,34 +743,54 @@ class HookServiceProvider extends ServiceProvider
 
                     return Html::link($store->url, $store->name, ['target' => '_blank']);
                 })
-                ->filter(function ($query) use ($model) {
-                    $keyword = request()->input('search.value');
-                    if ($keyword) {
+                ->filter(function ($query) use ($table, $model) {
+                    if ($keyword = request()->input('search.value')) {
                         $keyword = '%' . $keyword . '%';
 
-                        $query = $query
+                        return $query
                             ->whereHas('store', function ($subQuery) use ($keyword) {
                                 return $subQuery->where('name', 'LIKE', $keyword);
-                            });
+                            })
+                            ->orWhere('code', 'LIKE', $keyword);
+                    }
 
-                        if ($model instanceof Order) {
-                            $query = $query
-                                ->orWhereHas('address', function ($subQuery) use ($keyword) {
-                                    return $subQuery
-                                        ->where('name', 'LIKE', $keyword)
-                                        ->orWhere('email', 'LIKE', $keyword)
-                                        ->orWhere('phone', 'LIKE', $keyword);
-                                })
-                                ->orWhereHas('user', function ($subQuery) use ($keyword) {
-                                    return $subQuery
-                                        ->where('name', 'LIKE', $keyword)
-                                        ->orWhere('email', 'LIKE', $keyword)
-                                        ->orWhere('phone', 'LIKE', $keyword);
-                                })
-                                ->orWhere('code', 'LIKE', $keyword);
-                        }
+                    return $query;
+                }),
+            Order::class => $data
+                ->addColumn('store_id', function ($item) {
+                    $store = $item->original_product && $item->original_product->store->name ? $item->original_product->store : $item->store;
 
-                        return $query;
+                    if (! $store->name) {
+                        return '&mdash;';
+                    }
+
+                    return Html::link($store->url, $store->name, ['target' => '_blank']);
+                })
+                ->filter(function ($query) use ($table, $model) {
+                    if ($keyword = request()->input('search.value')) {
+                        $keyword = '%' . $keyword . '%';
+
+                        return $query
+                            ->where(function ($query) use ($keyword) {
+                                $query
+                                    ->whereHas('store', function ($subQuery) use ($keyword) {
+                                        return $subQuery->where('name', 'LIKE', $keyword);
+                                    })
+                                    ->orWhereHas('address', function ($subQuery) use ($keyword) {
+                                        return $subQuery
+                                            ->where('name', 'LIKE', $keyword)
+                                            ->orWhere('email', 'LIKE', $keyword)
+                                            ->orWhere('phone', 'LIKE', $keyword);
+                                    })
+                                    ->orWhereHas('user', function ($subQuery) use ($keyword) {
+                                        return $subQuery
+                                            ->where('name', 'LIKE', $keyword)
+                                            ->orWhere('email', 'LIKE', $keyword)
+                                            ->orWhere('phone', 'LIKE', $keyword);
+                                    })
+                                    ->orWhere('code', 'LIKE', $keyword);
+                            })
+                            ->where('is_finished', ! $table instanceof OrderIncompleteTable);
                     }
 
                     return $query;
@@ -1031,7 +1049,7 @@ class HookServiceProvider extends ServiceProvider
             return false;
         }
 
-        if (! $data->customer->store || ! $data->customer->store->id) {
+        if (! $data->customer->store || ! $data->customer->store?->id) {
             return false;
         }
 

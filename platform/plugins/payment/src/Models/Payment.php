@@ -16,6 +16,7 @@ class Payment extends BaseModel
 
     protected $fillable = [
         'amount',
+        'payment_fee',
         'currency',
         'user_id',
         'charge_id',

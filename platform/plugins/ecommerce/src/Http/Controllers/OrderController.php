@@ -160,13 +160,15 @@ class OrderController extends BaseController
                 'user_id' => $userId,
             ]);
 
-            $createPaymentForOrderService->execute(
-                $order,
-                $request->input('payment_method'),
-                $paymentStatus,
-                $customerId,
-                $request->input('transaction_id')
-            );
+            if (is_plugin_active('payment')) {
+                $createPaymentForOrderService->execute(
+                    $order,
+                    $request->input('payment_method'),
+                    $paymentStatus,
+                    $customerId,
+                    $request->input('transaction_id')
+                );
+            }
 
             if ($request->input('customer_address.name')) {
                 OrderAddress::query()->create([
@@ -233,6 +235,8 @@ class OrderController extends BaseController
             }
 
             event(new OrderCreated($order));
+
+            OrderHelper::sendOrderConfirmationEmail($order, true);
         }
 
         if (Arr::get($data, 'is_available_shipping')) {

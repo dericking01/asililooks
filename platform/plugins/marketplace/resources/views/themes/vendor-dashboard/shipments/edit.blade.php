@@ -32,9 +32,18 @@
             'updateCodStatusUrl' => route('marketplace.vendor.shipments.update-cod-status', $shipment->id),
         ])
 
-        @include('plugins/ecommerce::shipments.partials.update-status-modal', [
-            'shipment' => $shipment,
-            'updateShippingStatusUrl' => route('marketplace.vendor.orders.update-shipping-status', $shipment->id),
-        ])
+        @if (! EcommerceHelper::isDisabledPhysicalProduct() && $shipment && $shipment->id)
+            <x-core::modal
+                id="update-shipping-status-modal"
+                :title="trans('plugins/ecommerce::shipping.update_shipping_status')"
+                button-id="confirm-update-shipping-status-button"
+                :button-label="trans('plugins/ecommerce::order.update')"
+            >
+                @include(MarketplaceHelper::viewPath('vendor-dashboard.orders.shipping-status-modal'), [
+                    'shipment' => $shipment,
+                    'url' => route('marketplace.vendor.orders.update-shipping-status', $shipment->id),
+                ])
+            </x-core::modal>
+        @endif
     @endif
 @endpush

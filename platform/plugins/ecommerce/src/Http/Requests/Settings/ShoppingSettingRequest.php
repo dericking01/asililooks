@@ -18,6 +18,7 @@ class ShoppingSettingRequest extends Request
             'shared_wishlist_lifetime' => [Rule::when($this->boolean('wishlist_sharing'), 'required', 'nullable'), 'integer', 'min:0'],
             'compare_enabled' => $onOffRule,
             'order_tracking_enabled' => $onOffRule,
+            'payment_proof_enabled' => $onOffRule,
             'enable_quick_buy_button' => $onOffRule,
             'order_auto_confirmed' => $onOffRule,
             'quick_buy_target_page' => ['nullable', 'required_if:enable_quick_buy_button,1', 'in:checkout,cart'],

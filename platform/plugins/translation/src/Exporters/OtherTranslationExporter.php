@@ -22,7 +22,7 @@ class OtherTranslationExporter extends Exporter
             ExportColumn::make('key')->disabled()->label('key'),
         ];
 
-        foreach (Language::getAvailableLocales() as $locale) {
+        foreach (Language::getAvailableLocales(true) as $locale) {
             $columns[] = ExportColumn::make($locale['locale'])->label($locale['locale'])->disabled();
         }
 
@@ -38,7 +38,7 @@ class OtherTranslationExporter extends Exporter
                 'en' => $translation['value'],
             ]);
 
-        foreach (Language::getAvailableLocales() as $locale) {
+        foreach (Language::getAvailableLocales(true) as $locale) {
             $translations->transform(function ($translation) use ($locale) {
                 [$group, $key] = explode('::', $translation['key']);
 

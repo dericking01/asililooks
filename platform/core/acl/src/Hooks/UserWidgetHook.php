@@ -10,7 +10,7 @@ class UserWidgetHook
 {
     public static function addUserStatsWidget(array $widgets, Collection $widgetSettings): array
     {
-        $users = User::query()->count();
+        $users = fn () => User::query()->count();
 
         return (new DashboardWidgetInstance())
             ->setType('stats')

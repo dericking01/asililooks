@@ -86,6 +86,8 @@ return [
         'receiver_emails' => 'Receiver emails',
         'receiver_emails_placeholder' => 'You can enter more than 1 email address (separated by comma)',
         'receiver_emails_helper' => 'Emails from contact forms will be sent to these addresses. To send emails to admin email addresses, leave this field blank.',
+        'show_terms_checkbox' => 'Show Terms and Privacy Policy checkbox',
+        'show_terms_checkbox_helper' => 'Enable to show the "I agree to the Terms and Privacy Policy" checkbox in the contact form.',
     ],
     'no_reply' => 'No reply yet!',
     'reply' => 'Reply',

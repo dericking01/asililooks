@@ -372,7 +372,7 @@
                                             <h4 class="d-inline-block">{{ child_total_amount_label }}</h4>
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr v-if="Object.keys(paymentMethods).length > 0">
                                         <td colspan="2">
                                             <label for="payment-method" class="form-label">
                                                 {{ __('order.payment_method') }}
@@ -388,7 +388,7 @@
                                             </select>
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr v-if="Object.keys(paymentMethods).length > 0">
                                         <td colspan="2">
                                             <label for="payment-status" class="form-label">
                                                 {{ __('order.payment_status_label') }}
@@ -404,7 +404,7 @@
                                             </select>
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr v-if="Object.keys(paymentMethods).length > 0">
                                         <td colspan="2">
                                             <label for="payment-status" class="form-label">
                                                 {{ __('order.transaction_id') }}
@@ -834,12 +834,12 @@
 
         <ec-modal
             id="create-order"
-            :title="__('order.confirm_payment_title').replace(':status', paymentStatuses[child_payment_status])"
+            :title="Object.keys(paymentMethods).length > 0 ? __('order.confirm_payment_title').replace(':status', paymentStatuses[child_payment_status]) : __('order.create_order')"
             :ok-title="__('order.create_order')"
             :cancel-title="__('order.close')"
             @ok="createOrder($event)"
         >
-            <div class="alert alert-warning" role="alert">
+            <div class="alert alert-warning" role="alert" v-if="paymentMethods.length">
                 {{
                     __('order.confirm_payment_description').replace(
                         ':status',

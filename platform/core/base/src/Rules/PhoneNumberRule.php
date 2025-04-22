@@ -10,6 +10,10 @@ class PhoneNumberRule implements ValidationRule
 {
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
+        if (! is_string($value)) {
+            $fail(trans('validation.string'));
+        }
+
         $rules = BaseHelper::getPhoneValidationRule(asArray: true);
 
         $min = str($rules[0])->replace('min:', '')->toInteger();
@@ -26,7 +30,7 @@ class PhoneNumberRule implements ValidationRule
             $fail(trans('validation.max.string', ['max' => $max]));
         }
 
-        if (preg_match($regex, $value) == false) {
+        if (! preg_match($regex, $value)) {
             $fail(trans('validation.regex'));
         }
     }

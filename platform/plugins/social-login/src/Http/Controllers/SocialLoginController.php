@@ -7,6 +7,7 @@ use Botble\Base\Http\Controllers\BaseController;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Media\Facades\RvMedia;
 use Botble\SocialLogin\Facades\SocialService;
+use Botble\SocialLogin\Services\SocialLoginService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Auth\Events\Registered;
@@ -21,6 +22,10 @@ use Laravel\Socialite\Two\InvalidStateException;
 
 class SocialLoginController extends BaseController
 {
+    public function __construct(protected SocialLoginService $socialLoginService)
+    {
+    }
+
     public function redirectToProvider(string $provider, Request $request)
     {
         $this->ensureProviderIsExisted($provider);
@@ -133,18 +138,29 @@ class SocialLoginController extends BaseController
                 ->setMessage(__('Cannot login, no email provided!'));
         }
 
+        $avatarId = null;
+
         $model = new $providerData['model']();
 
-        $account = $model->where('email', $oAuth->getEmail())->first();
+        // Find account by email
+        $account = $this->socialLoginService->findUserByEmail($oAuth->getEmail(), $model::class);
 
-        if (! $account) {
+        // Find social login by provider and provider ID
+        $socialLoginUser = $this->socialLoginService->findUserByProvider($provider, $oAuth->getId());
+
+        if ($socialLoginUser && $account && $socialLoginUser->getKey() !== $account->getKey()) {
+            // If social login exists but belongs to a different account, update it
+            $this->socialLoginService->updateSocialLogin($socialLoginUser, $provider, [
+                'user_id' => $account->getKey(),
+                'user_type' => $account::class,
+            ]);
+        } elseif (! $account) {
+            // Create new account if not exists
             $beforeProcessData = apply_filters('social_login_before_creating_account', null, $oAuth, $providerData);
 
             if ($beforeProcessData instanceof BaseHttpResponse) {
                 return $beforeProcessData;
             }
-
-            $avatarId = null;
 
             try {
                 $url = $oAuth->getAvatar();
@@ -173,6 +189,45 @@ class SocialLoginController extends BaseController
             $account->save();
 
             event(new Registered($account));
+        }
+
+        // Create or update social login
+        $socialLoginData = $this->socialLoginService->createSocialLoginData([
+            'provider' => $provider,
+            'id' => $oAuth->getId(),
+            'token' => $oAuth->token,
+            'refresh_token' => $oAuth->refreshToken,
+            'expires_in' => $oAuth->expiresIn,
+            'name' => $oAuth->getName(),
+            'email' => $oAuth->getEmail(),
+            'avatar' => $oAuth->getAvatar(),
+        ]);
+
+        if ($this->socialLoginService->hasSocialLogin($account, $provider)) {
+            $this->socialLoginService->updateSocialLogin($account, $provider, $socialLoginData);
+        } else {
+            $this->socialLoginService->addSocialLogin($account, $socialLoginData);
+        }
+
+        // Update user information if changed
+        if ($account->name !== $oAuth->getName() || $account->email !== $oAuth->getEmail()) {
+            $account->name = $oAuth->getName() ?: $account->name;
+            $account->email = $oAuth->getEmail();
+            $account->save();
+        }
+
+        // Update avatar if changed
+        try {
+            $url = $oAuth->getAvatar();
+            if ($url && (! $account->avatar_id || $account->avatar_id !== $avatarId)) {
+                $result = RvMedia::uploadFromUrl($url, 0, $model->upload_folder ?: 'accounts', 'image/png');
+                if (! $result['error']) {
+                    $account->avatar_id = $result['data']->id;
+                    $account->save();
+                }
+            }
+        } catch (Exception $exception) {
+            BaseHelper::logError($exception);
         }
 
         Auth::guard($guard)->login($account, true);

@@ -189,4 +189,17 @@ class FormFieldOptions implements Arrayable
 
         return $this;
     }
+
+    public function cssClass(string $class): static
+    {
+        $cssClass = trim($this->getAttribute('class') . ' ' . $class);
+
+        if ($cssClass) {
+            $this->addAttribute('class', $cssClass);
+        } else {
+            $this->removeAttribute('class');
+        }
+
+        return $this;
+    }
 }

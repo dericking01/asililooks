@@ -88,6 +88,13 @@ class SelectFieldOption extends FormFieldOptions
         return $this;
     }
 
+    public function placeholder(string $placeholder): static
+    {
+        $this->addAttribute('placeholder', $placeholder);
+
+        return $this;
+    }
+
     public function emptyValue(string|bool|int|null $value): static
     {
         $this->emptyValue = $value;

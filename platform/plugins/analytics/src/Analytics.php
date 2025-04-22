@@ -15,7 +15,8 @@ use Botble\Analytics\Traits\OrderByDimensionTrait;
 use Botble\Analytics\Traits\OrderByMetricTrait;
 use Botble\Analytics\Traits\ResponseTrait;
 use Botble\Analytics\Traits\RowOperationTrait;
-use Google\Analytics\Data\V1beta\BetaAnalyticsDataClient;
+use Google\Analytics\Data\V1beta\Client\BetaAnalyticsDataClient;
+use Google\Analytics\Data\V1beta\RunReportRequest;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 
@@ -66,19 +67,43 @@ class Analytics extends AnalyticsAbstract implements AnalyticsContract
 
     public function get(): AnalyticsResponse
     {
-        $response = $this->getClient()->runReport([
+        $params = [
             'property' => 'properties/' . $this->getPropertyId(),
-            'dateRanges' => $this->dateRanges,
+            'date_ranges' => $this->dateRanges,
             'metrics' => $this->metrics,
             'dimensions' => $this->dimensions,
-            'orderBys' => $this->orderBys,
-            'metricAggregations' => $this->metricAggregations,
-            'dimensionFilter' => $this->dimensionFilter,
-            'metricFilter' => $this->metricFilter,
-            'limit' => $this->limit,
-            'offset' => $this->offset,
-            'keepEmptyRows' => $this->keepEmptyRows,
-        ]);
+        ];
+
+        if (! empty($this->orderBys)) {
+            $params['order_bys'] = $this->orderBys;
+        }
+
+        if (! empty($this->metricAggregations)) {
+            $params['metric_aggregations'] = $this->metricAggregations;
+        }
+
+        if (! empty($this->dimensionFilter)) {
+            $params['dimension_filter'] = $this->dimensionFilter;
+        }
+
+        if (! empty($this->metricFilter)) {
+            $params['metric_filter'] = $this->metricFilter;
+        }
+
+        if (is_int($this->limit)) {
+            $params['limit'] = $this->limit;
+        }
+
+        if (is_int($this->offset)) {
+            $params['offset'] = $this->offset;
+        }
+
+        if (is_bool($this->keepEmptyRows)) {
+            $params['keep_empty_rows'] = $this->keepEmptyRows;
+        }
+
+        $request = new RunReportRequest($params);
+        $response = $this->getClient()->runReport($request);
 
         return $this->formatResponse($response);
     }

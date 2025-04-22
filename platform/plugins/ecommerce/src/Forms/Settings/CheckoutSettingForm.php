@@ -122,6 +122,24 @@ class CheckoutSettingForm extends SettingForm
                     ->helperText(trans('plugins/ecommerce::setting.checkout.form.display_tax_fields_at_checkout_page_helper'))
                     ->value(EcommerceHelper::isDisplayTaxFieldsAtCheckoutPage())
             )
+            ->add(
+                'show_terms_and_policy_checkbox',
+                OnOffCheckboxField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('plugins/ecommerce::setting.checkout.form.show_terms_and_policy_checkbox'))
+                    ->helperText(trans('plugins/ecommerce::setting.checkout.form.show_terms_and_policy_checkbox_helper'))
+                    ->value($showTermsAndPolicy = get_ecommerce_setting('show_terms_and_policy_checkbox', true))
+            )
+            ->addOpenCollapsible('show_terms_and_policy_checkbox', '1', $showTermsAndPolicy == '1')
+            ->add(
+                'terms_and_policy_checkbox_checked_by_default',
+                OnOffCheckboxField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('plugins/ecommerce::setting.checkout.form.terms_and_policy_checkbox_checked_by_default'))
+                    ->helperText(trans('plugins/ecommerce::setting.checkout.form.terms_and_policy_checkbox_checked_by_default_helper'))
+                    ->value(get_ecommerce_setting('terms_and_policy_checkbox_checked_by_default', false))
+            )
+            ->addCloseCollapsible('show_terms_and_policy_checkbox', '1')
             ->when(is_plugin_active('location'), function () use ($countries, $selectedCountries): void {
                 $this
                     ->add(

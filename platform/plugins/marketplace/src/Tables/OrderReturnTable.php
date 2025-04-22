@@ -76,7 +76,7 @@ class OrderReturnTable extends TableAbstract
             ])
             ->with(['customer', 'order', 'items'])
             ->withCount('items')
-            ->where('store_id', auth('customer')->user()->store->id)
+            ->where('store_id', auth('customer')->user()->store?->id)
             ->orderByDesc('id');
 
         return $this->applyScopes($query);

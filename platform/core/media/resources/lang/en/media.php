@@ -48,6 +48,11 @@ return [
 
     'trash_error' => 'Error when deleting selected item(s)',
     'trash_success' => 'Moved selected item(s) to trash successfully!',
+    'move_error' => 'Error when moving selected item(s)',
+    'move_success' => 'Moved selected item(s) successfully!',
+    'selected_items_move_success' => 'Moved selected item(s) to :name successfully!',
+    'selected_items_move_error' => 'Error when moving selected item(s) to :name',
+    'destination' => 'Destination',
     'restore_error' => 'Error when restoring selected item(s)',
     'restore_success' => 'Restore selected item(s) successfully!',
     'copy_success' => 'Copied selected item(s) successfully!',

@@ -222,9 +222,11 @@
                                             {{ $order->user->name ?: $order->address->name }}
                                         </a>
                                     </x-core::table.body.cell>
-                                    <x-core::table.body.cell>
-                                        {!! BaseHelper::clean($order->payment->status->toHtml()) !!}
-                                    </x-core::table.body.cell>
+                                    @if (is_plugin_active('payment'))
+                                        <x-core::table.body.cell>
+                                            {!! BaseHelper::clean($order->payment->status->toHtml()) !!}
+                                        </x-core::table.body.cell>
+                                    @endif
                                     <x-core::table.body.cell>
                                         {!! BaseHelper::clean($order->status->toHtml()) !!}
                                     </x-core::table.body.cell>

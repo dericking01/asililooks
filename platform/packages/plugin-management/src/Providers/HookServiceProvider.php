@@ -23,7 +23,7 @@ class HookServiceProvider extends ServiceProvider
 
     public function addStatsWidgets(array $widgets, Collection $widgetSettings): array
     {
-        $plugins = count(BaseHelper::scanFolder(plugin_path()));
+        $plugins = fn () => count(BaseHelper::scanFolder(plugin_path()));
 
         return (new DashboardWidgetInstance())
             ->setType('stats')

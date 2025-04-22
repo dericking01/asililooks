@@ -42,7 +42,6 @@ class ProductCategoryForm extends FormAbstract
                     'status',
                     'order',
                 ])
-                ->toArray()
             );
 
             $categories = [0 => trans('plugins/ecommerce::product-categories.none')] + $categories;

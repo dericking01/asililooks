@@ -11,23 +11,23 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
 
-#[AsCommand('cms:images:compress', 'Scan and compress all images in a folder recursively')]
+#[AsCommand('cms:images:compress', 'Compress an image file or scan and compress all images in a folder recursively')]
 class CompressImagesCommand extends Command
 {
     public function handle(): void
     {
-        $folder = $this->argument('folder');
+        $path = $this->argument('folder');
 
-        if (! File::exists($folder)) {
-            $this->error("The folder '{$folder}' does not exist.");
+        if (! File::exists($path)) {
+            $this->error("The path '{$path}' does not exist.");
 
             return;
         }
 
-        $images = $this->getImages($folder);
+        $images = $this->getImages($path);
 
         if (empty($images)) {
-            $this->info("No images found in '{$folder}'.");
+            $this->info("No images found in '{$path}'.");
 
             return;
         }
@@ -39,9 +39,17 @@ class CompressImagesCommand extends Command
         $this->components->info('✅ Image compression completed!');
     }
 
-    protected function getImages(string $folder): array
+    protected function getImages(string $path): array
     {
-        return File::allFiles($folder, true);
+        if (File::isFile($path)) {
+            $this->info("Processing file '{$path}'...");
+
+            return [new SplFileInfo($path, dirname($path), $path)];
+        }
+
+        $this->info("Scanning '{$path}' for images...");
+
+        return File::allFiles($path, true);
     }
 
     protected function compressImage(SplFileInfo $file): void
@@ -75,7 +83,7 @@ class CompressImagesCommand extends Command
 
     protected function configure(): void
     {
-        $this->addArgument('folder', InputArgument::REQUIRED, 'The folder which you want to compress images');
+        $this->addArgument('folder', InputArgument::REQUIRED, 'The folder or file path which you want to compress');
         $this->addOption('width', null, InputArgument::OPTIONAL, 'The width of the compressed image', 1000);
         $this->addOption('height', null, InputArgument::OPTIONAL, 'The height of the compressed image', 1000);
     }

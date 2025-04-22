@@ -57,4 +57,18 @@ class Column extends BaseColumn
 
         return $this->addClass('no-column-visibility');
     }
+
+    public function hidden(): static
+    {
+        $this->attributes['visible'] = false;
+
+        return $this;
+    }
+
+    public function visible(bool $flag = true): static
+    {
+        $this->attributes['visible'] = $flag;
+
+        return $this;
+    }
 }

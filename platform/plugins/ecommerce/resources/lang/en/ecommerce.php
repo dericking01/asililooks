@@ -55,6 +55,8 @@ return [
         ],
         'number_products_per_page' => 'Number of products per page',
         'number_of_cross_sale_product' => 'Number of cross sale products in product detail page',
+        'number_of_related_product' => 'Number of related products in product detail page',
+        'number_of_related_product_helper' => 'Number of related products to show in product detail page. Default is 4.',
         'max_price_filter' => 'Maximum price to filter',
         'logo_in_the_checkout_page' => 'Logo in the checkout page (Default is the main logo)',
         'login_background_image' => 'Login background image',

@@ -21,7 +21,7 @@ class CheckoutRequest extends Request
             'amount' => ['required', 'min:0'],
         ];
 
-        if (Theme::termAndPrivacyPolicyUrl()) {
+        if (Theme::termAndPrivacyPolicyUrl() && get_ecommerce_setting('show_terms_and_policy_checkbox', true)) {
             $rules['agree_terms_and_policy'] = 'required|accepted:1';
         }
 

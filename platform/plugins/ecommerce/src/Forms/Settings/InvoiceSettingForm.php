@@ -139,9 +139,9 @@ class InvoiceSettingForm extends SettingForm
                     ->label(trans('plugins/ecommerce::setting.invoice.form.add_language_support'))
                     ->choices([
                         'default' => trans('plugins/ecommerce::setting.invoice.form.only_latin_languages'),
-                        'arabic' => 'Arabic',
-                        'bangladesh' => 'Bangladesh',
-                        'chinese' => 'Chinese',
+                        'arabic' => trans('plugins/ecommerce::setting.invoice.form.languages.arabic'),
+                        'bangladesh' => trans('plugins/ecommerce::setting.invoice.form.languages.bangladesh'),
+                        'chinese' => trans('plugins/ecommerce::setting.invoice.form.languages.chinese'),
                     ])
                     ->defaultValue('default')
                     ->when(InvoiceHelper::getLanguageSupport(), function (RadioFieldOption $option, string $language): void {

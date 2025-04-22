@@ -3,6 +3,6 @@
     "description": "Stripe Payment Gateway",
     "type": "package",
     "require": {
-        "stripe/stripe-php": "^16.0"
+        "stripe/stripe-php": "^17.0"
     }
 }

@@ -5,7 +5,9 @@ use Botble\Ecommerce\Http\Controllers\API\BrandController;
 use Botble\Ecommerce\Http\Controllers\API\CartController;
 use Botble\Ecommerce\Http\Controllers\API\CheckoutController;
 use Botble\Ecommerce\Http\Controllers\API\CountryController;
+use Botble\Ecommerce\Http\Controllers\API\FlashSaleController;
 use Botble\Ecommerce\Http\Controllers\API\OrderController;
+use Botble\Ecommerce\Http\Controllers\API\OrderTrackingController;
 use Botble\Ecommerce\Http\Controllers\API\ProductCategoryController;
 use Botble\Ecommerce\Http\Controllers\API\ProductController;
 use Botble\Ecommerce\Http\Controllers\API\TaxController;
@@ -29,6 +31,8 @@ Route::group([
     Route::get('brands/{slug}', [BrandController::class, 'show']);
     Route::get('brands/{id}/products', [BrandController::class, 'products']);
 
+    Route::get('flash-sales', [FlashSaleController::class, 'index']);
+
     Route::group(['middleware' => ['auth:sanctum']], function (): void {
         Route::get('orders', [OrderController::class, 'index']);
         Route::get('orders/{id}', [OrderController::class, 'show']);
@@ -51,4 +55,6 @@ Route::group([
     Route::group(['middleware' => ['web', 'core']], function (): void {
         Route::get('checkout/cart/{id}', [CheckoutController::class, 'process']);
     });
+
+    Route::post('orders/tracking', OrderTrackingController::class);
 });

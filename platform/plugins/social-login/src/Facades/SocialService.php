@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static array getDataProviderDefault()
  * @method static bool getProviderEnabled(string $provider)
  * @method static array getProviderKeysEnabled()
+ * @method static array refreshToken(string $provider, string $refreshToken)
  *
  * @see \Botble\SocialLogin\Supports\SocialService
  */

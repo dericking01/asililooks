@@ -10,6 +10,7 @@ use Botble\Base\Forms\FieldOptions\OnOffFieldOption;
 use Botble\Base\Forms\Fields\MultiCheckListField;
 use Botble\Base\Forms\Fields\NumberField;
 use Botble\Base\Forms\Fields\OnOffCheckboxField;
+use Botble\Marketplace\Enums\WithdrawalFeeTypeEnum;
 use Botble\Marketplace\Facades\MarketplaceHelper;
 use Botble\Marketplace\Http\Requests\MarketPlaceSettingFormRequest;
 use Botble\Marketplace\Models\Store;
@@ -66,8 +67,13 @@ class MarketplaceSettingForm extends SettingForm
                 )->render(),
             ])
             ->add('fee_withdrawal', 'number', [
-                'label' => trans('plugins/marketplace::marketplace.settings.fee_withdrawal'),
+                'label' => trans('plugins/marketplace::marketplace.settings.fee_withdrawal_amount'),
                 'value' => MarketplaceHelper::getSetting('fee_withdrawal', 0),
+            ])
+            ->add('withdrawal_fee_type', 'customSelect', [
+                'label' => trans('plugins/marketplace::marketplace.settings.withdrawal_fee_type'),
+                'value' => MarketplaceHelper::getSetting('withdrawal_fee_type', WithdrawalFeeTypeEnum::FIXED),
+                'choices' => WithdrawalFeeTypeEnum::labels(),
             ])
             ->add('check_valid_signature', OnOffCheckboxField::class, [
                 'label' => trans('plugins/marketplace::marketplace.settings.check_valid_signature'),

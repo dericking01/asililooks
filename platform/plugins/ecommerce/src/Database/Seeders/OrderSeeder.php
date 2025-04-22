@@ -343,7 +343,7 @@ class OrderSeeder extends BaseSeeder
                     'user_id' => 0,
                 ]);
 
-                if ($isMarketplace && $order->store->id && $order->store->customer->id) {
+                if ($isMarketplace && $order->store?->id && $order->store->customer->id) {
                     $customer = $order->store->customer;
                     $vendorInfo = $customer->vendorInfo;
 

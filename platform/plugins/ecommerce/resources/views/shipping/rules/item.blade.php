@@ -1,7 +1,7 @@
 <div class="box-table-shipping input-shipping-sync-wrapper box-table-shipping-item-{{ $rule ? $rule->id : 0 }} mb-2">
     <div class="accordion" id="accordion-rule-{{ $rule->id }}">
         <div class="accordion-item">
-            <h2 class="accordion-header" id="heading-rule-{{ $rule->id }}">
+            <div class="accordion-header" id="heading-rule-{{ $rule->id }}">
                 <button
                     class="accordion-button collapsed px-3 py-2"
                     data-bs-toggle="collapse"
@@ -33,7 +33,7 @@
                         </div>
                     </div>
                 </button>
-            </h2>
+            </div>
             <div
                 class="accordion-collapse collapse"
                 id="collapse-rule-{{ $rule->id }}"

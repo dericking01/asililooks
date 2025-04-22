@@ -19,8 +19,8 @@
             :placeholder="__('Shop URL')"
             :required="true"
         >
-            <x-core::form.helper-text data-base-url="{{ route('public.store', old('slug', '')) }}">
-                {{ route('public.store', old('slug', $store->slug)) }}
+            <x-core::form.helper-text data-base-url="{{ route('public.store', old('slug', '/') ?: '/') }}">
+                {{ route('public.store', old('slug', $store->slug ?: '/') ?: '/') }}
             </x-core::form.helper-text>
         </x-core::form.text-input>
     </div>

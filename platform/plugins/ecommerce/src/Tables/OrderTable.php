@@ -79,26 +79,7 @@ class OrderTable extends TableAbstract
 
         $data = $data
             ->filter(function ($query) {
-                if ($keyword = $this->request->input('search.value')) {
-                    $keyword = '%' . $keyword . '%';
-
-                    return $query
-                        ->whereHas('address', function ($subQuery) use ($keyword) {
-                            return $subQuery
-                                ->where('name', 'LIKE', $keyword)
-                                ->orWhere('email', 'LIKE', $keyword)
-                                ->orWhere('phone', 'LIKE', $keyword);
-                        })
-                        ->orWhereHas('user', function ($subQuery) use ($keyword) {
-                            return $subQuery
-                                ->where('name', 'LIKE', $keyword)
-                                ->orWhere('email', 'LIKE', $keyword)
-                                ->orWhere('phone', 'LIKE', $keyword);
-                        })
-                        ->orWhere('code', 'LIKE', $keyword);
-                }
-
-                return $query;
+                return $this->filterOrders($query);
             });
 
         return $this->toJson($data);
@@ -400,5 +381,33 @@ class OrderTable extends TableAbstract
                         $subQuery->where($column, $operator, $value);
                     });
             });
+    }
+
+    protected function filterOrders($query, bool $finished = true): Builder|QueryBuilder|Relation
+    {
+        if ($keyword = $this->request->input('search.value')) {
+            $keyword = '%' . $keyword . '%';
+
+            return $query
+                ->where(function ($query) use ($keyword) {
+                    $query
+                        ->whereHas('address', function ($subQuery) use ($keyword) {
+                            return $subQuery
+                                ->where('name', 'LIKE', $keyword)
+                                ->orWhere('email', 'LIKE', $keyword)
+                                ->orWhere('phone', 'LIKE', $keyword);
+                        })
+                        ->orWhereHas('user', function ($subQuery) use ($keyword) {
+                            return $subQuery
+                                ->where('name', 'LIKE', $keyword)
+                                ->orWhere('email', 'LIKE', $keyword)
+                                ->orWhere('phone', 'LIKE', $keyword);
+                        })
+                        ->orWhere('code', 'LIKE', $keyword);
+                })
+                ->where('is_finished', $finished);
+        }
+
+        return $query;
     }
 }

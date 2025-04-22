@@ -29,5 +29,9 @@ return [
         'google_adsense_unit_ads_where_to_get_client_id' => 'Where to get Google AdSense Client ID?',
         'google_adsense_unit_ads_guide_to_get_client_id' => 'When you get the snippet code of unit ads, you can see this attribute <code>data-ad-client="ca-pub-123456789"</code>, the <code>ca-pub-123456789</code> is the unit ads client id.',
         'google_adsense_unit_ads_guide_example_snippet' => 'Google AdSense Unit Ads Snippet Example:',
+        'google_adsense_txt_file' => 'Your Google Adsense ads.txt',
+        'confirm_delete_ads_txt' => 'Are you sure you want to delete this file?',
+        'delete_ads_txt' => 'Delete ads.txt file',
+        'view_ads_txt' => 'View your ads.txt here: :url',
     ],
 ];

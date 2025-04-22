@@ -13,12 +13,12 @@
             class="input-text qty"
             name="{{ $name ?? 'qty' }}"
             type="number"
-            value="{{ $value ?? 1 }}"
+            value="{{ $value ?? $product->min_cart_quantity }}"
+            min="{{ $product->min_cart_quantity }}"
+            max="{{ $product->max_cart_quantity }}"
             title="Qty"
             tabindex="0"
             step="1"
-            min="1"
-            max="{{ $product->with_storehouse_management ? $product->quantity : 1000 }}"
             required
         >
         <span class="svg-icon increase">

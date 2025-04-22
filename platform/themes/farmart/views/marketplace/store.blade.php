@@ -6,6 +6,8 @@
     $categories = ProductCategoryHelper::getProductCategoriesWithUrl();
     $categoriesRequest = (array) request()->input('categories', []);
     $categoryId = Arr::get($categoriesRequest, 0);
+
+    Theme::asset()->container('footer')->add('store-search-fix-js', 'themes/farmart/assets/js/store-search-fix.js', ['jquery']);
 @endphp
 
 {!! Theme::partial('page-header') !!}
@@ -120,7 +122,6 @@
                                 <input
                                     class="form-control"
                                     name="q"
-                                    form="products-filter-form"
                                     type="text"
                                     value="{{ BaseHelper::stringify(request()->query('q')) }}"
                                     placeholder="{{ __('Search in this store...') }}"

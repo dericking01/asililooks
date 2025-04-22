@@ -17,9 +17,7 @@ class SiteMapManager
 
     protected string $extension = 'xml';
 
-    protected string $defaultDate = '2025-03-01 00:00';
-
-    protected int $itemsPerPage = 1000;
+    protected string $defaultDate = '2025-04-17 00:00';
 
     protected array $patterns = [];
 
@@ -136,21 +134,11 @@ class SiteMapManager
     }
 
     /**
-     * Set the number of items per page for pagination
-     */
-    public function setItemsPerPage(int $itemsPerPage): self
-    {
-        $this->itemsPerPage = $itemsPerPage;
-
-        return $this;
-    }
-
-    /**
      * Get the number of items per page for pagination
      */
     public function getItemsPerPage(): int
     {
-        return $this->itemsPerPage;
+        return (int) setting('sitemap_items_per_page', 1000);
     }
 
     /**
@@ -213,11 +201,13 @@ class SiteMapManager
         if (preg_match($pattern, $key, $matches)) {
             $page = (int) (Arr::get($matches, 'page', 1));
 
+            $itemsPerPage = $this->getItemsPerPage();
+
             return [
                 'matches' => $matches,
                 'page' => $page,
-                'offset' => ($page - 1) * $this->itemsPerPage,
-                'limit' => $this->itemsPerPage,
+                'offset' => ($page - 1) * $itemsPerPage,
+                'limit' => $itemsPerPage,
             ];
         }
 
@@ -245,7 +235,7 @@ class SiteMapManager
      */
     public function createPaginatedSitemaps(string $baseKey, int $totalItems, ?string $lastModified = null): void
     {
-        $totalPages = ceil($totalItems / $this->itemsPerPage);
+        $totalPages = ceil($totalItems / $this->getItemsPerPage());
 
         if ($totalPages <= 1) {
             // Single sitemap (the regular case)
@@ -303,7 +293,7 @@ class SiteMapManager
         $patterns = [];
         foreach ($keys as $key) {
             // If this is a regex pattern, use it directly
-            if (strpos($key, '(') !== false) {
+            if (str_contains($key, '(')) {
                 $patterns[] = $key;
             } else {
                 // Otherwise, escape it for literal matching

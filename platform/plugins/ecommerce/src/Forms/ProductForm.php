@@ -197,15 +197,27 @@ class ProductForm extends FormAbstract
 
                     if ($product && $product->getKey()) {
                         $selectedTaxes = $product->taxes()->pluck('tax_id')->all();
-                    } elseif ($defaultTaxRate = get_ecommerce_setting('default_tax_rate')) {
-                        $selectedTaxes = [$defaultTaxRate];
                     }
 
-                    $this->add('taxes[]', MultiCheckListField::class, [
+                    $taxFieldOptions = [
                         'label' => trans('plugins/ecommerce::products.form.taxes'),
                         'choices' => $taxes,
                         'value' => old('taxes', $selectedTaxes),
-                    ]);
+                    ];
+
+                    if (empty($selectedTaxes) && get_ecommerce_setting('default_tax_rate')) {
+                        $taxFieldOptions['help_block'] = [
+                            'text' => trans('plugins/ecommerce::products.form.taxes_helper', [
+                                'url' => route('ecommerce.settings.taxes'),
+                            ]),
+                            'tag' => 'span',
+                            'attr' => [
+                                'class' => 'text-warning',
+                            ],
+                        ];
+                    }
+
+                    $this->add('taxes[]', MultiCheckListField::class, $taxFieldOptions);
                 }
             })
             ->when(EcommerceHelper::isCartEnabled(), function (ProductForm $form): void {

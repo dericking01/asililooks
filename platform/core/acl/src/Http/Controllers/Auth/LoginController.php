@@ -4,12 +4,13 @@ namespace Botble\ACL\Http\Controllers\Auth;
 
 use Botble\ACL\Forms\Auth\LoginForm;
 use Botble\ACL\Http\Requests\LoginRequest;
-use Botble\ACL\Models\User;
 use Botble\ACL\Traits\AuthenticatesUsers;
 use Botble\Base\Http\Controllers\BaseController;
 use Closure;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Validation\ValidationException;
 
 class LoginController extends BaseController
 {
@@ -46,22 +47,24 @@ class LoginController extends BaseController
             $this->sendLockoutResponse($request);
         }
 
-        $user = User::query()->where([$this->username() => $request->input($this->username())])->first();
-        if (! empty($user)) {
-            if (! $user->activated) {
-                return $this->httpResponse()
-                    ->setError()
-                    ->setMessage(trans('core/acl::auth.login.not_active'));
-            }
-        }
-
         return app(Pipeline::class)->send($request)
             ->through(apply_filters('core_acl_login_pipeline', [
                 function (Request $request, Closure $next) {
-                    if ($this->guard()->attempt(
-                        $this->credentials($request),
-                        $request->filled('remember')
-                    )) {
+                    $credentials = $this->credentials($request);
+
+                    $callbacks = apply_filters('core_acl_login_attempt_callbacks', [
+                        function (Authenticatable $user) {
+                            if (! $user->activated) {
+                                throw ValidationException::withMessages([
+                                    'username' => [trans('core/acl::auth.login.not_active')],
+                                ]);
+                            }
+
+                            return true;
+                        },
+                    ]);
+
+                    if ($this->guard()->attemptWhen($credentials, $callbacks, $request->filled('remember'))) {
                         return $next($request);
                     }
 

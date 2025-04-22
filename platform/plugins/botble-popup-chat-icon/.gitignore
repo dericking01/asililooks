@@ -1,0 +1,14 @@
+
+.DS_Store
+/bower_components
+/.idea
+/.vscode
+/.vagrant
+npm-debug.log
+sftp-config.json
+.phpstorm.meta.php
+_ide_helper_models.php
+
+__MACOSX
+/.phpintel
+/.php_cs.cache

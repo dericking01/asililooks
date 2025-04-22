@@ -427,6 +427,13 @@ class OrderSupportServiceProvider extends ServiceProvider
 
         $orderAmount += (float) $shippingAmount;
 
+        // Add payment fee if applicable
+        $paymentFee = 0;
+        if ($paymentMethod && is_plugin_active('payment')) {
+            $paymentFee = (float) get_payment_setting('fee', $paymentMethod, 0);
+            $orderAmount += $paymentFee;
+        }
+
         $data = array_merge($request->input(), [
             'amount' => $orderAmount,
             'currency' => $request->input('currency', strtoupper(get_application_currency()->title)),
@@ -434,6 +441,7 @@ class OrderSupportServiceProvider extends ServiceProvider
             'shipping_method' => $isAvailableShipping ? $shippingMethodInput : '',
             'shipping_option' => $isAvailableShipping ? $request->input("shipping_option.$storeId") : null,
             'shipping_amount' => (float) $shippingAmount,
+            'payment_fee' => (float) $paymentFee,
             'tax_amount' => Cart::instance('cart')->rawTaxByItems($cartItems),
             'sub_total' => Cart::instance('cart')->rawSubTotalByItems($cartItems),
             'coupon_code' => $couponCode,
@@ -531,12 +539,19 @@ class OrderSupportServiceProvider extends ServiceProvider
 
     public function processPaymentMethodPostCheckout(Request $request, int|float $totalAmount): array
     {
+        // Add payment fee if applicable
+        $paymentMethod = $request->input('payment_method');
+        if ($paymentMethod && is_plugin_active('payment')) {
+            $paymentFee = (float) get_payment_setting('fee', $paymentMethod, 0);
+            $totalAmount += $paymentFee;
+        }
+
         $paymentData = [
             'error' => false,
             'message' => false,
             'amount' => round((float) $totalAmount, 2),
             'currency' => $request->input('currency', strtoupper(cms_currency()->getDefaultCurrency()->title)),
-            'type' => $request->input('payment_method'),
+            'type' => $paymentMethod,
             'charge_id' => null,
         ];
 
@@ -549,6 +564,18 @@ class OrderSupportServiceProvider extends ServiceProvider
             ->where('token', $token)
             ->with(['address', 'products'])
             ->get();
+
+        // Update order amounts to include payment fee if needed
+        foreach ($orders as $order) {
+            if ($order->payment_fee > 0 && $order->amount > 0) {
+                // Make sure payment fee is included in the order amount
+                $orderAmount = $order->sub_total + $order->tax_amount + $order->shipping_amount + $order->payment_fee - $order->discount_amount;
+                if ($order->amount != $orderAmount) {
+                    $order->amount = $orderAmount;
+                    $order->save();
+                }
+            }
+        }
 
         abort_if($orders->isEmpty(), 404);
 
@@ -1120,13 +1147,23 @@ class OrderSupportServiceProvider extends ServiceProvider
         int|string|null $currentUserId,
         ?Order $order
     ): array {
-        $store = $products['store'];
         $cartItems = $products['products']->pluck('cartItem');
+
+        $shippingMethod = $request->input('shipping_method', ShippingMethodEnum::DEFAULT);
+
+        $shippingOption = $request->input('shipping_option');
+
+        $store = $products['store'];
+
+        if ($store && $store->id) {
+            $shippingMethod = $request->input('shipping_method.' . $store->id, ShippingMethodEnum::DEFAULT);
+            $shippingOption = $request->input('shipping_option.' . $store->id);
+        }
 
         $generalData = [
             'user_id' => $currentUserId,
-            'shipping_method' => $request->input('shipping_method.' . $store->id, ShippingMethodEnum::DEFAULT),
-            'shipping_option' => $request->input('shipping_option.' . $store->id),
+            'shipping_method' => $shippingMethod,
+            'shipping_option' => $shippingOption,
             'coupon_code' => Arr::get($sessionData, 'applied_coupon_code'),
             'token' => $token,
         ];
@@ -1148,7 +1185,7 @@ class OrderSupportServiceProvider extends ServiceProvider
         Arr::set($sessionData, 'created_order_id', $order->id);
         $sessionData = OrderHelper::processAddressOrder($currentUserId, $sessionData, $request);
 
-        $order->store_id = $store->id;
+        $order->store_id = $store?->id;
         $order->save();
 
         return OrderHelper::processOrderProductData($products, $sessionData);
@@ -1220,7 +1257,7 @@ class OrderSupportServiceProvider extends ServiceProvider
     {
         $order->loadMissing(['store', 'store.customer']);
 
-        if ($order->store->id && $order->store->customer->id) {
+        if ($order->store?->id && $order->store->customer->id) {
             $customer = $order->store->customer;
             $vendorInfo = $customer->vendorInfo;
             if (! $vendorInfo->id) {
@@ -1231,7 +1268,7 @@ class OrderSupportServiceProvider extends ServiceProvider
             }
 
             if ($vendorInfo->id) {
-                $orderAmountWithoutShippingFee = $order->amount - $order->shipping_amount - $order->tax_amount;
+                $orderAmountWithoutShippingFee = $order->amount - $order->shipping_amount - $order->tax_amount - $order->payment_fee;
                 if (! MarketplaceHelper::isCommissionCategoryFeeBasedEnabled()) {
                     $feePercentage = MarketplaceHelper::getSetting('fee_per_order', 0);
                     $fee = $orderAmountWithoutShippingFee * ($feePercentage / 100);
@@ -1325,7 +1362,7 @@ class OrderSupportServiceProvider extends ServiceProvider
     public function afterReturnOrderCompleted(OrderReturn $orderReturn)
     {
         $order = $orderReturn->order;
-        if ($order && $order->store->id && $order->store->customer->id) {
+        if ($order && $order->store?->id && $order->store->customer->id) {
             $customer = $order->store->customer;
             $vendorInfo = $customer->vendorInfo;
             if (! $vendorInfo->id) {
@@ -1337,6 +1374,10 @@ class OrderSupportServiceProvider extends ServiceProvider
 
             if ($vendorInfo->id) {
                 $refundAmount = $orderReturn->items->sum('refund_amount');
+                // Exclude payment fee from refund amount if it exists
+                if ($order->payment_fee > 0) {
+                    $refundAmount = $refundAmount - $order->payment_fee;
+                }
                 if (! MarketplaceHelper::isCommissionCategoryFeeBasedEnabled()) {
                     $feePercentage = MarketplaceHelper::getSetting('fee_per_order', 0);
                     $fee = $refundAmount * ($feePercentage / 100);

@@ -32,7 +32,7 @@ class MediaFileRepository extends RepositoriesAbstract implements MediaFileInter
     }
 
     public function getFilesByFolderId(
-        int|string $folderId,
+        int|string|null $folderId,
         array $params = [],
         bool $withFolders = true,
         array $folderParams = []

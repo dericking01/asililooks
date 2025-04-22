@@ -182,7 +182,7 @@ class MetaBox
         return MetaBoxModel::query()->where([
             'meta_key' => $key,
             'reference_id' => $object->getKey(),
-            'reference_type' => get_class($object),
+            'reference_type' => $object::class,
         ], $select)->first();
     }
 
@@ -197,7 +197,7 @@ class MetaBox
         return MetaBoxModel::query()->where([
             'meta_key' => $key,
             'reference_id' => $object->getKey(),
-            'reference_type' => get_class($object),
+            'reference_type' => $object::class,
         ])->delete();
     }
 

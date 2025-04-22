@@ -1,10 +1,10 @@
-let mix = require('laravel-mix');
+let mix = require('laravel-mix')
 
-const path = require('path');
-let directory = path.basename(path.resolve(__dirname));
+const path = require('path')
+let directory = path.basename(path.resolve(__dirname))
 
-const source = 'platform/plugins/' + directory;
-const dist = 'public/vendor/core/plugins/' + directory;
+const source = 'platform/plugins/' + directory
+const dist = 'public/vendor/core/plugins/' + directory
 
 mix
     .js(source + '/resources/assets/js/discount.js', dist + '/js')
@@ -21,7 +21,7 @@ if (mix.inProduction()) {
         .copy(dist + '/js/checkout.js', source + '/public/js')
         .copy(dist + '/js/admin-review.js', source + '/public/js')
         .copy(dist + '/js/order-return.js', source + '/public/js')
-        .copy(dist + '/js/front-review.js', source + '/public/js');
+        .copy(dist + '/js/front-review.js', source + '/public/js')
 }
 
 const scripts = [
@@ -57,12 +57,12 @@ const scripts = [
 ];
 
 scripts.forEach(item => {
-    mix.js(source + '/resources/assets/js/' + item, dist + '/js');
+    mix.js(source + '/resources/assets/js/' + item, dist + '/js')
 });
 
 if (mix.inProduction()) {
     scripts.forEach(item => {
-        mix.copy(dist + '/js/' + item, source + '/public/js');
+        mix.copy(dist + '/js/' + item, source + '/public/js')
     });
 }
 
@@ -83,14 +83,14 @@ const styles = [
     'front-review.scss',
     'front-theme.scss',
     'front-theme-rtl.scss',
-];
+]
 
 styles.forEach(item => {
-    mix.sass(source + '/resources/assets/sass/' + item, dist + '/css');
-});
+    mix.sass(source + '/resources/assets/sass/' + item, dist + '/css')
+})
 
 if (mix.inProduction()) {
     styles.forEach(item => {
-        mix.copy(dist + '/css/' + item.replace('.scss', '.css'), source + '/public/css');
-    });
+        mix.copy(dist + '/css/' + item.replace('.scss', '.css'), source + '/public/css')
+    })
 }

@@ -1,3 +1,12 @@
+// Color variables
+$color-blue: var(--bb-primary);
+$color-red: #dc3545;
+$color-yellow: #ffc107;
+$color-green: #198754;
+$color-gray: #6c757d;
+$color-dark: #212529;
+$color-light: #f8f9fa;
+
 .permissions-tree {
     .permissions-item {
         background-color: #f6f8fb;
@@ -38,7 +47,7 @@
         margin: 0;
         padding: 3px 0pt 3px 18px;
     }
-    
+
     .form-check {
         .form-check-input {
             &.check-blue {

@@ -14,6 +14,7 @@ class TaxSettingRequest extends Request
             'display_tax_fields_at_checkout_page' => $onOffRule,
             'default_tax_rate' => ['nullable', 'integer', 'min:0'],
             'display_product_price_including_taxes' => $onOffRule,
+            'display_tax_description' => $onOffRule,
         ];
     }
 }

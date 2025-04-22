@@ -304,6 +304,8 @@ return [
     'update_shipping_status_notifications' => [
         'update_shipping_status' => 'Update shipping status',
         'description' => 'Order :order had changed shipping status :description',
+        'changed_from_to' => 'from :old_status to :new_status',
+        'changed_to' => 'to :status',
     ],
     'cancel_order_notifications' => [
         'cancel_order' => 'Cancel order',

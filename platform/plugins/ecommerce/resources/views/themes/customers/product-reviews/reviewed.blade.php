@@ -29,7 +29,7 @@
                                 <p><small>({{ $sku }})</small></p>
                             @endif
 
-                            @if (is_plugin_active('marketplace') && $item->product->store->id)
+                            @if (is_plugin_active('marketplace') && $item->product->store?->id)
                                 <p class="d-block mb-0 sold-by">
                                     <small>{{ __('Sold by') }}: <a href="{{ $item->product->original_product->store->url }}" class="text-primary">{{ $item->product->store->name }}</a>
                                     </small>

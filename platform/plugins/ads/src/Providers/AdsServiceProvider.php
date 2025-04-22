@@ -44,7 +44,7 @@ class AdsServiceProvider extends ServiceProvider
             ->loadAndPublishConfigurations(['permissions', 'general'])
             ->loadMigrations()
             ->loadAndPublishTranslations()
-            ->loadRoutes()
+            ->loadRoutes(['web', 'api'])
             ->loadHelpers()
             ->loadAndPublishViews();
 
@@ -120,6 +120,8 @@ class AdsServiceProvider extends ServiceProvider
             LanguageAdvancedManager::registerModule(Ads::class, [
                 'name',
                 'image',
+                'tablet_image',
+                'mobile_image',
                 'url',
             ]);
         }
@@ -138,14 +140,16 @@ class AdsServiceProvider extends ServiceProvider
             add_filter(THEME_FRONT_HEADER, function ($html) {
                 $clientId = setting('ads_google_adsense_unit_client_id');
 
-                if (! $clientId) {
+                $autoAds = setting('ads_google_adsense_auto_ads');
+
+                if (! $clientId || $autoAds) {
                     return $html;
                 }
 
                 return $html . view('plugins/ads::partials.google-adsense.unit-ads-header', compact('clientId'))->render();
             }, 128);
 
-            add_filter(THEME_FRONT_HEADER, function ($html) {
+            add_filter(THEME_FRONT_FOOTER, function ($html) {
                 $clientId = setting('ads_google_adsense_unit_client_id');
 
                 if (! $clientId) {

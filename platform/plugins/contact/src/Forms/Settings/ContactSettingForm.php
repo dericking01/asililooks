@@ -3,7 +3,9 @@
 namespace Botble\Contact\Forms\Settings;
 
 use Botble\Base\Facades\Assets;
+use Botble\Base\Forms\FieldOptions\OnOffFieldOption;
 use Botble\Base\Forms\FieldOptions\TextareaFieldOption;
+use Botble\Base\Forms\Fields\OnOffCheckboxField;
 use Botble\Base\Forms\Fields\TextareaField;
 use Botble\Contact\Http\Requests\Settings\ContactSettingRequest;
 use Botble\Setting\Forms\SettingForm;
@@ -44,6 +46,14 @@ class ContactSettingForm extends SettingForm
                     ->label(trans('plugins/contact::contact.settings.receiver_emails'))
                     ->placeholder(trans('plugins/contact::contact.settings.receiver_emails_placeholder'))
                     ->helperText(trans('plugins/contact::contact.settings.receiver_emails_helper'))
+            )
+            ->add(
+                'contact_form_show_terms_checkbox',
+                OnOffCheckboxField::class,
+                OnOffFieldOption::make()
+                    ->defaultValue((bool) setting('contact_form_show_terms_checkbox', true))
+                    ->label(trans('plugins/contact::contact.settings.show_terms_checkbox'))
+                    ->helperText(trans('plugins/contact::contact.settings.show_terms_checkbox_helper'))
             );
     }
 }

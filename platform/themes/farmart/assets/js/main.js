@@ -141,14 +141,6 @@ MartApp.isRTL = $('body').prop('dir') === 'rtl'
             e.preventDefault()
             MartApp.toggleSidebarFilterProducts('open', $(e.currentTarget).data('toggle'))
         })
-
-        MartApp.$body.on('submit', '.products-filter-form-vendor', function () {
-            if ($(document).find(MartApp.formSearch).length) {
-                $(document).find(MartApp.formSearch).trigger('submit')
-                return false
-            }
-            return true
-        })
     }
 
     MartApp.toggleSidebarFilterProducts = function (status = 'close', target = 'product-categories-primary-sidebar') {

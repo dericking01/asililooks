@@ -48,6 +48,14 @@ class ShoppingSettingForm extends SettingForm
                     ->value(EcommerceHelper::isOrderTrackingEnabled())
             )
             ->add(
+                'payment_proof_enabled',
+                OnOffCheckboxField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('plugins/ecommerce::setting.shopping.form.enable_payment_proof'))
+                    ->helperText(trans('plugins/ecommerce::setting.shopping.form.enable_payment_proof_helper'))
+                    ->value(EcommerceHelper::isPaymentProofEnabled())
+            )
+            ->add(
                 'enable_quick_buy_button',
                 OnOffCheckboxField::class,
                 OnOffFieldOption::make()

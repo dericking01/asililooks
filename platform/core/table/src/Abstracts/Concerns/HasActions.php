@@ -51,9 +51,9 @@ trait HasActions
     /**
      * @param \Botble\Table\Abstracts\TableActionAbstract[] $actions
      */
-    public function addActions(array $actions): static
+    public function addActions(Closure|callable|array $actions): static
     {
-        foreach ($actions as $action) {
+        foreach (value($actions) as $action) {
             $this->addAction($action);
         }
 
@@ -67,9 +67,9 @@ trait HasActions
         return $this;
     }
 
-    public function removeActions(array $name): static
+    public function removeActions(Closure|callable|array $name): static
     {
-        foreach ($name as $key) {
+        foreach (value($name) as $key) {
             $this->removeAction($key);
         }
 

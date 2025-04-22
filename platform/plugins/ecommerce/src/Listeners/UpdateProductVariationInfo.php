@@ -18,11 +18,11 @@ class UpdateProductVariationInfo
 
             $product = $event->product;
 
-            if ($product->store->id !== null) {
+            if ($product->store?->id !== null) {
                 return;
             }
 
-            $product->store_id = auth('customer')->user()->store->id;
+            $product->store_id = auth('customer')->user()->store?->id;
             $product->created_by_id = auth('customer')->id();
             $product->created_by_type = Customer::class;
 

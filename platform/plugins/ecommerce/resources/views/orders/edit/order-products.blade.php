@@ -69,7 +69,7 @@
                                 @endif
                             </li>
 
-                            @if ($isInAdmin && is_plugin_active('marketplace') && $order->store->name)
+                            @if ($isInAdmin && is_plugin_active('marketplace') && $order->store?->name)
                                 <li class="ws-nm">
                                     <span class="bull">↳</span>
                                     <span

@@ -5,6 +5,7 @@ namespace Botble\Dashboard\Supports;
 use Botble\Dashboard\Models\DashboardWidget;
 use Botble\Dashboard\Models\DashboardWidgetSetting;
 use Carbon\Carbon;
+use Closure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
@@ -30,7 +31,7 @@ class DashboardWidgetInstance
 
     protected string $permission;
 
-    protected int|string $statsTotal = 0;
+    protected int|string|Closure $statsTotal = 0;
 
     protected bool $hasLoadCallback = false;
 
@@ -172,12 +173,12 @@ class DashboardWidgetInstance
         return $this;
     }
 
-    public function getStatsTotal(): int
+    public function getStatsTotal(): int|string
     {
-        return $this->statsTotal;
+        return value($this->statsTotal, $this);
     }
 
-    public function setStatsTotal(int|string $statsTotal): self
+    public function setStatsTotal(int|string|Closure $statsTotal): self
     {
         $this->statsTotal = $statsTotal;
 
@@ -249,7 +250,7 @@ class DashboardWidgetInstance
             return $widgets;
         }
 
-        $widget->statsTotal = $this->statsTotal;
+        $widget->statsTotal = $this->getStatsTotal();
 
         $widgets[$this->key] = [
             'id' => $widget->id,

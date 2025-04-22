@@ -72,6 +72,17 @@
         </div>
     @endif
 
+    @if (isset($paymentFee) && $paymentFee > 0)
+        <div class="row payment-fee-row">
+            <div class="col-6">
+                <p>{{ __('plugins/payment::payment.payment_fee') }}:</p>
+            </div>
+            <div class="col-6 float-end">
+                <p class="price-text payment-fee-text">{{ format_price($paymentFee) }}</p>
+            </div>
+        </div>
+    @endif
+
     <div class="row">
         <div class="col-6">
             <p><strong>{{ __('Total') }}</strong>:</p>

@@ -1,4 +1,4 @@
-@if (! (bool) get_ecommerce_setting('disable_shipping_options', false))
+<div @style(['display: none' => (bool) get_ecommerce_setting('disable_shipping_options', false)])>
     @if (! empty($shipping))
         <div class="payment-checkout-form">
             <input
@@ -39,4 +39,4 @@
             <p class="text-muted">{{ __('Please fill out all shipping information to view available shipping methods!') }}</p>
         @endif
     @endif
-@endif
+</div>

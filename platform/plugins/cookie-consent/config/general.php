@@ -12,4 +12,19 @@ return [
      * Set the cookie duration in days.  Default is 365 * 20.
      */
     'cookie_lifetime' => 365 * 20,
+
+    /*
+     * Cookie categories for GDPR compliance
+     */
+    'cookie_categories' => [
+        'essential' => [
+            'required' => true,
+        ],
+        'analytics' => [
+            'required' => false,
+        ],
+        'marketing' => [
+            'required' => false,
+        ],
+    ],
 ];

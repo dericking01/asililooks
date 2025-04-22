@@ -47,7 +47,7 @@ class ProductImporter extends BaseProductImporter
             $product->product_type = $request->input('product_type');
         }
 
-        $product->store_id = auth('customer')->user()->store->id;
+        $product->store_id = auth('customer')->user()->store?->id;
         $product->created_by_id = auth('customer')->id();
         $product->created_by_type = Customer::class;
 

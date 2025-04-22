@@ -34,7 +34,7 @@
                                     </a>
                                 </div>
 
-                                @if (is_plugin_active('marketplace') && $product->original_product->store->id)
+                                @if (is_plugin_active('marketplace') && $product->original_product->store?->id)
                                     <div class="small">
                                         <span>{{ __('Vendor:') }}</span>
                                         <a href="{{ $product->original_product->store->url }}" class="fw-medium">{{ $product->original_product->store->name }}</a>

@@ -174,19 +174,24 @@ class Pdf
                     '₹' => 'indian-rupee',
                     '৳' => 'bangladeshi-taka',
                     '₺' => 'turkish-lira',
+                    '﷼' => 'iranian-rial',
                 ];
 
-                foreach ($currencies as $currency => $icon) {
-                    $content = str_replace(
-                        $currency,
-                        Html::image(asset("vendor/core/core/base/images/pdf-symbols/$icon.svg"), 'currency', ['width' => 10, 'style' => 'margin-right: 2px; display: inline-block;']),
-                        $content
-                    );
+                if ($this->supportLanguage === 'arabic') {
+                    $content = $this->compileArabic($content);
                 }
+            } else {
+                $currencies = [
+                    '﷼' => 'iranian-rial',
+                ];
             }
 
-            if ($this->supportLanguage === 'arabic') {
-                $content = $this->compileArabic($content);
+            foreach ($currencies as $currency => $icon) {
+                $content = str_replace(
+                    $currency,
+                    Html::image(asset("vendor/core/core/base/images/pdf-symbols/$icon.svg"), 'currency', ['width' => 10, 'style' => 'margin-right: 2px; display: inline-block;']),
+                    $content
+                );
             }
         }
 
@@ -249,6 +254,8 @@ class Pdf
         $inlineCss = new CssToInlineStyles();
 
         $content = $inlineCss->convert($this->getContent($this->templatePath, $this->destinationPath, true));
+
+        $mpdf->autoLangToFont = true;
 
         $mpdf->WriteHTML($content);
 

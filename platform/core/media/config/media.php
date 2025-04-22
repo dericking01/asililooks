@@ -90,6 +90,8 @@ return [
         'y' => env('RV_MEDIA_WATERMARK_Y', 10),
     ],
 
+    'custom_s3_path' => env('RV_MEDIA_CUSTOM_S3_PATH', ''),
+
     'chunk' => [
         'enabled' => env('RV_MEDIA_UPLOAD_CHUNK', false),
         'chunk_size' => 1024 * 1024, // Bytes

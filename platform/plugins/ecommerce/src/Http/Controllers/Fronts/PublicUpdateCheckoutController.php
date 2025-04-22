@@ -44,6 +44,7 @@ class PublicUpdateCheckoutController extends BaseController
                     'shippingAmount' => $checkoutOrderData->shippingAmount,
                     'promotionDiscountAmount' => $checkoutOrderData->promotionDiscountAmount,
                     'couponDiscountAmount' => $checkoutOrderData->couponDiscountAmount,
+                    'paymentFee' => $checkoutOrderData->paymentFee,
                 ])->render(),
                 'payment_methods' => view('plugins/ecommerce::orders.partials.payment-methods', [
                     'orderAmount' => $checkoutOrderData->orderAmount,

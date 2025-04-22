@@ -7,6 +7,7 @@ use Botble\Base\Forms\FieldOptions\TextareaFieldOption;
 use Botble\Base\Forms\Fields\NumberField;
 use Botble\Base\Forms\Fields\TextareaField;
 use Botble\Base\Forms\FormAbstract;
+use Botble\Marketplace\Enums\WithdrawalFeeTypeEnum;
 use Botble\Marketplace\Facades\MarketplaceHelper;
 use Botble\Marketplace\Http\Requests\Fronts\VendorEditWithdrawalRequest;
 use Botble\Marketplace\Http\Requests\Fronts\VendorWithdrawalRequest;
@@ -17,6 +18,7 @@ class VendorWithdrawalForm extends FormAbstract
     public function setup(): void
     {
         $fee = MarketplaceHelper::getSetting('fee_withdrawal', 0);
+        $feeType = MarketplaceHelper::getSetting('withdrawal_fee_type', WithdrawalFeeTypeEnum::FIXED);
 
         $exists = $this->getModel() && $this->getModel()->id;
 
@@ -38,6 +40,26 @@ class VendorWithdrawalForm extends FormAbstract
             $paymentChannel = $model->payment_channel;
         }
 
+        // Calculate maximum withdrawal amount considering the fee type
+        if ($feeType === WithdrawalFeeTypeEnum::PERCENTAGE) {
+            // For percentage fee, solve the equation: amount + (amount * fee / 100) <= balance
+            // Which gives us: amount <= balance / (1 + fee/100)
+            $maximum = $fee > 0 ? floor($balance / (1 + $fee / 100)) : $balance;
+        } else {
+            // For fixed fee, simply subtract the fee from balance
+            $maximum = $balance - $fee;
+        }
+        $maximum = max(0, $maximum); // Ensure maximum is not negative
+
+        $feeHelperText = '';
+        if ($fee) {
+            if ($feeType === WithdrawalFeeTypeEnum::FIXED) {
+                $feeHelperText = trans('plugins/marketplace::withdrawal.forms.fee_fixed_helper', ['fee' => format_price($fee)]);
+            } else {
+                $feeHelperText = trans('plugins/marketplace::withdrawal.forms.fee_percentage_helper', ['fee' => $fee]);
+            }
+        }
+
         $this
             ->model(Withdrawal::class)
             ->setValidatorClass($exists ? VendorEditWithdrawalRequest::class : VendorWithdrawalRequest::class)
@@ -51,13 +73,11 @@ class VendorWithdrawalForm extends FormAbstract
                     ->placeholder(trans('plugins/marketplace::withdrawal.forms.amount_placeholder'))
                     ->attributes([
                         'data-counter' => 120,
-                        'max' => $balance,
+                        'max' => $maximum,
+                        'min' => MarketplaceHelper::getMinimumWithdrawalAmount(),
                     ])
                     ->disabled($exists)
-                    ->helperText($fee ? trans(
-                        'plugins/marketplace::withdrawal.forms.fee_helper',
-                        ['fee' => format_price($fee)]
-                    ) : '')
+                    ->helperText($feeHelperText)
             )
             ->when($exists, function (FormAbstract $form): void {
                 $form->add(

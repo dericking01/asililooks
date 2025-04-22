@@ -49,6 +49,8 @@ class HookServiceProvider extends ServiceProvider
 
         add_filter(BASE_FILTER_PUBLIC_SINGLE_DATA, [$this, 'handleSingleView'], 2);
 
+        add_filter('facebook_comment_html', [$this, 'renderBlogPostFacebookComments'], 10, 2);
+
         if (defined('PAGE_MODULE_SCREEN_NAME')) {
             add_filter(PAGE_FILTER_FRONT_PAGE_CONTENT, [$this, 'renderBlogPage'], 2, 2);
         }
@@ -313,5 +315,14 @@ class HookServiceProvider extends ServiceProvider
     protected function getBlogPageId(): int|string|null
     {
         return theme_option('blog_page_id', setting('blog_page_id'));
+    }
+
+    public function renderBlogPostFacebookComments(string $html, ?object $object = null): string
+    {
+        if ($object instanceof Post && theme_option('facebook_comment_enabled_in_post', 'no') === 'yes') {
+            return view('packages/theme::partials.facebook-comments')->render();
+        }
+
+        return $html;
     }
 }

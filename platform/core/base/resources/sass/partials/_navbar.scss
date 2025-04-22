@@ -1,16 +1,8 @@
 [data-bs-theme='dark'] {
     .navbar-brand-autodark {
-        @media screen and (min-width: 992px) {
-            background-color: rgba(var(--bb-gray-800-rgb), 1);
-        }
-
         .navbar-brand-image {
             filter: unset;
         }
-    }
-
-    &.navbar-vertical {
-        background-color: rgba(var(--bb-gray-800-rgb), 0.9);
     }
 }
 

@@ -119,6 +119,9 @@ return [
     'invalid_settings' => 'Settings for :name are invalid!',
     'view_transaction' => 'Transaction ":charge_id"',
     'payment_description' => 'Pay for your order #:order_id at :site_url',
+    'fee' => 'Processing fee - :currency (Optional)',
+    'fee_helper' => 'Extra fee will be charged when customer selects this payment method. Enter 0 for no fee.',
+    'payment_fee' => 'Payment fee',
     'payment_log' => [
         'name' => 'Payment Logs',
         'view' => 'View Payment Log #:id',

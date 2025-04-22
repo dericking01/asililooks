@@ -49,7 +49,7 @@ class MacroableModels
             /**
              * @var Builder $this
              */
-            $class = get_class($this->getModel());
+            $class = $this->getModel()::class;
 
             if (! isset($models[$class])) {
                 throw new BadMethodCallException(sprintf('Call to undefined method %s::%s()', $class, $name));

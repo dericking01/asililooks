@@ -737,6 +737,16 @@ class PublicCheckoutController extends BaseController
 
         $orderAmount += (float) $shippingAmount;
 
+        // Add payment fee if applicable
+        $paymentFee = 0;
+        if ($paymentMethod && is_plugin_active('payment')) {
+            $paymentFee = (float) get_payment_setting('fee', $paymentMethod, 0);
+            $orderAmount += $paymentFee;
+        }
+
+        // Store payment fee in request
+        $request->merge(['payment_fee' => $paymentFee]);
+
         $request->merge([
             'amount' => $orderAmount ?: 0,
             'currency' => $request->input('currency', strtoupper(get_application_currency()->title)),
@@ -744,6 +754,7 @@ class PublicCheckoutController extends BaseController
             'shipping_method' => $isAvailableShipping ? $shippingMethodInput : '',
             'shipping_option' => $isAvailableShipping ? $request->input('shipping_option') : null,
             'shipping_amount' => (float) $shippingAmount,
+            'payment_fee' => (float) $paymentFee,
             'tax_amount' => Cart::instance('cart')->rawTax(),
             'sub_total' => Cart::instance('cart')->rawSubTotal(),
             'coupon_code' => session('applied_coupon_code'),

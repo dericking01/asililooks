@@ -50,11 +50,15 @@ class Handler extends ExceptionHandler
         switch (true) {
             case $e instanceof DisabledInDemoModeException:
             case $e instanceof MethodNotAllowedHttpException:
-            case $e instanceof TokenMismatchException:
                 return $this->baseHttpResponse
                     ->setError()
                     ->setCode($e->getCode())
                     ->setMessage($e->getMessage());
+            case $e instanceof TokenMismatchException:
+                return $this->baseHttpResponse
+                    ->setError()
+                    ->setCode($e->getCode())
+                    ->setMessage(is_in_admin(true) ? $e->getMessage() : trans('core/base::errors.token_mismatch'));
             case $e instanceof PostTooLargeException:
                 if (! empty($request->allFiles())) {
                     return RvMedia::responseError(

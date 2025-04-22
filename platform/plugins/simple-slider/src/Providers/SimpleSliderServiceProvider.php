@@ -40,7 +40,7 @@ class SimpleSliderServiceProvider extends ServiceProvider
             ->loadAndPublishConfigurations(['permissions'])
             ->loadAndPublishViews()
             ->loadAndPublishTranslations()
-            ->loadRoutes()
+            ->loadRoutes(['web', 'api'])
             ->loadMigrations()
             ->publishAssets();
 

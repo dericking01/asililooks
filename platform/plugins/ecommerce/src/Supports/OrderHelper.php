@@ -273,8 +273,19 @@ class OrderHelper
                 compact('order')
             )
                 ->render(),
-            'order' => $order->toArray(),
-            'shipment' => $order->shipment ? $order->shipment->toArray() : [],
+            'order' => [
+                ...$order->toArray(),
+                'created_at' => $order->created_at->toDateTimeString(),
+                'updated_at' => $order->updated_at->toDateTimeString(),
+            ],
+            'shipment' => $order->shipment ? [
+                ...$order->shipment->toArray(),
+                'created_at' => $order->shipment->created_at?->toDateTimeString(),
+                'updated_at' => $order->shipment->updated_at?->toDateTimeString(),
+                'estimate_date_shipped' => $order->shipment->estimate_date_shipped?->toDateTimeString(),
+                'date_shipped' => $order->shipment->date_shipped?->toDateTimeString(),
+                'customer_delivered_confirmed_at' => $order->shipment->customer_delivered_confirmed_at?->toDateTimeString(),
+            ] : [],
             'address' => $order->address->toArray(),
             'products' => $order->products->toArray(),
             'digital_products' => $digitalProducts,
@@ -545,7 +556,7 @@ class OrderHelper
 
         $taxClasses = $parentProduct
             ->taxes()
-            ->select(['id', 'title', 'percentage'])
+            ->select(['ec_taxes.id', 'ec_taxes.title', 'ec_taxes.percentage'])
             ->get()
             ->mapWithKeys(function ($tax) {
                 return [$tax->title => $tax->percentage];
@@ -940,10 +951,21 @@ class OrderHelper
 
         $lastUpdatedAt = Cart::instance('cart')->getLastUpdatedAt();
 
+        // Get payment fee if applicable
+        $paymentFee = 0;
+        $paymentMethod = $request->input('payment_method');
+        if ($paymentMethod && is_plugin_active('payment')) {
+            $paymentFee = (float) get_payment_setting('fee', $paymentMethod, 0);
+        }
+
+        // Calculate total amount including payment fee
+        $amount = Cart::instance('cart')->rawTotalByItems($cartItems) + $paymentFee;
+
         $data = array_merge([
-            'amount' => Cart::instance('cart')->rawTotalByItems($cartItems),
+            'amount' => $amount,
             'shipping_method' => $request->input('shipping_method', ShippingMethodEnum::DEFAULT),
             'shipping_option' => $request->input('shipping_option'),
+            'payment_fee' => $paymentFee,
             'tax_amount' => Cart::instance('cart')->rawTaxByItems($cartItems),
             'sub_total' => Cart::instance('cart')->rawSubTotalByItems($cartItems),
             'coupon_code' => session()->get('applied_coupon_code'),
@@ -974,12 +996,23 @@ class OrderHelper
 
     public function createOrder(Request $request, int|string $currentUserId, string $token, array $cartItems)
     {
+        // Get payment fee if applicable
+        $paymentFee = 0;
+        $paymentMethod = $request->input('payment_method');
+        if ($paymentMethod && is_plugin_active('payment')) {
+            $paymentFee = (float) get_payment_setting('fee', $paymentMethod, 0);
+        }
+
+        // Calculate total amount including payment fee
+        $amount = Cart::instance('cart')->rawTotalByItems($cartItems) + $paymentFee;
+
         $request->merge([
-            'amount' => Cart::instance('cart')->rawTotalByItems($cartItems),
+            'amount' => $amount,
             'user_id' => $currentUserId,
             'shipping_method' => $request->input('shipping_method', ShippingMethodEnum::DEFAULT),
             'shipping_option' => $request->input('shipping_option'),
             'shipping_amount' => 0,
+            'payment_fee' => $paymentFee,
             'tax_amount' => Cart::instance('cart')->rawTaxByItems($cartItems),
             'sub_total' => Cart::instance('cart')->rawSubTotalByItems($cartItems),
             'coupon_code' => session()->get('applied_coupon_code'),
@@ -1172,11 +1205,13 @@ class OrderHelper
 
         $order->save();
 
-        $payment = Payment::query()->where('order_id', $order->getKey())->first();
+        if (is_plugin_active('payment')) {
+            $payment = Payment::query()->where('order_id', $order->getKey())->first();
 
-        if ($payment && Auth::check()) {
-            $payment->user_id = Auth::id();
-            $payment->save();
+            if ($payment && Auth::check()) {
+                $payment->user_id = Auth::id();
+                $payment->save();
+            }
         }
 
         event(

@@ -3,6 +3,7 @@
         <div
             class="chart"
             id="stats-chart"
+            style="min-height: 320px;"
         ></div>
     </div>
     <div class="col-lg-5">

@@ -180,7 +180,7 @@
                                                     {!! $invoiceItem->product_options_implode !!}
                                                 </p>
 
-                                                @if (is_plugin_active('marketplace') && ($product = $invoiceItem->reference) && $product->original_product->store->id)
+                                                @if (is_plugin_active('marketplace') && ($product = $invoiceItem->reference) && $product->original_product->store?->id)
                                                     <p class="mb-0 small">
                                                         {{ __('Sold by') }}
                                                         <a href="{{ $product->original_product->store->url }}" class="text-primary">

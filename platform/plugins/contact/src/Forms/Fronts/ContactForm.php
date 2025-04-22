@@ -2,7 +2,6 @@
 
 namespace Botble\Contact\Forms\Fronts;
 
-use Botble\Base\Facades\Html;
 use Botble\Base\Forms\FieldOptions\ButtonFieldOption;
 use Botble\Base\Forms\FieldOptions\CheckboxFieldOption;
 use Botble\Base\Forms\FieldOptions\HtmlFieldOption;
@@ -249,41 +248,35 @@ class ContactForm extends FormFront
             ->addRowWrapper(
                 'content',
                 function (self $form): void {
-                    $form->addColumnWrapper(
-                        'content',
-                        function (self $form): void {
-                            $form->add(
-                                'content',
-                                TextareaField::class,
-                                TextareaFieldOption::make()
-                                    ->required()
-                                    ->label(__('Content'))
-                                    ->placeholder(__('Write your message here'))
-                                    ->wrapperAttributes(['class' => $this->formInputWrapperClass])
-                                    ->cssClass($this->formInputClass)
-                                    ->rows(5)
-                                    ->maxLength(-1)
-                            );
-                        },
-                        12
-                    );
+                    $form
+                        ->add(
+                            'content',
+                            TextareaField::class,
+                            TextareaFieldOption::make()
+                                ->required()
+                                ->label(__('Message'))
+                                ->placeholder(__('Your Message'))
+                                ->wrapperAttributes(['class' => $this->formInputWrapperClass])
+                                ->cssClass($this->formInputClass)
+                                ->maxLength(-1)
+                        );
                 }
             )
+            ->when(setting('contact_form_show_terms_checkbox', true), function (self $form): void {
+                $form->add(
+                    'agree_terms_and_policy',
+                    OnOffCheckboxField::class,
+                    CheckboxFieldOption::make()
+                        ->required()
+                        ->label(__('I agree to the Terms and Privacy Policy'))
+                        ->wrapperAttributes(['class' => $this->formInputWrapperClass])
+                );
+            })
             ->add(
                 'filters_after_form',
                 HtmlField::class,
                 HtmlFieldOption::make()
                     ->content(apply_filters('after_contact_form', null))
-            )
-            ->add(
-                'agree_terms_and_policy',
-                OnOffCheckboxField::class,
-                CheckboxFieldOption::make()
-                    ->label(
-                        ($privacyPolicyUrl = Theme::termAndPrivacyPolicyUrl())
-                            ? __('I agree to the :link', ['link' => Html::link($privacyPolicyUrl, __('Terms and Privacy Policy'), attributes: ['class' => 'text-decoration-underline', 'target' => '_blank'])])
-                            : __('I agree to the Terms and Privacy Policy')
-                    )
             )
             ->addWrappedField(
                 'submit',

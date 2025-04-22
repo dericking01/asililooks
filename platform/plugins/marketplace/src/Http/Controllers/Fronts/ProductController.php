@@ -88,7 +88,7 @@ class ProductController extends BaseController
 
         $product = $service->execute($request, $product);
 
-        $product->store_id = auth('customer')->user()->store->id;
+        $product->store_id = auth('customer')->user()->store?->id;
         $product->created_by_id = auth('customer')->id();
         $product->created_by_type = Customer::class;
         $product->save();
@@ -158,7 +158,7 @@ class ProductController extends BaseController
     {
         $product = Product::query()->findOrFail($id);
 
-        abort_if($product->is_variation || $product->store->id != auth('customer')->user()->store->id, 404);
+        abort_if($product->is_variation || $product->store?->id != auth('customer')->user()->store?->id, 404);
 
         $this->pageTitle(trans('plugins/ecommerce::products.edit', ['name' => $product->name]));
 
@@ -176,13 +176,13 @@ class ProductController extends BaseController
          */
         $product = Product::query()->findOrFail($id);
 
-        abort_if($product->is_variation || $product->store->id != auth('customer')->user()->store->id, 404);
+        abort_if($product->is_variation || $product->store?->id != auth('customer')->user()->store?->id, 404);
 
         $request->merge(['video_media' => $this->uploadVideoMedia($request)]);
 
         $request = $this->processRequestData($request);
 
-        $product->store_id = auth('customer')->user()->store->id;
+        $product->store_id = auth('customer')->user()->store?->id;
 
         $product = $service->execute($request, $product);
         $storeProductTagService->execute($request, $product);
@@ -351,7 +351,7 @@ class ProductController extends BaseController
 
         $product = $variation->configurableProduct;
 
-        abort_if(! $product || $product->original_product->store_id != auth('customer')->user()->store->id, 404);
+        abort_if(! $product || $product->original_product->store_id != auth('customer')->user()->store?->id, 404);
 
         return $this->baseDeleteVersionItem($variationId);
     }
@@ -381,7 +381,7 @@ class ProductController extends BaseController
         foreach ($variations as $variation) {
             $product = $variation->product;
 
-            abort_if(! $product || $product->original_product->store_id != auth('customer')->user()->store->id, 404);
+            abort_if(! $product || $product->original_product->store_id != auth('customer')->user()->store?->id, 404);
         }
 
         return $this->baseDeleteVersions($request, $this->httpResponse());
@@ -394,7 +394,7 @@ class ProductController extends BaseController
             ->where('is_variation', 0)
             ->where('id', '!=', $request->input('product_id', 0))
             ->where('name', 'LIKE', '%' . $request->input('keyword') . '%')
-            ->where('store_id', auth('customer')->user()->store->id)
+            ->where('store_id', auth('customer')->user()->store?->id)
             ->select([
                 'id',
                 'name',
@@ -433,7 +433,7 @@ class ProductController extends BaseController
         $product = Product::query()
             ->where([
                 'is_variation' => 0,
-                'store_id' => auth('customer')->user()->store->id,
+                'store_id' => auth('customer')->user()->store?->id,
             ])
             ->findOrFail($id);
 
@@ -450,7 +450,7 @@ class ProductController extends BaseController
     {
         $variation = ProductVariation::query()->findOrFail($id);
 
-        abort_if($variation->configurableProduct->store_id != auth('customer')->user()->store->id, 404);
+        abort_if($variation->configurableProduct->store_id != auth('customer')->user()->store?->id, 404);
 
         ProductVariation::query()
             ->where('configurable_product_id', $variation->configurable_product_id)

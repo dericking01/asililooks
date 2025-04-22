@@ -23,7 +23,7 @@
             $isFreeShipping = Arr::get($sessionData, 'is_free_shipping', 0);
             $rawTotal = Cart::rawTotalByItems($cartItems);
             $shippingCurrent = Arr::get($shipping, $defaultShippingMethod . '.' . $defaultShippingOption, []);
-            $isAvailableShipping = Arr::get($sessionData, 'is_available_shipping', true) && ! (bool) get_ecommerce_setting('disable_shipping_options', false);
+            $isAvailableShipping = Arr::get($sessionData, 'is_available_shipping', true);
 
             $orderAmount = max($rawTotal - $promotionDiscountAmount - $couponDiscountAmount, 0);
             $orderAmount += (float) $shippingAmount;
@@ -62,7 +62,7 @@
             </div>
 
             @if ($isAvailableShipping)
-                <div class="shipping-method-wrapper py-3">
+                <div class="shipping-method-wrapper py-3" @style(['display: none' => (bool) get_ecommerce_setting('disable_shipping_options', false)])>
                     @if (!empty($shipping))
                         <div class="payment-checkout-form">
                             <h6>{{ __('Shipping method') }}:</h6>

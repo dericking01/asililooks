@@ -28,7 +28,7 @@ class LocaleController extends SettingController
 
         Assets::addScriptsDirectly('vendor/core/plugins/translation/js/locales.js');
 
-        $existingLocales = Language::getAvailableLocales();
+        $existingLocales = Language::getAvailableLocales(true);
         $flags = Language::getListLanguageFlags();
 
         $locales = Language::getLocales();

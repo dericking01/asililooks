@@ -2,23 +2,66 @@
 
 $(() => {
     window.botbleCookieConsent = (function () {
-        const COOKIE_VALUE = 1
         const COOKIE_NAME = $('div[data-site-cookie-name]').data('site-cookie-name')
         const COOKIE_DOMAIN = $('div[data-site-cookie-domain]').data('site-cookie-domain')
         const COOKIE_LIFETIME = $('div[data-site-cookie-lifetime]').data('site-cookie-lifetime')
         const SESSION_SECURE = $('div[data-site-session-secure]').data('site-session-secure')
 
         const $cookieDialog = $('.js-cookie-consent')
+        const $cookieCategories = $('.cookie-consent__categories')
+        const $customizeButton = $('.js-cookie-consent-customize')
 
         $cookieDialog.addClass('cookie-consent--visible')
+        $cookieCategories.hide()
 
         function consentWithCookies() {
-            setCookie(COOKIE_NAME, COOKIE_VALUE, COOKIE_LIFETIME)
+            const categories = {}
+            $('.js-cookie-category:checked').each(function() {
+                categories[$(this).val()] = true
+            })
+            setCookie(COOKIE_NAME, JSON.stringify(categories), COOKIE_LIFETIME)
+            hideCookieDialog()
+        }
+
+        function savePreferences() {
+            consentWithCookies()
+            $cookieCategories.slideUp()
+            $customizeButton.removeClass('active')
+        }
+
+        function rejectAllCookies() {
+            // Delete the cookie if it exists
+            if (cookieExists(COOKIE_NAME)) {
+                document.cookie = COOKIE_NAME +
+                    '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=' +
+                    COOKIE_DOMAIN +
+                    '; path=/' +
+                    SESSION_SECURE
+            }
+
+            // Update Google Analytics consent if available
+            if (typeof gtag !== 'undefined') {
+                gtag('consent', 'update', {
+                    'ad_storage': 'denied',
+                    'analytics_storage': 'denied'
+                })
+            }
+
             hideCookieDialog()
         }
 
         function cookieExists(name) {
-            return document.cookie.split('; ').indexOf(name + '=' + COOKIE_VALUE) !== -1
+            const cookie = getCookie(name)
+            return cookie !== null && cookie !== undefined
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`
+            const parts = value.split(`; ${name}=`)
+            if (parts.length === 2) {
+                return parts.pop().split(';').shift()
+            }
+            return null
         }
 
         function hideCookieDialog() {
@@ -40,6 +83,11 @@ $(() => {
                 SESSION_SECURE
         }
 
+        function toggleCustomizeView() {
+            $cookieCategories.slideToggle()
+            $customizeButton.toggleClass('active')
+        }
+
         if (cookieExists(COOKIE_NAME)) {
             hideCookieDialog()
         }
@@ -48,9 +96,23 @@ $(() => {
             consentWithCookies()
         })
 
+        $(document).on('click', '.js-cookie-consent-reject', function () {
+            rejectAllCookies()
+        })
+
+        $(document).on('click', '.js-cookie-consent-customize', function () {
+            toggleCustomizeView()
+        })
+
+        $(document).on('click', '.js-cookie-consent-save', function () {
+            savePreferences()
+        })
+
         return {
             consentWithCookies: consentWithCookies,
+            rejectAllCookies: rejectAllCookies,
             hideCookieDialog: hideCookieDialog,
+            savePreferences: savePreferences,
         }
     })()
 })

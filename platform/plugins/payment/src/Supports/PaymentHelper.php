@@ -49,9 +49,16 @@ class PaymentHelper
 
         $paymentChannel = Arr::get($data, 'payment_channel', PaymentMethodEnum::COD);
 
+        // Get payment fee directly from payment settings
+        $paymentFee = 0;
+        if ($paymentChannel) {
+            $paymentFee = (float) get_payment_setting('fee', $paymentChannel, 0);
+        }
+
         return Payment::query()
             ->create([
                 'amount' => $data['amount'],
+                'payment_fee' => $paymentFee,
                 'currency' => $data['currency'],
                 'charge_id' => $data['charge_id'],
                 'order_id' => Arr::first($orderIds),

@@ -111,7 +111,7 @@ class Location
         }
 
         if (is_object($model)) {
-            $model = get_class($model);
+            $model = $model::class;
         }
 
         return Arr::get(config('plugins.location.general.supported', []), $model, []);
@@ -298,9 +298,9 @@ class Location
     public function filter($model, int|string $cityId = null, string $location = null, int|string $stateId = null)
     {
         if ($model instanceof BaseQueryBuilder) {
-            $className = get_class($model->getModel());
+            $className = $model->getModel()::class;
         } else {
-            $className = get_class($model);
+            $className = $model::class;
         }
 
         if ($this->isSupported($className)) {

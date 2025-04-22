@@ -41,11 +41,11 @@ class PageSeeder extends BaseSeeder
                     Html::tag('div', '[product-category-products category_id="18"][/product-category-products]') .
                     Html::tag(
                         'div',
-                        '[featured-posts title="Health Daily" background="general/blog-bg.jpg"
+                        '[featured-posts title="Asili Looks" background="general/blog-bg.jpg"
                         app_enabled="1"
-                        app_title="Shop faster with Farmart App"
+                        app_title="Shop faster with AsiliLooks Store App"
                         app_description="Available on both iOS & Android"
-                        app_bg="general/app-bg.png"
+                        app_bg="general/asiliog.jpg"
                         app_android_img="general/app-android.png"
                         app_android_link="#"
                         app_ios_img="general/app-ios.png"
@@ -77,17 +77,17 @@ class PageSeeder extends BaseSeeder
             ],
             [
                 'name' => 'Contact',
-                'content' => Html::tag('div', '[google-map]502 New Street, Brighton VIC, Australia[/google-map]') .
+                'content' => Html::tag('div', '[google-map]Mwenge Tower, Mlimani City, DSM[/google-map]') .
                     Html::tag(
                         'div',
                         '[contact-info-boxes title="Contact Info" subtitle="Location" ' .
                         'name_1="Store" ' .
-                        'address_1="68 Atlantic Ave St, Brooklyn, NY 90002, USA" ' .
-                        'phone_1="(+005) 5896 72 78 79" ' .
-                        'email_1="support@farmart.com" ' .
-                        'name_2="Warehouse" ' .
-                        'address_2="172 Richmond Hill Ave St, Stamford, NY 90002, USA" ' .
-                        'phone_2="(+005) 5896 03 04 05" ' .
+                        'address_1="Mwenge Tower, Mlimani City, DSM" ' .
+                        'phone_1="(+255) 747-341-614" ' .
+                        'email_1="sales@asililooks.co.tz" ' .
+                        'name_2="Beauty Saloon" ' .
+                        'address_2="Kigamboni, Ungindoni, DSM" ' .
+                        'phone_2="(+255) 655-857-913" ' .
                         'show_contact_form="1" ' .
                         '][/contact-info-boxes]'
                     ),
@@ -113,21 +113,21 @@ class PageSeeder extends BaseSeeder
                         '- XSRF-Token Cookie: Laravel automatically generates a CSRF "token" for each active user session managed by the application. This token is used to verify that the authenticated user is the one actually making the requests to the application.'
                     ),
             ],
-            [
-                'name' => 'Affiliate',
-            ],
-            [
-                'name' => 'Career',
-            ],
-            [
-                'name' => 'Coming soon',
-                'content' => Html::tag(
-                    'div',
-                    sprintf('[coming-soon time="%s" title="We’re coming soon." subtitle="Currently we’re working on our brand new website and will be
-launching soon." social_title="Connect us on social networks" image="general/coming-soon.jpg"][/coming-soon]', $this->now()->addYear()->toDateTimeString())
-                ),
-                'template' => 'coming-soon',
-            ],
+            // [
+            //     'name' => 'Affiliate',
+            // ],
+            // [
+            //     'name' => 'Career',
+            // ],
+//             [
+//                 'name' => 'Coming soon',
+//                 'content' => Html::tag(
+//                     'div',
+//                     sprintf('[coming-soon time="%s" title="We’re coming soon." subtitle="Currently we’re working on our brand new website and will be
+//              launching soon." social_title="Connect us on social networks" image="general/coming-soon.jpg"][/coming-soon]', $this->now()->addYear()->toDateTimeString())
+//                 ),
+//                 'template' => 'coming-soon',
+//             ],
         ];
 
         $this->createPages($pages);

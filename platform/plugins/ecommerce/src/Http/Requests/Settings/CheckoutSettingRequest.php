@@ -34,6 +34,8 @@ class CheckoutSettingRequest extends Request
             'max_customer_recently_viewed_products' => ['nullable', 'required_if:enable_customer_recently_viewed_products,1', 'integer', 'min:1'],
             'default_country_at_checkout_page' => ['nullable', Rule::in($countries)],
             'checkout_product_quantity_editable' => $onOffRule,
+            'show_terms_and_policy_checkbox' => $onOffRule,
+            'terms_and_policy_checkbox_checked_by_default' => $onOffRule,
         ];
     }
 }

@@ -34,6 +34,7 @@ class Order extends BaseModel
         'shipping_method',
         'shipping_option',
         'shipping_amount',
+        'payment_fee',
         'description',
         'coupon_code',
         'discount_amount',

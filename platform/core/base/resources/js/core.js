@@ -161,6 +161,29 @@ class Botble {
         }
     }
 
+    static handleDatatableError(error) {
+        let errorMessage = BotbleVariables.languages.tables.error_loading
+            ? BotbleVariables.languages.tables.error_loading
+            : 'An error occurred while loading the data. Please refresh the page and try again.';
+
+        if (typeof error.responseJSON !== 'undefined') {
+            if (typeof error.responseJSON.message !== 'undefined') {
+                // Remove any sensitive information from error message
+                errorMessage = error.responseJSON.message
+                    .replace(/table\s+[a-zA-Z0-9_-]+/g, 'table')
+                    .replace('botble-', '')
+                    .replace(/column\s+['"]\w+['"]/g, 'column')
+                    .replace(/parameter\s+['"]\w+['"]/g, 'parameter')
+                    .replace(/row\s+\d+/g, 'row')
+                    .replace(/\s+for\s+\d+/g, '')
+                    .replace(/\s+\d+,\s+/g, ' ')
+                    .replace(/\s+\d+\./g, '.');
+            }
+        }
+
+        Botble.showError(errorMessage);
+    }
+
     static handleValidationError(errors) {
         let message = ''
         $.each(errors, (index, item) => {

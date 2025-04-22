@@ -75,6 +75,28 @@ class PaymentMethodForm extends FormAbstract
             );
     }
 
+    protected function paymentFeeField(string $name): static
+    {
+        return $this
+            ->add(
+                get_payment_setting_key('fee', $name),
+                'text',
+                [
+                    'label' => trans('plugins/payment::payment.fee', ['currency' => get_application_currency()->title]),
+                    'value' => get_payment_setting('fee', $name, 0),
+                    'help_block' => [
+                        'text' => trans('plugins/payment::payment.fee_helper'),
+                    ],
+                    'attr' => [
+                        'placeholder' => '0',
+                        'class' => 'form-control input-mask-number',
+                        'data-thousands-separator' => ',',
+                        'data-decimal-separator' => '.',
+                    ],
+                ]
+            );
+    }
+
     public function getPaymentInstructions(): HtmlString
     {
         return new HtmlString($this->getFormOption('payment_instructions'));

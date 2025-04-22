@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static array allowedExtensions()
  * @method static \Botble\Theme\Supports\SiteMapManager setItemsPerPage(int $itemsPerPage)
  * @method static int getItemsPerPage()
+ * @method static string getCacheKey(string|null $prefix = null, string $extension = 'xml')
+ * @method static void clearCache()
  * @method static \Botble\Theme\Supports\SiteMapManager registerPattern(string $name, string $pattern)
  * @method static string|null getPattern(string $name)
  * @method static string generateKey(string $prefix, string $patternName, array $params = [])

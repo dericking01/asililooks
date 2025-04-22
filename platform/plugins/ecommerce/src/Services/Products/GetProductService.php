@@ -32,12 +32,12 @@ class GetProductService
 
         $queryVar = [
             'keyword' => BaseHelper::stringify($request->input('q')),
-            'brands' => (array) $request->input('brands', []),
-            'categories' => (array) $request->input('categories', []),
-            'tags' => (array) $request->input('tags', []),
-            'collections' => (array) $request->input('collections', []),
+            'brands' => EcommerceHelper::parseFilterParams($request, 'brands'),
+            'categories' => EcommerceHelper::parseFilterParams($request, 'categories'),
+            'tags' => EcommerceHelper::parseFilterParams($request, 'tags'),
+            'collections' => EcommerceHelper::parseFilterParams($request, 'collections'),
             'collection' => $request->input('collection'),
-            'attributes' => (array) $request->input('attributes', []),
+            'attributes' => is_array($request->input('attributes')) ? $request->input('attributes') : [],
             'max_price' => $request->input('max_price'),
             'min_price' => $request->input('min_price'),
             'price_ranges' => (array) $request->input('price_ranges', []),

@@ -26,7 +26,7 @@
         :discount_amount_label="'{{ format_price(0) }}'"
         :shipping_amount_label="'{{ format_price(0) }}'"
         :total_amount_label="'{{ format_price(0) }}'"
-        :payment-methods="{{ json_encode(\Botble\Payment\Enums\PaymentMethodEnum::labels()) }}"
-        :payment-statuses="{{ json_encode(\Botble\Payment\Enums\PaymentStatusEnum::labels()) }}"
+        :payment-methods="{{ json_encode(is_plugin_active('payment') ? \Botble\Payment\Enums\PaymentMethodEnum::labels() : []) }}"
+        :payment-statuses="{{ json_encode(is_plugin_active('payment') ? \Botble\Payment\Enums\PaymentStatusEnum::labels() : []) }}"
     ></create-order>
 @endsection

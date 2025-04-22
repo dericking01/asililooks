@@ -157,7 +157,7 @@ class OrderController extends BaseController
         $address = OrderAddress::query()
             ->where('id', $id)
             ->whereHas('order', function ($query): void {
-                $query->where('store_id', auth('customer')->user()->store->id);
+                $query->where('store_id', auth('customer')->user()->store?->id);
             })
             ->first();
 
@@ -219,7 +219,7 @@ class OrderController extends BaseController
             ->where([
                 'id' => $id,
                 'is_finished' => 1,
-                'store_id' => auth('customer')->user()->store->id,
+                'store_id' => auth('customer')->user()->store?->id,
             ])
             ->firstOrFail();
     }

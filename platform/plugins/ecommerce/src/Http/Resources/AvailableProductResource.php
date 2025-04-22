@@ -58,7 +58,7 @@ class AvailableProductResource extends JsonResource
                 return [
                     'store_id' => $this->original_product->store_id,
                     'store' => [
-                        'id' => $this->original_product->store->id,
+                        'id' => $this->original_product->store?->id,
                         'name' => $this->original_product->store->name,
                     ],
                 ];

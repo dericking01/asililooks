@@ -21,7 +21,7 @@ class MenuSeeder extends BaseSeeder
                 'items' => [
                     [
                         'title' => 'Special Prices',
-                        'url' => '/products/smart-watches',
+                        'url' => '/products',
                         'icon_font' => 'icon icon-tag',
                     ],
                     [
@@ -74,15 +74,15 @@ class MenuSeeder extends BaseSeeder
                             ],
                         ],
                     ],
-                    [
-                        'title' => 'Stores',
-                        'url' => '/stores',
-                    ],
-                    [
-                        'title' => 'Blog',
-                        'reference_id' => 6,
-                        'reference_type' => Page::class,
-                    ],
+                    // [
+                    //     'title' => 'Stores',
+                    //     'url' => '/stores',
+                    // ],
+                    // [
+                    //     'title' => 'Blog',
+                    //     'reference_id' => 6,
+                    //     'reference_type' => Page::class,
+                    // ],
                     [
                         'title' => 'FAQs',
                         'reference_id' => 7,
@@ -139,10 +139,10 @@ class MenuSeeder extends BaseSeeder
                         'reference_id' => 7,
                         'reference_type' => Page::class,
                     ],
-                    [
-                        'title' => '404 Page',
-                        'url' => '/nothing',
-                    ],
+                    // [
+                    //     'title' => '404 Page',
+                    //     'url' => '/nothing',
+                    // ],
                 ],
             ],
             [
@@ -154,16 +154,16 @@ class MenuSeeder extends BaseSeeder
                         'reference_id' => 2,
                         'reference_type' => Page::class,
                     ],
-                    [
-                        'title' => 'Affiliate',
-                        'reference_id' => 10,
-                        'reference_type' => Page::class,
-                    ],
-                    [
-                        'title' => 'Career',
-                        'reference_id' => 11,
-                        'reference_type' => Page::class,
-                    ],
+                    // [
+                    //     'title' => 'Affiliate',
+                    //     'reference_id' => 10,
+                    //     'reference_type' => Page::class,
+                    // ],
+                    // [
+                    //     'title' => 'Career',
+                    //     'reference_id' => 11,
+                    //     'reference_type' => Page::class,
+                    // ],
                     [
                         'title' => 'Contact us',
                         'reference_id' => 8,
@@ -175,11 +175,11 @@ class MenuSeeder extends BaseSeeder
                 'name' => 'Business',
                 'slug' => 'business',
                 'items' => [
-                    [
-                        'title' => 'Our blog',
-                        'reference_id' => 6,
-                        'reference_type' => Page::class,
-                    ],
+                    // [
+                    //     'title' => 'Our blog',
+                    //     'reference_id' => 6,
+                    //     'reference_type' => Page::class,
+                    // ],
                     [
                         'title' => 'Cart',
                         'url' => '/cart',

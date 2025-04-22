@@ -191,6 +191,16 @@ class HandleCheckoutOrderData
         $orderAmount = max($rawTotal - $promotionDiscountAmount - $couponDiscountAmount, 0);
         $orderAmount += (float) $shippingAmount;
 
+        // Add payment fee if applicable
+        $paymentFee = 0;
+        if ($paymentMethod && is_plugin_active('payment')) {
+            $paymentFee = (float) get_payment_setting('fee', $paymentMethod, 0);
+            $orderAmount += $paymentFee;
+        }
+
+        // Store payment fee in session
+        Arr::set($sessionCheckoutData, 'payment_fee', $paymentFee);
+
         return new CheckoutOrderData(
             shipping: $shipping,
             sessionCheckoutData: $sessionCheckoutData,
@@ -200,7 +210,8 @@ class HandleCheckoutOrderData
             promotionDiscountAmount: $promotionDiscountAmount,
             couponDiscountAmount: $couponDiscountAmount,
             defaultShippingMethod: $defaultShippingMethod,
-            defaultShippingOption: $defaultShippingOption
+            defaultShippingOption: $defaultShippingOption,
+            paymentFee: $paymentFee
         );
     }
 }

@@ -55,17 +55,7 @@ class MediaSettingForm extends SettingForm
                 SelectField::class,
                 SelectFieldOption::make()
                     ->label(trans('core/setting::setting.media.driver'))
-                    ->choices(
-                        apply_filters('core_media_drivers', [
-                            'public' => trans('core/setting::setting.media.local_disk'),
-                            's3' => 'Amazon S3',
-                            'r2' => 'Cloudflare R2',
-                            'do_spaces' => 'DigitalOcean Spaces',
-                            'wasabi' => 'Wasabi',
-                            'bunnycdn' => 'BunnyCDN',
-                            'backblaze' => 'Backblaze B2',
-                        ])
-                    )
+                    ->choices(RvMedia::getAvailableDrivers())
                     ->selected($mediaDriver = RvMedia::getMediaDriver())
                     ->colspan(6)
             )
@@ -123,6 +113,15 @@ class MediaSettingForm extends SettingForm
                     ->label(trans('core/setting::setting.media.aws_endpoint'))
                     ->value(setting('media_aws_endpoint'))
                     ->placeholder(trans('core/setting::setting.media.optional'))
+            )
+            ->add(
+                'media_s3_path',
+                TextField::class,
+                TextFieldOption::make()
+                    ->label(trans('core/setting::setting.media.s3_path'))
+                    ->value(setting('media_s3_path'))
+                    ->placeholder(trans('core/setting::setting.media.s3_path_placeholder'))
+                    ->helperText(trans('core/setting::setting.media.s3_path_placeholder'))
             )
             ->add(
                 'media_aws_use_path_style_endpoint',
