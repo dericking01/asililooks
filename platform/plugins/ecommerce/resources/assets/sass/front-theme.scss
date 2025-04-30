@@ -994,3 +994,79 @@ body,
     top: 0;
     width: var(--bb-rating-size)
 }
+
+/* Mobile-specific styles for checkout and coupons */
+@media screen and (max-width: 768px) {
+    /* Ensure coupon information is visible on mobile */
+    .coupon-information,
+    .discount-amount {
+        display: flex !important;
+    }
+
+    /* Fix for coupon code display on mobile */
+    .cart-item-wrapper .coupon-code-text,
+    .cart-item-wrapper .total-discount-amount-text {
+        text-align: right;
+        width: 100%;
+    }
+
+    /* Ensure coupon wrapper is visible on mobile */
+    .coupon-wrapper.mt-2 {
+        display: block !important;
+        margin-top: 0.5rem !important;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+    }
+
+    /* Style for applied coupon on mobile */
+    .coupon-wrapper.mt-2 .coupon-information {
+        margin-bottom: 8px;
+        padding: 8px;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Make remove coupon button more visible */
+    .coupon-wrapper.mt-2 .btn.remove-coupon-code {
+        padding: 4px 8px;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    /* Ensure checkout coupon items are properly displayed */
+    .checkout__coupon-section {
+        margin-bottom: 15px;
+    }
+
+    .checkout__coupon-item {
+        margin-bottom: 10px;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .checkout__coupon-item.active {
+        border-color: var(--bs-primary);
+    }
+
+    .checkout__coupon-item-content {
+        padding: 10px;
+    }
+
+    .checkout__coupon-item-code {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 5px;
+    }
+
+    .checkout__coupon-item-code button {
+        padding: 2px 8px;
+        font-size: 12px;
+        border-radius: 3px;
+    }
+}

@@ -17,8 +17,7 @@ class AuditLogController extends BaseSystemController
         $limit = $limit > 0 ? $limit : 10;
 
         $histories = AuditHistory::query()
-            ->with('user')
-            ->orderByDesc('created_at')
+            ->with('user')->latest()
             ->paginate($limit);
 
         return $this

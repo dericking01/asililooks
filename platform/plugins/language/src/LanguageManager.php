@@ -151,7 +151,7 @@ class LanguageManager
         }
 
         $this->activeLanguages = Language::query()
-            ->orderBy('lang_order')
+            ->oldest('lang_order')
             ->select($select)
             ->get();
 

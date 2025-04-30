@@ -20,6 +20,7 @@ class RazorpayPaymentMethodForm extends PaymentMethodForm
             ->paymentName('Razorpay')
             ->paymentDescription(__('Customer can buy product and pay directly using Visa, Credit card via :name', ['name' => 'Razorpay']))
             ->paymentLogo(url('vendor/core/plugins/razorpay/images/razorpay.svg'))
+            ->paymentFeeField(RAZORPAY_PAYMENT_METHOD_NAME)
             ->paymentUrl('https://razorpay.com')
             ->paymentInstructions(view('plugins/razorpay::instructions')->render())
             ->add(

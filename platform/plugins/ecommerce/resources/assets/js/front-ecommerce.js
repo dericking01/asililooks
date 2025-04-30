@@ -2,6 +2,7 @@ class Ecommerce {
     quickSearchAjax = null
     filterAjax = null
     lastFilterFormData = null
+    lastFilterFormAction = null
     filterTimeout = null
 
     constructor() {
@@ -25,17 +26,11 @@ class Ecommerce {
             .on('submit', 'form.bb-product-form-filter', (e) => {
                 e.preventDefault()
 
-                const currentTarget = $(e.currentTarget)
-
-                // Process form data to convert array inputs to comma-separated values
-                const formElements = currentTarget.find('input, select').filter(function() {
-                    // Only include elements with a name and exclude array notation inputs
-                    return $(this).attr('name') && !$(this).attr('name').endsWith('[]')
-                })
+                const form = $(e.currentTarget)
 
                 // Create a new FormData object
-                const formData = this.#transformFormData(currentTarget.serializeArray())
-                const url = currentTarget.prop('action')
+                const formData = this.#transformFormData(form.serializeArray())
+                const url = form.prop('action')
                 let nextUrl = url
 
                 // Use URLSearchParams to prevent duplicate parameters
@@ -71,12 +66,16 @@ class Ecommerce {
                     return
                 }
 
-                // Don't send duplicate requests with the same parameters
+                // Don't send duplicate requests with the same parameters and same action URL
                 const formDataString = JSON.stringify(formData)
-                if (this.lastFilterFormData === formDataString) {
+                const currentFormAction = form.prop('action')
+
+                if (this.lastFilterFormData === formDataString && this.lastFilterFormAction === currentFormAction) {
                     return
                 }
+
                 this.lastFilterFormData = formDataString
+                this.lastFilterFormAction = currentFormAction
 
                 // Cancel any pending AJAX request
                 if (this.filterAjax) {
@@ -1075,6 +1074,12 @@ class Ecommerce {
     #ajaxFilterForm = (url, data, nextUrl) => {
         const form = $('.bb-product-form-filter')
 
+        // If a direct URL is provided without form data, reset the tracking variables
+        if (url && !data) {
+            this.lastFilterFormData = null
+            this.lastFilterFormAction = null
+        }
+
         // If data is an array, convert it to a proper format for AJAX
         let ajaxData = data
         if (Array.isArray(data)) {
@@ -1542,7 +1547,22 @@ $(() => {
                 $sidebar = $defaultSidebar
             }
 
+            // Store the current active filter link before replacing the sidebar
+            const activeFilterLinks = {};
+            $('.bb-product-filter-link.active').each(function() {
+                const filterGroup = $(this).closest('.bb-product-filter').data('filter-group');
+                if (filterGroup) {
+                    activeFilterLinks[filterGroup] = $(this).data('id');
+                }
+            });
+
             $sidebar.replaceWith(data.additional.filters_html)
+
+            // Restore active state for filter links after sidebar is replaced
+            Object.keys(activeFilterLinks).forEach(group => {
+                const id = activeFilterLinks[group];
+                $(`.bb-product-filter[data-filter-group="${group}"] .bb-product-filter-link[data-id="${id}"]`).addClass('active');
+            });
         }
 
         if ($(document).find('.bb-product-price-filter').length) {

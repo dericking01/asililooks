@@ -13,8 +13,7 @@ class RenderingSiteMapListener
     {
         if ($event->key == 'pages') {
             $pages = Page::query()
-                ->wherePublished()
-                ->orderByDesc('created_at')
+                ->wherePublished()->latest()
                 ->select(['id', 'name', 'updated_at'])
                 ->with('slugable');
 

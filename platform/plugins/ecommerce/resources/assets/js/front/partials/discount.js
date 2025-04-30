@@ -16,7 +16,12 @@ export class DiscountManagement {
             }
         })
 
+        // Define targets for both desktop and mobile layouts
         let target = '.checkout-order-info'
+        let mobileTarget = '.cart-item-wrapper'
+        let couponWrapperTarget = '.coupon-wrapper.mt-2'
+        let couponItemTarget = '.checkout__coupon-item'
+        let couponSectionTarget = '.checkout__coupon-section'
 
         $(document).on('click', '.apply-coupon-code', (event) => {
             event.preventDefault()
@@ -39,7 +44,66 @@ export class DiscountManagement {
                 },
                 success: ({ error, message }) => {
                     if (!error) {
-                        $(target).load(`${window.location.href}?applied_coupon=1 ${target} > *`, () => currentTarget.find('i').remove())
+                        // Use a more reliable approach for both desktop and mobile
+                        $.ajax({
+                            url: window.location.href + '?applied_coupon=1',
+                            type: 'GET',
+                            success: (response) => {
+                                // Extract the target content from the response
+                                const tempDiv = document.createElement('div');
+                                tempDiv.innerHTML = response;
+
+                                // Update desktop layout if it exists
+                                const desktopContent = $(tempDiv).find(target);
+                                if (desktopContent.length && $(target).length) {
+                                    $(target).html(desktopContent.html());
+                                }
+
+                                // Update mobile layout
+                                const mobileContent = $(tempDiv).find(mobileTarget);
+                                if (mobileContent.length && $(mobileTarget).length) {
+                                    $(mobileTarget).html(mobileContent.html());
+                                }
+
+                                // Update coupon wrapper section for mobile
+                                const couponWrapperContent = $(tempDiv).find(couponWrapperTarget);
+                                if (couponWrapperContent.length && $(couponWrapperTarget).length) {
+                                    $(couponWrapperTarget).html(couponWrapperContent.html());
+                                } else if (couponWrapperContent.length) {
+                                    // If coupon wrapper doesn't exist yet, append it after the cart-item-wrapper
+                                    $(mobileTarget).after(couponWrapperContent);
+                                }
+
+                                // Update coupon items
+                                const couponItemsContent = $(tempDiv).find(couponItemTarget);
+                                if (couponItemsContent.length) {
+                                    // Update each coupon item or the entire section
+                                    const couponSection = $(tempDiv).find(couponSectionTarget);
+                                    if (couponSection.length && $(couponSectionTarget).length) {
+                                        $(couponSectionTarget).html(couponSection.html());
+                                    } else {
+                                        // Update individual coupon items
+                                        $(couponItemTarget).each(function(index) {
+                                            if (couponItemsContent[index]) {
+                                                $(this).replaceWith(couponItemsContent[index]);
+                                            }
+                                        });
+                                    }
+                                }
+
+                                // If nothing was updated, reload the page
+                                if ((!desktopContent.length && !mobileContent.length && !couponWrapperContent.length) ||
+                                    ($(target).length === 0 && $(mobileTarget).length === 0)) {
+                                    window.location.reload();
+                                }
+
+                                currentTarget.find('i').remove();
+                            },
+                            error: () => {
+                                // Fallback to page reload if AJAX extraction fails
+                                window.location.reload();
+                            }
+                        });
                     } else {
                         $('.coupon-error-msg .text-danger').html(sanitizeHTML(message))
                         currentTarget.find('i').remove()
@@ -85,9 +149,66 @@ export class DiscountManagement {
                 },
                 success: (res) => {
                     if (!res.error) {
-                        $(target).load(window.location.href + ' ' + target + ' > *', function () {
-                            _self.find('i').remove()
-                        })
+                        // Use a more reliable approach for both desktop and mobile
+                        $.ajax({
+                            url: window.location.href,
+                            type: 'GET',
+                            success: (response) => {
+                                // Extract the target content from the response
+                                const tempDiv = document.createElement('div');
+                                tempDiv.innerHTML = response;
+
+                                // Update desktop layout if it exists
+                                const desktopContent = $(tempDiv).find(target);
+                                if (desktopContent.length && $(target).length) {
+                                    $(target).html(desktopContent.html());
+                                }
+
+                                // Update mobile layout
+                                const mobileContent = $(tempDiv).find(mobileTarget);
+                                if (mobileContent.length && $(mobileTarget).length) {
+                                    $(mobileTarget).html(mobileContent.html());
+                                }
+
+                                // Update or remove coupon wrapper section for mobile
+                                const couponWrapperContent = $(tempDiv).find(couponWrapperTarget);
+                                if (couponWrapperContent.length && $(couponWrapperTarget).length) {
+                                    $(couponWrapperTarget).html(couponWrapperContent.html());
+                                } else {
+                                    // If coupon was removed, remove the wrapper
+                                    $(couponWrapperTarget).remove();
+                                }
+
+                                // Update coupon items
+                                const couponItemsContent = $(tempDiv).find(couponItemTarget);
+                                if (couponItemsContent.length) {
+                                    // Update each coupon item or the entire section
+                                    const couponSection = $(tempDiv).find(couponSectionTarget);
+                                    if (couponSection.length && $(couponSectionTarget).length) {
+                                        $(couponSectionTarget).html(couponSection.html());
+                                    } else {
+                                        // Update individual coupon items
+                                        $(couponItemTarget).each(function(index) {
+                                            if (couponItemsContent[index]) {
+                                                $(this).replaceWith(couponItemsContent[index]);
+                                            }
+                                        });
+                                    }
+                                }
+
+                                // If nothing was updated, reload the page
+                                if ((!desktopContent.length && !mobileContent.length) ||
+                                    ($(target).length === 0 && $(mobileTarget).length === 0)) {
+                                    window.location.reload();
+                                }
+
+                                _self.find('i').remove();
+                            },
+                            error: () => {
+                                // Fallback to page reload if AJAX extraction fails
+                                window.location.reload();
+                            }
+                        });
                     } else {
                         $('.coupon-error-msg .text-danger').text(res.message)
                         _self.find('i').remove()

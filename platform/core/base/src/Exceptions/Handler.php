@@ -168,7 +168,7 @@ class Handler extends ExceptionHandler
                     [
                         'Request URL' => $request->fullUrl(),
                         'Request IP' => $request->ip(),
-                        'Request Referer' => $request->header('referer'),
+                        'Request Referer' => $request->header('referer') ?: 'No referer',
                         'Request Method' => $request->method(),
                         'Request Form Data' => $inputs,
                         'Exception Type' => $e::class,

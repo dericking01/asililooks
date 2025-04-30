@@ -24,6 +24,20 @@ class IndexCartRequest extends Request
         ];
     }
 
+    public function bodyParameters(): array
+    {
+        return [
+            'device_id' => [
+                'description' => 'The unique identifier of the device',
+                'example' => 'e70c6c88dae8344b03e39bb147eba66a',
+            ],
+            'customer_id' => [
+                'description' => 'The ID of the customer (optional)',
+                'example' => 1,
+            ],
+        ];
+    }
+
     protected function failedValidation(Validator $validator)
     {
         $errors = $validator->errors();

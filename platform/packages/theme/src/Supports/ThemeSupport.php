@@ -674,6 +674,7 @@ class ThemeSupport
             $year = Carbon::now()->format('Y');
 
             $copyright = str_replace('%Y', $year, $copyright);
+            $copyright = str_replace('%y', $year, $copyright);
             $copyright = str_replace(':year', $year, $copyright);
         }
 

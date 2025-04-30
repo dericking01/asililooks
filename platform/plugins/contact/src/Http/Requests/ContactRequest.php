@@ -52,10 +52,15 @@ class ContactRequest extends Request
         }
 
         try {
+            // Get display_fields and required_fields from request
+            // These could be strings or arrays depending on how the form is submitted
+            $displayFields = $this->input('display_fields');
+            $requiredFields = $this->input('required_fields');
+
             $rules = $this->applyRules(
                 $rules,
-                $this->request->getString('display_fields'),
-                $this->request->getString('required_fields')
+                $displayFields,
+                $requiredFields
             );
         } catch (Throwable $exception) {
             BaseHelper::logError($exception);
@@ -177,10 +182,24 @@ class ContactRequest extends Request
         return $mandatoryFields;
     }
 
-    public function applyRules(array $rules, ?string $displayFields, ?string $mandatoryFields): array
+    public function applyRules(array $rules, $displayFields, $mandatoryFields): array
     {
-        $this->mandatoryFields(array_filter(explode(',', (string) $mandatoryFields)));
-        $this->displayFields(array_filter(explode(',', (string) $displayFields)));
+        // Handle both string and array inputs for fields
+        if (is_array($mandatoryFields)) {
+            $this->mandatoryFields(array_filter($mandatoryFields));
+        } elseif (is_string($mandatoryFields)) {
+            $this->mandatoryFields(array_filter(explode(',', $mandatoryFields)));
+        } else {
+            $this->mandatoryFields([]);
+        }
+
+        if (is_array($displayFields)) {
+            $this->displayFields(array_filter($displayFields));
+        } elseif (is_string($displayFields)) {
+            $this->displayFields(array_filter(explode(',', $displayFields)));
+        } else {
+            $this->displayFields([]);
+        }
 
         $rules = $this->filtersByDisplayFields($rules);
 

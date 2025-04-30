@@ -47,7 +47,7 @@ class CompressImagesCommand extends Command
             return [new SplFileInfo($path, dirname($path), $path)];
         }
 
-        $this->info("Scanning '{$path}' for images...");
+        $this->components->info("Scanning '{$path}' for images...");
 
         return File::allFiles($path, true);
     }

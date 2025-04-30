@@ -27,11 +27,18 @@
     <div @class(['payment_collapse_wrap collapse mt-1', 'show' => $isSelected])>
         <p class="text-muted">{!! BaseHelper::clean($description ?: get_payment_setting('description', $name) ?: setting('payment_' . $name . '_description')) !!}</p>
         @php
-            $fee = get_payment_setting('fee', $name, 0);
+            $feeValue = get_payment_setting('fee', $name, 0);
+            $feeType = get_payment_setting('fee_type', $name, \Botble\Payment\Enums\PaymentFeeTypeEnum::FIXED);
+            $orderAmount = apply_filters('payment_order_total_amount', 0);
+            $fee = \Botble\Payment\Supports\PaymentFeeHelper::calculateFee($name, $orderAmount);
         @endphp
-        @if ($fee > 0)
+        @if ($feeValue > 0)
             <p class="text-warning">
-                {{ __('plugins/payment::payment.payment_fee') }}: {{ format_price($fee) }}
+                @if ($feeType === \Botble\Payment\Enums\PaymentFeeTypeEnum::PERCENTAGE)
+                    {{ __('plugins/payment::payment.payment_fee') }}: {{ format_price($fee) }} ({{ $feeValue }}%)
+                @else
+                    {{ __('plugins/payment::payment.payment_fee') }}: {{ format_price($fee) }}
+                @endif
                 <input type="hidden" name="payment_fee" value="{{ $fee }}" class="payment-fee-input" data-method="{{ $name }}">
             </p>
         @endif

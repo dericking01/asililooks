@@ -17,4 +17,14 @@ class DeleteCartRequest extends Request
             ],
         ];
     }
+
+    public function bodyParameters(): array
+    {
+        return [
+            'product_id' => [
+                'description' => 'The ID of the product to remove from the cart',
+                'example' => 1,
+            ],
+        ];
+    }
 }

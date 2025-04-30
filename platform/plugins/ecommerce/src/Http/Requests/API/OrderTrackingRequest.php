@@ -12,7 +12,7 @@ class OrderTrackingRequest extends Request
     public function rules(): array
     {
         $rules = [
-            'order_id' => ['required', 'string', 'min:1'],
+            'code' => ['required', 'string', 'min:1'],
             'email' => ['nullable', new EmailRule()],
         ];
 
@@ -34,11 +34,29 @@ class OrderTrackingRequest extends Request
     public function messages(): array
     {
         return [
-            'order_id.required' => __('Order ID is required'),
+            'code.required' => __('Order code is required'),
             'email.required' => __('Email is required'),
             'phone.required' => __('Phone is required'),
             'email.required_without' => __('Either email or phone is required'),
             'phone.required_without' => __('Either email or phone is required'),
+        ];
+    }
+
+    public function bodyParameters(): array
+    {
+        return [
+            'code' => [
+                'description' => 'The code of the order to track',
+                'example' => 'ORD-12345',
+            ],
+            'email' => [
+                'description' => 'The email address associated with the order (required if phone not provided)',
+                'example' => 'john.doe@example.com',
+            ],
+            'phone' => [
+                'description' => 'The phone number associated with the order (required if email not provided)',
+                'example' => '0123456789',
+            ],
         ];
     }
 }

@@ -23,28 +23,21 @@ class CustomerSettingForm extends SettingForm
             ->setSectionDescription(trans('plugins/ecommerce::setting.customer.customer_setting_description'))
             ->setValidatorClass(CustomerSettingRequest::class)
             ->add(
+                'enable_customer_registration',
+                OnOffCheckboxField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('plugins/ecommerce::setting.customer.form.enable_customer_registration'))
+                    ->helperText(trans('plugins/ecommerce::setting.customer.form.enable_customer_registration_helper'))
+                    ->value($registrationEnabled = get_ecommerce_setting('enable_customer_registration', true))
+            )
+            ->addOpenCollapsible('enable_customer_registration', '1', $registrationEnabled == '1')
+            ->add(
                 'verify_customer_email',
                 OnOffCheckboxField::class,
                 OnOffFieldOption::make()
                     ->label(trans('plugins/ecommerce::setting.customer.form.verify_customer_email'))
                     ->helperText(trans('plugins/ecommerce::setting.customer.form.verify_customer_email_helper'))
                     ->value(EcommerceHelper::isEnableEmailVerification())
-            )
-            ->add(
-                'enabled_customer_account_deletion',
-                OnOffCheckboxField::class,
-                OnOffFieldOption::make()
-                    ->label(trans('plugins/ecommerce::setting.customer.form.enabled_customer_account_deletion'))
-                    ->helperText(trans('plugins/ecommerce::setting.customer.form.enabled_customer_account_deletion_helper'))
-                    ->value(get_ecommerce_setting('enabled_customer_account_deletion', true))
-            )
-            ->add(
-                'enabled_customer_dob_field',
-                OnOffCheckboxField::class,
-                OnOffFieldOption::make()
-                    ->label(trans('plugins/ecommerce::setting.customer.form.enabled_customer_dob_field'))
-                    ->helperText(trans('plugins/ecommerce::setting.customer.form.enabled_customer_dob_field_helper'))
-                    ->value(get_ecommerce_setting('enabled_customer_dob_field', true))
             )
             ->add(
                 'enabled_phone_field_in_registration_form',
@@ -64,6 +57,7 @@ class CustomerSettingForm extends SettingForm
                     ->value(get_ecommerce_setting('make_customer_phone_number_required', false))
             )
             ->addCloseCollapsible('enabled_phone_field_in_registration_form', '1')
+            ->addCloseCollapsible('enable_customer_registration', '1')
             ->add(
                 'login_option',
                 RadioField::class,
@@ -86,6 +80,22 @@ class CustomerSettingForm extends SettingForm
                     ->value(get_ecommerce_setting('keep_email_field_in_registration_form', true))
             )
             ->addCloseCollapsible('login_option', 'phone')
+            ->add(
+                'enabled_customer_dob_field',
+                OnOffCheckboxField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('plugins/ecommerce::setting.customer.form.enabled_customer_dob_field'))
+                    ->helperText(trans('plugins/ecommerce::setting.customer.form.enabled_customer_dob_field_helper'))
+                    ->value(get_ecommerce_setting('enabled_customer_dob_field', true))
+            )
+            ->add(
+                'enabled_customer_account_deletion',
+                OnOffCheckboxField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('plugins/ecommerce::setting.customer.form.enabled_customer_account_deletion'))
+                    ->helperText(trans('plugins/ecommerce::setting.customer.form.enabled_customer_account_deletion_helper'))
+                    ->value(get_ecommerce_setting('enabled_customer_account_deletion', true))
+            )
             ->add(
                 'customer_default_avatar',
                 MediaImageField::class,

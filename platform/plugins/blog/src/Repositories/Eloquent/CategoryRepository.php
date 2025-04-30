@@ -142,7 +142,7 @@ class CategoryRepository extends RepositoriesAbstract implements CategoryInterfa
         $data = $this->model
             ->with($with)
             ->withCount($withCount)
-            ->orderByDesc('posts_count')
+            ->latest('posts_count')
             ->oldest('order')
             ->latest()
             ->wherePublished()

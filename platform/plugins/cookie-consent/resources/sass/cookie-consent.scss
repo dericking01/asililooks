@@ -4,7 +4,7 @@
     left: 0;
     right: 0;
     padding: 8px;
-    z-index: 9999;
+    z-index: 99999;
     transition: transform .3s ease;
     transform: translateY(100%);
 
@@ -97,10 +97,6 @@
         align-items: center;
         gap: 1rem;
         flex-wrap: wrap;
-
-        [dir="rtl"] & {
-            flex-direction: row-reverse;
-        }
     }
 
     .cookie-consent__message {

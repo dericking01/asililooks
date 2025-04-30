@@ -10,16 +10,24 @@ use Illuminate\Support\Arr;
 
 class HandleRemoveCouponService
 {
-    public function execute(?string $prefix = '', bool $isForget = true): array
+    public function execute(?string $prefix = '', bool $isForget = true, ?string $couponCode = null): array
     {
-        if (! session()->has('applied_coupon_code')) {
-            return [
-                'error' => true,
-                'message' => trans('plugins/ecommerce::discount.not_used'),
-            ];
+        // If no coupon code is provided, try to get it from the session
+        if (! $couponCode) {
+            if (! session()->has('applied_coupon_code')) {
+                return [
+                    'error' => true,
+                    'message' => trans('plugins/ecommerce::discount.not_used'),
+                ];
+            }
+
+            $couponCode = session('applied_coupon_code');
         }
 
-        $couponCode = session('applied_coupon_code');
+        // Store the coupon code in the session temporarily to ensure compatibility with other methods
+        if (! session()->has('applied_coupon_code')) {
+            session()->put('applied_coupon_code', $couponCode);
+        }
 
         $discount = Discount::query()
             ->where('code', $couponCode)

@@ -58,7 +58,7 @@ class SitemapServiceProvider extends ServiceProvider
             ClearCacheService::make()->clearFrameworkCache();
         });
 
-        PanelSectionManager::default()->beforeRendering(function () {
+        PanelSectionManager::default()->beforeRendering(function (): void {
             PanelSectionManager::registerItem(
                 SettingCommonPanelSection::class,
                 function () {

@@ -32,6 +32,10 @@ class RegisterController extends BaseController
 
     public function showRegistrationForm()
     {
+        if (! EcommerceHelper::isCustomerRegistrationEnabled()) {
+            abort(404);
+        }
+
         SeoHelper::setTitle(__('Register'));
 
         Theme::breadcrumb()->add(__('Register'), route('customer.register'));
@@ -60,6 +64,10 @@ class RegisterController extends BaseController
 
     public function register(RegisterRequest $request)
     {
+        if (! EcommerceHelper::isCustomerRegistrationEnabled()) {
+            abort(404);
+        }
+
         do_action('customer_register_validation', $request);
 
         /**

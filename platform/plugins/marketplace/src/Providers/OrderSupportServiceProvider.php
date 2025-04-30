@@ -29,6 +29,7 @@ use Botble\Marketplace\Models\Revenue;
 use Botble\Marketplace\Models\Store;
 use Botble\Marketplace\Models\VendorInfo;
 use Botble\Payment\Enums\PaymentStatusEnum;
+use Botble\Payment\Supports\PaymentFeeHelper;
 use Botble\Payment\Supports\PaymentHelper;
 use Botble\PayPal\Services\Gateways\PayPalPaymentService;
 use Botble\Theme\Facades\Theme;
@@ -430,7 +431,7 @@ class OrderSupportServiceProvider extends ServiceProvider
         // Add payment fee if applicable
         $paymentFee = 0;
         if ($paymentMethod && is_plugin_active('payment')) {
-            $paymentFee = (float) get_payment_setting('fee', $paymentMethod, 0);
+            $paymentFee = PaymentFeeHelper::calculateFee($paymentMethod, $orderAmount);
             $orderAmount += $paymentFee;
         }
 
@@ -542,7 +543,7 @@ class OrderSupportServiceProvider extends ServiceProvider
         // Add payment fee if applicable
         $paymentMethod = $request->input('payment_method');
         if ($paymentMethod && is_plugin_active('payment')) {
-            $paymentFee = (float) get_payment_setting('fee', $paymentMethod, 0);
+            $paymentFee = PaymentFeeHelper::calculateFee($paymentMethod, $totalAmount);
             $totalAmount += $paymentFee;
         }
 

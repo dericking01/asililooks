@@ -17,7 +17,3 @@ mix.combine([
     `${source}/resources/js/timezones.js`,
     `${source}/resources/js/validations.js`,
 ], `${dist}/js/js-validation.js`)
-
-if (mix.inProduction()) {
-    // mix.copy(`${dist}/js/js-validation.js`, `${source}/public/js`)
-}

@@ -23,6 +23,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static string getLanguageSupport()
  * @method static array supportedDateFormats()
  * @method static array getDefaultInvoiceTemplatesFilter()
+ * @method static string getInvoiceUrl(\Botble\Ecommerce\Models\Invoice $invoice)
+ * @method static string getInvoiceDownloadUrl(\Botble\Ecommerce\Models\Invoice $invoice)
  *
  * @see \Botble\Ecommerce\Supports\InvoiceHelper
  */

@@ -43,7 +43,7 @@ class CacheSettingForm extends SettingForm
                     ->helperText(trans('core/setting::setting.cache.form.cache_user_avatar_helper'))
                     ->value(setting('cache_user_avatar_enabled', true))
             )
-            ->when(setting('sitemap_enabled', true), function (CacheSettingForm $form) {
+            ->when(setting('sitemap_enabled', true), function (CacheSettingForm $form): void {
                 $form
                     ->add(
                         'enable_cache_site_map',

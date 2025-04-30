@@ -11,6 +11,7 @@ use Botble\Base\Events\CreatedContentEvent;
 use Botble\Base\Events\FormRendering;
 use Botble\Base\Events\UpdatedContentEvent;
 use Botble\Base\Facades\Assets;
+use Botble\Base\Forms\FieldOptions\HtmlFieldOption;
 use Botble\Base\Forms\Fields\AutocompleteField;
 use Botble\Base\Forms\Fields\ColorField;
 use Botble\Base\Forms\Fields\DatePickerField;
@@ -604,6 +605,17 @@ abstract class FormAbstract extends Form implements ExtensibleContract
         $this->setFormOption('class', $this->getFormOption('class') . ' ' . $class);
 
         return $this;
+    }
+
+    public function addHtml(Closure|string $html): static
+    {
+        return $this
+            ->add(
+                'html_' . Str::random(10),
+                HtmlField::class,
+                HtmlFieldOption::make()
+                    ->content($html)
+            );
     }
 
     public function disablePermalinkField(bool $disabled = true): static

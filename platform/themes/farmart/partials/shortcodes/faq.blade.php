@@ -1,6 +1,12 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col">
+            @if ($title)
+                <h2 class="text-center mb-4">{{ $title }}</h2>
+            @endif
+            @if (!empty($subtitle))
+                <p class="text-center mb-4">{{ $subtitle }}</p>
+            @endif
             <div class="row faqs-nav-tab">
                 <div class="col-md-3">
                     <ul

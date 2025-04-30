@@ -5,6 +5,8 @@ namespace Botble\Installer\InstallerStep;
 use Botble\Theme\Facades\Manager;
 use Botble\Theme\Facades\Theme;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 
 class InstallerStep
 {
@@ -13,7 +15,11 @@ class InstallerStep
      */
     protected static array $steps = [];
 
+    protected static string $currentTheme;
+
     protected static array $themes = [];
+
+    protected static array $themePresets = [];
 
     /**
      * @return array<InstallerStepItem>
@@ -51,6 +57,13 @@ class InstallerStep
             self::$steps['theme'] = InstallerStepItem::make()
                 ->label(fn () => trans('packages/installer::installer.theme.title'))
                 ->route('installers.themes.index')
+                ->priority(40);
+        }
+
+        if (InstallerStep::hasMoreThemePresets()) {
+            self::$steps['preset'] = InstallerStepItem::make()
+                ->label(fn () => trans('packages/installer::installer.theme_preset.title'))
+                ->route('installers.theme-presets.index')
                 ->priority(40);
         }
 
@@ -95,5 +108,57 @@ class InstallerStep
     public static function hasMoreThemes(): bool
     {
         return count(self::getThemes()) > 1;
+    }
+
+    public static function setCurrentTheme(string $theme): void
+    {
+        self::$currentTheme = $theme;
+
+        Session::put('installer_theme', $theme);
+    }
+
+    public static function getThemePresets(): array
+    {
+        if (! class_exists(Manager::class)) {
+            return [];
+        }
+
+        self::$currentTheme ??= Session::get('installer_theme', Theme::getThemeName());
+
+        if (isset(self::$themePresets[self::$currentTheme])
+            && $themePresets = self::$themePresets[self::$currentTheme]) {
+            return $themePresets;
+        }
+
+        $presets = Manager::getThemePresets(self::$currentTheme);
+
+        $presets = [
+            [
+                'id' => 'default',
+                'name' => 'Default',
+                'screenshot' => 'screenshot.png',
+            ],
+            ...$presets,
+        ];
+
+        $presets = collect($presets)
+            ->mapWithKeys(function ($preset) {
+                $name = $preset['name'];
+                $id = $preset['id'] ?? Str::kebab($name);
+                $id = self::$currentTheme . '-' . $id;
+
+                return [$id => [
+                    'label' => $name,
+                    'image' => Theme::getThemeScreenshot(self::$currentTheme, $preset['screenshot'] ?? null),
+                ]];
+            })
+            ->all();
+
+        return self::$themePresets[self::$currentTheme] = apply_filters('cms_installer_theme_presets', $presets);
+    }
+
+    public static function hasMoreThemePresets(): bool
+    {
+        return count(self::getThemePresets()) > 1;
     }
 }

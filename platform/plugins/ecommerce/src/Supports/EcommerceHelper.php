@@ -433,6 +433,11 @@ class EcommerceHelper
         return (bool) get_ecommerce_setting('verify_customer_email', 0);
     }
 
+    public function isCustomerRegistrationEnabled(): bool
+    {
+        return (bool) get_ecommerce_setting('enable_customer_registration', true);
+    }
+
     public function disableOrderInvoiceUntilOrderConfirmed(): bool
     {
         return (bool) get_ecommerce_setting('disable_order_invoice_until_order_confirmed', 0);
@@ -1451,7 +1456,7 @@ class EcommerceHelper
 
     public function registerThemeAssets(): void
     {
-        $version = get_cms_version() . '.5';
+        $version = get_cms_version();
 
         Theme::asset()
             ->add('front-ecommerce-css', 'vendor/core/plugins/ecommerce/css/front-ecommerce.css', version: $version);

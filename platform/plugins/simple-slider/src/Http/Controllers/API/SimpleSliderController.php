@@ -26,8 +26,8 @@ class SimpleSliderController extends BaseController
     {
         if ($request->has('keys')) {
             $validator = Validator::make($request->all(), [
-                'keys' => 'required|array',
-                'keys.*' => 'string',
+                'keys' => ['required', 'array'],
+                'keys.*' => ['string'],
             ]);
 
             if ($validator->fails()) {
@@ -42,7 +42,7 @@ class SimpleSliderController extends BaseController
         // Build the base query
         $query = SimpleSlider::query()
             ->wherePublished()
-            ->with(['sliderItems' => function ($query) {
+            ->with(['sliderItems' => function ($query): void {
                 $query->orderBy('order');
             }]);
 

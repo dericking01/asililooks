@@ -259,8 +259,7 @@ class HookServiceProvider extends ServiceProvider
         $categoryIds = ShortcodeFacade::fields()->getIds('category_ids', $shortcode);
 
         $posts = Post::query()
-            ->wherePublished()
-            ->orderByDesc('created_at')
+            ->wherePublished()->latest()
             ->with(['slugable', 'categories.slugable'])
             ->when(! empty($categoryIds), function ($query) use ($categoryIds): void {
                 $query->whereHas('categories', function ($query) use ($categoryIds): void {

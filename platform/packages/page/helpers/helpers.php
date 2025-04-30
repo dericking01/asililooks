@@ -12,8 +12,7 @@ if (! function_exists('get_all_pages')) {
         $pages = Page::query()
             ->when($active, function (BaseQueryBuilder $query): void {
                 $query->wherePublished();
-            })
-            ->orderByDesc('created_at')
+            })->latest()
             ->with('slugable');
 
         return RepositoryHelper::applyBeforeExecuteQuery($pages, new Page())->get();

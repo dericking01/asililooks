@@ -2,7 +2,6 @@
 
 namespace Botble\Ecommerce\Http\Resources\API;
 
-use Botble\Ecommerce\Http\Resources\ProductOptionResource;
 use Botble\Ecommerce\Models\Product;
 use Botble\Media\Facades\RvMedia;
 use Illuminate\Http\Resources\Json\JsonResource;

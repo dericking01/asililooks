@@ -42,7 +42,7 @@ class HookServiceProvider extends ServiceProvider
         add_filter('form_extra_fields_render', function (?string $fields = null, ?string $form = null): ?string {
             $customFields = CustomField::query()
                 ->wherePublished()->with('options')
-                ->orderBy('order')
+                ->oldest('order')
                 ->get();
 
             if ($customFields->isEmpty()) {

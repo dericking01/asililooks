@@ -20,6 +20,7 @@ class StripePaymentMethodForm extends PaymentMethodForm
             ->paymentName('Stripe')
             ->paymentDescription(trans('plugins/payment::payment.stripe_description'))
             ->paymentLogo(url('vendor/core/plugins/stripe/images/stripe.svg'))
+            ->paymentFeeField(STRIPE_PAYMENT_METHOD_NAME)
             ->paymentUrl('https://stripe.com')
             ->paymentInstructions(view('plugins/stripe::instructions')->render())
             ->add(

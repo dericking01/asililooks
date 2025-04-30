@@ -5,7 +5,6 @@ namespace Botble\Ecommerce\Http\Resources;
 use Botble\Ecommerce\Models\Product;
 use Botble\Media\Facades\RvMedia;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Auth;
 
 /**
  * @mixin Product
@@ -34,15 +33,19 @@ class AvailableProductResource extends JsonResource
             'price' => $this->front_sale_price,
             'formatted_price' => format_price($this->front_sale_price),
             'final_price' => $this->front_sale_price + $taxPrice,
+            'formatted_final_price' => format_price($this->front_sale_price + $taxPrice),
             'original_price' => $this->original_price,
+            'formatted_original_price' => format_price($this->original_price),
             'tax_price' => $taxPrice,
+            'formatted_tax_price' => format_price($taxPrice),
             'total_taxes_percentage' => $this->total_taxes_percentage,
+            'reviews_avg' => $this->reviews_avg,
+            'reviews_count' => $this->reviews_count,
             'image_with_sizes' => $this->image_with_sizes,
             'weight' => $this->weight,
             'height' => $this->height,
             'wide' => $this->wide,
             'length' => $this->length,
-            'product_link' => Auth::user()->hasPermission('products.edit') ? route('products.edit', $this->original_product->id) : '',
             'image_url' => RvMedia::getImageUrl($this->image, 'thumb', false, RvMedia::getDefaultImage()),
             'is_variation' => $this->is_variation,
             'variations' => $this->variations->map(function ($item) {

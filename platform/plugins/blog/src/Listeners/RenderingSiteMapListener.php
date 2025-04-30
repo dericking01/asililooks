@@ -30,8 +30,7 @@ class RenderingSiteMapListener
                 case 'blog-tags':
                     $tags = Tag::query()
                         ->with('slugable')
-                        ->wherePublished()
-                        ->orderByDesc('created_at')
+                        ->wherePublished()->latest()
                         ->select(['id', 'name', 'updated_at'])
                         ->get();
 

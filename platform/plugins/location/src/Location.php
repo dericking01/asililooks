@@ -30,7 +30,7 @@ class Location
     {
         return State::query()
             ->wherePublished()
-            ->orderBy('order')
+            ->oldest('order')
             ->oldest('name')
             ->pluck('name', 'id')
             ->all();
@@ -45,7 +45,7 @@ class Location
         return City::query()
             ->wherePublished()
             ->where('state_id', $stateId)
-            ->orderBy('order')
+            ->oldest('order')
             ->oldest('name')
             ->pluck('name', 'id')
             ->all();

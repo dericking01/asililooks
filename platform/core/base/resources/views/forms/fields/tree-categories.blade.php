@@ -1,8 +1,12 @@
+@php
+    use Illuminate\Support\Arr;
+@endphp
+
 @if (
     isset($options['choices'])
     && (is_array($options['choices']) || $options['choices'] instanceof \Illuminate\Support\Collection)
 )
-    @if(count($options['choices']) < 50)
+    @if (count($options['choices']) < (Arr::get($options, 'switch_to_dropdown_threshold', 50)))
         <div class="mb-3">
             <div class="input-icon">
                 <input

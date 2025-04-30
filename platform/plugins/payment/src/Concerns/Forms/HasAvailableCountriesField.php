@@ -2,7 +2,6 @@
 
 namespace Botble\Payment\Concerns\Forms;
 
-use Botble\Base\Facades\Assets;
 use Botble\Base\Forms\FieldOptions\CheckboxFieldOption;
 use Botble\Base\Forms\FieldOptions\LabelFieldOption;
 use Botble\Base\Forms\FieldOptions\MultiChecklistFieldOption;
@@ -16,8 +15,6 @@ trait HasAvailableCountriesField
 {
     protected function addAvailableCountriesField(string $paymentMethod): static
     {
-        Assets::addScriptsDirectly('vendor/core/plugins/ecommerce/js/setting.js');
-
         $countries = Helper::countries();
         $selected = array_keys(PaymentHelper::getAvailableCountries($paymentMethod));
 

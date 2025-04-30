@@ -54,6 +54,12 @@ interface Manager extends Htmlable, Renderable
      */
     public function getItems(string $section): array;
 
+    /**
+     * @param class-string<PanelSection> $section
+     * @param string $id The ID of the panel section item to remove
+     */
+    public function removeItem(string $section, string $id): static;
+
     public function ignoreItemId(string $id): static;
 
     public function ignoreItemIds(array $ids): static;

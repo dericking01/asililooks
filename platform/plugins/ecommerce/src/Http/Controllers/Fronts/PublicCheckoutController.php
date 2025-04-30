@@ -38,6 +38,7 @@ use Botble\Ecommerce\Services\HandleShippingFeeService;
 use Botble\Ecommerce\Services\HandleTaxService;
 use Botble\Optimize\Facades\OptimizerHelper;
 use Botble\Payment\Enums\PaymentStatusEnum;
+use Botble\Payment\Supports\PaymentFeeHelper;
 use Botble\Payment\Supports\PaymentHelper;
 use Botble\Theme\Facades\Theme;
 use Exception;
@@ -740,7 +741,7 @@ class PublicCheckoutController extends BaseController
         // Add payment fee if applicable
         $paymentFee = 0;
         if ($paymentMethod && is_plugin_active('payment')) {
-            $paymentFee = (float) get_payment_setting('fee', $paymentMethod, 0);
+            $paymentFee = PaymentFeeHelper::calculateFee($paymentMethod, $orderAmount);
             $orderAmount += $paymentFee;
         }
 

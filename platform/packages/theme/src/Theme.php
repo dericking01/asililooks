@@ -900,23 +900,31 @@ class Theme implements ThemeContract
         return $this;
     }
 
-    public function getThemeScreenshot(string $theme): string
+    public function getThemeScreenshot(string $theme, ?string $name = null): string
     {
         $publicThemeName = Theme::getPublicThemeName();
 
         $themeName = Theme::getThemeName() == $theme && $publicThemeName ? $publicThemeName : $theme;
 
-        $screenshot = public_path($this->getConfig('themeDir') . '/' . $themeName . '/screenshot.png');
+        $screenshotName = $name ?: 'screenshot.png';
+
+        $screenshot = public_path($this->getConfig('themeDir') . '/' . $themeName . '/' . $screenshotName);
 
         if (! File::exists($screenshot)) {
-            $screenshot = $this->path($theme) . '/screenshot.png';
+            $screenshot = $this->path($theme) . '/' . $screenshotName;
+        }
+
+        if (! File::exists($screenshot)) {
+            $screenshot = theme_path($theme . '/' . $screenshotName);
         }
 
         if (! File::exists($screenshot)) {
             return RvMedia::getDefaultImage();
         }
 
-        return 'data:image/png;base64,' . base64_encode(File::get($screenshot));
+        $guessedMimeType = File::mimeType($screenshot);
+
+        return 'data:' . $guessedMimeType . ';base64,' . base64_encode(File::get($screenshot));
     }
 
     public function registerThemeIconFields(array $icons, array $css = [], array $js = []): void
@@ -1075,6 +1083,8 @@ class Theme implements ThemeContract
         if ($height) {
             $attributes['style'] = sprintf('max-height: %s', is_numeric($height) ? "{$height}px" : $height);
         }
+
+        $attributes['loading'] = false;
 
         return apply_filters('theme_logo_image', RvMedia::image($logo, $this->getSiteTitle(), attributes: $attributes, lazy: false));
     }

@@ -16,6 +16,40 @@ class Review extends BaseModel
 {
     protected $table = 'ec_reviews';
 
+    /**
+     * Check if a customer has already reviewed a product
+     *
+     * @param int|string $customerId
+     * @param int|string $productId
+     * @return bool
+     */
+    public static function hasUserReviewed(int|string $customerId, int|string $productId): bool
+    {
+        return static::query()
+            ->where([
+                'customer_id' => $customerId,
+                'product_id' => $productId,
+            ])
+            ->exists();
+    }
+
+    /**
+     * Get a customer's review for a product
+     *
+     * @param int|string $customerId
+     * @param int|string $productId
+     * @return Review|null
+     */
+    public static function getUserReview(int|string $customerId, int|string $productId): ?Review
+    {
+        return static::query()
+            ->where([
+                'customer_id' => $customerId,
+                'product_id' => $productId,
+            ])
+            ->first();
+    }
+
     protected $fillable = [
         'product_id',
         'customer_id',

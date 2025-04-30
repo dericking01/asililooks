@@ -158,7 +158,7 @@ class SelectLocationField extends FormField
         if ($stateId) {
             $cities = City::query()
                 ->where('state_id', $stateId)
-                ->orderBy('order')
+                ->oldest('order')
                 ->oldest('name')
                 ->latest()
                 ->select('name', 'id')->get()

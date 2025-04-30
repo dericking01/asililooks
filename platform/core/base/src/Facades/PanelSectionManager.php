@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static static registerItem(string $section, \Closure $item)
  * @method static static registerItems(string $section, \Closure $items)
  * @method static array getItems(string $section)
+ * @method static static removeItem(string $section, string $id)
  * @method static static ignoreItemId(string $id)
  * @method static static ignoreItemIds(array $ids)
  * @method static bool isIgnoredItemIds(string $id)

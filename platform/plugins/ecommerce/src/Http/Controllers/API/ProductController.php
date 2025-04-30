@@ -8,8 +8,14 @@ use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Http\Resources\API\AvailableProductResource;
 use Botble\Ecommerce\Http\Resources\API\RelatedProductResource;
 use Botble\Ecommerce\Http\Resources\API\ReviewResource;
+use Botble\Ecommerce\Http\Resources\ProductVariationResource;
 use Botble\Ecommerce\Models\Product;
+use Botble\Ecommerce\Models\ProductVariation;
+use Botble\Ecommerce\Models\ProductVariationItem;
+use Botble\Ecommerce\Models\Review;
+use Botble\Ecommerce\Repositories\Interfaces\ProductInterface;
 use Botble\Ecommerce\Services\Products\GetProductService;
+use Botble\Ecommerce\Services\Products\GetProductWithCrossSalesBySlugService;
 use Botble\Ecommerce\Services\Products\ProductCrossSalePriceService;
 use Botble\Ecommerce\Services\Products\UpdateDefaultProductService;
 use Botble\Media\Facades\RvMedia;
@@ -116,6 +122,31 @@ class ProductController extends BaseController
             $product->image = $selectedProductVariation->configurableProduct->image ?: $product->image;
         }
 
+        // Get product variations info for filtering unavailable attributes
+        $productVariations = ProductVariation::query()
+            ->where('configurable_product_id', $product->id)
+            ->with(['productAttributes', 'product'])
+            ->get();
+
+        $productVariationsInfo = ProductVariationItem::getVariationsInfo($productVariations->pluck('id')->all());
+
+        if ($productVariationsInfo->isNotEmpty()) {
+            $productVariationsInfo = $productVariationsInfo
+                ->reject(function (ProductVariationItem $productVariation) use ($productVariations) {
+                    $variationItem = $productVariations->where('id', $productVariation->variation_id)->first();
+
+                    if (! $variationItem) {
+                        return false;
+                    }
+
+                    return $variationItem->product->isOutOfStock();
+                });
+        }
+
+        // Get attribute sets and attributes
+        $attributeSets = $product->productAttributeSets()->orderBy('order')->get();
+        $productAttributes = app(ProductInterface::class)->getRelatedProductAttributes($product)->sortBy('order');
+
         $price = $productVariation->price();
 
         return $this
@@ -152,14 +183,34 @@ class ProductController extends BaseController
                         RvMedia::getDefaultImage()
                     ),
                 ],
-                'attribute_sets' => array_map(function ($attr) {
+                'attribute_sets' => array_map(function ($set, $key) use ($productVariationsInfo, $attributeSets, $productAttributes) {
+                    $variationNextIds = [];
+
+                    // Process previous attribute sets to get variationNextIds
+                    if ($key > 0) {
+                        for ($i = 0; $i < $key; $i++) {
+                            $previousSet = $attributeSets[$i];
+                            [$variationNextIds] = handle_next_attributes_in_product(
+                                $productAttributes->where('attribute_set_id', $previousSet->id),
+                                $productVariationsInfo,
+                                $previousSet->id,
+                                [], // No selected attributes for API response
+                                $i,
+                                $variationNextIds
+                            );
+                        }
+                    }
+
+                    // Get all attributes for this set
+                    $setAttributes = $productAttributes->where('attribute_set_id', $set->id)->sortBy('order');
+
                     return [
-                        'id' => $attr->id,
-                        'title' => $attr->title,
-                        'slug' => $attr->slug,
-                        'order' => $attr->order,
-                        'display_layout' => $attr->display_layout,
-                        'attributes' => array_map(function ($attr) {
+                        'id' => $set->id,
+                        'title' => $set->title,
+                        'slug' => $set->slug,
+                        'order' => $set->order,
+                        'display_layout' => $set->display_layout,
+                        'attributes' => array_values(array_map(function ($attr) {
                             return [
                                 'id' => $attr->id,
                                 'title' => $attr->title,
@@ -168,9 +219,10 @@ class ProductController extends BaseController
                                 'image' => $attr->image,
                                 'order' => $attr->order,
                             ];
-                        }, $attr->attributes->sortBy('order')->all()),
+                        }, $setAttributes->all())),
                     ];
-                }, $product->productAttributeSets->sortBy('order')->all()),
+                }, $attributeSets->all(), array_keys($attributeSets->all())),
+                'unavailable_attribute_ids' => $this->getUnavailableAttributeIds($productVariationsInfo, $attributeSets, $productAttributes, $selectedAttrs instanceof Collection ? $selectedAttrs->pluck('id')->toArray() : []),
                 'selected_attributes' => array_map(function ($attr) {
                     return [
                         'id' => $attr->id,
@@ -190,6 +242,67 @@ class ProductController extends BaseController
                 }, $selectedAttrs instanceof Collection ? $selectedAttrs->all() : $selectedAttrs),
             ])
             ->toApiResponse();
+    }
+
+    /**
+     * Get unavailable attribute IDs for a product
+     *
+     * @param Collection $productVariationsInfo
+     * @param Collection $attributeSets
+     * @param Collection $productAttributes
+     * @param array $selectedAttributeIds
+     * @return array
+     */
+    protected function getUnavailableAttributeIds(Collection $productVariationsInfo, Collection $attributeSets, Collection $productAttributes, array $selectedAttributeIds = []): array
+    {
+        $unavailableAttributeIds = [];
+        $variationNextIds = [];
+
+        foreach ($attributeSets as $key => $set) {
+            $variationInfo = $productVariationsInfo;
+
+            if ($key != 0) {
+                $variationInfo = $productVariationsInfo
+                    ->where('attribute_set_id', $set->id)
+                    ->whereIn('variation_id', $variationNextIds);
+            }
+
+            foreach ($productAttributes->where('attribute_set_id', $set->id) as $attribute) {
+                // Skip if this is a selected attribute
+                if (in_array($attribute->id, $selectedAttributeIds)) {
+                    continue;
+                }
+
+                if ($variationInfo->where('id', $attribute->id)->isEmpty()) {
+                    $unavailableAttributeIds[] = $attribute->id;
+                }
+            }
+
+            // Calculate next variation IDs for the next attribute set
+            foreach ($productAttributes->where('attribute_set_id', $set->id) as $attribute) {
+                // Only consider selected attributes for this set when calculating next variations
+                if (in_array($attribute->id, $selectedAttributeIds)) {
+                    $variationIds = $productVariationsInfo
+                        ->where('attribute_set_id', $set->id)
+                        ->where('id', $attribute->id)
+                        ->pluck('variation_id')
+                        ->toArray();
+
+                    if ($key == 0) {
+                        $variationNextIds = $variationIds;
+                    } else {
+                        $variationNextIds = array_intersect($variationNextIds, $variationIds);
+                    }
+                }
+            }
+
+            // If no attributes are selected for this set, use all variations
+            if ($key == 0 && empty($variationNextIds)) {
+                $variationNextIds = $productVariationsInfo->pluck('variation_id')->unique()->toArray();
+            }
+        }
+
+        return $unavailableAttributeIds;
     }
 
     /**
@@ -247,6 +360,17 @@ class ProductController extends BaseController
 
         $reviews = EcommerceHelper::getProductReviews($product, $star, $perPage);
 
+        // Check if the current user has reviewed this product
+        $hasReviewed = false;
+        $userReview = null;
+        $user = $request->user();
+
+        if ($user) {
+            // Get the user's review if it exists
+            $userReview = Review::getUserReview($user->id, $product->id);
+            $hasReviewed = $userReview !== null;
+        }
+
         if ($star) {
             $message = __(':total review(s) ":star star" for ":product"', [
                 'total' => $reviews->total(),
@@ -260,10 +384,397 @@ class ProductController extends BaseController
             ]);
         }
 
+        $data = [
+            'reviews' => ReviewResource::collection($reviews),
+            'has_reviewed' => $hasReviewed,
+            'user_review' => $hasReviewed ? new ReviewResource($userReview) : null,
+        ];
+
         return $this
             ->httpResponse()
-            ->setData(ReviewResource::collection($reviews))
+            ->setData($data)
             ->setMessage($message)
+            ->toApiResponse();
+    }
+
+    /**
+     * Get product variation by attributes
+     *
+     * @group Products
+     * @param int|string $id Product ID
+     * @param Request $request
+     * @param ProductInterface $productRepository
+     * @param GetProductWithCrossSalesBySlugService $getProductWithCrossSalesBySlugService
+     *
+     * @queryParam attributes array Array of attribute IDs. Example: [1, 2]
+     * @queryParam reference_product string Reference product slug. No-example
+     */
+    public function getProductVariation(
+        int|string $id,
+        Request $request,
+        ProductInterface $productRepository,
+        GetProductWithCrossSalesBySlugService $getProductWithCrossSalesBySlugService,
+    ) {
+        $request->validate([
+            'reference_product' => ['sometimes', 'required', 'string'],
+            'attributes' => ['sometimes', 'array'],
+            'attributes.*' => ['required'],
+        ]);
+
+        $product = null;
+
+        if ($attributes = $request->input('attributes', [])) {
+            $variation = ProductVariation::getVariationByAttributes($id, $attributes);
+
+            if ($variation) {
+                $product = $productRepository->getProductVariations($id, [
+                    'condition' => [
+                        'ec_product_variations.id' => $variation->getKey(),
+                        'original_products.status' => BaseStatusEnum::PUBLISHED,
+                    ],
+                    'select' => [
+                        'ec_products.id',
+                        'ec_products.name',
+                        'ec_products.quantity',
+                        'ec_products.price',
+                        'ec_products.sale_price',
+                        'ec_products.sale_type',
+                        'ec_products.start_date',
+                        'ec_products.end_date',
+                        'ec_products.allow_checkout_when_out_of_stock',
+                        'ec_products.with_storehouse_management',
+                        'ec_products.stock_status',
+                        'ec_products.images',
+                        'ec_products.sku',
+                        'ec_products.barcode',
+                        'ec_products.description',
+                        'ec_products.is_variation',
+                        'original_products.images as original_images',
+                        'ec_products.height',
+                        'ec_products.weight',
+                        'ec_products.wide',
+                        'ec_products.length',
+                    ],
+                    'take' => 1,
+                ]);
+            }
+        } else {
+            $product = Product::query()
+                ->where('id', $id)
+                ->wherePublished()
+                ->select([
+                    'id',
+                    'name',
+                    'quantity',
+                    'price',
+                    'sale_price',
+                    'allow_checkout_when_out_of_stock',
+                    'with_storehouse_management',
+                    'stock_status',
+                    'images',
+                    'sku',
+                    'description',
+                    'is_variation',
+                    'height',
+                    'weight',
+                    'wide',
+                    'length',
+                ])
+                ->first();
+
+            $attributes = $product ? $product->defaultVariation->productAttributes->pluck('id')->all() : [];
+        }
+
+        if ($product) {
+            if ($product->images) {
+                $originalImages = $product->images;
+
+                if (get_ecommerce_setting(
+                    'how_to_display_product_variation_images'
+                ) == 'variation_images_and_main_product_images') {
+                    $parentImages = is_array(
+                        $product->original_images
+                    ) ? $product->original_images : (array) json_decode($product->original_images, true);
+
+                    if ($parentImages) {
+                        $originalImages = array_merge($originalImages, $parentImages);
+                    }
+                }
+            } else {
+                $originalImages = $product->original_images ?: $product->original_product->images;
+
+                if (! is_array($originalImages)) {
+                    $originalImages = json_decode($originalImages, true);
+                }
+            }
+
+            $product->image_with_sizes = rv_get_image_list($originalImages, array_unique([
+                'origin',
+                'thumb',
+                ...array_keys(RvMedia::getSizes()),
+            ]));
+
+            if ($product->stock_status == 'on_backorder') {
+                $product->warningMessage = __('Warning: This product is on backorder and may take longer to ship.');
+            } elseif ($product->isOutOfStock()) {
+                $product->errorMessage = __('Out of stock');
+            } elseif (! $product->with_storehouse_management || $product->quantity < 1) {
+                $product->successMessage = __('In stock');
+            } elseif ($product->quantity) {
+                if (EcommerceHelper::showNumberOfProductsInProductSingle()) {
+                    if ($product->quantity != 1) {
+                        $product->successMessage = __(':number products available', ['number' => $product->quantity]);
+                    } else {
+                        $product->successMessage = __(':number product available', ['number' => $product->quantity]);
+                    }
+                } else {
+                    $product->successMessage = __('In stock');
+                }
+            }
+
+            $originalProduct = $product->original_product;
+        } else {
+            $originalProduct = Product::query()
+                ->where('id', $id)
+                ->wherePublished()
+                ->select([
+                    'id',
+                    'name',
+                    'quantity',
+                    'price',
+                    'sale_price',
+                    'allow_checkout_when_out_of_stock',
+                    'with_storehouse_management',
+                    'stock_status',
+                    'images',
+                    'sku',
+                    'description',
+                    'is_variation',
+                    'height',
+                    'weight',
+                    'wide',
+                    'length',
+                ])
+                ->first();
+
+            if ($originalProduct) {
+                if ($originalProduct->images) {
+                    $originalProduct->image_with_sizes = rv_get_image_list($originalProduct->images, array_unique([
+                        'origin',
+                        'thumb',
+                        ...array_keys(RvMedia::getSizes()),
+                    ]));
+                }
+
+                $originalProduct->errorMessage = __('Please select attributes');
+            }
+        }
+
+        if (! $originalProduct) {
+            return $this
+                ->httpResponse()
+                ->setError()
+                ->setMessage(__('Not available'));
+        }
+
+        $productAttributes = $productRepository->getRelatedProductAttributes($originalProduct)->sortBy('order');
+
+        $attributeSets = $originalProduct->productAttributeSets()->orderBy('order')->get();
+
+        $productVariations = ProductVariation::query()
+            ->where('configurable_product_id', $originalProduct->id)
+            ->get();
+
+        $productVariationsInfo = ProductVariationItem::getVariationsInfo($productVariations->pluck('id')->all());
+
+        if ($productVariationsInfo->isNotEmpty()) {
+            $productVariationsInfo = $productVariationsInfo
+                ->reject(function (ProductVariationItem $productVariation) use ($productVariations) {
+                    $variationItem = $productVariations->where('id', $productVariation->variation_id)->first();
+
+                    if (! $variationItem) {
+                        return false;
+                    }
+
+                    return $variationItem->product->isOutOfStock();
+                });
+        }
+
+        $variationInfo = $productVariationsInfo;
+
+        $unavailableAttributeIds = [];
+        $variationNextIds = [];
+        foreach ($attributeSets as $key => $set) {
+            if ($key != 0) {
+                $variationInfo = $productVariationsInfo
+                    ->where('attribute_set_id', $set->id)
+                    ->whereIn('variation_id', $variationNextIds);
+            }
+
+            [$variationNextIds, $unavailableAttributeIds] = handle_next_attributes_in_product(
+                $productAttributes->where('attribute_set_id', $set->id),
+                $productVariationsInfo,
+                $set->id,
+                $attributes,
+                $key,
+                $variationNextIds,
+                $variationInfo,
+                $unavailableAttributeIds
+            );
+        }
+
+        if (! $product) {
+            $product = $originalProduct;
+        }
+
+        if (! $product->is_variation) {
+            $selectedAttributes = $product->defaultVariation->productAttributes->map(function ($item) {
+                $item->attribute_set_slug = $item->productAttributeSet->slug;
+
+                return $item;
+            });
+        } else {
+            $selectedAttributes = $product->variationProductAttributes;
+
+            if ($attributes) {
+                $selectedAttributes = $selectedAttributes->whereIn('id', $attributes);
+            }
+        }
+
+        $product->unavailableAttributeIds = $unavailableAttributeIds;
+        $product->selectedAttributes = $selectedAttributes;
+
+        if (
+            $request->filled('reference_product')
+            && $referenceProduct = $getProductWithCrossSalesBySlugService->handle(
+                $request->input('reference_product')
+            )
+        ) {
+            app(ProductCrossSalePriceService::class)->applyProduct($referenceProduct);
+        }
+
+        return $this
+            ->httpResponse()
+            ->setData(new ProductVariationResource($product))
+            ->setAdditional([
+                'attribute_sets' => array_map(function ($set, $key) use ($productVariationsInfo, $attributeSets, $productAttributes) {
+                    // Initialize variation info for this attribute set
+                    $variationNextIds = [];
+
+                    // Process previous attribute sets to get variationNextIds
+                    if ($key > 0) {
+                        for ($i = 0; $i < $key; $i++) {
+                            $previousSet = $attributeSets[$i];
+                            [$variationNextIds] = handle_next_attributes_in_product(
+                                $productAttributes->where('attribute_set_id', $previousSet->id),
+                                $productVariationsInfo,
+                                $previousSet->id,
+                                [], // No selected attributes for API response
+                                $i,
+                                $variationNextIds
+                            );
+                        }
+                    }
+
+                    // Get all attributes for this set
+                    $setAttributes = $productAttributes->where('attribute_set_id', $set->id)->sortBy('order');
+
+                    return [
+                        'id' => $set->id,
+                        'title' => $set->title,
+                        'slug' => $set->slug,
+                        'order' => $set->order,
+                        'display_layout' => $set->display_layout,
+                        'attributes' => array_values(array_map(function ($attr) {
+                            return [
+                                'id' => $attr->id,
+                                'title' => $attr->title,
+                                'slug' => $attr->slug,
+                                'color' => $attr->color,
+                                'image' => $attr->image,
+                                'order' => $attr->order,
+                            ];
+                        }, $setAttributes->all())),
+                    ];
+                }, $attributeSets->all(), array_keys($attributeSets->all())),
+                'unavailable_attribute_ids' => $unavailableAttributeIds,
+                'selected_attributes' => is_object($selectedAttributes) && method_exists($selectedAttributes, 'map')
+                    ? $selectedAttributes->map(function ($attr) {
+                        if (! is_object($attr)) {
+                            return null;
+                        }
+
+                        $attributeSet = $attr->productAttributeSet ?? null;
+
+                        return [
+                            'id' => $attr->id ?? null,
+                            'attribute_set' => $attributeSet ? [
+                                'id' => $attr->attribute_set_id ?? null,
+                                'title' => $attributeSet->title ?? null,
+                                'slug' => $attributeSet->slug ?? null,
+                                'order' => $attributeSet->order ?? 0,
+                                'display_layout' => $attributeSet->display_layout ?? null,
+                            ] : null,
+                            'title' => $attr->title ?? null,
+                            'slug' => $attr->slug ?? null,
+                            'color' => $attr->color ?? null,
+                            'image' => $attr->image ?? null,
+                            'order' => $attr->order ?? 0,
+                        ];
+                    })->filter()->values()->all()
+                    : [],
+            ])
+            ->toApiResponse();
+    }
+
+    /**
+     * Get cross-sale products for a product
+     *
+     * @group Products
+     * @param string $slug Product slug
+     * @param ProductCrossSalePriceService $productCrossSalePriceService
+     * @return JsonResponse
+     */
+    public function getCrossSaleProducts(string $slug, ProductCrossSalePriceService $productCrossSalePriceService)
+    {
+        $slug = SlugHelper::getSlug($slug, SlugHelper::getPrefix(Product::class));
+
+        abort_unless($slug, 404);
+
+        /**
+         * @var Product $product
+         */
+        $product = Product::query()
+            ->where('id', $slug->reference_id)
+            ->wherePublished()
+            ->firstOrFail();
+
+        // Load cross-sale products
+        $product->loadMissing('crossSales');
+
+        // Get cross-sale products using the helper function
+        $crossSaleProducts = get_cross_sale_products($product, null, [
+            'slugable',
+            'productLabels',
+            'productCollections',
+            'variationInfo',
+            'defaultVariation',
+            'defaultVariation.configurableProduct',
+            'defaultVariation.productAttributes',
+            'productAttributeSets',
+            'variationProductAttributes',
+        ]);
+
+        // Apply cross-sale pricing
+        $productCrossSalePriceService->applyProduct($product);
+
+        // Pass the parent product as additional data to the resource collection
+        $resourceCollection = RelatedProductResource::collection($crossSaleProducts)
+            ->additional(['parent_product' => $product]);
+
+        return $this
+            ->httpResponse()
+            ->setData($resourceCollection)
             ->toApiResponse();
     }
 }

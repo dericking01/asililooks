@@ -30,6 +30,11 @@ body {
             .step-item.active ~ .step-item:before {
                 background: #d3d5d8;
             }
+
+            &.steps-vertical.steps-counter {
+                margin-inline-start: 0 !important;
+                padding-inline-start: 0 !important;
+            }
         }
 
         .card {

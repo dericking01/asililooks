@@ -21,4 +21,18 @@ class CategoryRequest extends Request
             'categories.*' => trans('plugins/ecommerce::products.form.categories'),
         ];
     }
+
+    public function bodyParameters(): array
+    {
+        return [
+            'categories' => [
+                'description' => 'Array of category IDs to filter products by',
+                'example' => [1, 2, 3],
+            ],
+            'is_featured' => [
+                'description' => 'Filter by featured status',
+                'example' => true,
+            ],
+        ];
+    }
 }

@@ -22,8 +22,7 @@ class CategoryController extends BaseController
     public function index(Request $request)
     {
         $data = Category::query()
-            ->wherePublished()
-            ->orderByDesc('created_at')
+            ->wherePublished()->latest()
             ->with(['slugable'])
             ->paginate($request->integer('per_page', 10) ?: 10);
 

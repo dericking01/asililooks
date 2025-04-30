@@ -34,4 +34,19 @@ class PostRequest extends Request
 
         return $rules;
     }
+
+    public function attributes(): array
+    {
+        return [
+            'name' => trans('plugins/blog::posts.form.name'),
+            'description' => trans('plugins/blog::posts.form.description'),
+            'content' => trans('plugins/blog::posts.form.content'),
+            'tag' => trans('plugins/blog::posts.form.tags'),
+            'categories' => trans('plugins/blog::posts.form.categories'),
+            'status' => trans('core/base::tables.status'),
+            'is_featured' => trans('plugins/blog::posts.form.is_featured'),
+            'image' => trans('core/base::forms.image'),
+            'format_type' => trans('plugins/blog::posts.form.format_type'),
+        ];
+    }
 }

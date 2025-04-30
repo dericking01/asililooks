@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static void registerTheme(array|string $theme)
  * @method static array getAllThemes()
  * @method static array getThemes()
+ * @method static array getThemePresets(string $theme)
  *
  * @see \Botble\Theme\Manager
  */

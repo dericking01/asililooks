@@ -36,6 +36,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static array getDateRangeInReport(\Illuminate\Http\Request $request)
  * @method static string|null getSettingPrefix()
  * @method static bool isEnableEmailVerification()
+ * @method static bool isCustomerRegistrationEnabled()
  * @method static bool disableOrderInvoiceUntilOrderConfirmed()
  * @method static bool isEnabledProductOptions()
  * @method static bool isEnabledCrossSaleProducts()

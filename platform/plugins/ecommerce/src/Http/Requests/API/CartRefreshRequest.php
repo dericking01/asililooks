@@ -24,4 +24,31 @@ class CartRefreshRequest extends Request
             ],
         ];
     }
+
+    public function bodyParameters(): array
+    {
+        return [
+            'products' => [
+                'description' => 'Array of products to refresh in the cart',
+                'example' => [
+                    [
+                        'product_id' => 1,
+                        'quantity' => 2,
+                    ],
+                    [
+                        'product_id' => 3,
+                        'quantity' => 1,
+                    ],
+                ],
+            ],
+            'products.*.product_id' => [
+                'description' => 'The ID of the product',
+                'example' => 1,
+            ],
+            'products.*.quantity' => [
+                'description' => 'The quantity of the product',
+                'example' => 2,
+            ],
+        ];
+    }
 }

@@ -138,6 +138,15 @@ class Manager implements ManagerContract
         return $this->sectionItems[$this->groupId][$section] ?? [];
     }
 
+    public function removeItem(string $section, string $id): static
+    {
+        if (isset($this->sectionItems[$this->groupId][$section])) {
+            $this->ignoreItemId($id);
+        }
+
+        return $this;
+    }
+
     public function ignoreItemId(string $id): static
     {
         return $this->ignoreItemIds([$id]);

@@ -83,10 +83,12 @@ Theme::registerRoutes(function (): void {
         Route::get(EcommerceHelper::getPageSlug('login'), 'LoginController@showLoginForm')->name('login');
         Route::post('login', 'LoginController@login')->name('login.post');
 
-        Route::get(EcommerceHelper::getPageSlug('register'), 'RegisterController@showRegistrationForm')->name(
-            'register'
-        );
-        Route::post('register', 'RegisterController@register')->name('register.post');
+        if (EcommerceHelper::isCustomerRegistrationEnabled()) {
+            Route::get(EcommerceHelper::getPageSlug('register'), 'RegisterController@showRegistrationForm')->name(
+                'register'
+            );
+            Route::post('register', 'RegisterController@register')->name('register.post');
+        }
 
         Route::post('password/email', 'ForgotPasswordController@sendResetLinkEmail')->name('password.request');
         Route::post('password/reset', 'ResetPasswordController@reset')->name('password.reset.post');

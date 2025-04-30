@@ -458,4 +458,26 @@ class InvoiceHelper
             ],
         ];
     }
+
+    /**
+     * Get the URL to view/print an invoice
+     *
+     * @param Invoice $invoice
+     * @return string
+     */
+    public function getInvoiceUrl(Invoice $invoice): string
+    {
+        return route('customer.invoices.generate', $invoice->id) . '?type=print';
+    }
+
+    /**
+     * Get the URL to download an invoice
+     *
+     * @param Invoice $invoice
+     * @return string
+     */
+    public function getInvoiceDownloadUrl(Invoice $invoice): string
+    {
+        return route('customer.invoices.generate', $invoice->id);
+    }
 }

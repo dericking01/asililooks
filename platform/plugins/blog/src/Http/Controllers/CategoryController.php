@@ -31,7 +31,7 @@ class CategoryController extends BaseController
         $this->pageTitle(trans('plugins/blog::categories.menu'));
 
         $categories = Category::query()
-            ->orderByDesc('is_default')
+            ->latest('is_default')
             ->oldest('order')->oldest()
             ->with('slugable');
 

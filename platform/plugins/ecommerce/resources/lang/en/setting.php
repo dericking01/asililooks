@@ -262,6 +262,8 @@ return [
         'customer_setting' => 'Customer settings',
         'customer_setting_description' => 'Configure customer settings',
         'form' => [
+            'enable_customer_registration' => 'Enable customer registration',
+            'enable_customer_registration_helper' => 'If disabled, customers will not be able to register new accounts. Existing customers can still login.',
             'verify_customer_email' => "Verify customer's email",
             'verify_customer_email_helper' => "When it's enabled, a verification link will be sent to customer's email, customers need to click on this link to verify their email before they can log in. Need to config email in Admin -> Settings -> Email to send email verification.",
             'login_using_phone' => 'Sign in with phone number instead of email',

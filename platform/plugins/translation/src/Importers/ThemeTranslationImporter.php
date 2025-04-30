@@ -82,7 +82,7 @@ class ThemeTranslationImporter extends Importer implements WithMapping
 
         $manager = app(Manager::class);
 
-        foreach (Language::getAvailableLocales() as $locale) {
+        foreach (Language::getAvailableLocales(true) as $locale) {
             $locale = $locale['locale'];
 
             if ($locale === 'en') {

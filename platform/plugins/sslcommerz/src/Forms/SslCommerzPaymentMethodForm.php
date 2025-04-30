@@ -20,6 +20,7 @@ class SslCommerzPaymentMethodForm extends PaymentMethodForm
             ->paymentName('SslCommerz')
             ->paymentDescription(__('Customer can buy product and pay directly using Visa, Credit card via :name', ['name' => 'SslCommerz']))
             ->paymentLogo(url('vendor/core/plugins/sslcommerz/images/sslcommerz.png'))
+            ->paymentFeeField(SSLCOMMERZ_PAYMENT_METHOD_NAME)
             ->paymentUrl('https://sslcommerz.com')
             ->paymentInstructions(view('plugins/sslcommerz::instructions')->render())
             ->add(

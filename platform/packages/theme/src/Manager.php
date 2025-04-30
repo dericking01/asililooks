@@ -29,9 +29,8 @@ class Manager
     public function getAllThemes(): array
     {
         $themes = [];
-        $themePath = theme_path();
-        foreach (BaseHelper::scanFolder($themePath) as $folder) {
-            $jsonFile = $themePath . '/' . $folder . '/theme.json';
+        foreach (BaseHelper::scanFolder(theme_path()) as $folder) {
+            $jsonFile = $this->getThemeJsonPath($folder);
 
             $publicJsonFile = public_path('themes/' . ThemeFacade::getPublicThemeName() . '/theme.json');
 
@@ -56,8 +55,24 @@ class Manager
         return $themes;
     }
 
+    public function getThemePresets(string $theme): array
+    {
+        if (! $theme || ! File::exists($jsonFile = $this->getThemeJsonPath($theme))) {
+            return [];
+        }
+
+        $theme = BaseHelper::getFileData($jsonFile);
+
+        return $theme['presets'] ?? [];
+    }
+
     public function getThemes(): array
     {
         return $this->themes;
+    }
+
+    protected function getThemeJsonPath(string $theme): string
+    {
+        return  theme_path() . '/' . $theme . '/theme.json';
     }
 }

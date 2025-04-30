@@ -45,7 +45,7 @@ class MenuNode extends BaseModel
 
     public function child(): HasMany
     {
-        return $this->hasMany(MenuNode::class, 'parent_id')->orderBy('position');
+        return $this->hasMany(MenuNode::class, 'parent_id')->oldest('position');
     }
 
     public function reference(): MorphTo

@@ -2,6 +2,8 @@
 
 namespace Botble\Ecommerce\Http\Controllers\Settings;
 
+use Botble\Base\Exceptions\DisabledInDemoModeException;
+use Botble\Base\Facades\BaseHelper;
 use Botble\Ecommerce\Forms\Settings\CustomerSettingForm;
 use Botble\Ecommerce\Http\Requests\Settings\CustomerSettingRequest;
 
@@ -16,6 +18,12 @@ class CustomerSettingController extends SettingController
 
     public function update(CustomerSettingRequest $request)
     {
-        return $this->performUpdate($request->validated());
+        if (BaseHelper::hasDemoModeEnabled()) {
+            throw new DisabledInDemoModeException();
+        }
+
+        $data = $request->validated();
+
+        return $this->performUpdate($data);
     }
 }

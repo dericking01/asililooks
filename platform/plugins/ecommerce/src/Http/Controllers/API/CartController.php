@@ -13,11 +13,13 @@ use Botble\Ecommerce\Http\Requests\API\AddCartRequest;
 use Botble\Ecommerce\Http\Requests\API\CartRefreshRequest;
 use Botble\Ecommerce\Http\Requests\API\DeleteCartRequest;
 use Botble\Ecommerce\Http\Requests\API\UpdateCartRequest;
+use Botble\Ecommerce\Http\Resources\API\CartItemResource;
 use Botble\Ecommerce\Http\Resources\API\ProductCartResource;
 use Botble\Ecommerce\Models\Discount;
 use Botble\Ecommerce\Models\Product;
 use Botble\Ecommerce\Services\HandleApplyCouponService;
 use Botble\Ecommerce\Services\HandleApplyPromotionsService;
+use Botble\Media\Facades\RvMedia;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -61,14 +63,16 @@ class CartController extends BaseController
      *
      * @group Cart
      * @param AddCartRequest $request
+     * @param string|null $id Optional cart ID to add product to existing cart
      * @return JsonResponse
      * @bodyParam product_id integer required ID of the product. Example: 1
      * @bodyParam qty integer required Quantity of the product. Default: 1. Example: 1
      */
-    public function store(AddCartRequest $request)
+    public function store(AddCartRequest $request, ?string $id = null)
     {
         $response = $this->httpResponse();
-        $identifier = (string) Str::uuid();
+        // Use provided cart ID or generate a new one
+        $identifier = $id ?: (string) Str::uuid();
 
         Cart::instance('cart')->restore($identifier);
 
@@ -416,44 +420,118 @@ class CartController extends BaseController
     protected function getCartData(): array
     {
         $products = Cart::instance('cart')->products();
+        $content = Cart::instance('cart')->content();
 
         $promotionDiscountAmount = $this->applyPromotionsService->execute();
 
         $couponDiscountAmount = 0;
+        $couponCode = null;
 
-        if ($couponCode = session('auto_apply_coupon_code')) {
+        // Get coupon code from cart items
+        foreach ($content as $item) {
+            if (isset($item->options['coupon_code']) && $item->options['coupon_code']) {
+                $couponCode = $item->options['coupon_code'];
+
+                break;
+            }
+        }
+
+        // If not found in cart items, try auto-apply coupon from URL as fallback
+        if (! $couponCode && ($autoApplyCouponCode = session('auto_apply_coupon_code'))) {
             $coupon = Discount::query()
-                ->where('code', $couponCode)
+                ->where('code', $autoApplyCouponCode)
                 ->where('apply_via_url', true)
                 ->where('type', DiscountTypeEnum::COUPON)
                 ->exists();
 
             if ($coupon) {
-                $couponData = $this->handleApplyCouponService->execute($couponCode);
+                $couponData = $this->handleApplyCouponService->execute($autoApplyCouponCode);
 
                 if (! Arr::get($couponData, 'error')) {
+                    $couponCode = $autoApplyCouponCode;
                     $couponDiscountAmount = Arr::get($couponData, 'data.discount_amount');
+
+                    // Store the coupon code in the first cart item
+                    if ($content->isNotEmpty()) {
+                        $firstItem = $content->first();
+                        $options = $firstItem->options->toArray();
+                        $options['coupon_code'] = $couponCode;
+
+                        // Update the first item with the coupon code
+                        Cart::instance('cart')->update($firstItem->rowId, [
+                            'options' => $options,
+                        ]);
+                    }
                 }
             }
         }
 
         $sessionData = OrderHelper::getOrderSessionData();
 
-        if (session()->has('applied_coupon_code')) {
-            $couponDiscountAmount = Arr::get($sessionData, 'coupon_discount_amount', 0);
+        // If we have a coupon code, apply it to get the discount amount
+        if ($couponCode) {
+            // Apply the coupon to calculate the discount
+            $couponData = $this->handleApplyCouponService->execute($couponCode, $sessionData);
+
+            if (! Arr::get($couponData, 'error')) {
+                $couponDiscountAmount = Arr::get($couponData, 'data.discount_amount', 0);
+            } else {
+                // If there's an error applying the coupon, log it and set discount to 0
+                logger()->error('Error calculating coupon discount: ' . Arr::get($couponData, 'message', 'Unknown error'));
+                $couponDiscountAmount = 0;
+            }
         }
 
-        return [$products, $promotionDiscountAmount, $couponDiscountAmount];
+        return [$products, $promotionDiscountAmount, $couponDiscountAmount, $couponCode];
     }
 
     protected function getDataForResponse(): array
     {
-        $cartData = $this->getCartData();
+        [$products, $promotionDiscountAmount, $couponDiscountAmount, $couponCode] = $this->getCartData();
 
-        return apply_filters('ecommerce_cart_data_for_response', [
-            'count' => Cart::instance('cart')->count(),
-            'total_price' => format_price(Cart::instance('cart')->rawSubTotal()),
-            'content' => Cart::instance('cart')->content(),
-        ], $cartData);
+        $content = Cart::instance('cart')->content();
+        $rawTotal = Cart::instance('cart')->rawTotal();
+        $countCart = Cart::instance('cart')->count();
+
+        if (is_plugin_active('marketplace')) {
+            foreach ($content as $item) {
+                $product = Product::query()->find($item->id);
+
+                if (! $product) {
+                    continue;
+                }
+
+                $item->options['image'] = RvMedia::getImageUrl($item->options['image']);
+
+                if ($store = $product->original_product->store) {
+                    $item->options['store'] = [
+                        'id' => $store?->id,
+                        'slug' => $store?->slugable?->key,
+                        'name' => $store?->name,
+                    ];
+                }
+            }
+        }
+
+        $orderTotal = $rawTotal - $promotionDiscountAmount - $couponDiscountAmount;
+        if ($orderTotal < 0) {
+            $orderTotal = 0;
+        }
+
+        $cartData = [
+            'cart_items' => CartItemResource::collection($content),
+            'count' => $countCart,
+            'raw_total' => $rawTotal,
+            'raw_total_formatted' => format_price($rawTotal),
+            'promotion_discount_amount' => $promotionDiscountAmount,
+            'promotion_discount_amount_formatted' => format_price($promotionDiscountAmount),
+            'coupon_discount_amount' => $couponDiscountAmount,
+            'coupon_discount_amount_formatted' => format_price($couponDiscountAmount),
+            'applied_coupon_code' => $couponCode,
+            'order_total' => $orderTotal,
+            'order_total_formatted' => format_price($orderTotal),
+        ];
+
+        return apply_filters('ecommerce_cart_data_for_api_response', $cartData, [$products, $promotionDiscountAmount, $couponDiscountAmount, $couponCode]);
     }
 }

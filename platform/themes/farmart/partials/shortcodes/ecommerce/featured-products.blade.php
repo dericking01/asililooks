@@ -3,7 +3,12 @@
         <div class="row">
             <div class="col-12">
                 <div class="row align-items-center mb-2 widget-header">
-                    <h2 class="col-auto mb-0 py-2">{{ $shortcode->title }}</h2>
+                    <div class="col-auto">
+                        <h2 class="mb-0 py-2">{{ $shortcode->title }}</h2>
+                        @if ($shortcode->subtitle)
+                            <p class="mb-0">{{ $shortcode->subtitle }}</p>
+                        @endif
+                    </div>
                 </div>
                 <div class="product-deals-day__body arrows-top-right">
                     <div

@@ -110,6 +110,7 @@ class EditorManagement {
                     'blockQuote',
                     'insertTable',
                     'mediaEmbed',
+                    'bootstrapGrid',
                     'undo',
                     'redo',
                     'findAndReplace',

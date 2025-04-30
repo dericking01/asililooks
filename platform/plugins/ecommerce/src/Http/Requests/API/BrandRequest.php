@@ -21,4 +21,18 @@ class BrandRequest extends Request
             'brands.*' => trans('plugins/ecommerce::brands.brands'),
         ];
     }
+
+    public function bodyParameters(): array
+    {
+        return [
+            'brands' => [
+                'description' => 'Array of brand IDs to filter products by',
+                'example' => [1, 2, 3],
+            ],
+            'is_featured' => [
+                'description' => 'Filter by featured status',
+                'example' => true,
+            ],
+        ];
+    }
 }

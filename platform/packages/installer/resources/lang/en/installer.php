@@ -95,6 +95,11 @@ return [
         'message' => 'Choose a theme to personalize the appearance of your website. This selection will also import sample data tailored to the chosen theme.',
     ],
 
+    'theme_preset' => [
+        'title' => 'Choose theme preset',
+        'message' => 'Choose a theme preset to personalize the appearance of your website. This selection will also import sample data tailored to the chosen theme.',
+    ],
+
     /**
      * Create account page.
      */

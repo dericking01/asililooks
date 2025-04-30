@@ -26,4 +26,18 @@ class UpdateCartRequest extends Request
             'qty.integer' => __('Quantity must be a number!'),
         ];
     }
+
+    public function bodyParameters(): array
+    {
+        return [
+            'product_id' => [
+                'description' => 'The ID of the product to update in the cart',
+                'example' => 1,
+            ],
+            'qty' => [
+                'description' => 'The new quantity of the product',
+                'example' => 2,
+            ],
+        ];
+    }
 }

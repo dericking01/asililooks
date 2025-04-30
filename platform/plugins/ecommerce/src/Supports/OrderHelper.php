@@ -46,6 +46,7 @@ use Botble\Payment\Enums\PaymentMethodEnum;
 use Botble\Payment\Enums\PaymentStatusEnum;
 use Botble\Payment\Facades\PaymentMethods;
 use Botble\Payment\Models\Payment;
+use Botble\Payment\Supports\PaymentFeeHelper;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -540,7 +541,7 @@ class OrderHelper
         session()->forget('tracked_start_checkout');
     }
 
-    public function handleAddCart(Product $product, Request $request): array
+    public function handleAddCart(Product $product, Request $request, bool $relativePath = true): array
     {
         if ($product->status != BaseStatusEnum::PUBLISHED) {
             throw new ProductIsNotActivatedYetException();
@@ -548,7 +549,6 @@ class OrderHelper
 
         $parentProduct = $product->original_product;
 
-        $image = $product->image ?: $parentProduct->image;
         $options = [];
         if ($requestOption = $request->input('options')) {
             $options = $this->getProductOptionData($requestOption);
@@ -573,6 +573,8 @@ class OrderHelper
                 $taxRate = $tax->percentage;
             }
         }
+
+        $image = $product->image ?: $parentProduct->image;
 
         /**
          * Add cart to session
@@ -955,7 +957,8 @@ class OrderHelper
         $paymentFee = 0;
         $paymentMethod = $request->input('payment_method');
         if ($paymentMethod && is_plugin_active('payment')) {
-            $paymentFee = (float) get_payment_setting('fee', $paymentMethod, 0);
+            $orderAmount = Cart::instance('cart')->rawTotalByItems($cartItems);
+            $paymentFee = PaymentFeeHelper::calculateFee($paymentMethod, $orderAmount);
         }
 
         // Calculate total amount including payment fee
@@ -1000,7 +1003,8 @@ class OrderHelper
         $paymentFee = 0;
         $paymentMethod = $request->input('payment_method');
         if ($paymentMethod && is_plugin_active('payment')) {
-            $paymentFee = (float) get_payment_setting('fee', $paymentMethod, 0);
+            $orderAmount = Cart::instance('cart')->rawTotalByItems($cartItems);
+            $paymentFee = PaymentFeeHelper::calculateFee($paymentMethod, $orderAmount);
         }
 
         // Calculate total amount including payment fee

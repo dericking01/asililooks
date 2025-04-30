@@ -761,6 +761,10 @@ class HookServiceProvider extends ServiceProvider
             return $html;
         }, 120, 3);
 
+        add_filter('payment_order_total_amount', function () {
+            return Cart::instance('cart')->rawTotal();
+        }, 120);
+
         add_filter('payment-transaction-card-actions', function ($data, $payment) {
             $invoice = Invoice::query()->where('payment_id', $payment->id)->first();
 

@@ -22,7 +22,7 @@ class OrderTrackingController extends BaseController
      *
      * Track an order by order code and email/phone
      *
-     * @bodyParam order_id string required The order code. Example: ORD-12345
+     * @bodyParam code string required The order code. Example: ORD-12345
      * @bodyParam email string required if phone not provided The email associated with the order. Example: customer@example.com
      * @bodyParam phone string required if email not provided The phone number associated with the order. Example: +1234567890
      *
@@ -106,7 +106,7 @@ class OrderTrackingController extends BaseController
                 ->toApiResponse();
         }
 
-        $code = $request->input('order_id');
+        $code = $request->input('code');
 
         $query = Order::query()
             ->where(function (Builder $query) use ($code): void {

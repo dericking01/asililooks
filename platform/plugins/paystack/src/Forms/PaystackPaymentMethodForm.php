@@ -18,6 +18,7 @@ class PaystackPaymentMethodForm extends PaymentMethodForm
             ->paymentName('Paystack')
             ->paymentDescription(__('Customer can buy product and pay directly using Visa, Credit card via :name', ['name' => 'Paystack']))
             ->paymentLogo(url('vendor/core/plugins/paystack/images/paystack.png'))
+            ->paymentFeeField(PAYSTACK_PAYMENT_METHOD_NAME)
             ->paymentUrl('https://paystack.com')
             ->paymentInstructions(view('plugins/paystack::instructions')->render())
             ->add(

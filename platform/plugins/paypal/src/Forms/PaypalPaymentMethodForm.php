@@ -20,6 +20,7 @@ class PaypalPaymentMethodForm extends PaymentMethodForm
             ->paymentName('Paypal')
             ->paymentDescription(trans('plugins/payment::payment.paypal_description'))
             ->paymentLogo(url('vendor/core/plugins/paypal/images/paypal.svg'))
+            ->paymentFeeField(PAYPAL_PAYMENT_METHOD_NAME)
             ->paymentUrl('https://paypal.com')
             ->defaultDescriptionValue(__('You will be redirected to :name to complete the payment.', ['name' => 'PayPal']))
             ->paymentInstructions(view('plugins/paypal::instructions')->render())

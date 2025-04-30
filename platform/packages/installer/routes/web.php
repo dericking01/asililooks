@@ -7,6 +7,7 @@ use Botble\Installer\Http\Controllers\InstallController;
 use Botble\Installer\Http\Controllers\LicenseController;
 use Botble\Installer\Http\Controllers\RequirementController;
 use Botble\Installer\Http\Controllers\ThemeController;
+use Botble\Installer\Http\Controllers\ThemePresetController;
 use Illuminate\Support\Facades\Route;
 
 Route::group([
@@ -24,6 +25,8 @@ Route::group([
     Route::group(['middleware' => 'installing'], function (): void {
         Route::get('themes', [ThemeController::class, 'index'])->name('themes.index');
         Route::post('themes', [ThemeController::class, 'store'])->name('themes.store');
+        Route::get('theme-presets', [ThemePresetController::class, 'index'])->name('theme-presets.index');
+        Route::post('theme-presets', [ThemePresetController::class, 'store'])->name('theme-presets.store');
         Route::resource('accounts', AccountController::class)->only(['index', 'store']);
         Route::resource('licenses', LicenseController::class)->only(['index', 'store']);
         Route::get('final', [FinalController::class, 'index'])->name('final');

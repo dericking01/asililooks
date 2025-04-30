@@ -22,4 +22,18 @@ class AddCartRequest extends Request
             ],
         ];
     }
+
+    public function bodyParameters(): array
+    {
+        return [
+            'product_id' => [
+                'description' => 'The ID of the product to add to the cart',
+                'example' => 1,
+            ],
+            'qty' => [
+                'description' => 'The quantity of the product to add',
+                'example' => 1,
+            ],
+        ];
+    }
 }

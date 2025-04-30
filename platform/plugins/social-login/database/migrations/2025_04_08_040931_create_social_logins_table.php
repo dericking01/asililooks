@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class () extends Migration {
     public function up(): void
     {
-        Schema::create('social_logins', function (Blueprint $table) {
+        Schema::create('social_logins', function (Blueprint $table): void {
             $table->id();
             $table->morphs('user'); // This will create user_id and user_type columns
             $table->string('provider');

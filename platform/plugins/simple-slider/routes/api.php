@@ -7,6 +7,6 @@ Route::group([
     'middleware' => 'api',
     'prefix' => 'api/v1/simple-sliders',
     'namespace' => 'Botble\SimpleSlider\Http\Controllers\API',
-], function () {
+], function (): void {
     Route::get('/', [SimpleSliderController::class, 'index']);
 });

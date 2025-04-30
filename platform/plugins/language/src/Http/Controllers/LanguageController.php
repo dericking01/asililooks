@@ -42,7 +42,7 @@ class LanguageController extends SettingController
         $flags = Language::getListLanguageFlags();
         $languageCodes = Language::getLanguageCodes();
         $localeKeys = Language::getLocaleKeys();
-        $activeLanguages = LanguageModel::query()->orderBy('lang_order')->get();
+        $activeLanguages = LanguageModel::query()->oldest('lang_order')->get();
 
         $languageSettingForm = LanguageSettingForm::create();
 

@@ -80,15 +80,16 @@ class ProductCategoryController extends BaseController
      *
      * @group Product Categories
      *
-     * @param ProductCategory $category
      * @param Request $request
      * @return JsonResponse
      */
-    public function products(ProductCategory $category, Request $request)
+    public function products(int|string $id, Request $request)
     {
         if (! EcommerceHelper::productFilterParamsValidated($request)) {
             $request = request();
         }
+
+        $category = ProductCategory::query()->findOrFail($id);
 
         $with = EcommerceHelper::withProductEagerLoadingRelations();
 

@@ -24,7 +24,7 @@ class TagRepository extends RepositoriesAbstract implements TagInterface
         $data = $this->model
             ->with($with)
             ->withCount($withCount)
-            ->orderByDesc('posts_count')
+            ->latest('posts_count')
             ->limit($limit);
 
         return $this->applyBeforeExecuteQuery($data)->get();

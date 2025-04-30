@@ -3,6 +3,7 @@
 namespace Botble\Mollie\Providers;
 
 use Botble\Base\Facades\Html;
+use Botble\Mollie\Forms\MolliePaymentMethodForm;
 use Botble\Mollie\Services\Gateways\MolliePaymentService;
 use Botble\Payment\Enums\PaymentMethodEnum;
 use Botble\Payment\Facades\PaymentMethods;
@@ -86,7 +87,7 @@ class HookServiceProvider extends ServiceProvider
 
     public function addPaymentSettings(?string $settings): string
     {
-        return $settings . view('plugins/mollie::settings')->render();
+        return $settings . MolliePaymentMethodForm::create()->renderForm();
     }
 
     public function registerMollieMethod(?string $html, array $data): ?string

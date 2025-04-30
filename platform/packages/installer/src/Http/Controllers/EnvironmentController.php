@@ -55,6 +55,8 @@ class EnvironmentController extends BaseController
 
         if (InstallerStep::hasMoreThemes()) {
             $nextRouteName = 'installers.themes.index';
+        } elseif (InstallerStep::hasMoreThemePresets()) {
+            $nextRouteName = 'installers.theme-presets.index';
         } else {
             $nextRouteName = 'installers.accounts.index';
 

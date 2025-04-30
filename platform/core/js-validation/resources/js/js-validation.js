@@ -13,19 +13,36 @@ const laravelValidation = {
             this.rules = {}
         }
 
+        // Assign arrayRules method to dataRules
         $.validator.dataRules = this.arrayRules
-        $.validator.prototype.arrayRulesCache = {}
+
+        // Extend the validator prototype to include arrayRulesCache
+        if (!$.validator.prototype.arrayRulesCache) {
+            $.validator.prototype.arrayRulesCache = {}
+        }
+
         // Register validations methods
         this.setupValidations()
     },
 
     arrayRules: function (element) {
-        const rules = {},
-            validator = $.data(element.form, 'validator'),
-            cache = validator.arrayRulesCache
+        const rules = {}
+        const validator = $.data(element.form, 'validator')
+
+        // Check if validator exists
+        if (!validator) {
+            return rules
+        }
+
+        // Initialize cache if it doesn't exist
+        if (!validator.arrayRulesCache) {
+            validator.arrayRulesCache = {}
+        }
+
+        const cache = validator.arrayRulesCache
 
         // Is not an Array
-        if (element.name.indexOf('[') === -1) {
+        if (element.name && element.name.indexOf('[') === -1) {
             return rules
         }
 
@@ -33,19 +50,22 @@ const laravelValidation = {
             cache[element.name] = {}
         }
 
-        $.each(validator.settings.rules, function (name, tmpRules) {
-            if (name in cache[element.name]) {
-                $.extend(rules, cache[element.name][name])
-            } else {
-                cache[element.name][name] = {}
-                const nameRegExp = laravelValidation.helpers.regexFromWildcard(name)
-                if (element.name.match(nameRegExp)) {
-                    const newRules = $.validator.normalizeRule(tmpRules) || {}
-                    cache[element.name][name] = newRules
-                    $.extend(rules, newRules)
+        // Check if settings.rules exists
+        if (validator.settings && validator.settings.rules) {
+            $.each(validator.settings.rules, function (name, tmpRules) {
+                if (name in cache[element.name]) {
+                    $.extend(rules, cache[element.name][name])
+                } else {
+                    cache[element.name][name] = {}
+                    const nameRegExp = laravelValidation.helpers.regexFromWildcard(name)
+                    if (element.name && typeof element.name === 'string' && element.name.match(nameRegExp)) {
+                        const newRules = $.validator.normalizeRule(tmpRules) || {}
+                        cache[element.name][name] = newRules
+                        $.extend(rules, newRules)
+                    }
                 }
-            }
-        })
+            })
+        }
 
         return rules
     },

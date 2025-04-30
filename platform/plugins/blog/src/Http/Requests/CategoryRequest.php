@@ -26,4 +26,17 @@ class CategoryRequest extends Request
             'order' => ['nullable', 'integer', 'min:0', 'max:10000'],
         ];
     }
+
+    public function attributes(): array
+    {
+        return [
+            'name' => trans('core/base::forms.name'),
+            'description' => trans('core/base::forms.description'),
+            'status' => trans('core/base::tables.status'),
+            'is_default' => trans('core/base::forms.is_default'),
+            'is_featured' => trans('core/base::forms.is_featured'),
+            'parent_id' => trans('core/base::forms.parent'),
+            'order' => trans('core/base::forms.order'),
+        ];
+    }
 }

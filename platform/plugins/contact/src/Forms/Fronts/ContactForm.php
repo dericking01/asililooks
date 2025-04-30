@@ -105,7 +105,7 @@ class ContactForm extends FormFront
             ->addRowWrapper('form_wrapper', function (self $form) use ($displayFields, $mandatoryFields): void {
                 $customFields = CustomField::query()
                     ->wherePublished()
-                    ->orderBy('order')
+                    ->oldest('order')
                     ->get();
 
                 $form

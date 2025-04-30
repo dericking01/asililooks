@@ -319,7 +319,7 @@ class Menu
                 $items = $model
                     ->where('parent_id', Arr::get($args, 'parent_id', 0))
                     ->with(['children', 'children.children'])
-                    ->orderBy('name');
+                    ->oldest('name');
             } else {
                 $items = $model->orderBy('name');
             }

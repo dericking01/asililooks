@@ -8,6 +8,7 @@ use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Facades\OrderHelper;
 use Botble\Ecommerce\Models\Order;
 use Botble\Ecommerce\ValueObjects\CheckoutOrderData;
+use Botble\Payment\Supports\PaymentFeeHelper;
 use Botble\Payment\Supports\PaymentHelper;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
@@ -194,7 +195,7 @@ class HandleCheckoutOrderData
         // Add payment fee if applicable
         $paymentFee = 0;
         if ($paymentMethod && is_plugin_active('payment')) {
-            $paymentFee = (float) get_payment_setting('fee', $paymentMethod, 0);
+            $paymentFee = PaymentFeeHelper::calculateFee($paymentMethod, $orderAmount);
             $orderAmount += $paymentFee;
         }
 

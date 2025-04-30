@@ -16,4 +16,13 @@ class TagRequest extends Request
             'status' => [Rule::in(BaseStatusEnum::values())],
         ];
     }
+
+    public function attributes(): array
+    {
+        return [
+            'name' => trans('plugins/blog::tags.form.name'),
+            'description' => trans('plugins/blog::tags.form.description'),
+            'status' => trans('core/base::tables.status'),
+        ];
+    }
 }

@@ -8,6 +8,7 @@ use Botble\Base\PanelSections\PanelSectionItem;
 use Botble\Base\Supports\ServiceProvider;
 use Botble\Base\Traits\LoadAndPublishDataTrait;
 use Botble\Language\Facades\Language;
+use Botble\Language\Http\Middleware\ApiLanguageMiddleware;
 use Botble\Language\Http\Middleware\LocaleSessionRedirect;
 use Botble\Language\Http\Middleware\LocalizationRedirectFilter;
 use Botble\Language\Http\Middleware\LocalizationRoutes;
@@ -43,6 +44,7 @@ class LanguageServiceProvider extends ServiceProvider
         $router->aliasMiddleware('localize', LocalizationRoutes::class);
         $router->aliasMiddleware('localizationRedirect', LocalizationRedirectFilter::class);
         $router->aliasMiddleware('localeSessionRedirect', LocaleSessionRedirect::class);
+        $router->aliasMiddleware('api.language', ApiLanguageMiddleware::class);
     }
 
     public function boot(): void
@@ -53,7 +55,7 @@ class LanguageServiceProvider extends ServiceProvider
             ->setNamespace('plugins/language')
             ->loadHelpers()
             ->loadAndPublishConfigurations(['permissions'])
-            ->loadRoutes()
+            ->loadRoutes(['web', 'api'])
             ->loadAndPublishViews()
             ->loadAndPublishTranslations()
             ->loadMigrations()
