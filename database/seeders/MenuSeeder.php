@@ -25,7 +25,7 @@ class MenuSeeder extends BaseSeeder
                         'icon_font' => 'icon icon-tag',
                     ],
                     [
-                        'title' => 'Pages',
+                        'title' => 'About',
                         'url' => '#',
                         'children' => [
                             [
@@ -33,26 +33,26 @@ class MenuSeeder extends BaseSeeder
                                 'reference_id' => 2,
                                 'reference_type' => Page::class,
                             ],
-                            [
-                                'title' => 'Terms Of Use',
-                                'reference_id' => 3,
-                                'reference_type' => Page::class,
-                            ],
-                            [
-                                'title' => 'Terms & Conditions',
-                                'reference_id' => 4,
-                                'reference_type' => Page::class,
-                            ],
-                            [
-                                'title' => 'Refund Policy',
-                                'reference_id' => 5,
-                                'reference_type' => Page::class,
-                            ],
-                            [
-                                'title' => 'Coming soon',
-                                'reference_id' => 12,
-                                'reference_type' => Page::class,
-                            ],
+                            // [
+                            //     'title' => 'Terms Of Use',
+                            //     'reference_id' => 3,
+                            //     'reference_type' => Page::class,
+                            // ],
+                            // [
+                            //     'title' => 'Terms & Conditions',
+                            //     'reference_id' => 4,
+                            //     'reference_type' => Page::class,
+                            // ],
+                            // [
+                            //     'title' => 'Refund Policy',
+                            //     'reference_id' => 5,
+                            //     'reference_type' => Page::class,
+                            // ],
+                            // [
+                            //     'title' => 'Coming soon',
+                            //     'reference_id' => 12,
+                            //     'reference_type' => Page::class,
+                            // ],
                         ],
                     ],
                     [

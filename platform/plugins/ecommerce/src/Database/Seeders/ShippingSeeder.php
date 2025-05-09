@@ -27,14 +27,14 @@ class ShippingSeeder extends BaseSeeder
             'price' => 0,
         ]);
 
-        ShippingRule::query()->create([
-            'name' => 'Flat Rate',
-            'shipping_id' => $shipping->getKey(),
-            'type' => ShippingRuleTypeEnum::BASED_ON_PRICE,
-            'from' => 0,
-            'to' => null,
-            'price' => 20,
-        ]);
+        // ShippingRule::query()->create([
+        //     'name' => 'Flat Rate',
+        //     'shipping_id' => $shipping->getKey(),
+        //     'type' => ShippingRuleTypeEnum::BASED_ON_PRICE,
+        //     'from' => 0,
+        //     'to' => null,
+        //     'price' => 20,
+        // ]);
 
         ShippingRule::query()->create([
             'name' => 'Local Pickup',

@@ -1,4 +1,4 @@
-@if ($discounts->isNotEmpty())
+<!-- @if ($discounts->isNotEmpty())
     <div class="checkout__coupon-section">
         <div class="checkout__coupon-heading">
             <img width="32" height="32" src="{{ asset('vendor/core/plugins/ecommerce/images/coupon-code.gif') }}" alt="coupon code icon">
@@ -65,4 +65,4 @@
         @include(EcommerceHelper::viewPath('discounts.partials.remove-coupon'))
     @endif
 </div>
-<div class="clearfix"></div>
+<div class="clearfix"></div> -->

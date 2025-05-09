@@ -166,6 +166,17 @@ app()->booted(function (): void {
                 MetaBox::saveMetaBoxData($store, 'socials', $socials);
             }
         }, 230);
+
+        if (function_exists('add_shortcode')) {
+            add_shortcode('testimonial-slider', __('Testimonial Slider'), __('Customer testimonials slider'), function () {
+                return Theme::partial('shortcodes.testimonial-slider');
+            });
+        
+            shortcode()->setAdminConfig('testimonial-slider', function () {
+                return null; // Optional: no config form
+            });
+        }
+        
     }
 
     app('events')->listen(RouteMatched::class, function (): void {

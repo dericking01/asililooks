@@ -62,9 +62,21 @@ class HookServiceProvider extends ServiceProvider
                     [
                         'id' => 'chat_btn_instagram',
                         'type' => 'text',
-                        'label' => __('Link Inta'),
+                        'label' => __('Link Instagram'),
                         'attributes' => [
                             'name' => 'chat_btn_instagram',
+                            'value' => null,
+                            'options' => [
+                                'class' => 'form-control',
+                            ],
+                        ],
+                    ],
+                    [
+                        'id' => 'chat_btn_whatsapp',
+                        'type' => 'text',
+                        'label' => __('Link WhatsApp'),
+                        'attributes' => [
+                            'name' => 'chat_btn_whatsapp',
                             'value' => null,
                             'options' => [
                                 'class' => 'form-control',

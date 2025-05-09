@@ -46,7 +46,7 @@
                         class="col-auto pe-0"
                         href="{{ get_blog_page_url() }}"
                     >
-                        <span class="link-text">{{ __('All Articles') }}
+                        <span class="link-text">{{ __('All Events') }}
                             <span class="svg-icon">
                                 <svg>
                                     <use
