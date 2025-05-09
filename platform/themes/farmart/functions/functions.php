@@ -176,7 +176,58 @@ app()->booted(function (): void {
                 return null; // Optional: no config form
             });
         }
+
+        if (function_exists('add_shortcode')) {
+            add_shortcode('asili-services', __('Asili Services Slider'), __('Show sliding list of Asili Looks services'), function () {
+                return Theme::partial('shortcodes.asili-services');
+            });
         
+            shortcode()->setAdminConfig('asili-services', function () {
+                return null;
+            });
+        }
+
+        if (function_exists('add_shortcode')) {
+            add_shortcode('asili-services', __('Asili Services Slider'), __('Show sliding list of Asili Looks services'), function () {
+                return Theme::partial('shortcodes.asili-services');
+            });
+        
+            add_shortcode('about-asili', __('About Asili Looks'), __('Show company mission and values'), function () {
+                return Theme::partial('shortcodes.about-asili');
+            });
+        
+            shortcode()->setAdminConfig('asili-services', function () {
+                return null;
+            });
+        
+            shortcode()->setAdminConfig('about-asili', function () {
+                return null;
+            });
+        }
+        
+        if (function_exists('add_shortcode')) {
+            add_shortcode('asili-services', __('Asili Services Slider'), __('Show sliding list of Asili Looks services'), function () {
+                return Theme::partial('shortcodes.asili-services');
+            });
+        
+            add_shortcode('about-asili', __('About Asili Looks'), __('Show company mission and values'), function () {
+                return Theme::partial('shortcodes.about-asili');
+            });
+        
+            add_shortcode('asili-team', __('Asili Team Section'), __('Display a section showing the Asili Looks team'), function () {
+                return Theme::partial('shortcodes.asili-team');
+            });
+        
+            shortcode()->setAdminConfig('asili-services', function () {
+                return null;
+            });
+            shortcode()->setAdminConfig('about-asili', function () {
+                return null;
+            });
+            shortcode()->setAdminConfig('asili-team', function () {
+                return null;
+            });
+        }
     }
 
     app('events')->listen(RouteMatched::class, function (): void {
