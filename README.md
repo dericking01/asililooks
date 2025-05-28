@@ -47,7 +47,7 @@ Easily embed dynamic content into any page using shortcodes:
    ```bash
    git clone https://github.com/your-org/asili-looks.git
    cd asili-looks
-composer install
-npm install && npm run dev
-php artisan migrate --seed
-php artisan serve
+   composer install
+   npm install && npm run dev
+   php artisan migrate --seed
+   php artisan serve
