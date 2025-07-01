@@ -14,7 +14,13 @@ class ShortcodeField
             return '';
         }
 
-        $current = (int) Arr::get($attributes, $tabKey ? "{$tabKey}_quantity" : 'quantity') ?: 6;
+        $current = Arr::get($attributes, $tabKey ? "{$tabKey}_quantity" : 'quantity') ?: 6;
+
+        if (str_contains($current, ',')) {
+            $current = Str::afterLast($current, ',');
+        }
+
+        $current = (int) $current;
 
         $selector = 'quantity_' . Str::random(20);
 

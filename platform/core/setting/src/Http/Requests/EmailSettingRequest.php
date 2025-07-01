@@ -13,7 +13,7 @@ class EmailSettingRequest extends Request
         $mailDriver = $this->input('email_driver');
 
         return apply_filters('cms_email_settings_validation_rules', [
-            'email_driver' => ['required', 'in:smtp,mailgun,ses,postmark,log,array,sendmail'],
+            'email_driver' => ['required', 'in:smtp,mailgun,ses,postmark,resend,log,array,sendmail'],
             'email_from_name' => ['required', 'string', 'max:150'],
             'email_from_address' => ['required', new EmailRule(), 'min:6', 'max:150'],
             'email_port' => ['nullable', 'numeric', $smtpRules = new RequiredIf($mailDriver == 'smtp')],
@@ -29,6 +29,7 @@ class EmailSettingRequest extends Request
             'email_ses_secret' => ['nullable', 'string', $sesRules],
             'email_ses_region' => ['nullable', 'string', $sesRules],
             'email_postmark_token' => ['nullable', 'string', new RequiredIf($mailDriver == 'postmark')],
+            'email_resend_key' => ['nullable', 'string', new RequiredIf($mailDriver == 'resend')],
             'email_log_channel' => ['nullable', 'string', new RequiredIf($mailDriver == 'log')],
             'email_sendmail_path' => ['nullable', 'string', new RequiredIf($mailDriver == 'sendmail')],
         ]);

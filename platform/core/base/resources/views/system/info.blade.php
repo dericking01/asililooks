@@ -1,7 +1,6 @@
 @extends(BaseHelper::getAdminMasterLayoutTemplate())
 
 @section('content')
-    @php $serverIp = Botble\Base\Supports\Helper::getIpFromThirdParty(); @endphp
     <x-core::alert
         type="primary"
         :title="trans('core/base::system.report_description')"

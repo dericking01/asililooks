@@ -43,6 +43,68 @@ class CacheSettingForm extends SettingForm
                     ->helperText(trans('core/setting::setting.cache.form.cache_user_avatar_helper'))
                     ->value(setting('cache_user_avatar_enabled', true))
             )
+            ->add(
+                'shortcode_cache_enabled',
+                OnOffCheckboxField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('core/setting::setting.cache.form.shortcode_cache_enabled'))
+                    ->helperText(trans('core/setting::setting.cache.form.shortcode_cache_enabled_helper'))
+                    ->value($targetValue = setting('shortcode_cache_enabled', false))
+                    ->attributes(['id' => 'shortcode-cache-settings'])
+            )
+            ->addOpenCollapsible('shortcode_cache_enabled', '1', $targetValue)
+            ->add(
+                'shortcode_cache_ttl_default',
+                NumberField::class,
+                NumberFieldOption::make()
+                    ->label(trans('core/setting::setting.cache.form.shortcode_cache_ttl_default'))
+                    ->helperText(trans('core/setting::setting.cache.form.shortcode_cache_ttl_default_helper'))
+                    ->value(setting('shortcode_cache_ttl_default', 5))
+            )
+            ->add(
+                'shortcode_cache_ttl_cacheable',
+                NumberField::class,
+                NumberFieldOption::make()
+                    ->label(trans('core/setting::setting.cache.form.shortcode_cache_ttl_cacheable'))
+                    ->helperText(trans('core/setting::setting.cache.form.shortcode_cache_ttl_cacheable_helper'))
+                    ->value(setting('shortcode_cache_ttl_cacheable', 1800))
+            )
+            ->addCloseCollapsible('shortcode_cache_enabled', '1')
+            ->add(
+                'widget_cache_enabled',
+                OnOffCheckboxField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('core/setting::setting.cache.form.widget_cache_enabled'))
+                    ->helperText(trans('core/setting::setting.cache.form.widget_cache_enabled_helper'))
+                    ->value($targetValue = setting('widget_cache_enabled', false))
+                    ->attributes(['id' => 'widget-cache-settings'])
+            )
+            ->addOpenCollapsible('widget_cache_enabled', '1', $targetValue)
+            ->add(
+                'widget_cache_ttl_default',
+                NumberField::class,
+                NumberFieldOption::make()
+                    ->label(trans('core/setting::setting.cache.form.widget_cache_ttl_default'))
+                    ->helperText(trans('core/setting::setting.cache.form.widget_cache_ttl_default_helper'))
+                    ->value(setting('widget_cache_ttl_default', 5))
+            )
+            ->add(
+                'widget_cache_ttl_cacheable',
+                NumberField::class,
+                NumberFieldOption::make()
+                    ->label(trans('core/setting::setting.cache.form.widget_cache_ttl_cacheable'))
+                    ->helperText(trans('core/setting::setting.cache.form.widget_cache_ttl_cacheable_helper'))
+                    ->value(setting('widget_cache_ttl_cacheable', 1800))
+            )
+            ->addCloseCollapsible('widget_cache_enabled', '1')
+            ->add(
+                'plugin_cache_enabled',
+                OnOffCheckboxField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('core/setting::setting.cache.form.plugin_cache_enabled'))
+                    ->helperText(trans('core/setting::setting.cache.form.plugin_cache_enabled_helper'))
+                    ->value(setting('plugin_cache_enabled', true))
+            )
             ->when(setting('sitemap_enabled', true), function (CacheSettingForm $form): void {
                 $form
                     ->add(

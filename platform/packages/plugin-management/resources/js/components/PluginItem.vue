@@ -76,11 +76,37 @@ export default defineComponent({
 
             <div class="card-footer">
                 <div class="d-flex">
+                    <a
+                        v-if="!isInstalled && plugin.price > 0"
+                        :href="plugin.buy_url"
+                        target="_blank"
+                        class="btn btn-warning"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="icon"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            stroke-width="2"
+                            stroke="currentColor"
+                            fill="none"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M3 5m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"></path>
+                            <path d="M3 10l18 0"></path>
+                            <path d="M7 15l.01 0"></path>
+                            <path d="M11 15l2 0"></path>
+                        </svg>
+                        {{ __('base.buy_now') }}
+                    </a>
                     <button
+                        v-if="!isInstalled && !(plugin.price > 0)"
                         type="button"
                         class="btn btn-primary"
                         @click="$emit('install', $event, plugin.id)"
-                        v-if="!isInstalled"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"

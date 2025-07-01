@@ -9,8 +9,10 @@ use Botble\Shortcode\Events\ShortcodeAdminConfigRendering;
 use Botble\Shortcode\Facades\Shortcode;
 use Botble\Shortcode\Http\Requests\GetShortcodeDataRequest;
 use Botble\Shortcode\Http\Requests\RenderBlockUiRequest;
+use Carbon\Carbon;
 use Closure;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 
 class ShortcodeController extends BaseController
 {
@@ -64,12 +66,55 @@ class ShortcodeController extends BaseController
                 ->setData(null);
         }
 
-        $code = Shortcode::generateShortcode($name, $request->input('attributes', []));
+        $attributes = $request->input('attributes', []);
 
-        $content = Shortcode::compile($code, true)->toHtml();
+        // Create a cache key based on the shortcode name and attributes
+        $cacheKey = 'shortcode_' . md5($name . serialize($attributes));
+
+        if (! setting('shortcode_cache_enabled', false)) {
+            $code = Shortcode::generateShortcode($name, $attributes);
+            $content = Shortcode::compile($code, true)->toHtml();
+
+            return $this->httpResponse()->setData($content);
+        }
+
+        // Check if this shortcode should be cached for longer
+        $cacheable = $this->isShortcodeCacheable($name);
+
+        // Get cache durations from settings
+        $defaultTtl = (int) setting('shortcode_cache_ttl_default', 5);
+        $cacheableTtl = (int) setting('shortcode_cache_ttl_cacheable', 1800);
+
+        // Set cache duration based on whether the shortcode is cacheable
+        $cacheDuration = $cacheable
+            ? Carbon::now()->addSeconds($cacheableTtl)
+            : Carbon::now()->addSeconds($defaultTtl);
+
+        $content = Cache::remember($cacheKey, $cacheDuration, function () use ($name, $attributes) {
+            $code = Shortcode::generateShortcode($name, $attributes);
+
+            return Shortcode::compile($code, true)->toHtml();
+        });
 
         return $this
             ->httpResponse()
             ->setData($content);
+    }
+
+    protected function isShortcodeCacheable(string $name): bool
+    {
+        // List of shortcodes that should be cached for longer periods
+        // These are typically shortcodes that don't change frequently or don't contain dynamic content
+        $cacheableShortcodes = [
+            'static-block',
+            'featured-posts',
+            'gallery',
+            'youtube-video',
+            'google-map',
+            'contact-form',
+            'image',
+        ];
+
+        return in_array($name, $cacheableShortcodes);
     }
 }

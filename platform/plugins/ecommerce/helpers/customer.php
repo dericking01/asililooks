@@ -37,8 +37,7 @@ if (! function_exists('get_customer_addresses')) {
         }
 
         return Address::query()
-            ->where('customer_id', auth('customer')->id())
-            ->orderByDesc('created_at')
+            ->where('customer_id', auth('customer')->id())->latest()
             ->get();
     }
 }

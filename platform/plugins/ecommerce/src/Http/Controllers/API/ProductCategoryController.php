@@ -31,7 +31,7 @@ class ProductCategoryController extends BaseController
     {
         $categories = ProductCategory::query()
             ->wherePublished()
-            ->orderBy('order')->latest()
+            ->oldest('order')->latest()
             ->when($request->input('categories'), function ($query, $categoryIds) {
                 return $query->whereIn('id', $categoryIds);
             })

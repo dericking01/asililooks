@@ -24,6 +24,8 @@ class HookServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+        LanguageAdvancedManager::registerImportersAndExporters();
+
         if (! $this->app->runningInConsole()) {
             add_action(BASE_ACTION_META_BOXES, [$this, 'addLanguageBox'], 1134, 2);
             add_action(BASE_ACTION_TOP_FORM_CONTENT_NOTIFICATION, [$this, 'addCurrentLanguageEditingAlert'], 1134, 3);
@@ -74,7 +76,7 @@ class HookServiceProvider extends ServiceProvider
         ) {
             MetaBox::addMetaBox(
                 'language_advanced_wrap',
-                trans('plugins/language::language.name'),
+                trans('plugins/language-advanced::language-advanced.name'),
                 [$this, 'languageMetaField'],
                 $object::class,
                 'top'

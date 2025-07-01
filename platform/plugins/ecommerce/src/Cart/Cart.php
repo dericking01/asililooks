@@ -46,7 +46,7 @@ class Cart
         $this->instance(self::DEFAULT_INSTANCE);
     }
 
-    public function instance(string $instance = null): self
+    public function instance(?string $instance = null): self
     {
         $instance = $instance ?: self::DEFAULT_INSTANCE;
 
@@ -405,19 +405,26 @@ class Cart
 
     public function store(string $identifier): void
     {
-        $content = $this->getContent();
-
         if ($this->storedCartWithIdentifierExists($identifier)) {
-            throw new CartAlreadyStoredException('A cart with identifier ' . $identifier . ' was already stored.');
+            throw new CartAlreadyStoredException(sprintf('A cart with identifier %s was already stored.', $identifier));
         }
 
         $this->getConnection()->table($this->getTableName())->insert([
             'identifier' => $identifier,
             'instance' => $this->currentInstance(),
-            'content' => serialize($content),
+            'content' => serialize($this->getContent()),
         ]);
 
         static::dispatchEvent('cart.stored');
+    }
+
+    public function storeOrIgnore(string $identifier): void
+    {
+        if ($this->storedCartWithIdentifierExists($identifier)) {
+            return;
+        }
+
+        $this->store($identifier);
     }
 
     public function storeQuietly($identifier)
@@ -460,29 +467,36 @@ class Cart
             return;
         }
 
-        $stored = $this->getConnection()->table($this->getTableName())
+        $stored = $this
+            ->getConnection()
+            ->table($this->getTableName())
             ->where('identifier', $identifier)->first();
 
-        $storedContent = unserialize($stored->content);
+        if ($stored) {
+            $storedContent = unserialize($stored->content);
 
-        $currentInstance = $this->currentInstance();
+            $currentInstance = $this->currentInstance();
 
-        $this->instance($stored->instance);
+            $this->instance($stored->instance);
 
-        $content = $this->getContent();
+            $content = $this->getContent();
 
-        foreach ($storedContent as $cartItem) {
-            $content->put($cartItem->rowId, $cartItem);
+            foreach ($storedContent as $cartItem) {
+                $content->put($cartItem->rowId, $cartItem);
+            }
+
+            static::dispatchEvent('cart.restored');
+
+            $this->putToSession($content);
+
+            $this->instance($currentInstance);
         }
 
-        static::dispatchEvent('cart.restored');
-
-        $this->putToSession($content);
-
-        $this->instance($currentInstance);
-
-        $this->getConnection()->table($this->getTableName())
-            ->where('identifier', $identifier)->delete();
+        $this
+            ->getConnection()
+            ->table($this->getTableName())
+            ->where('identifier', $identifier)
+            ->delete();
     }
 
     public function restoreQuietly($identifier)

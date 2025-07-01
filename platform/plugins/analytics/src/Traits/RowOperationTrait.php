@@ -17,14 +17,14 @@ trait RowOperationTrait
         return $this;
     }
 
-    public function limit(int $limit = null): self
+    public function limit(?int $limit = null): self
     {
         $this->limit = $limit;
 
         return $this;
     }
 
-    public function offset(int $offset = null): self
+    public function offset(?int $offset = null): self
     {
         $this->offset = $offset;
 

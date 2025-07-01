@@ -215,6 +215,10 @@ class PublicCheckoutController extends BaseController
             return view($checkoutView, $data);
         }
 
+        add_filter('payment_order_total_amount', function () use ($orderAmount) {
+            return $orderAmount;
+        }, 120);
+
         return view(
             'plugins/ecommerce::orders.checkout',
             ['orderAmount' => $orderAmount, 'checkoutForm' => CheckoutForm::createFromArray($data)]
@@ -777,7 +781,7 @@ class PublicCheckoutController extends BaseController
             'order_id' => $order->getKey(),
         ]);
 
-        if ($isAvailableShipping) {
+        if ($isAvailableShipping && ! Shipment::query()->where(['order_id' => $order->getKey()])->exists()) {
             Shipment::query()->create([
                 'order_id' => $order->getKey(),
                 'user_id' => 0,

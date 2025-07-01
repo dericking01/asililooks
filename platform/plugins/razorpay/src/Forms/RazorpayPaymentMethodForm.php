@@ -7,10 +7,12 @@ use Botble\Base\Forms\FieldOptions\SelectFieldOption;
 use Botble\Base\Forms\FieldOptions\TextFieldOption;
 use Botble\Base\Forms\Fields\SelectField;
 use Botble\Base\Forms\Fields\TextField;
+use Botble\Payment\Concerns\Forms\HasAvailableCountriesField;
 use Botble\Payment\Forms\PaymentMethodForm;
 
 class RazorpayPaymentMethodForm extends PaymentMethodForm
 {
+    use HasAvailableCountriesField;
     public function setup(): void
     {
         parent::setup();
@@ -51,6 +53,15 @@ class RazorpayPaymentMethodForm extends PaymentMethodForm
                         RAZORPAY_PAYMENT_METHOD_NAME,
                         'hosted_checkout',
                     ))
-            );
+            )
+            ->add(
+                sprintf('payment_%s_webhook_secret', RAZORPAY_PAYMENT_METHOD_NAME),
+                TextField::class,
+                TextFieldOption::make()
+                    ->label(__('Webhook Secret'))
+                    ->helperText(__('Get webhook secret key from your Razorpay dashboard to verify webhook requests'))
+                    ->value(BaseHelper::hasDemoModeEnabled() ? '*******************************' : get_payment_setting('webhook_secret', RAZORPAY_PAYMENT_METHOD_NAME))
+            )
+            ->addAvailableCountriesField(RAZORPAY_PAYMENT_METHOD_NAME);
     }
 }

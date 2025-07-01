@@ -2,8 +2,8 @@ const mix = require('laravel-mix')
 const path = require('path')
 
 const directory = path.basename(path.resolve(__dirname))
-const source = 'platform/plugins/' + directory
-const dist = 'public/vendor/core/plugins/' + directory
+const source = `platform/plugins/${directory}`
+const dist = `public/vendor/core/plugins/${directory}`
 
 mix
     .js(`${source}/resources/js/marketplace-product.js`, `${dist}/js`)

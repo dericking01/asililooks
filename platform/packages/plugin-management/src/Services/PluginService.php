@@ -8,14 +8,18 @@ use Botble\Base\Supports\Helper;
 use Botble\PluginManagement\Events\ActivatedPluginEvent;
 use Botble\PluginManagement\Events\DeactivatedPlugin;
 use Botble\PluginManagement\Events\RemovedPlugin;
+use Botble\PluginManagement\Events\UpdatedPluginEvent;
+use Botble\PluginManagement\Events\UpdatingPluginEvent;
 use Botble\PluginManagement\PluginManifest;
 use Botble\Setting\Facades\Setting;
+use Carbon\Carbon;
 use Composer\Autoload\ClassLoader;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
@@ -513,8 +517,11 @@ class PluginService
             return self::$activatedPlugins;
         }
 
+        $cacheEnabled = Setting::get('plugin_cache_enabled', true);
+
         if (
-            Cache::has($key = 'core_installed_plugins')
+            $cacheEnabled
+            && Cache::has($key = 'core_installed_plugins')
             && ! app()->runningInConsole()
             && ($activatedPlugins = Cache::get($key))
         ) {
@@ -543,7 +550,9 @@ class PluginService
 
         $activatedPlugins = array_values($activatedPlugins);
 
-        Cache::forever('core_installed_plugins', $activatedPlugins);
+        if ($cacheEnabled) {
+            Cache::put('core_installed_plugins', $activatedPlugins, Carbon::now()->addMinutes(30));
+        }
 
         self::$activatedPlugins = $activatedPlugins;
 
@@ -568,5 +577,108 @@ class PluginService
         }
 
         return $list;
+    }
+
+    public function updatePlugin(string $name, callable $updateCallback): mixed
+    {
+        $validate = $this->validate($name);
+
+        if ($validate['error']) {
+            return response()->json($validate);
+        }
+
+        $content = $this->getPluginInfo($name);
+
+        if (empty($content)) {
+            return response()->json([
+                'error' => true,
+                'message' => trans('packages/plugin-management::plugin.invalid_json'),
+            ]);
+        }
+
+        $this->clearCache();
+
+        // Fire updating event
+        UpdatingPluginEvent::dispatch($name);
+
+        // Load plugin class if not already loaded
+        if (! class_exists($content['provider'])) {
+            $loader = new ClassLoader();
+            $loader->setPsr4($content['namespace'], plugin_path($name . '/src'));
+            $loader->register(true);
+        }
+
+        // Call updating method if exists
+        if (class_exists($content['namespace'] . 'Plugin')) {
+            try {
+                call_user_func([$content['namespace'] . 'Plugin', 'updating']);
+            } catch (Throwable $exception) {
+                BaseHelper::logError($exception);
+            }
+        }
+
+        // Execute the update callback
+        $result = $updateCallback();
+
+        // Call updated method if exists
+        if (class_exists($content['namespace'] . 'Plugin')) {
+            try {
+                call_user_func([$content['namespace'] . 'Plugin', 'updated']);
+            } catch (Throwable $exception) {
+                BaseHelper::logError($exception);
+            }
+        }
+
+        $this->clearCache();
+
+        $this->pluginManifest->generateManifest();
+
+        // Fire updated event
+        UpdatedPluginEvent::dispatch($name);
+
+        return $result;
+    }
+
+    public function getPluginLicenseSettingKey(string $name): ?string
+    {
+        $content = $this->getPluginInfo($name);
+
+        if (empty($content) || ! isset($content['namespace'])) {
+            return null;
+        }
+
+        $pluginClass = $content['namespace'] . 'Plugin';
+
+        if (! class_exists($pluginClass)) {
+            // Try to load the plugin class
+            if (! class_exists($content['provider'])) {
+                $loader = new ClassLoader();
+                $loader->setPsr4($content['namespace'], plugin_path($name . '/src'));
+                $loader->register(true);
+            }
+        }
+
+        if (class_exists($pluginClass) && method_exists($pluginClass, 'getLicenseSettingKey')) {
+            try {
+                return call_user_func([$pluginClass, 'getLicenseSettingKey']);
+            } catch (Throwable $exception) {
+                BaseHelper::logError($exception);
+            }
+        }
+
+        return null;
+    }
+
+    public function getPluginPurchaseCode(string $name): ?string
+    {
+        $licenseSettingKey = $this->getPluginLicenseSettingKey($name);
+
+        if (! $licenseSettingKey) {
+            return null;
+        }
+
+        $purchaseCode = Setting::get($licenseSettingKey);
+
+        return Crypt::decryptString($purchaseCode);
     }
 }

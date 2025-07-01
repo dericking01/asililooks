@@ -207,10 +207,10 @@
                                                 data-target="#history-line-{{ $history->id }}"
                                                 href="javascript:void(0)"
                                             >
-                                                {{ OrderHelper::processHistoryVariables($history) }}
+                                                {!! OrderHelper::processHistoryVariables($history) !!}
                                             </a>
                                         @else
-                                            {{ OrderHelper::processHistoryVariables($history) }}
+                                            {!! OrderHelper::processHistoryVariables($history) !!}
                                         @endif
                                     </div>
                                     <div class="text-secondary">{{ BaseHelper::formatDateTime($history->created_at) }}</div>

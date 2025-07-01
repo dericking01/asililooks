@@ -177,7 +177,7 @@ class HandleShippingFeeService
         int|float $weight,
         int|float $orderTotal,
         array $data,
-        string $option = null
+        ?string $option = null
     ): array {
         $result = [];
 

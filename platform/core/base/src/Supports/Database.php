@@ -10,7 +10,7 @@ use Throwable;
 
 class Database
 {
-    public static function restoreFromPath(string $pathToSqlFile, string $connection = null): void
+    public static function restoreFromPath(string $pathToSqlFile, ?string $connection = null): void
     {
         if (! File::exists($pathToSqlFile) || File::size($pathToSqlFile) < 1024) {
             return;

@@ -25,11 +25,11 @@ class CompareController extends BaseController
     {
         $identifier = $id;
 
-        Cart::instance('compare')->restore($id);
+        Cart::instance('compare')->restore($identifier);
 
         $compareItems = $this->getCompareItems();
 
-        Cart::instance('compare')->store($id);
+        Cart::instance('compare')->storeOrIgnore($identifier);
 
         return response()->json([
             'id' => $identifier,

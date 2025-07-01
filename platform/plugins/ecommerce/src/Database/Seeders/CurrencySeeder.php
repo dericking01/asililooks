@@ -13,22 +13,13 @@ class CurrencySeeder extends BaseSeeder
 
         $currencies = [
             [
-                'title' => 'TZS',
-                'symbol' => 'TSh',
-                'is_prefix_symbol' => true,
-                'order' => 0,
-                'decimals' => 0,
-                'is_default' => 1,
-                'exchange_rate' => 1,
-            ],
-            [
                 'title' => 'USD',
                 'symbol' => '$',
                 'is_prefix_symbol' => true,
-                'order' => 1,
+                'order' => 0,
                 'decimals' => 2,
-                'is_default' => 0,
-                'exchange_rate' => 0.00037,
+                'is_default' => 1,
+                'exchange_rate' => 1,
             ],
             [
                 'title' => 'EUR',
@@ -37,7 +28,25 @@ class CurrencySeeder extends BaseSeeder
                 'order' => 1,
                 'decimals' => 2,
                 'is_default' => 0,
-                'exchange_rate' => 0.00033,
+                'exchange_rate' => 0.84,
+            ],
+            [
+                'title' => 'VND',
+                'symbol' => '₫',
+                'is_prefix_symbol' => false,
+                'order' => 2,
+                'decimals' => 0,
+                'is_default' => 0,
+                'exchange_rate' => 23203,
+            ],
+            [
+                'title' => 'NGN',
+                'symbol' => '₦',
+                'is_prefix_symbol' => true,
+                'order' => 2,
+                'decimals' => 2,
+                'is_default' => 0,
+                'exchange_rate' => 895.52,
             ],
         ];
 

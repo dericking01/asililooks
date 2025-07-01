@@ -134,6 +134,8 @@ abstract class TableAbstract extends DataTable implements ExtensibleContract
             $this->setOption('class', 'table card-table table-vcenter table-striped table-hover');
         }
 
+        $this->hasResponsive = setting('datatables_default_enable_responsive', true);
+
         $this->setup();
 
         $this->setupExtended();

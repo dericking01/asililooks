@@ -29,9 +29,9 @@ class Widget extends BaseModel
     }
 
     public static function getThemeName(
-        string $locale = null,
-        string $defaultLocale = null,
-        string $theme = null
+        ?string $locale = null,
+        ?string $defaultLocale = null,
+        ?string $theme = null
     ): string {
         if (! $theme) {
             $theme = Theme::getThemeName();

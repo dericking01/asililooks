@@ -33,6 +33,7 @@
                 >
                 <label for='tax-information-company-name'>{{ __('Company name') }}</label>
             </div>
+            <small class="form-text text-muted">{{ __('Enter your registered business or company name as it appears on official documents (e.g., ABC Corporation Ltd.).') }}</small>
             {!! Form::error('tax_information.company_name', $errors) !!}
         </div>
 
@@ -50,6 +51,7 @@
                 >
                 <label for='tax-information-company-address'>{{ __('Company address') }}</label>
             </div>
+            <small class="form-text text-muted">{{ __('Enter your complete business address including street, city, state, and postal code (e.g., 123 Business Street, Suite 100, City, State 12345).') }}</small>
             {!! Form::error('tax_information.company_address', $errors) !!}
         </div>
 
@@ -67,6 +69,7 @@
                 >
                 <label for='tax-information-company-tax-code'>{{ __('Company tax code') }}</label>
             </div>
+            <small class="form-text text-muted">{{ __('Enter your business tax identification number such as Tax ID, VAT number, or EIN (e.g., 12-3456789, VAT123456789, EIN 12-3456789).') }}</small>
             {!! Form::error('tax_information.company_tax_code', $errors) !!}
         </div>
 
@@ -84,6 +87,7 @@
                 >
                 <label for='tax-information-company-email'>{{ __('Company email') }}</label>
             </div>
+            <small class="form-text text-muted">{{ __('Enter your business email address where invoices and tax documents will be sent (e.g., billing@company.com).') }}</small>
             {!! Form::error('tax_information.company_email', $errors) !!}
         </div>
     </div>

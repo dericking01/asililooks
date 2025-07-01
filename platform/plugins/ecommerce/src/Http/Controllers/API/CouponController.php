@@ -150,9 +150,9 @@ class CouponController extends BaseController
         // Step 4: Remove the coupon using the service
         if (is_plugin_active('marketplace')) {
             $products = Cart::instance('cart')->products();
-            $result = apply_filters(HANDLE_POST_REMOVE_COUPON_CODE_ECOMMERCE, $products, $request);
+            apply_filters(HANDLE_POST_REMOVE_COUPON_CODE_ECOMMERCE, $products, $request);
         } else {
-            $result = $this->removeCouponService->execute();
+            $this->removeCouponService->execute();
         }
 
         // Step 5: Remove the coupon code from all cart items

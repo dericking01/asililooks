@@ -1,71 +1,70 @@
-<div class="table-responsive">
-    <table class="table table-striped table-bordered">
-        <thead>
-            <tr>
-                <th>{{ __('Image') }}</th>
-                <th>{{ __('Product Name') }}</th>
-                <th>{{ __('Date') }}</th>
-                <th>{{ __('Star') }}</th>
-                <th>{{ __('Comment') }}</th>
-                <th>{{ __('Actions') }}</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if ($reviews->total() > 0)
-                @foreach ($reviews as $item)
-                    <tr>
-                        <th scope="row">
-                            <img
-                                class="img-thumb"
-                                src="{{ RvMedia::getImageUrl($item->product->image, 'thumb', false, RvMedia::getDefaultImage()) }}"
-                                alt="{{ $item->product->name }}"
-                                style="max-width: 70px"
-                            >
-                        </th>
-                        <th scope="row">
-                            <a href="{{ $item->product->url }}">{!! BaseHelper::clean($item->product->name) !!}</a>
+@if ($reviews->total() > 0)
+    <div class="bb-customer-card-list">
+        @foreach ($reviews as $item)
+            <div class="bb-customer-card-content">
+                <div class="bb-customer-card-image">
+                    <img
+                        src="{{ RvMedia::getImageUrl($item->product->image, 'thumb', false, RvMedia::getDefaultImage()) }}"
+                        alt="{{ $item->product->name }}"
+                        class="img-fluid"
+                    >
+                </div>
+                <div class="bb-customer-card-details">
+                    <div class="bb-customer-card-name">
+                        <a href="{{ $item->product->url }}">{!! BaseHelper::clean($item->product->name) !!}</a>
+                    </div>
 
-                            @if ($sku = $item->product->sku)
-                                <p><small>({{ $sku }})</small></p>
-                            @endif
+                    <div class="bb-customer-card-meta">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="me-2">{{ $item->star }}</span>
+                            @for ($i = 1; $i <= 5; $i++)
+                                <x-core::icon
+                                    name="ti ti-star{{ $i <= $item->star ? '-filled' : '' }}"
+                                    class="ecommerce-icon text-warning me-1"
+                                />
+                            @endfor
+                        </div>
 
-                            @if (is_plugin_active('marketplace') && $item->product->store?->id)
-                                <p class="d-block mb-0 sold-by">
-                                    <small>{{ __('Sold by') }}: <a href="{{ $item->product->original_product->store->url }}" class="text-primary">{{ $item->product->store->name }}</a>
-                                    </small>
-                                </p>
-                            @endif
-                        </th>
-                        <td>{{ $item->created_at->translatedFormat('M d, Y h:m') }}</td>
-                        <td>
-                            <span>{{ $item->star }}</span>
-                            <x-core::icon name="ti ti-star" class="ecommerce-icon text-warning" />
-                        </td>
-                        <td><span title="{{ $item->comment }}">{{ Str::limit($item->comment, 120) }}</span></td>
-                        <td>
-                            {!! Form::open([
-                                'url' => route('public.reviews.destroy', $item->id),
-                                'onSubmit' => 'return confirm("' . __('Do you really want to delete the review?') . '")',
-                            ]) !!}
-                                <input
-                                    name="_method"
-                                    type="hidden"
-                                    value="DELETE"
-                                >
-                                <button class="btn btn-danger btn-sm">{{ __('Delete') }}</button>
-                            {!! Form::close() !!}
-                        </td>
-                    </tr>
-                @endforeach
-            @else
-                <tr>
-                    <td class="text-center" colspan="6">{{ __('No reviews!') }}</td>
-                </tr>
+                        @if ($sku = $item->product->sku)
+                            <span class="d-block text-muted">({{ $sku }})</span>
+                        @endif
+
+                        @if (is_plugin_active('marketplace') && $item->product->store?->id)
+                            <span class="d-block">{{ __('Sold by') }}: <a href="{{ $item->product->original_product->store->url }}" class="text-primary">{{ $item->product->store->name }}</a></span>
+                        @endif
+
+                        <span class="d-block text-muted">{{ __('Date') }}: {{ $item->created_at->translatedFormat('M d, Y h:m') }}</span>
+                    </div>
+
+                    <div class="bb-customer-card-description">
+                        <p title="{{ $item->comment }}">{{ Str::limit($item->comment, 200) }}</p>
+                    </div>
+
+                    <div class="bb-customer-card-actions mt-2">
+                        {!! Form::open([
+                            'url' => route('public.reviews.destroy', $item->id),
+                            'onSubmit' => 'return confirm("' . __('Do you really want to delete the review?') . '")',
+                            'class' => 'd-inline'
+                        ]) !!}
+                            <input name="_method" type="hidden" value="DELETE">
+                            <button class="btn btn-outline-danger btn-sm">{{ __('Delete') }}</button>
+                        {!! Form::close() !!}
+                    </div>
+                </div>
+            </div>
+            @if (!$loop->last)
+                <hr class="my-3">
             @endif
-        </tbody>
-    </table>
-</div>
+        @endforeach
+    </div>
+@else
+    <div class="text-center p-4">
+        <div role="alert" class="alert alert-info">
+            {{ __('No reviews!') }}
+        </div>
+    </div>
+@endif
 
-<div class="pagination">
+<div class="pagination tp-pagination">
     {!! $reviews->links() !!}
 </div>

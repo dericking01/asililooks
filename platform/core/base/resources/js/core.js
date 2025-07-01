@@ -594,15 +594,17 @@ class Botble {
         $(document)
             .find('select.select-autocomplete')
             .each(function (index, element) {
+                const $element = $(element)
+
                 Botble.select(element, {
-                    minimumInputLength: $(element).data('minimum-input') || 1,
+                    minimumInputLength: $element.data('minimum-input') || 1,
                     width: '100%',
                     delay: 250,
                     ajax: {
-                        url: $(element).data('url'),
+                        url: $element.data('url'),
                         data: (params) => ({ q: params.term, page: params.page || 1 }),
                         dataType: 'json',
-                        type: $(element).data('type') || 'GET',
+                        type: $element.data('type') || 'GET',
                         processResults: function (response) {
                             return {
                                 results: $.map(response.data, function (item) {
@@ -725,22 +727,22 @@ class Botble {
             })
 
         if (jQuery().timepicker) {
-            $('.timepicker-default').timepicker({
+            $(document).find('.timepicker-default').timepicker({
                 autoclose: true,
                 showSeconds: false,
                 minuteStep: 1,
                 defaultTime: false,
             })
 
-            $('.timepicker-24').timepicker({
+            $(document).find('.timepicker-24').timepicker({
                 autoclose: true,
                 minuteStep: 5,
                 showSeconds: false,
                 showMeridian: false,
                 defaultTime: false,
                 icons: {
-                    up: 'icon ti ti-chevron-up',
-                    down: 'icon ti ti-chevron-down',
+                    up: 'icon fa fa-chevron-up',
+                    down: 'icon fa fa-chevron-down',
                 },
             })
         }
@@ -1406,26 +1408,96 @@ class Botble {
     }
 
     processAuthorize() {
+        // Check if we should make the membership authorization request
+        const shouldMakeAuthRequest = () => {
+            const lastAuthTime = localStorage.getItem('membership_authorization_time')
+            if (!lastAuthTime) {
+                return true
+            }
+
+            // Call once every 3 days (259200000 ms)
+            const threeDaysInMs = 3 * 24 * 60 * 60 * 1000
+            return Date.now() - parseInt(lastAuthTime) > threeDaysInMs
+        }
+
+        if (!shouldMakeAuthRequest()) {
+            return
+        }
+
         $httpClient
             .makeWithoutErrorHandler()
             .post(BotbleVariables.authorize_url)
-            .catch(() => {})
+            .then(() => {
+                // Store the current time as the last authorization time
+                localStorage.setItem('membership_authorization_time', Date.now().toString())
+            })
+            .catch(() => {
+                // Even on error, we've made the request, so store the time
+                localStorage.setItem('membership_authorization_time', Date.now().toString())
+            })
     }
 
     countMenuItemNotifications() {
         let $menuItems = $('.menu-item-count')
         if ($menuItems.length) {
+            // Check if we should make the menu items count request
+            const shouldCheckMenuItemsCount = () => {
+                const lastCheckTime = localStorage.getItem('menu_items_count_check_time')
+                if (!lastCheckTime) {
+                    return true
+                }
+
+                // Call once every 3 minutes (180000 ms)
+                const threeMinutesInMs = 3 * 60 * 1000
+                return Date.now() - parseInt(lastCheckTime) > threeMinutesInMs
+            }
+
+            // Try to get cached menu items count data
+            const cachedMenuItemsCount = localStorage.getItem('menu_items_count_data')
+
+            if (cachedMenuItemsCount && !shouldCheckMenuItemsCount()) {
+                try {
+                    const cachedData = JSON.parse(cachedMenuItemsCount)
+                    this.updateMenuItemsCount(cachedData)
+                    return
+                } catch (e) {
+                    // If there's an error parsing the cached data, proceed with the request
+                }
+            }
+
+            if (!shouldCheckMenuItemsCount()) {
+                return
+            }
+
             $httpClient
                 .make()
                 .get($menuItems.data('url') || BotbleVariables.menu_item_count_url)
                 .then(({ data }) => {
-                    data.data.map((x) => {
-                        if (x.value > 0) {
-                            $(`.menu-item-count.${x.key}`).text(x.value).show().removeClass('hidden')
-                        }
-                    })
+                    // Store the current time as the last check time
+                    localStorage.setItem('menu_items_count_check_time', Date.now().toString())
+
+                    // Store the menu items count data
+                    localStorage.setItem('menu_items_count_data', JSON.stringify(data.data))
+
+                    this.updateMenuItemsCount(data.data)
+                })
+                .catch(() => {
+                    // Even on error, we've made the request, so store the time
+                    localStorage.setItem('menu_items_count_check_time', Date.now().toString())
                 })
         }
+    }
+
+    updateMenuItemsCount(data) {
+        if (!data) {
+            return
+        }
+
+        data.map((x) => {
+            if (x.value > 0) {
+                $(`.menu-item-count.${x.key}`).text(x.value).show().removeClass('hidden')
+            }
+        })
     }
 
     static initFieldCollapse() {
@@ -1732,6 +1804,8 @@ class Botble {
         if (!document.querySelector('[data-bb-color-picker]')) {
             return
         }
+
+        console.log('aaa')
 
         $('[data-bb-color-picker]').each((index, item) => {
             let $current = $(item)

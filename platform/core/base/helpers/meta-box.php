@@ -48,7 +48,7 @@ if (! function_exists('save_meta_data')) {
     /**
      * @deprecated since 5.7
      */
-    function save_meta_data($object, string $key, string $value, array $options = null): void
+    function save_meta_data($object, string $key, string $value, ?array $options = null): void
     {
         MetaBox::saveMetaBoxData($object, $key, $value, $options);
     }

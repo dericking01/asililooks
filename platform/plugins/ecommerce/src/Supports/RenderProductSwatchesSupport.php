@@ -33,7 +33,7 @@ class RenderProductSwatchesSupport
 
         $product = $this->product;
 
-        $attributeSets = $product->productAttributeSets()->orderBy('order')->latest()->get();
+        $attributeSets = $product->productAttributeSets()->oldest('order')->latest()->get();
 
         $attributes = $this->productRepository->getRelatedProductAttributes($this->product)->sortBy('order');
 
@@ -58,6 +58,10 @@ class RenderProductSwatchesSupport
         }
 
         $selected = $params['selected'];
+
+        if (is_array($selected)) {
+            $selected = collect($selected);
+        }
 
         return view(
             $params['view'],

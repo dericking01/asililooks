@@ -10,7 +10,7 @@ if (! function_exists('get_featured_brands')) {
         return Brand::query()
             ->where('is_featured', true)
             ->wherePublished()
-            ->orderBy('order')->latest()
+            ->oldest('order')->latest()
             ->with($with)
             ->withCount($withCount)
             ->take($limit)
@@ -23,7 +23,7 @@ if (! function_exists('get_all_brands')) {
     {
         return Brand::query()
             ->where($conditions)
-            ->orderBy('order')->latest()
+            ->oldest('order')->latest()
             ->with($with)
             ->withCount($withCount)
             ->get();

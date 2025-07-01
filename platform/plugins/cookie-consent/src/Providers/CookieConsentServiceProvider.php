@@ -5,7 +5,6 @@ namespace Botble\CookieConsent\Providers;
 use Botble\Base\Supports\ServiceProvider;
 use Botble\Base\Traits\LoadAndPublishDataTrait;
 use Botble\Theme\Events\RenderingThemeOptionSettings;
-use Botble\Theme\Facades\Theme;
 use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Routing\Events\RouteMatched;
@@ -21,8 +20,7 @@ class CookieConsentServiceProvider extends ServiceProvider
             ->setNamespace('plugins/cookie-consent')
             ->loadAndPublishConfigurations(['general'])
             ->loadAndPublishTranslations()
-            ->loadAndPublishViews()
-            ->publishAssets();
+            ->loadAndPublishViews();
 
         $this->app['events']->listen(RouteMatched::class, function (): void {
             if (defined('THEME_FRONT_FOOTER') && theme_option('cookie_consent_enable', 'yes') == 'yes') {
@@ -35,28 +33,6 @@ class CookieConsentServiceProvider extends ServiceProvider
 
                     $view->with(compact('cookieConsentConfig'));
                 });
-
-                if (! Cookie::has(config('plugins.cookie-consent.general.cookie_name'))) {
-                    Theme::asset()
-                        ->usePath(false)
-                        ->add(
-                            'cookie-consent-css',
-                            asset('vendor/core/plugins/cookie-consent/css/cookie-consent.css'),
-                            [],
-                            [],
-                            '1.1.0'
-                        );
-                    Theme::asset()
-                        ->container('footer')
-                        ->usePath(false)
-                        ->add(
-                            'cookie-consent-js',
-                            asset('vendor/core/plugins/cookie-consent/js/cookie-consent.js'),
-                            ['jquery'],
-                            [],
-                            '1.1.0'
-                        );
-                }
 
                 add_filter(THEME_FRONT_FOOTER, [$this, 'registerCookieConsent'], 1346);
             }

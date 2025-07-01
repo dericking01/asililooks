@@ -26,6 +26,8 @@
                 @include(EcommerceHelper::viewPath('includes.filters.price'))
             @endif
 
+            @include(EcommerceHelper::viewPath('includes.filters.discounted-only'))
+
             @if (EcommerceHelper::isEnabledFilterProductsByAttributes())
                 @include(EcommerceHelper::viewPath('includes.filters.attributes', ['view' => $view ?? null]))
             @endif

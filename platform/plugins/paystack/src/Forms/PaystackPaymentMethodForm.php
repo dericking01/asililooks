@@ -5,10 +5,12 @@ namespace Botble\Paystack\Forms;
 use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Forms\FieldOptions\TextFieldOption;
 use Botble\Base\Forms\Fields\TextField;
+use Botble\Payment\Concerns\Forms\HasAvailableCountriesField;
 use Botble\Payment\Forms\PaymentMethodForm;
 
 class PaystackPaymentMethodForm extends PaymentMethodForm
 {
+    use HasAvailableCountriesField;
     public function setup(): void
     {
         parent::setup();
@@ -34,6 +36,7 @@ class PaystackPaymentMethodForm extends PaymentMethodForm
                 TextFieldOption::make()
                     ->label(__('Secret Key'))
                     ->value(BaseHelper::hasDemoModeEnabled() ? '*******************************' : get_payment_setting('secret', PAYSTACK_PAYMENT_METHOD_NAME))
-            );
+            )
+            ->addAvailableCountriesField(PAYSTACK_PAYMENT_METHOD_NAME);
     }
 }

@@ -26,6 +26,9 @@ class Plugin extends PluginOperationAbstract
             'social_login_linkedin_enable',
             'social_login_linkedin_app_id',
             'social_login_linkedin_app_secret',
+            'social_login_apple_enable',
+            'social_login_apple_app_id',
+            'social_login_apple_app_secret',
         ]);
     }
 }

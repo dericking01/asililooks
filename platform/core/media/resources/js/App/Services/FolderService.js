@@ -36,6 +36,13 @@ export class FolderService {
         this.MediaService.getMedia(true)
     }
 
+    changeFolderAndAddToRecent(folderId) {
+        if (folderId > 0) {
+            Helpers.addToRecent(folderId, true)
+        }
+        this.changeFolder(folderId)
+    }
+
     static closeModal() {
         $(document).find('#modal_add_folder').modal('hide')
     }

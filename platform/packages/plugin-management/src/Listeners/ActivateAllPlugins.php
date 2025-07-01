@@ -25,7 +25,8 @@ class ActivateAllPlugins
             }
 
             Artisan::call('migrate', ['--force' => true]);
-        } catch (Throwable) {
+        } catch (Throwable $exception) {
+            BaseHelper::logError($exception);
         }
     }
 }

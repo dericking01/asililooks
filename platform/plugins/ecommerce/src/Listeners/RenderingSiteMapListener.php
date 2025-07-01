@@ -20,8 +20,7 @@ class RenderingSiteMapListener
                 case 'product-tags':
                     $tags = ProductTag::query()
                         ->with('slugable')
-                        ->wherePublished()
-                        ->orderByDesc('created_at')
+                        ->wherePublished()->latest()
                         ->select(['id', 'name', 'updated_at'])
                         ->get();
 
@@ -37,8 +36,7 @@ class RenderingSiteMapListener
                 case 'product-categories':
                     $productCategories = ProductCategory::query()
                         ->with('slugable')
-                        ->wherePublished()
-                        ->orderByDesc('created_at')
+                        ->wherePublished()->latest()
                         ->select(['id', 'name', 'updated_at'])
                         ->get();
 
@@ -54,8 +52,7 @@ class RenderingSiteMapListener
                 case 'product-brands':
                     $brands = Brand::query()
                         ->with('slugable')
-                        ->wherePublished()
-                        ->orderByDesc('created_at')
+                        ->wherePublished()->latest()
                         ->select(['id', 'name', 'updated_at'])
                         ->get();
 

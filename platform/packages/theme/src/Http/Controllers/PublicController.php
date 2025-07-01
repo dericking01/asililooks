@@ -97,7 +97,7 @@ class PublicController extends BaseController
         return $this->getSiteMapIndex();
     }
 
-    public function getSiteMapIndex(string $key = null, string $extension = 'xml')
+    public function getSiteMapIndex(?string $key = null, string $extension = 'xml')
     {
         if ($key == 'sitemap') {
             $key = null;

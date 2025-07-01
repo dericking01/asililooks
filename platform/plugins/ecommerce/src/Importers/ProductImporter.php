@@ -215,6 +215,8 @@ class ProductImporter extends Importer implements WithMapping
                 ->rules(['nullable', 'numeric', 'min:0'], trans('plugins/ecommerce::products.import.rules.nullable_numeric_min', ['attribute' => 'Minimum order quantity'])),
             ImportColumn::make('maximum_order_quantity')
                 ->rules(['nullable', 'numeric', 'min:0'], trans('plugins/ecommerce::products.import.rules.nullable_numeric_min', ['attribute' => 'Maximum order quantity'])),
+            ImportColumn::make('order')
+                ->rules(['nullable', 'integer', 'min:0'], trans('plugins/ecommerce::products.import.rules.nullable_numeric_min', ['attribute' => 'Order'])),
         ];
 
         if (is_plugin_active('marketplace')) {
@@ -317,6 +319,7 @@ class ProductImporter extends Importer implements WithMapping
                 'generate_license_code' => 1,
                 'minimum_order_quantity' => 1,
                 'maximum_order_quantity' => 10,
+                'order' => 0,
             ],
         ];
 
@@ -383,6 +386,7 @@ class ProductImporter extends Importer implements WithMapping
                 'generate_license_code' => $product->generate_license_code,
                 'minimum_order_quantity' => $product->minimum_order_quantity,
                 'maximum_order_quantity' => $product->maximum_order_quantity,
+                'order' => (int) $product->order ?: 0,
             ];
 
             if ($this->isEnabledDigital) {
@@ -450,6 +454,7 @@ class ProductImporter extends Importer implements WithMapping
                         'generate_license_code' => $variation->product->generate_license_code,
                         'minimum_order_quantity' => $variation->product->minimum_order_quantity,
                         'maximum_order_quantity' => $variation->product->maximum_order_quantity,
+                        'order' => (int) $variation->product->order ?: 0,
                     ];
 
                     if ($this->isEnabledDigital) {
@@ -938,6 +943,7 @@ class ProductImporter extends Importer implements WithMapping
             ['key' => 'end_date', 'type' => 'datetime'],
             ['key' => 'tags', 'type' => 'array'],
             ['key' => 'taxes', 'type' => 'array'],
+            ['key' => 'order', 'type' => 'number'],
         ]);
 
         $row['product_labels'] = $row['labels'];
@@ -1007,6 +1013,8 @@ class ProductImporter extends Importer implements WithMapping
                 }
             }
         }
+
+        $row['order'] = (int) Arr::get($row, 'order');
 
         return $row;
     }

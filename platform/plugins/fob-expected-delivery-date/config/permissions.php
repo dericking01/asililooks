@@ -20,4 +20,9 @@ return [
         'flag' => 'delivery-estimates.destroy',
         'parent_flag' => 'delivery-estimates.index',
     ],
-]; 
+    [
+        'name' => 'Settings',
+        'flag' => 'expected-delivery-date.settings',
+        'parent_flag' => 'delivery-estimates.index',
+    ],
+];

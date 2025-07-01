@@ -7,10 +7,12 @@ use Botble\Base\Forms\FieldOptions\CheckboxFieldOption;
 use Botble\Base\Forms\FieldOptions\TextFieldOption;
 use Botble\Base\Forms\Fields\OnOffCheckboxField;
 use Botble\Base\Forms\Fields\TextField;
+use Botble\Payment\Concerns\Forms\HasAvailableCountriesField;
 use Botble\Payment\Forms\PaymentMethodForm;
 
 class PaypalPaymentMethodForm extends PaymentMethodForm
 {
+    use HasAvailableCountriesField;
     public function setup(): void
     {
         parent::setup();
@@ -44,6 +46,7 @@ class PaypalPaymentMethodForm extends PaymentMethodForm
                 CheckboxFieldOption::make()
                     ->label(trans('plugins/payment::payment.live_mode'))
                     ->value(get_payment_setting('mode', PAYPAL_PAYMENT_METHOD_NAME, true))
-            );
+            )
+            ->addAvailableCountriesField(PAYPAL_PAYMENT_METHOD_NAME);
     }
 }

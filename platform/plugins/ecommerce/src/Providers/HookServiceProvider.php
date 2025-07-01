@@ -702,6 +702,17 @@ class HookServiceProvider extends ServiceProvider
             switch ($request->input('payment_method')) {
                 case PaymentMethodEnum::COD:
 
+                    $products = Cart::instance('cart')->products();
+                    if (EcommerceHelper::isEnabledSupportDigitalProducts()) {
+                        $digitalProductsCount = EcommerceHelper::countDigitalProducts($products);
+                        if ($digitalProductsCount > 0 && $digitalProductsCount === $products->count()) {
+                            $data['error'] = true;
+                            $data['message'] = __('COD (Cash On Delivery) payment method is not available for digital products only.');
+
+                            break;
+                        }
+                    }
+
                     $minimumOrderAmount = (float) get_payment_setting('minimum_amount', PaymentMethodEnum::COD, 0);
 
                     if ($minimumOrderAmount > Cart::instance('cart')->rawSubTotal()) {
@@ -761,10 +772,6 @@ class HookServiceProvider extends ServiceProvider
             return $html;
         }, 120, 3);
 
-        add_filter('payment_order_total_amount', function () {
-            return Cart::instance('cart')->rawTotal();
-        }, 120);
-
         add_filter('payment-transaction-card-actions', function ($data, $payment) {
             $invoice = Invoice::query()->where('payment_id', $payment->id)->first();
 
@@ -798,7 +805,7 @@ class HookServiceProvider extends ServiceProvider
                             'price_per_order' => $this->convertOrderAmount(
                                 ($product->price * $product->qty)
                                 + ($order->tax_amount / $order->products->count())
-                                - (($product->price * $product->qty) / $order->sub_total * $order->discount_amount)
+                                - ($order->sub_total > 0 ? (($product->price * $product->qty) / $order->sub_total * $order->discount_amount) : 0)
                             ),
                             'qty' => $product->qty,
                         ];
@@ -968,7 +975,27 @@ class HookServiceProvider extends ServiceProvider
                 return $html;
             }
 
-            return $html . Html::tag('p', $message, ['class' => 'text-danger small mt-2'])->toHtml();
+            return $html . view('plugins/ecommerce::partials.quantity-warning', compact('message'))->render();
+        }, 123, 2);
+
+        add_filter('ecommerce_cart_sidebar_before_checkout', function (?string $html, Collection $products) {
+            $messages = $this->getQuantityRestrictionMessages($products);
+
+            if (empty($messages)) {
+                return $html;
+            }
+
+            return $html . view('plugins/ecommerce::partials.cart-sidebar-warnings', compact('messages'))->render();
+        }, 123, 2);
+
+        add_filter('ecommerce_checkout_form_before', function (?string $html, Collection $products) {
+            $messages = $this->getQuantityRestrictionMessages($products);
+
+            if (empty($messages)) {
+                return $html;
+            }
+
+            return $html . view('plugins/ecommerce::partials.checkout-warnings', compact('messages'))->render();
         }, 123, 2);
 
         add_filter('razorpay_is_valid_to_process_checkout', function () {
@@ -987,6 +1014,31 @@ class HookServiceProvider extends ServiceProvider
         }, 999, 2);
 
         add_filter('facebook_comment_html', [$this, 'renderProductFacebookComments'], 99, 2);
+    }
+
+    protected function getQuantityRestrictionMessages(Collection $products): array
+    {
+        $messages = [];
+
+        foreach ($products as $product) {
+            $quantityOfProduct = Cart::instance('cart')->rawQuantityByItemId($product->getKey());
+
+            if ($product->minimum_order_quantity > 0 && $quantityOfProduct < $product->minimum_order_quantity) {
+                $messages[] = __('You need to add :quantity more items of :product to place your order.', [
+                    'product' => BaseHelper::clean($product->original_product->name),
+                    'quantity' => $product->minimum_order_quantity - $quantityOfProduct,
+                ]);
+            }
+
+            if ($product->maximum_order_quantity > 0 && $quantityOfProduct > $product->maximum_order_quantity) {
+                $messages[] = __('Sorry, you can only order a maximum of :quantity units of :product at a time. Please adjust the quantity and try again.', [
+                    'quantity' => $product->maximum_order_quantity,
+                    'product' => BaseHelper::clean($product->original_product->name),
+                ]);
+            }
+        }
+
+        return $messages;
     }
 
     protected function convertOrderAmount(float $amount): float
@@ -1262,8 +1314,7 @@ class HookServiceProvider extends ServiceProvider
                     ->where([
                         'status' => BaseStatusEnum::PENDING,
                         'is_finished' => 1,
-                    ])
-                    ->orderByDesc('created_at')
+                    ])->latest()
                     ->with(['address', 'user'])
                     ->paginate(10);
 

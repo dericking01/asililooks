@@ -38,6 +38,9 @@ class PluginManagement {
                 .then(({ data }) => {
                     Botble.showSuccess(data.message)
 
+                    localStorage.removeItem('plugin_update_check_time')
+                    localStorage.removeItem('plugin_update_data')
+
                     setTimeout(() => window.location.reload(), 2000)
                 })
                 .finally(() => currentTarget.prop('disabled', false))
@@ -158,30 +161,78 @@ class PluginManagement {
     }
 
     checkUpdate() {
+        // Check if we should make the update check request
+        const shouldCheckUpdate = () => {
+            const lastCheckTime = localStorage.getItem('plugin_update_check_time')
+            if (!lastCheckTime) {
+                return true
+            }
+
+            // Call once every 15 minutes (900000 ms)
+            const fifteenMinutesInMs = 15 * 60 * 1000
+            return Date.now() - parseInt(lastCheckTime) > fifteenMinutesInMs
+        }
+
+        // Try to get cached update data
+        const cachedUpdateData = localStorage.getItem('plugin_update_data')
+
+        if (cachedUpdateData && !shouldCheckUpdate()) {
+            try {
+                const data = JSON.parse(cachedUpdateData)
+                this.processUpdateData(data)
+                return
+            } catch (e) {
+                // If there's an error parsing the cached data, proceed with the request
+            }
+        }
+
+        if (!shouldCheckUpdate()) {
+            return
+        }
+
         $httpClient
             .make()
             .post($('button[data-check-update]').data('check-update-url'))
             .then(({ data }) => {
+                // Store the current time as the last check time
+                localStorage.setItem('plugin_update_check_time', Date.now().toString())
+
                 if (!data.data) {
+                    localStorage.removeItem('plugin_update_data')
                     return
                 }
 
-                Object.keys(data.data).forEach((key) => {
-                    const plugin = data.data[key]
+                // Store the update data
+                localStorage.setItem('plugin_update_data', JSON.stringify(data.data))
 
-                    const $button = $(`button[data-check-update="${plugin.name}"]`)
-
-                    const url = $button.data('update-url').replace('__id__', plugin.id)
-
-                    $button.data('update-url', url).show()
-
-                    const $parent = $button.closest('.plugin-item')
-
-                    $parent.data('available-for-updates', true).trigger('change')
-
-                    $('[data-bb-toggle="plugins-count"][data-status="updates-available"]').text(data.data.length)
-                })
+                this.processUpdateData(data.data)
             })
+            .catch(() => {
+                // Even on error, we've made the request, so store the time
+                localStorage.setItem('plugin_update_check_time', Date.now().toString())
+            })
+    }
+
+    processUpdateData(data) {
+        if (!data) {
+            return
+        }
+
+        Object.keys(data).forEach((key) => {
+            const plugin = data[key]
+
+            const $button = $(`button[data-check-update="${plugin.name}"]`)
+
+            const url = $button.data('update-url').replace('__id__', plugin.id)
+
+            $button.data('update-url', url).show()
+
+            const $parent = $button.closest('.plugin-item')
+
+            $parent.data('available-for-updates', true).trigger('change')
+
+            $('[data-bb-toggle="plugins-count"][data-status="updates-available"]').text(Object.keys(data).length)
+        })
     }
 
     async activateOrDeactivatePlugin(url, reload = true) {

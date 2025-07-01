@@ -2,6 +2,8 @@
 
 namespace Botble\StripeConnect\Providers;
 
+use Botble\AffiliatePro\Enums\PayoutPaymentMethodsEnum as AffiliatePayoutPaymentMethodsEnum;
+use Botble\AffiliatePro\Facades\AffiliateHelper;
 use Botble\Base\Forms\FieldOptions\HtmlFieldOption;
 use Botble\Base\Forms\FieldOptions\TextFieldOption;
 use Botble\Base\Forms\Fields\HtmlField;
@@ -20,7 +22,7 @@ class StripeConnectServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        if (! is_plugin_active('payment') || ! is_plugin_active('stripe') || ! is_plugin_active('marketplace')) {
+        if (! is_plugin_active('payment') || ! is_plugin_active('stripe')) {
             return;
         }
 
@@ -39,7 +41,7 @@ class StripeConnectServiceProvider extends ServiceProvider
             }
 
             add_filter(BASE_FILTER_ENUM_ARRAY, function (array $data, string $class) {
-                if ($class === PayoutPaymentMethodsEnum::class) {
+                if ($class === PayoutPaymentMethodsEnum::class || $class === AffiliatePayoutPaymentMethodsEnum::class) {
                     $data['STRIPE'] = 'stripe';
                 }
 
@@ -47,7 +49,7 @@ class StripeConnectServiceProvider extends ServiceProvider
             }, 999, 2);
 
             add_filter(BASE_FILTER_ENUM_LABEL, function (string $label, string $class) {
-                if ($class === PayoutPaymentMethodsEnum::class && $label === 'stripe') {
+                if (($class === PayoutPaymentMethodsEnum::class || $class === AffiliatePayoutPaymentMethodsEnum::class) && $label === 'stripe') {
                     $label = 'Stripe';
                 }
 
@@ -64,6 +66,19 @@ class StripeConnectServiceProvider extends ServiceProvider
 
                 return $data;
             });
+
+            if (is_plugin_active('affiliate-pro')) {
+                add_filter('affiliate_pro_payout_methods', function (array $data) {
+                    $data['stripe'] = [
+                        'is_enabled' => (bool) Arr::get(AffiliateHelper::getSetting('payout_methods'), 'stripe', true),
+                        'key' => 'stripe',
+                        'label' => 'Stripe',
+                        'fields' => [],
+                    ];
+
+                    return $data;
+                });
+            }
 
             add_filter('marketplace_withdrawal_payout_info', function (?string $html) {
                 if (is_in_admin(true) || auth('customer')->user()->vendorInfo->payout_payment_method !== 'stripe') {

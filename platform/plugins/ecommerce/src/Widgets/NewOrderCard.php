@@ -26,7 +26,7 @@ class NewOrderCard extends Card
         }
 
         $data = $query
-            ->where('is_finished', true)
+            ->where('ec_orders.is_finished', true)
             ->selectRaw(
                 'count(ec_orders.id) as total, date_format(ec_orders.created_at, "' . $this->dateFormat . '") as period'
             )
@@ -53,7 +53,7 @@ class NewOrderCard extends Card
                 ->whereIn('payments.status', [PaymentStatusEnum::COMPLETED, PaymentStatusEnum::PENDING])
                 ->whereDate('payments.created_at', '>=', $this->startDate)
                 ->whereDate('payments.created_at', '<=', $this->endDate)
-                ->where('is_finished', true)
+                ->where('ec_orders.is_finished', true)
                 ->groupBy('payments.status')
                 ->count();
         } else {
@@ -79,9 +79,9 @@ class NewOrderCard extends Card
                 ->whereDate('ec_orders.created_at', '<=', $currentPeriod->getEndDate())
                 ->join('payments', 'payments.id', '=', 'ec_orders.payment_id')
                 ->whereIn('payments.status', [PaymentStatusEnum::COMPLETED, PaymentStatusEnum::PENDING])
-                ->whereDate('payments.created_at', '>=', $this->startDate)
-                ->whereDate('payments.created_at', '<=', $this->endDate)
-                ->where('is_finished', true)
+                ->whereDate('payments.created_at', '>=', $currentPeriod->getStartDate())
+                ->whereDate('payments.created_at', '<=', $currentPeriod->getEndDate())
+                ->where('ec_orders.is_finished', true)
                 ->groupBy('payments.status')
                 ->count();
 
@@ -90,9 +90,9 @@ class NewOrderCard extends Card
                 ->whereDate('ec_orders.created_at', '<=', $previousPeriod->getEndDate())
                 ->join('payments', 'payments.id', '=', 'ec_orders.payment_id')
                 ->whereIn('payments.status', [PaymentStatusEnum::COMPLETED, PaymentStatusEnum::PENDING])
-                ->whereDate('payments.created_at', '>=', $this->startDate)
-                ->whereDate('payments.created_at', '<=', $this->endDate)
-                ->where('is_finished', true)
+                ->whereDate('payments.created_at', '>=', $previousPeriod->getStartDate())
+                ->whereDate('payments.created_at', '<=', $previousPeriod->getEndDate())
+                ->where('ec_orders.is_finished', true)
                 ->groupBy('payments.status')
                 ->count();
         } else {

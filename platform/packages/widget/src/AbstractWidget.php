@@ -5,8 +5,11 @@ namespace Botble\Widget;
 use Botble\Theme\Facades\Theme;
 use Botble\Widget\Facades\WidgetGroup as WidgetGroupFacade;
 use Botble\Widget\Forms\WidgetForm;
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
@@ -44,7 +47,7 @@ abstract class AbstractWidget
         return File::basename(File::dirname($reflection->getFilename()));
     }
 
-    public function getConfig(string $name = null, $default = null): array|int|string|null
+    public function getConfig(?string $name = null, $default = null): array|int|string|null
     {
         if ($name) {
             return Arr::get($this->config, $name, $default);
@@ -68,13 +71,50 @@ abstract class AbstractWidget
             return '';
         }
 
+        $args = func_get_args();
+
+        $widgetClass = $this->getId();
+        $sidebar = $args[0] ?? 'default';
+        $position = $args[1] ?? 0;
+        $theme = Theme::getThemeName();
+        $locale = App::getLocale();
+
+        $cacheKey = 'widget_' . md5($widgetClass . $sidebar . $position . $theme . $locale . serialize($this->config));
+
+        // Check if caching is enabled from settings
+        if (setting('widget_cache_enabled', false) && ! request()->ajax()) {
+            // Check if this widget should be cached for longer
+            $cacheable = $this->isWidgetCacheable();
+
+            // Get cache durations from settings
+            $defaultTtl = (int) setting('widget_cache_ttl_default', 5);
+            $cacheableTtl = (int) setting('widget_cache_ttl_cacheable', 1800);
+
+            // Set cache duration based on whether the widget is cacheable
+            $cacheDuration = $cacheable
+                ? Carbon::now()->addSeconds($cacheableTtl)
+                : Carbon::now()->addSeconds($defaultTtl);
+
+            // Get from cache or render if not cached
+            return Cache::remember($cacheKey, $cacheDuration, function () use ($args) {
+                return $this->renderWidget($args);
+            });
+        }
+
+        // If caching is disabled, render directly
+        return $this->renderWidget($args);
+    }
+
+    /**
+     * Render the widget without caching
+     */
+    protected function renderWidget(array $args): ?string
+    {
         $widgetGroup = app('botble.widget-group-collection');
         $widgetGroup->load();
         $widgetGroupData = $widgetGroup->getData();
 
         Theme::uses(Theme::getThemeName());
-
-        $args = func_get_args();
 
         $this->group = WidgetGroupFacade::group($args[0]);
 
@@ -111,6 +151,25 @@ abstract class AbstractWidget
         }
 
         return apply_filters('widget_rendered', $html, $this);
+    }
+
+    /**
+     * Determine if a widget should be cached for a longer period
+     *
+     * @return bool
+     */
+    protected function isWidgetCacheable(): bool
+    {
+        // List of widgets that should be cached for longer periods
+        // These are typically widgets that don't change frequently or don't contain dynamic content
+        $cacheableWidgets = [
+            'Botble\Widget\Widgets\Text',
+            'Botble\Widget\Widgets\Menu',
+            'Botble\Widget\Widgets\CustomMenu',
+            'Botble\Widget\Widgets\CustomHTML',
+        ];
+
+        return in_array($this->getId(), $cacheableWidgets);
     }
 
     public function getId(): string

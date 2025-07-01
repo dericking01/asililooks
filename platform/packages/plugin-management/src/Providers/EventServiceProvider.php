@@ -7,6 +7,8 @@ use Botble\Base\Events\SystemUpdateDBMigrated;
 use Botble\Base\Events\SystemUpdatePublished;
 use Botble\Base\Listeners\ClearDashboardMenuCaches;
 use Botble\PluginManagement\Events\ActivatedPluginEvent;
+use Botble\PluginManagement\Events\UpdatedPluginEvent;
+use Botble\PluginManagement\Events\UpdatingPluginEvent;
 use Botble\PluginManagement\Listeners\ActivateAllPlugins;
 use Botble\PluginManagement\Listeners\ClearPluginCaches;
 use Botble\PluginManagement\Listeners\CoreUpdatePluginsDB;
@@ -30,6 +32,12 @@ class EventServiceProvider extends ServiceProvider
             ActivateAllPlugins::class,
         ],
         ActivatedPluginEvent::class => [
+            ClearDashboardMenuCaches::class,
+        ],
+        UpdatingPluginEvent::class => [
+            ClearPluginCaches::class,
+        ],
+        UpdatedPluginEvent::class => [
             ClearDashboardMenuCaches::class,
         ],
     ];

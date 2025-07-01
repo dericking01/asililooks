@@ -14,5 +14,21 @@
         @endif
     </x-slot:label>
 
-    {!! Form::autocomplete($name, ($options['empty_value'] ? ['' => $options['empty_value']] : []) + $options['choices'], $options['selected'], $options['attr']) !!}
+    @php
+        if ($options['choices'] instanceof \Illuminate\Contracts\Support\Arrayable) {
+            $options['choices'] = $options['choices']->toArray();
+        }
+
+        // Merge the select-autocomplete class with existing classes
+        $options['attr']['class'] = trim(($options['attr']['class'] ?? '') . ' select-autocomplete');
+    @endphp
+
+    {!! Form::customSelect(
+        $name,
+        ($options['empty_value'] ? ['' => $options['empty_value']] : []) + $options['choices'],
+        $options['selected'] !== null ? $options['selected'] : $options['default_value'],
+        $options['attr'],
+        Arr::get($options, 'optionAttrs', []),
+        Arr::get($options, 'optgroupsAttributes', []),
+    ) !!}
 </x-core::form.field>

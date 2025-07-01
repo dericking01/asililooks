@@ -70,6 +70,8 @@ use Botble\Ecommerce\Models\Shipping;
 use Botble\Ecommerce\Models\ShippingRule;
 use Botble\Ecommerce\Models\ShippingRuleItem;
 use Botble\Ecommerce\Models\SpecificationAttribute;
+use Botble\Ecommerce\Models\SpecificationGroup;
+use Botble\Ecommerce\Models\SpecificationTable;
 use Botble\Ecommerce\Models\StoreLocator;
 use Botble\Ecommerce\Models\Tax;
 use Botble\Ecommerce\Models\Wishlist;
@@ -401,7 +403,8 @@ class EcommerceServiceProvider extends ServiceProvider
             ->loadAndPublishViews()
             ->loadMigrations()
             ->loadAnonymousComponents()
-            ->publishAssets();
+            ->publishAssets()
+            ->loadJsonTranslationsFrom($this->getPath() . '/resources/lang');
 
         if (class_exists('ApiHelper') && ApiHelper::enabled()) {
             ApiHelper::setConfig([
@@ -450,6 +453,16 @@ class EcommerceServiceProvider extends ServiceProvider
                 'name',
                 'options',
                 'default_value',
+            ]);
+
+            LanguageAdvancedManager::registerModule(SpecificationGroup::class, [
+                'name',
+                'description',
+            ]);
+
+            LanguageAdvancedManager::registerModule(SpecificationTable::class, [
+                'name',
+                'description',
             ]);
 
             LanguageAdvancedManager::addTranslatableMetaBox('specification-attribute-options');
@@ -679,7 +692,7 @@ class EcommerceServiceProvider extends ServiceProvider
             $router->pushMiddlewareToGroup('web', CaptureCouponMiddleware::class);
         });
 
-        $this->app->booted(function () {
+        $this->app->booted(function (): void {
             $emailConfig = config('plugins.ecommerce.email', []);
 
             if (! EcommerceHelper::isEnabledSupportDigitalProducts()) {

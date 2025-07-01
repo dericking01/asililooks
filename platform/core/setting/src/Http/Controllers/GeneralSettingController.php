@@ -7,12 +7,12 @@ use Botble\Base\Exceptions\LicenseIsAlreadyActivatedException;
 use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Base\Supports\Core;
-use Botble\Base\Supports\Helper;
 use Botble\Base\Supports\Language;
 use Botble\Setting\Facades\Setting;
 use Botble\Setting\Forms\GeneralSettingForm;
 use Botble\Setting\Http\Requests\GeneralSettingRequest;
 use Botble\Setting\Http\Requests\LicenseSettingRequest;
+use Botble\Setting\Models\Setting as SettingModel;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -55,15 +55,13 @@ class GeneralSettingController extends SettingController
     {
         if ($request->expectsJson() && ! $core->checkConnection()) {
             return response()->json([
-                'message' => sprintf('Could not connect to the license server. Please try again later. Your site IP: %s', Helper::getIpFromThirdParty()),
+                'message' => sprintf('Could not connect to the license server. Please try again later. Your site IP: %s', $core->getServerIP()),
             ], 400);
         }
 
         $invalidMessage = 'Your license is invalid. Please activate your license!';
 
-        $licenseFilePath = $core->getLicenseFilePath();
-
-        if (! File::exists($licenseFilePath)) {
+        if (! $this->isLicenseExists($core)) {
             $this
                 ->httpResponse()
                 ->setData([
@@ -84,7 +82,7 @@ class GeneralSettingController extends SettingController
                     ->setMessage($invalidMessage);
             }
 
-            $activatedAt = Carbon::createFromTimestamp(filectime($core->getLicenseFilePath()));
+            $activatedAt = $this->getLicenseActivatedDate($core);
 
             $data = [
                 'activated_at' => $activatedAt->format('M d Y'),
@@ -183,7 +181,7 @@ class GeneralSettingController extends SettingController
     {
         Setting::forceSet('licensed_to', $buyer)->save();
 
-        $activatedAt = Carbon::createFromTimestamp(filectime($core->getLicenseFilePath()));
+        $activatedAt = $this->getLicenseActivatedDate($core);
 
         $core->clearLicenseReminder();
 
@@ -191,5 +189,29 @@ class GeneralSettingController extends SettingController
             'activated_at' => $activatedAt->format('M d Y'),
             'licensed_to' => $buyer,
         ];
+    }
+
+    private function getLicenseActivatedDate(Core $core): Carbon
+    {
+        if (config('core.base.general.license_storage_method') === 'database') {
+            // For database storage, use the setting's updated_at timestamp or current time
+            $licenseContent = SettingModel::where('key', 'license_file_content')->first();
+
+            return $licenseContent && $licenseContent->updated_at
+                ? Carbon::parse($licenseContent->updated_at)
+                : Carbon::now();
+        }
+
+        // For file storage, use file creation time
+        return Carbon::createFromTimestamp(filectime($core->getLicenseFilePath()));
+    }
+
+    private function isLicenseExists(Core $core): bool
+    {
+        if (config('core.base.general.license_storage_method') === 'database') {
+            return Setting::has('license_file_content') && ! empty(Setting::get('license_file_content'));
+        }
+
+        return File::exists($core->getLicenseFilePath());
     }
 }

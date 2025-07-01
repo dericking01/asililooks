@@ -1,31 +1,29 @@
 @foreach ($reviews as $review)
     @continue(! $review->is_approved && auth('customer')->id() != $review->customer_id)
 
-    <div @class(['row pb-3 mb-3 review-item', 'border-bottom' => ! $loop->last, 'opacity-50' => ! $review->is_approved])>
+    @php
+        $isCurrentCustomerReview = auth('customer')->check() && auth('customer')->id() == $review->customer_id;
+    @endphp
+
+    <div @class([
+        'row pb-3 mb-3 review-item',
+        'border-bottom' => ! $loop->last,
+        'opacity-50' => ! $review->is_approved,
+        'current-customer-review' => $isCurrentCustomerReview
+    ])>
         <div class="col-auto">
-            <img class="rounded-circle" src="{{ $review->customer_avatar_url }}" alt="{{ $review->user->name ?: $review->customer_name }}" width="60">
+            <img class="rounded-circle" src="{{ $review->customer_avatar_url }}" alt="{{ $review->display_name }}" width="60">
         </div>
         <div class="col">
             <div class="d-flex flex-wrap align-items-center gap-2 mb-2 review-item__header">
                 <div class="fw-medium">
-                    @php
-                        $customerName = $review->user->name ?: $review->customer_name;
-
-                        if (! get_ecommerce_setting('show_customer_full_name', true)) {
-                            $customerNameCharCount = strlen($customerName);
-
-                            if ($customerNameCharCount > 7) {
-                                $customerName = Str::mask($customerName, '*', $customerNameCharCount - 5, 5);
-                            } elseif ($customerNameCharCount > 3) {
-                                $customerName = Str::mask($customerName, '*', $customerNameCharCount - 3, 3);
-                            } else {
-                                $customerName = Str::mask($customerName, '*', 1, -1);
-                            }
-                        }
-                    @endphp
-
-                    {{ $customerName }}
+                    {{ $review->display_name }}
                 </div>
+                @if ($isCurrentCustomerReview)
+                    <span class="badge bg-primary">
+                        {{ __('Your Review') }}
+                    </span>
+                @endif
                 <time class="text-muted small" datetime="{{ $review->created_at->translatedFormat('Y-m-d\TH:i:sP') }}">
                     {{ $review->created_at->diffForHumans() }}
                 </time>
@@ -34,6 +32,20 @@
                 @endif
                 @if (! $review->is_approved)
                     <div class="small text-warning">{{ __('Waiting for approval') }}</div>
+                @endif
+
+                @if ($isCurrentCustomerReview)
+                    <div class="review-item__actions">
+                        <a
+                            href="javascript:void(0)"
+                            class="text-danger delete-review-btn p-1"
+                            data-review-id="{{ $review->id }}"
+                            data-confirm-message="{{ __('Are you sure you want to delete your review?') }}"
+                            title="{{ __('Delete your review') }}"
+                        >
+                            <x-core::icon name="ti ti-trash" />
+                        </a>
+                    </div>
                 @endif
             </div>
 
@@ -87,4 +99,6 @@
     </div>
 @endforeach
 
-{{ $reviews->links() }}
+<div class="tp-pagination">
+    {{ $reviews->links() }}
+</div>

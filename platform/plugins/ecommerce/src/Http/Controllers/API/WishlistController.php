@@ -25,11 +25,11 @@ class WishlistController extends BaseController
     {
         $identifier = $id;
 
-        Cart::instance('wishlist')->restore($id);
+        Cart::instance('wishlist')->restore($identifier);
 
         $wishlistItems = $this->getSimplifiedWishlistItems();
 
-        Cart::instance('wishlist')->store($id);
+        Cart::instance('wishlist')->storeOrIgnore($identifier);
 
         return response()->json([
             'id' => $identifier,

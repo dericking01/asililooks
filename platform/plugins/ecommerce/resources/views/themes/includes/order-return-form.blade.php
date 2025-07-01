@@ -141,7 +141,7 @@
                                             collect($qtyChooses)->pluck('data-qty', 'data-qty'),
                                             old('return_items.' . $key . '.qty', $orderProduct->qty),
                                             [
-                                                'class' => 'form-control form-select select-return-item-qty',
+                                                'class' => 'form-select select-return-item-qty',
                                             ],
                                             $qtyChooses,
                                         ) !!}
@@ -152,7 +152,7 @@
                                             array_filter(Botble\Ecommerce\Enums\OrderReturnReasonEnum::labels()),
                                             old('return_items.' . $key . '.reason'),
                                             [
-                                                'class' => 'form-control form-select',
+                                                'class' => 'form-select',
                                                 'placeholder' => __('Choose Reason'),
                                             ],
                                         ) !!}

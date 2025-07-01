@@ -39,6 +39,12 @@ return [
             'in' => ':attribute must be one of the following values: :values.',
             'nullable_string' => 'The :attribute field accepts a string value or may be left blank.',
             'nullable_string_max_in' => 'The :attribute field can be left blank, or must be a string with a maximum length of :max characters if provided and must be one of the following values: :values.',
+            'faq_schema_config' => 'FAQ schema configuration must be a valid string if provided.',
+            'faq_ids' => 'FAQ IDs must be a valid array if provided.',
         ],
     ],
+    'post_translations' => 'Post Translations',
+    'export_post_translations' => 'Export Post Translations',
+    'import_description' => 'Import translations for :name from a CSV/Excel file.',
+    'export_description' => 'Export translations for :name to a CSV/Excel file.',
 ];

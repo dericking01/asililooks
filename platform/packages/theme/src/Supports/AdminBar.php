@@ -75,7 +75,7 @@ class AdminBar
         return $this;
     }
 
-    public function registerLink(string $title, string $url, $group = null, string $permission = null): self
+    public function registerLink(string $title, string $url, $group = null, ?string $permission = null): self
     {
         if ($group === null || ! isset($this->groups[$group])) {
             $this->noGroupLinks[] = [

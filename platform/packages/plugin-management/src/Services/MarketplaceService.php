@@ -12,7 +12,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
-use Throwable;
 
 class MarketplaceService
 {
@@ -28,7 +27,7 @@ class MarketplaceService
 
     protected string $licenseApiKey;
 
-    public function __construct(string $url = null, string $token = null)
+    public function __construct(?string $url = null, ?string $token = null)
     {
         $core = Core::make()->getCoreFileData();
 
@@ -49,27 +48,19 @@ class MarketplaceService
     {
         abort_unless(config('packages.plugin-management.general.enable_marketplace_feature'), 404);
 
-        try {
-            $request = array_merge($request, [
-                'product_id' => $this->productId,
-                'site_url' => rtrim(url('')),
-                'core_version' => get_core_version(),
-            ]);
+        $request = array_merge($request, [
+            'product_id' => $this->productId,
+            'site_url' => rtrim(url('')),
+            'core_version' => get_core_version(),
+        ]);
 
-            $response = $this->request()->{$method}($this->url . $path, $request);
+        $response = $this->request()->{$method}($this->url . $path, $request);
 
-            if ($response->status() !== 200) {
-                $body = json_decode($response->body(), true);
-
-                throw new Exception(Arr::get($body, 'message') ?: trans('packages/plugin-management::marketplace.could_not_connect'));
-            }
-
-            return $response;
-        } catch (Throwable $e) {
-            report($e);
-
-            throw new Exception(trans('packages/plugin-management::marketplace.could_not_connect'));
+        if ($response->failed()) {
+            throw new Exception($response->json('message') ?: trans('packages/plugin-management::marketplace.could_not_connect'));
         }
+
+        return $response;
     }
 
     protected function request(): PendingRequest
@@ -84,7 +75,7 @@ class MarketplaceService
             ->timeout(300);
     }
 
-    public function beginInstall(string $id, string $name): bool|JsonResponse
+    public function beginInstall(string $id, string $name, ?PluginService $pluginService = null): bool|JsonResponse
     {
         $core = Core::make();
         $licenseFilePath = $core->getLicenseFilePath();
@@ -93,14 +84,24 @@ class MarketplaceService
             throw new RequiresLicenseActivatedException();
         }
 
+        $requestData = [
+            'license_url' => $this->licenseUrl,
+            'license_api_key' => $this->licenseApiKey,
+            'license_file' => $core->getLicenseFile(),
+        ];
+
+        // Add plugin purchase code if available
+        if ($pluginService) {
+            $pluginPurchaseCode = $pluginService->getPluginPurchaseCode($name);
+            if ($pluginPurchaseCode) {
+                $requestData['plugin_purchase_code'] = $pluginPurchaseCode;
+            }
+        }
+
         $data = $this->callApi(
             'post',
             '/products/' . $id . '/download',
-            [
-                'license_url' => $this->licenseUrl,
-                'license_api_key' => $this->licenseApiKey,
-                'license_file' => $core->getLicenseFile(),
-            ]
+            $requestData
         );
 
         if ($data->getStatusCode() != 200) {

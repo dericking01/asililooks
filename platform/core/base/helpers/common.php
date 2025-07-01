@@ -25,15 +25,11 @@ if (! function_exists('language_flag')) {
 
             $contents = trim(preg_replace('/^(<\?xml.+?\?>)/', '', $contents));
 
-            $contents = str_replace(
+            return str_replace(
                 '<svg',
                 rtrim(sprintf('<svg style="height: %spx; width: auto;" class="flag"', $width)),
                 $contents
             );
-
-            $contents = str_replace('<mask id="a"', '<mask', $contents);
-
-            return str_replace('<mask id="b"', '<mask', $contents);
         }
 
         return Html::image(asset($flagPath), sprintf('%s flag', $name), [
@@ -91,7 +87,7 @@ if (! function_exists('get_cms_version')) {
 if (! function_exists('get_core_version')) {
     function get_core_version(): string
     {
-        return '7.5.5';
+        return '7.5.6';
     }
 }
 

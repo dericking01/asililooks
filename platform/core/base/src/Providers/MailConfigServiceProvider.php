@@ -112,6 +112,14 @@ class MailConfigServiceProvider extends ServiceProvider
                         ]);
 
                         break;
+                    case 'resend':
+                        $config->set([
+                            'services.resend' => [
+                                'key' => $setting->get('email_resend_key', $config->get('services.resend.key')),
+                            ],
+                        ]);
+
+                        break;
 
                     default:
                         do_action('core_email_setup_mailer', $mailDriver);

@@ -151,6 +151,7 @@
                     <form
                         action="{{ route('system.updater') }}?no-ajax=1&update_id={{ $latestUpdate->updateId }}&version={{ $latestUpdate->version }}"
                         method="POST"
+                        id="manual-updater-form"
                     >
                         <x-core::step :vertical="true" :counter="true">
                             @foreach (SystemUpdaterStepEnum::labels() as $step => $label)
@@ -191,3 +192,16 @@
         @endif
     </div>
 @endsection
+
+@push('footer')
+    <script>
+        $(document).ready(function() {
+            $('#manual-updater-form button[type="submit"][data-updating-text]').on('mousedown', function() {
+                const button = $(this);
+                const originalText = button.html();
+                button.data('original-text', originalText);
+                button.html(button.data('updating-text'));
+            });
+        });
+    </script>
+@endpush

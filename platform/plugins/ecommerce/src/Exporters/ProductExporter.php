@@ -80,6 +80,7 @@ class ProductExporter extends Exporter
             ExportColumn::make('generate_license_code'),
             ExportColumn::make('minimum_order_quantity'),
             ExportColumn::make('maximum_order_quantity'),
+            ExportColumn::make('order'),
         ];
 
         if ($this->isEnabledDigital) {
@@ -214,6 +215,7 @@ class ProductExporter extends Exporter
                 'generate_license_code' => $product->generate_license_code,
                 'minimum_order_quantity' => $product->minimum_order_quantity,
                 'maximum_order_quantity' => $product->maximum_order_quantity,
+                'order' => (int) $product->order ?: 0,
             ];
 
             if ($this->isEnabledDigital) {
@@ -278,6 +280,7 @@ class ProductExporter extends Exporter
                         'generate_license_code' => $variation->product->generate_license_code,
                         'minimum_order_quantity' => $variation->product->minimum_order_quantity,
                         'maximum_order_quantity' => $variation->product->maximum_order_quantity,
+                        'order' => (int) $variation->product->order ?: 0,
                     ];
 
                     if ($this->isEnabledDigital) {

@@ -46,7 +46,7 @@ class ProductAttributeSet extends BaseModel
 
     public function attributes(): HasMany
     {
-        return $this->hasMany(ProductAttribute::class, 'attribute_set_id')->orderBy('order');
+        return $this->hasMany(ProductAttribute::class, 'attribute_set_id')->oldest('order');
     }
 
     public function categories(): MorphToMany
@@ -98,7 +98,7 @@ class ProductAttributeSet extends BaseModel
                     ]);
             })
             ->with($with)
-            ->orderBy('ec_product_attribute_sets.order')
+            ->oldest('ec_product_attribute_sets.order')
             ->latest('ec_product_attribute_sets.created_at')
             ->wherePublished()
             ->get();

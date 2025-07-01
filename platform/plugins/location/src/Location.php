@@ -104,7 +104,7 @@ class Location
         return array_keys($this->getSupported());
     }
 
-    public function getSupported(string|object $model = null): array
+    public function getSupported(string|object|null $model = null): array
     {
         if (! $model) {
             return config('plugins.location.general.supported', []);
@@ -295,7 +295,7 @@ class Location
         ];
     }
 
-    public function filter($model, int|string $cityId = null, string $location = null, int|string $stateId = null)
+    public function filter($model, int|string|null $cityId = null, ?string $location = null, int|string|null $stateId = null)
     {
         if ($model instanceof BaseQueryBuilder) {
             $className = $model->getModel()::class;

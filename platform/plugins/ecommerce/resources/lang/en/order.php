@@ -60,6 +60,7 @@ return [
     'order_was_sent_to_shipping_team' => 'Order was sent to shipping team',
     'by_username' => 'by %user_name%',
     'shipping_was_created_from' => 'Shipping was created from order %order_id%',
+    'shipping_was_created_from_pos' => 'Shipping was created from POS order %order_id%',
     'shipping_was_canceled_success' => 'Shipping was cancelled successfully!',
     'shipping_was_canceled_by' => 'Shipping was cancelled by %user_name%',
     'update_shipping_address_success' => 'Update shipping address successfully!',
@@ -292,6 +293,7 @@ return [
     'order_return_items_count' => 'Product item(s)',
     'new_order_notifications' => [
         'new_order' => 'New order',
+        'new_order_with_code' => 'New order :code',
         'view' => 'View',
         'description' => ':customer ordered :quantity product(s)',
         'product' => 'product',
@@ -299,24 +301,29 @@ return [
     ],
     'confirm_payment_notifications' => [
         'confirm_payment' => 'Confirm payment',
+        'confirm_payment_with_code' => 'Confirm payment :code',
         'description' => 'Order :order Payment was confirmed (amount :amount) by :by',
     ],
     'update_shipping_status_notifications' => [
         'update_shipping_status' => 'Update shipping status',
+        'update_shipping_status_with_code' => 'Update shipping status :code',
         'description' => 'Order :order had changed shipping status :description',
         'changed_from_to' => 'from :old_status to :new_status',
         'changed_to' => 'to :status',
     ],
     'cancel_order_notifications' => [
         'cancel_order' => 'Cancel order',
+        'cancel_order_with_code' => 'Cancel order :code',
         'description' => 'Order :order was cancelled by custom :customer',
     ],
     'return_order_notifications' => [
         'return_order' => 'Return order',
+        'return_order_with_code' => 'Return order :code',
         'description' => ':customer has requested return product(s)',
     ],
     'order_completed_notifications' => [
         'order_completed' => 'Order Completed',
+        'order_completed_with_code' => 'Order Completed :code',
         'description' => 'Order :order has been completed',
     ],
     'tax_info' => [

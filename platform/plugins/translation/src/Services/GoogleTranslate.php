@@ -79,9 +79,9 @@ class GoogleTranslate
 
     public function __construct(
         string $target = 'en',
-        string $source = null,
+        ?string $source = null,
         array $options = [],
-        TokenProviderInterface $tokenProvider = null
+        ?TokenProviderInterface $tokenProvider = null
     ) {
         $this->client = new Client(['verify' => false]);
         $this->setTokenProvider($tokenProvider ?? new GoogleTokenGenerator())
@@ -97,7 +97,7 @@ class GoogleTranslate
         return $this;
     }
 
-    public function setSource(string $source = null): self
+    public function setSource(?string $source = null): self
     {
         $this->source = $source ?? 'auto';
 
@@ -140,9 +140,9 @@ class GoogleTranslate
     public static function trans(
         string $string,
         string $target = 'en',
-        string $source = null,
+        ?string $source = null,
         array $options = [],
-        TokenProviderInterface $tokenProvider = null
+        ?TokenProviderInterface $tokenProvider = null
     ): ?string {
         return (new self())
             ->setTokenProvider($tokenProvider ?? new GoogleTokenGenerator())

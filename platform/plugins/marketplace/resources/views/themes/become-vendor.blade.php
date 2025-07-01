@@ -1,4 +1,4 @@
-@extends(Theme::getThemeNamespace('views.ecommerce.customers.master'))
+@extends(EcommerceHelper::viewPath('customers.master'))
 
 @section('content')
     <style>

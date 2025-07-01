@@ -24,7 +24,7 @@
             @continue(! $customField->options->filter(fn ($option) => ! empty($option->label)))
             <div class="col-md-6">
                 <div class="form-group mb-3">
-                    <select class="form-control form-select" name="contact_custom_fields[{{ $customField->getKey() }}]">
+                    <select class="form-select" name="contact_custom_fields[{{ $customField->getKey() }}]">
                         <option value="">{{ $customField->name }}</option>
                         @foreach($customField->options as $option)
                             <option value="{{ $option->label }}">{{ $option->label }}</option>

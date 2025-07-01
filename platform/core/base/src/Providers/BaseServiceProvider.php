@@ -350,6 +350,8 @@ class BaseServiceProvider extends ServiceProvider
             ],
             'ziggy.except' => ['debugbar.*'],
             'datatables-buttons.pdf_generator' => 'excel',
+            'datatables-html.script' => 'core/table::script',
+            'datatables-html.editor' => 'core/table::editor',
             'excel.exports.csv.use_bom' => true,
             'dompdf.public_path' => public_path(),
             'database.connections.mysql.strict' => Arr::get($baseConfig, 'db_strict_mode'),

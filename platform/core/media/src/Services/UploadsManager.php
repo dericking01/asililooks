@@ -86,7 +86,7 @@ class UploadsManager
     public function saveFile(
         string $path,
         string $content,
-        UploadedFile $file = null,
+        ?UploadedFile $file = null,
         string $visibility = 'public'
     ): bool {
         $storage = Storage::disk(RvMedia::getConfig('disk'));

@@ -5,10 +5,12 @@ namespace Botble\Mollie\Forms;
 use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Forms\FieldOptions\TextFieldOption;
 use Botble\Base\Forms\Fields\TextField;
+use Botble\Payment\Concerns\Forms\HasAvailableCountriesField;
 use Botble\Payment\Forms\PaymentMethodForm;
 
 class MolliePaymentMethodForm extends PaymentMethodForm
 {
+    use HasAvailableCountriesField;
     public function setup(): void
     {
         parent::setup();
@@ -27,6 +29,7 @@ class MolliePaymentMethodForm extends PaymentMethodForm
                 TextFieldOption::make()
                     ->label(__('API Key'))
                     ->value(BaseHelper::hasDemoModeEnabled() ? '*******************************' : get_payment_setting('api_key', MOLLIE_PAYMENT_METHOD_NAME))
-            );
+            )
+            ->addAvailableCountriesField(MOLLIE_PAYMENT_METHOD_NAME);
     }
 }

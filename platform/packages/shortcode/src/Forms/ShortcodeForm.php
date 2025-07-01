@@ -56,7 +56,7 @@ class ShortcodeForm extends FormAbstract
         return $this;
     }
 
-    public function withHtmlAttributes(string $defaultBackgroundColor = '#fff', string $defaultColor = null): static
+    public function withHtmlAttributes(string $defaultBackgroundColor = '#fff', ?string $defaultColor = null): static
     {
         return $this
             ->withBackgroundColor($defaultBackgroundColor)
@@ -88,7 +88,7 @@ class ShortcodeForm extends FormAbstract
                 );
     }
 
-    public function withTextColor(string $defaultColor = null): static
+    public function withTextColor(?string $defaultColor = null): static
     {
         return $this
             ->add(
@@ -101,7 +101,7 @@ class ShortcodeForm extends FormAbstract
             );
     }
 
-    public function withBackgroundImage(string $defaultImage = null): static
+    public function withBackgroundImage(?string $defaultImage = null): static
     {
         return $this
             ->add(

@@ -127,6 +127,20 @@ AdminHelper::registerRoutes(function (): void {
                     'as' => 'store-revenues',
                     'uses' => 'getStoreRevenues',
                 ]);
+
+                Route::post('recent-withdrawals', [
+                    'as' => 'recent-withdrawals',
+                    'uses' => 'getRecentWithdrawals',
+                ]);
+            });
+
+            Route::group(['prefix' => 'messages', 'as' => 'messages.'], function (): void {
+                Route::resource('', 'MessageController')->parameters(['' => 'message'])->only(['index', 'show', 'destroy']);
+
+                Route::get('show/{id}', [
+                    'as' => 'show',
+                    'uses' => 'MessageController@show',
+                ])->wherePrimaryKey();
             });
         });
 

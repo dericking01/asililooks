@@ -48,9 +48,9 @@ class CartController extends BaseController
     {
         $identifier = $id;
 
-        Cart::instance('cart')->restore($id);
+        Cart::instance('cart')->restore($identifier);
 
-        Cart::instance('cart')->store($id);
+        Cart::instance('cart')->storeOrIgnore($identifier);
 
         return response()->json([
             'id' => $identifier,

@@ -1,11 +1,11 @@
 # FOB Expected Delivery Date
 
-This is a plugin for Botble CMS that adds expected delivery date functionality to products.
+This is a plugin for Botble CMS that adds expected delivery date functionality to products. It works for all Botble Ecommerce scripts.
 
 ## Requirements
 
-- Botble Core 7.3.0 or higher
-- PHP 8.1 or higher
+- Botble Core 7.5.0 or higher
+- PHP 8.2 or higher
 
 ## Installation
 
@@ -22,9 +22,11 @@ This is a plugin for Botble CMS that adds expected delivery date functionality t
 - Default delivery estimates for products without custom settings
 
 
-![Screenshot](./art/1.jpeg)
+![Screenshot](./art/1.png)
 
-![Screenshot](./art/2.jpeg)  
+![Screenshot](./art/2.png)  
+
+![Screenshot](./art/3.png)  
 
 ## Usage
 
@@ -32,6 +34,7 @@ This is a plugin for Botble CMS that adds expected delivery date functionality t
 2. Find the "Expected Delivery Date" section
 3. Set minimum and maximum delivery days
 4. Enable/disable delivery estimates per product
+5. Customize colors, icon... in Settings -> Expected Delivery Date
 
 ## Contributing
 

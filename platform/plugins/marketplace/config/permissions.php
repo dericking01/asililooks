@@ -90,4 +90,20 @@ return [
         'flag' => 'marketplace.settings',
         'parent_flag' => 'ecommerce.settings',
     ],
+
+    [
+        'name' => 'Messages',
+        'flag' => 'marketplace.messages.index',
+        'parent_flag' => 'marketplace.index',
+    ],
+    [
+        'name' => 'Edit',
+        'flag' => 'marketplace.messages.edit',
+        'parent_flag' => 'marketplace.messages.index',
+    ],
+    [
+        'name' => 'Delete',
+        'flag' => 'marketplace.messages.destroy',
+        'parent_flag' => 'marketplace.messages.index',
+    ],
 ];

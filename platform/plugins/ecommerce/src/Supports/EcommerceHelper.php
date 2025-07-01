@@ -199,7 +199,7 @@ class EcommerceHelper
         if ($this->loadCountriesStatesCitiesFromPluginLocation()) {
             $selectedCountries = Country::query()
                 ->wherePublished()
-                ->orderBy('order')
+                ->oldest('order')
                 ->oldest('name')
                 ->select('name', 'code')
                 ->get()
@@ -271,7 +271,7 @@ class EcommerceHelper
                         ->orWhere('code', $countryId);
                 });
             })
-            ->orderBy('order')
+            ->oldest('order')
             ->oldest('name')
             ->select('name', 'id')
             ->get()
@@ -300,7 +300,7 @@ class EcommerceHelper
                     });
                 }
             )
-            ->orderBy('order')
+            ->oldest('order')
             ->oldest('name')
             ->select('name', 'id')
             ->get()
@@ -491,6 +491,9 @@ class EcommerceHelper
             $reviews->where('ec_reviews.product_id', $product->getKey());
         }
 
+        // Check if customer is logged in to prioritize their review
+        $currentCustomerId = auth('customer')->id();
+
         return $reviews
             ->with([
                 'user',
@@ -505,6 +508,9 @@ class EcommerceHelper
             ])
             ->when($star && $star >= 1 && $star <= 5, function ($query) use ($star): void {
                 $query->where('ec_reviews.star', $star);
+            })
+            ->when($currentCustomerId, function ($query) use ($currentCustomerId): void {
+                $query->orderByRaw('CASE WHEN customer_id = ? THEN 0 ELSE 1 END', [$currentCustomerId]);
             })
             ->orderByDesc('created_at')
             ->paginate($perPage)
@@ -607,7 +613,7 @@ class EcommerceHelper
                 return $query->where('code', $countryCode);
             })
             ->wherePublished()
-            ->orderBy('order')
+            ->oldest('order')
             ->oldest('name')
             ->select('name', 'id')
             ->get()
@@ -624,7 +630,7 @@ class EcommerceHelper
         return City::query()
             ->where('state_id', $stateId)
             ->wherePublished()
-            ->orderBy('order')
+            ->oldest('order')
             ->oldest('name')
             ->select('name', 'id')
             ->get()
@@ -999,10 +1005,11 @@ class EcommerceHelper
             'sort-by' => ['nullable', 'string', 'max:40'],
             'page' => ['nullable', 'numeric', 'min:1'],
             'per_page' => ['nullable', 'numeric', 'min:1'],
+            'discounted_only' => ['nullable', 'boolean'],
         ]);
 
         // Also validate comma-separated string format
-        if (! $validator->fails()) {
+        if ($validator->passes()) {
             return true;
         }
 
@@ -1021,9 +1028,10 @@ class EcommerceHelper
             'sort-by' => ['nullable', 'string', 'max:40'],
             'page' => ['nullable', 'numeric', 'min:1'],
             'per_page' => ['nullable', 'numeric', 'min:1'],
+            'discounted_only' => ['nullable', 'boolean'],
         ]);
 
-        return ! $validator->fails();
+        return $validator->passes();
     }
 
     public function viewPath(string $view): string
@@ -1120,7 +1128,29 @@ class EcommerceHelper
 
     public function isValidToProcessCheckout(): bool
     {
-        return Cart::instance('cart')->rawSubTotal() >= $this->getMinimumOrderAmount();
+        // Check minimum order amount
+        if (Cart::instance('cart')->rawSubTotal() < $this->getMinimumOrderAmount()) {
+            return false;
+        }
+
+        // Check quantity restrictions for each product
+        $products = Cart::instance('cart')->products();
+
+        foreach ($products as $product) {
+            $quantityOfProduct = Cart::instance('cart')->rawQuantityByItemId($product->getKey());
+
+            // Check minimum order quantity
+            if ($product->minimum_order_quantity > 0 && $quantityOfProduct < $product->minimum_order_quantity) {
+                return false;
+            }
+
+            // Check maximum order quantity
+            if ($product->maximum_order_quantity > 0 && $quantityOfProduct > $product->maximum_order_quantity) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function getMandatoryFieldsAtCheckout(): array
@@ -1255,7 +1285,7 @@ class EcommerceHelper
                     $query->where('status', BaseStatusEnum::PUBLISHED);
                 },
             ])
-            ->orderBy('order')
+            ->oldest('order')
             ->latest('products_count')->latest()
             ->get()
             ->where('products_count', '>', 0);
@@ -1281,7 +1311,7 @@ class EcommerceHelper
                 },
             ])
             ->with('slugable')
-            ->orderByDesc('products_count')->latest()
+            ->latest('products_count')->latest()
             ->take(10)
             ->get()
             ->where('products_count', '>', 0);
@@ -1456,7 +1486,7 @@ class EcommerceHelper
 
     public function registerThemeAssets(): void
     {
-        $version = get_cms_version();
+        $version = get_cms_version() . '.6';
 
         Theme::asset()
             ->add('front-ecommerce-css', 'vendor/core/plugins/ecommerce/css/front-ecommerce.css', version: $version);
@@ -1789,6 +1819,6 @@ class EcommerceHelper
 
     public function getAssetVersion(): string
     {
-        return '3.9.1';
+        return '3.9.3';
     }
 }

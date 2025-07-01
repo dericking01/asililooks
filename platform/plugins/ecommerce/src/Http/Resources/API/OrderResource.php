@@ -3,7 +3,9 @@
 namespace Botble\Ecommerce\Http\Resources\API;
 
 use Botble\Ecommerce\Models\Order;
+use Botble\Media\Facades\RvMedia;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Arr;
 
 /**
  * @mixin Order
@@ -58,6 +60,30 @@ class OrderResource extends JsonResource
             'payment_status' => $this->payment->status ?? null,
             'payment_status_html' => $this->payment->status->toHtml() ?? null,
             'products_count' => $this->products_count,
+            'products' => $this->whenLoaded('products', function () {
+                // Get all original products info
+                $originalProducts = $this->getOrderProducts();
+
+                return $this->products->map(function ($product) use ($originalProducts) {
+                    // Find the corresponding original product
+                    $originalProduct = $originalProducts->firstWhere('id', $product->product_id);
+
+                    return [
+                        'id' => $product->id,
+                        'product_id' => $product->product_id,
+                        'product_name' => $product->product_name,
+                        'product_image' => RvMedia::getImageUrl($product->product_image, 'thumb', false, RvMedia::getDefaultImage()),
+                        'product_slug' => $originalProduct?->original_product?->slug,
+                        'sku' => Arr::get($product->options, 'sku'),
+                        'attributes' => Arr::get($product->options, 'attributes'),
+                        'amount' => $product->price,
+                        'amount_formatted' => $product->amount_format,
+                        'quantity' => $product->qty,
+                        'total' => $product->price * $product->qty,
+                        'total_formatted' => $product->total_format,
+                    ];
+                });
+            }),
         ];
     }
 }

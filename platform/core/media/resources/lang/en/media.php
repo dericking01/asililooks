@@ -59,6 +59,7 @@ return [
     'delete_success' => 'Deleted selected item(s) successfully!',
     'favorite_success' => 'Favorite selected item(s) successfully!',
     'remove_favorite_success' => 'Remove selected item(s) from favorites successfully!',
+    'add_recent_success' => 'Added item to recent list successfully!',
     'rename_error' => 'Error when rename item(s)',
     'rename_success' => 'Rename selected item(s) successfully!',
     'crop_success' => 'Crop image successfully!',

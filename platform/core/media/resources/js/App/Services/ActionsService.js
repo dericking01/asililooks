@@ -32,13 +32,13 @@ export class ActionsService {
                     selected.push(value.preview_url)
                 }
 
-                RecentItems.push(value.id)
+                // Add to recent items on the server
+                Helpers.addToRecent(value.id)
             }
         })
 
         if (Helpers.size(selected) > 0) {
             Botble.lightbox(selected)
-            Helpers.storeRecentItems()
         } else {
             this.handleGlobalAction('download')
         }

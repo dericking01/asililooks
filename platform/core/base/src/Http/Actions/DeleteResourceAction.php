@@ -117,18 +117,23 @@ class DeleteResourceAction implements Responsable
         call_user_func($this->afterDeleting, $this);
     }
 
+    public function processDelete(): void
+    {
+        DB::beginTransaction();
+
+        $this->dispatchBeforeDeleting();
+
+        $this->dispatchDelete();
+
+        $this->dispatchAfterDeleting();
+
+        DB::commit();
+    }
+
     public function toResponse($request): BaseHttpResponse
     {
         try {
-            DB::beginTransaction();
-
-            $this->dispatchBeforeDeleting();
-
-            $this->dispatchDelete();
-
-            $this->dispatchAfterDeleting();
-
-            DB::commit();
+            $this->processDelete();
 
             return $this->httpResponse;
         } catch (Throwable $exception) {

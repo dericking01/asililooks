@@ -82,19 +82,55 @@ export class Helpers {
         localStorage.setItem('MediaConfig', Helpers.jsonEncode(MediaConfig))
     }
 
+    // We no longer use localStorage for recent items
     static storeRecentItems() {
-        localStorage.setItem('RecentItems', Helpers.jsonEncode(RecentItems))
+        // This method is kept for backward compatibility
     }
 
-    static addToRecent(id) {
-        if (id instanceof Array) {
-            Helpers.each(id, (value) => {
-                RecentItems.push(value)
-            })
-        } else {
-            RecentItems.push(id)
-            this.storeRecentItems()
+    static addToRecent(id, isFolder = false) {
+        // If id is not a number, return
+        if (isNaN(parseInt(id))) {
+            return;
         }
+
+        // Create minimal file data with just id and is_folder
+        let fileData = {
+            id: id,
+            is_folder: isFolder
+        };
+
+        // If isFolder is not explicitly provided, check if it's a folder by looking at the DOM
+        if (!isFolder) {
+            $('.js-media-list-title').each((index, el) => {
+                let $box = $(el);
+                let data = $box.data() || {};
+                if (data.id == id) {
+                    fileData.is_folder = data.is_folder || false;
+                    return false; // Break the loop
+                }
+            });
+        }
+
+        // Send the minimal file data to the server to store in recent items
+        $httpClient
+            .make()
+            .post(RV_MEDIA_URL.global_actions, {
+                action: 'add_recent',
+                item: fileData
+            })
+            .then(({ data }) => {
+                // Update the local RecentItems array for the current session
+                if (id instanceof Array) {
+                    Helpers.each(id, (value) => {
+                        RecentItems.push(value)
+                    })
+                } else {
+                    RecentItems.push(id)
+                }
+            })
+            .catch((error) => {
+                console.error('Error adding to recent items:', error);
+            });
     }
 
     static getItems() {

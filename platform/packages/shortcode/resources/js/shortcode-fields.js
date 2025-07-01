@@ -6,8 +6,6 @@ $(() => {
         const quantity = parseInt($this.val()) || 1
         const key = $this.data('key')
 
-        $this.val(quantity)
-
         let $section = $this.closest('.shortcode-tabs-field-wrapper')
 
         if (! $section.length) {

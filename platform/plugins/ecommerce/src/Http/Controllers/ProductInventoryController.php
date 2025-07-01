@@ -3,6 +3,7 @@
 namespace Botble\Ecommerce\Http\Controllers;
 
 use Botble\Base\Facades\Assets;
+use Botble\Ecommerce\Events\ProductQuantityUpdatedEvent;
 use Botble\Ecommerce\Http\Requests\UpdateProductInventoryRequest;
 use Botble\Ecommerce\Models\Product;
 use Botble\Ecommerce\Services\Products\UpdateDefaultProductService;
@@ -21,8 +22,11 @@ class ProductInventoryController extends BaseController
 
     public function update(Product $product, UpdateProductInventoryRequest $request)
     {
+        $column = $request->input('column');
+        $value = $request->input('value');
+
         $product->forceFill([
-            $request->input('column') => $request->input('value'),
+            $column => $value,
         ])->save();
 
         if ($product->is_variation) {
@@ -31,6 +35,11 @@ class ProductInventoryController extends BaseController
             if ($product->variationInfo->is_default) {
                 app(UpdateDefaultProductService::class)->execute($product);
             }
+        }
+
+        // Trigger event if quantity or stock status was updated to update parent product
+        if (in_array($column, ['quantity', 'stock_status', 'with_storehouse_management'])) {
+            event(new ProductQuantityUpdatedEvent($product));
         }
 
         return $this->httpResponse()->withUpdatedSuccessMessage();

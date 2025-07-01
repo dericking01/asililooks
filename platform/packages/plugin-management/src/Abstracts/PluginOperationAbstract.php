@@ -33,4 +33,21 @@ abstract class PluginOperationAbstract
     {
         // Run when removed a plugin
     }
+
+    public static function updating()
+    {
+        // Run when updating a plugin
+    }
+
+    public static function updated()
+    {
+        // Run when a plugin is updated
+    }
+
+    public static function getLicenseSettingKey(): ?string
+    {
+        // Return the setting key for this plugin's license/purchase code
+        // Example: return 'plugin_name_purchase_code';
+        return null;
+    }
 }

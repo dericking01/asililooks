@@ -205,6 +205,7 @@ if (!MediaConfig.app_key || MediaConfig.app_key !== defaultConfig.app_key) {
 
 MediaConfig.request_params.search = ''
 
-let RecentItems = $.parseJSON(localStorage.getItem('RecentItems')) || []
+// We'll use server-side storage for recent items instead of localStorage
+let RecentItems = []
 
 export { MediaConfig, RecentItems }

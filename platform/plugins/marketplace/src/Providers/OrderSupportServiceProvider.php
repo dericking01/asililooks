@@ -461,6 +461,8 @@ class OrderSupportServiceProvider extends ServiceProvider
         /**
          * @var Order $order
          */
+        OrderHelper::captureFootprints($order);
+
         if ($isAvailableShipping) {
             Shipment::query()->create([
                 'order_id' => $order->id,
@@ -622,7 +624,7 @@ class OrderSupportServiceProvider extends ServiceProvider
             $mailer = EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME);
 
             if ($mailer->templateEnabled('admin_new_order')) {
-                $this->setEmailVariables($orders);
+                $this->setEmailVariables($orders->first());
 
                 $mailer->sendUsingTemplate('admin_new_order');
             }
@@ -637,50 +639,50 @@ class OrderSupportServiceProvider extends ServiceProvider
         return $orders;
     }
 
-    public function setEmailVariables(Collection $orders): \Botble\Base\Supports\EmailHandler
+    public function setEmailVariables(Order $order): \Botble\Base\Supports\EmailHandler
     {
-        $theFirst = $orders->first();
-
-        $customerAddress = $theFirst->full_address;
+        $customerAddress = $order->full_address;
 
         return EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME)
             ->setVariableValues([
-                'store_address' => $theFirst->store->full_address ?: get_ecommerce_setting('store_address'),
-                'store_name' => $theFirst->store->name ?: get_ecommerce_setting('store_name'),
-                'store_phone' => $theFirst->store->phone ?: get_ecommerce_setting('store_phone'),
-                'store_link' => $theFirst->store->url,
-                'store' => $theFirst->store->toArray(),
-                'order_id' => $theFirst->code,
-                'order_token' => $theFirst->token,
-                'customer_name' => $theFirst->user->name ?: $theFirst->address->name,
-                'customer_email' => $theFirst->user->email ?: $theFirst->address->email,
-                'customer_phone' => $theFirst->user->phone ?: $theFirst->address->phone,
+                'store_address' => $order->store->full_address ?: get_ecommerce_setting('store_address'),
+                'store_name' => $order->store->name ?: get_ecommerce_setting('store_name'),
+                'store_phone' => $order->store->phone ?: get_ecommerce_setting('store_phone'),
+                'store_link' => $order->store->url,
+                'store' => $order->store->toArray(),
+                'order_id' => $order->code,
+                'order_token' => $order->token,
+                'customer_name' => $order->user->name ?: $order->address->name,
+                'customer_email' => $order->user->email ?: $order->address->email,
+                'customer_phone' => $order->user->phone ?: $order->address->phone,
                 'customer_address' => $customerAddress,
-                'product_list' => view('plugins/marketplace::emails.partials.order-detail', compact('orders'))
+                'product_list' => view('plugins/marketplace::emails.partials.order-detail', compact('order'))
                     ->render(),
-                'shipping_method' => $theFirst->shipping_method_name,
-                'payment_method' => $theFirst->payment->payment_channel->label(),
+                'shipping_method' => $order->shipping_method_name,
+                'payment_method' => $order->payment->payment_channel->label(),
             ]);
     }
 
     public function sendOrderConfirmationEmail(Collection $orders, bool $saveHistory = false): bool
     {
         try {
-            $theFirst = $orders->first();
             $mailer = EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME);
-            if ($mailer->templateEnabled('customer_new_order')) {
-                $this->setEmailVariables($orders);
 
-                $mailer->sendUsingTemplate('customer_new_order', $theFirst->user->email ?: $theFirst->address->email);
+            if ($mailer->templateEnabled('customer_new_order')) {
+                return false;
+            }
+
+            foreach ($orders as $order) {
+                $this->setEmailVariables($order);
+
+                $mailer->sendUsingTemplate('customer_new_order', $order->user->email ?: $order->address->email);
 
                 if ($saveHistory) {
-                    foreach ($orders as $order) {
-                        OrderHistory::query()->create([
-                            'action' => OrderHistoryActionEnum::SEND_ORDER_CONFIRMATION_EMAIL,
-                            'description' => trans('plugins/ecommerce::order.confirmation_email_was_sent_to_customer'),
-                            'order_id' => $order->id,
-                        ]);
-                    }
+                    OrderHistory::query()->create([
+                        'action' => OrderHistoryActionEnum::SEND_ORDER_CONFIRMATION_EMAIL,
+                        'description' => trans('plugins/ecommerce::order.confirmation_email_was_sent_to_customer'),
+                        'order_id' => $order->id,
+                    ]);
                 }
             }
 

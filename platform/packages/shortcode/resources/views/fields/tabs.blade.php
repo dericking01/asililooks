@@ -62,8 +62,8 @@
                                         $fieldAttributes = [...Arr::get($field, 'attributes', []), 'data-name' => $key];
 
                                         $options = [];
-                                        if (Arr::has($field, 'options')) {
-                                            $options = Arr::get($field, 'options', []);
+                                        if (Arr::has($field, 'options') || Arr::has($field, 'choices')) {
+                                            $options = Arr::get($field, 'options', []) ?: Arr::get($field, 'choices', []);
                                         }
                                     @endphp
 

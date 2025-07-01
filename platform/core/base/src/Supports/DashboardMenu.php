@@ -163,7 +163,7 @@ class DashboardMenu
         return isset($this->links[$this->groupId][$id]);
     }
 
-    public function getAll(string $id = null): Collection
+    public function getAll(?string $id = null): Collection
     {
         if ($id !== null) {
             $this->setGroupId($id);

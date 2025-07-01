@@ -24,15 +24,19 @@
                 {!! apply_filters('ecommerce_after_product_description', null, $product) !!}
 
                 <div class="text-warning"></div>
-                <div class="row product-filters">
-                    @if ($product->variations()->count() > 0)
-                        {!! render_product_swatches($product, [
-                            'selected' => $selectedAttrs,
-                        ]) !!}
-                    @endif
-                </div>
                 <form class="single-variation-wrap" data-bb-toggle="product-form" action="{{ route('public.cart.add-to-cart') }}" method="post">
                     @csrf
+
+                    <div class="row product-filters">
+                        @if ($product->variations()->count() > 0)
+                            {!! render_product_swatches($product, [
+                                'selected' => $selectedAttrs,
+                            ]) !!}
+                        @endif
+                    </div>
+
+                    {!! render_product_options($product) !!}
+
                     {!! apply_filters(ECOMMERCE_PRODUCT_DETAIL_EXTRA_HTML, null) !!}
                     <input
                         id="hidden-product-is_out_of_stock"

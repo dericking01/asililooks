@@ -8,4 +8,18 @@ class AutocompleteField extends SelectField
     {
         return 'core/base::forms.fields.autocomplete';
     }
+
+    public function getDefaults(): array
+    {
+        return [
+            'choices' => [],
+            'option_attributes' => [],
+            'empty_value' => null,
+            'selected' => null,
+            'attr' => [
+                'class' => 'select-autocomplete',
+                'data-minimum-input' => 1,
+            ],
+        ];
+    }
 }

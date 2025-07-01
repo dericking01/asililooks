@@ -34,6 +34,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string|null getOrderBankInfo(\Botble\Ecommerce\Models\Order|\Illuminate\Database\Eloquent\Collection $orders)
  * @method static void confirmOrder(\Botble\Ecommerce\Models\Order $order)
  * @method static \Botble\Ecommerce\Models\Order|false|null createOrUpdateIncompleteOrder(array $data, \Botble\Ecommerce\Models\Order|null $order = null)
+ * @method static void captureFootprints(\Botble\Ecommerce\Models\Order $order)
  *
  * @see \Botble\Ecommerce\Supports\OrderHelper
  */

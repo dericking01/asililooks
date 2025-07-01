@@ -15,7 +15,7 @@
                         @if (! empty($referenceProduct)) data-reference-product="{{ $referenceProduct->slug }}" @endif
                         value="{{ $attribute->id }}"
                         @selected($selected->where('id', $attribute->id)->isNotEmpty())
-                        @disabled($variationInfo->where('id', $attribute->id)->isEmpty())
+                        @disabled(isset($variationInfo) && $variationInfo->where('id', $attribute->id)->isEmpty())
                     >
                         {{ $attribute->title }}
                     </option>

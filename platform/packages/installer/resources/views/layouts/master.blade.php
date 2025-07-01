@@ -20,6 +20,7 @@
     <link
         href="{{ asset('vendor/core/core/base/images/favicon.png') }}"
         rel="icon"
+        type="image/png"
     >
 
     @include('core/base::components.layouts.header')

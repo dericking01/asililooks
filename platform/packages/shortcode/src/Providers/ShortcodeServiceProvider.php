@@ -53,6 +53,7 @@ class ShortcodeServiceProvider extends ServiceProvider
             ->loadHelpers()
             ->loadAndPublishTranslations()
             ->loadAndPublishViews()
+            ->loadAndPublishConfigurations(['shortcode'])
             ->publishAssets();
 
         $this->app->booted(function (): void {
@@ -98,6 +99,8 @@ class ShortcodeServiceProvider extends ServiceProvider
                 return $footer;
             }, 120, 2);
         });
+
+        $this->app->register(HookServiceProvider::class);
     }
 
     protected function hasWithShortcode(array $attributes): bool

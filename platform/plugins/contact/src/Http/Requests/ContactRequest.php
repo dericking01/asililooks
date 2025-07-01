@@ -75,7 +75,9 @@ class ContactRequest extends Request
         foreach ($customFields as $customField) {
             $customFieldRules = [$customField->required ? 'required' : 'nullable'];
 
-            $rules["contact_custom_fields.$customField->id"] = match ($customField->type->getValue()) {
+            $fieldKey = "contact_custom_fields.$customField->id";
+
+            $rules[$fieldKey] = match ($customField->type->getValue()) {
                 CustomFieldType::TEXT, CustomFieldType::DROPDOWN, CustomFieldType::RADIO => [...$customFieldRules, 'string', 'max:255'],
                 CustomFieldType::TEXTAREA => [...$customFieldRules, 'string', 'max:1000'],
                 CustomFieldType::NUMBER => [...$customFieldRules, 'numeric'],
@@ -97,6 +99,7 @@ class ContactRequest extends Request
             'subject' => __('Subject'),
             'address' => __('Address'),
             'agree_terms_and_policy' => __('Agree terms and policy'),
+            'contact_custom_fields' => __('Custom Fields'),
         ];
 
         $customFields = $this->getCustomFields();
@@ -182,12 +185,12 @@ class ContactRequest extends Request
         return $mandatoryFields;
     }
 
-    public function applyRules(array $rules, $displayFields, $mandatoryFields): array
+    public function applyRules(array $rules, $displayFields = null, $mandatoryFields = null): array
     {
         // Handle both string and array inputs for fields
         if (is_array($mandatoryFields)) {
             $this->mandatoryFields(array_filter($mandatoryFields));
-        } elseif (is_string($mandatoryFields)) {
+        } elseif (is_string($mandatoryFields) && $mandatoryFields !== '') {
             $this->mandatoryFields(array_filter(explode(',', $mandatoryFields)));
         } else {
             $this->mandatoryFields([]);
@@ -195,7 +198,7 @@ class ContactRequest extends Request
 
         if (is_array($displayFields)) {
             $this->displayFields(array_filter($displayFields));
-        } elseif (is_string($displayFields)) {
+        } elseif (is_string($displayFields) && $displayFields !== '') {
             $this->displayFields(array_filter(explode(',', $displayFields)));
         } else {
             $this->displayFields([]);

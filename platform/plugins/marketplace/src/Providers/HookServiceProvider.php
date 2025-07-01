@@ -303,9 +303,9 @@ class HookServiceProvider extends ServiceProvider
                         RadioField::class,
                         RadioFieldOption::make()
                             ->label(__('Register as'))
-                            ->choices([0 => __('I am a customer')
-                                // , 1 => __('I am a vendor')
-                            ])
+                            ->choices([0 => __('I am a customer'),
+                                // 1 => __('I am a vendor')
+                             ])
                             ->defaultValue(0)
                     )
                     ->addAfter(
@@ -773,7 +773,7 @@ class HookServiceProvider extends ServiceProvider
                         $keyword = '%' . $keyword . '%';
 
                         return $query
-                            ->where(function ($query) use ($keyword) {
+                            ->where(function ($query) use ($keyword): void {
                                 $query
                                     ->whereHas('store', function ($subQuery) use ($keyword) {
                                         return $subQuery->where('name', 'LIKE', $keyword);

@@ -40,7 +40,7 @@ class RenderProductAttributeSetsOnSearchPageSupport
                         );
                 });
             })
-            ->orderBy('order')
+            ->oldest('order')
             ->with($with)
             ->get();
     }

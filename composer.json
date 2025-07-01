@@ -29,11 +29,10 @@
         "botble/widget": "*@dev",
         "doctrine/dbal": "^4.2",
         "guzzlehttp/guzzle": "^7.9",
-        "knuckleswtf/scribe": "^5.2",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10",
-        "predis/predis": "^2.3",
+        "predis/predis": "^3.0",
         "wikimedia/composer-merge-plugin": "^2.1"
     },
     "require-dev": {
@@ -72,6 +71,7 @@
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
             "Aws\\Script\\Composer\\Composer::removeUnusedServices",
+            "Google\\Task\\Composer::cleanup",
             "@php artisan cms:publish:assets"
         ],
         "post-root-package-install": [
@@ -102,6 +102,9 @@
             "S3",
             "Ses",
             "Translate"
+        ],
+        "google/apiclient-services": [
+            "Drive"
         ]
     },
     "config": {

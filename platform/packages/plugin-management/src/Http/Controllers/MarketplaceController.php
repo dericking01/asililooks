@@ -106,7 +106,7 @@ class MarketplaceController extends BaseController
         $name = Str::afterLast($detail['data']['package_name'], '/');
 
         try {
-            $this->marketplaceService->beginInstall($id, $name);
+            $this->marketplaceService->beginInstall($id, $name, $this->pluginService);
         } catch (Throwable $exception) {
             return $this
                 ->httpResponse()
@@ -131,36 +131,38 @@ class MarketplaceController extends BaseController
             $name = Str::afterLast($detail['data']['package_name'], '/');
         }
 
-        try {
-            $this->marketplaceService->beginInstall($id, $name);
-        } catch (Throwable $exception) {
+        return $this->pluginService->updatePlugin($name, function () use ($id, $name) {
+            try {
+                $this->marketplaceService->beginInstall($id, $name, $this->pluginService);
+            } catch (Throwable $exception) {
+                return response()->json([
+                    'error' => true,
+                    'message' => $exception->getMessage(),
+                ]);
+            }
+
+            $this->pluginService->runMigrations($name);
+
+            $published = $this->pluginService->publishAssets($name);
+
+            if ($published['error']) {
+                return response()->json([
+                    'error' => true,
+                    'message' => $published['message'],
+                ]);
+            }
+
+            $this->pluginService->publishTranslations($name);
+
             return response()->json([
-                'error' => true,
-                'message' => $exception->getMessage(),
+                'error' => false,
+                'message' => trans('packages/plugin-management::marketplace.update_success'),
+                'data' => [
+                    'name' => $name,
+                    'id' => $id,
+                ],
             ]);
-        }
-
-        $this->pluginService->runMigrations($name);
-
-        $published = $this->pluginService->publishAssets($name);
-
-        if ($published['error']) {
-            return response()->json([
-                'error' => true,
-                'message' => $published['message'],
-            ]);
-        }
-
-        $this->pluginService->publishTranslations($name);
-
-        return response()->json([
-            'error' => false,
-            'message' => trans('packages/plugin-management::marketplace.update_success'),
-            'data' => [
-                'name' => $name,
-                'id' => $id,
-            ],
-        ]);
+        });
     }
 
     public function checkUpdate(): JsonResponse|array|null

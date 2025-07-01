@@ -21,4 +21,18 @@ class CancelOrderRequest extends Request
             ],
         ];
     }
+
+    public function bodyParameters(): array
+    {
+        return [
+            'cancellation_reason' => [
+                'description' => 'The reason for cancellation. Must be one of the values from OrderCancellationReasonEnum.',
+                'example' => OrderCancellationReasonEnum::CHANGED_MIND,
+            ],
+            'cancellation_reason_description' => [
+                'description' => 'Additional description for the cancellation reason. Required when cancellation_reason is "other".',
+                'example' => 'I found a better deal elsewhere.',
+            ],
+        ];
+    }
 }

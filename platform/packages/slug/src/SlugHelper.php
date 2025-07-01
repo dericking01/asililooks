@@ -116,7 +116,7 @@ class SlugHelper
         return ! in_array($model, config('packages.slug.general.disable_preview', []));
     }
 
-    public function createSlug(BaseModel $model, string $name = null): BaseModel|Slug
+    public function createSlug(BaseModel $model, ?string $name = null): BaseModel|Slug
     {
         /**
          * @var Slug $slug

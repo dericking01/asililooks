@@ -44,7 +44,7 @@ class Captcha extends CaptchaContract
 
         $captchaContent = view('plugins/captcha::v2.html', ['name' => $name, 'siteKey' => $this->siteKey])->render();
 
-        if (request()->ajax()) {
+        if (request()->expectsJson()) {
             $captchaContent .= $footerContent;
         }
 
@@ -55,7 +55,7 @@ class Captcha extends CaptchaContract
             );
     }
 
-    public function verify(string $response, string $clientIp = null, array $options = []): bool
+    public function verify(string $response, ?string $clientIp = null, array $options = []): bool
     {
         if (! $this->reCaptchaEnabled()) {
             return true;

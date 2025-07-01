@@ -42,10 +42,12 @@
     .bb-social-sharing .bb-social-sharing__item svg {
         width: 1.25rem;
         height: 1.25rem;
+        margin-bottom: 0;
     }
     .bb-social-sharing .bb-social-sharing__item img {
         width: 1.25rem;
         height: 1.25rem;
+        margin-bottom: 0;
     }
     .bb-social-sharing .bb-social-sharing-text {
         display: none;

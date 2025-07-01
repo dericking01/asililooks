@@ -30,7 +30,7 @@
                     >
                         @{{ message }}, please go to <a
                             href="{{ route('system.updater') }}"
-                            class="text-warning fw-bold"
+                            class="fw-bold"
                         >System Updater</a> to upgrade to the latest version!
                     </x-core::alert>
                 </v-check-for-updates>

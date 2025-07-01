@@ -174,7 +174,7 @@ class StoreRevenueTable extends TableAbstract
 
     public function getDefaultButtons(): array
     {
-        return array_merge(['export'], parent::getDefaultButtons());
+        return array_unique(array_merge(['export'], parent::getDefaultButtons()));
     }
 
     public function htmlDrawCallbackFunction(): ?string

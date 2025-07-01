@@ -13,7 +13,7 @@ class OrderCreatedNotification
     {
         event(new AdminNotificationEvent(
             AdminNotificationItem::make()
-                ->title(trans('plugins/ecommerce::order.new_order_notifications.new_order'))
+                ->title(trans('plugins/ecommerce::order.new_order_notifications.new_order_with_code', ['code' => $event->order->code]))
                 ->description(trans('plugins/ecommerce::order.new_order_notifications.description', [
                     'customer' => $event->order->shippingAddress->name,
                     'quantity' => $quantity = $event->order->products->count(),

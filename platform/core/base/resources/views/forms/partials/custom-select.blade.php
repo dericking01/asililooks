@@ -1,5 +1,9 @@
 @php
-    Arr::set($selectAttributes, 'class', Arr::get($selectAttributes, 'class') . ' form-select');
+    $cssClass = Arr::get($selectAttributes, 'class') . ' form-select';
+
+    $cssClass = trim(str_replace('form-control', '', $cssClass));
+
+    Arr::set($selectAttributes, 'class', $cssClass);
     $choices = $list ?? $choices;
 
     if ($optionsAttributes && ! is_array($optionsAttributes)) {

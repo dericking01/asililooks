@@ -256,7 +256,7 @@ class TemplateShippingRuleItemExport implements
         return $this->getDropDownListValidation(ShippingRuleTypeEnum::keysAllowRuleItems());
     }
 
-    protected function getDecimalValidation(float $min = 0, float $max = null): DataValidation
+    protected function getDecimalValidation(float $min = 0, ?float $max = null): DataValidation
     {
         // set dropdown list for first data row
         $validation = new DataValidation();

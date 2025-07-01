@@ -6,6 +6,7 @@
         'num',
         'sort-by',
         'collection',
+        'discounted_only',
     ] as $item)
         <input
             name="{{ $item }}"

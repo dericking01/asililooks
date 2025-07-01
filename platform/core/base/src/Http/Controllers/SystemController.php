@@ -182,7 +182,7 @@ class SystemController extends BaseSystemController
                     ->setMessage(strip_tags(trans('core/base::system.cleanup.not_enabled_yet')));
             }
 
-            $request->validate(['tables' => 'array']);
+            $request->validate(['tables' => ['array']]);
 
             $cleanDatabaseService->execute($request->input('tables', []));
 

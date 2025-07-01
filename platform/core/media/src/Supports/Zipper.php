@@ -39,7 +39,7 @@ class Zipper
      *
      * @param Filesystem|null $fs
      */
-    public function __construct(Filesystem $fs = null)
+    public function __construct(?Filesystem $fs = null)
     {
         $this->file = $fs ?: new Filesystem();
     }

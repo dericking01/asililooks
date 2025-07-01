@@ -9,7 +9,7 @@ class DeleteWishlistRequest extends Request
     public function rules(): array
     {
         return [
-            'product_id' => 'required|exists:ec_products,id',
+            'product_id' => ['required', 'exists:ec_products,id'],
         ];
     }
 

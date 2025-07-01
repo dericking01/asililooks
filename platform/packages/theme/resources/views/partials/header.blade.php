@@ -3,7 +3,7 @@
 @if ($favicon = theme_option('favicon'))
     {{ Html::favicon(
         RvMedia::getImageUrl($favicon),
-        ['type' => rescue(fn () => File::mimeType(RvMedia::getRealPath($favicon)), 'image/x-icon')]
+        ['type' => rescue(fn () => RvMedia::getMimeType($favicon), 'image/x-icon')]
     ) }}
 @endif
 

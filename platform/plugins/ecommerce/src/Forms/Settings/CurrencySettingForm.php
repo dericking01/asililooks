@@ -23,7 +23,7 @@ class CurrencySettingForm extends SettingForm
             ->addStylesDirectly('vendor/core/plugins/ecommerce/css/currencies.css');
 
         $currencies = Currency::query()
-            ->orderBy('order')
+            ->oldest('order')
             ->get()
         ;
 

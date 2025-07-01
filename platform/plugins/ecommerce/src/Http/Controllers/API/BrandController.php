@@ -30,7 +30,7 @@ class BrandController extends BaseController
     {
         $brands = Brand::query()
             ->wherePublished()
-            ->orderBy('order')->latest()
+            ->oldest('order')->latest()
             ->when($request->input('brands'), function ($query, $brandIds) {
                 return $query->whereIn('id', $brandIds);
             })

@@ -13,16 +13,19 @@
     >
     <title>{{ trans('core/setting::setting.preview') }}</title>
 
-    @if (setting('admin_favicon') || config('core.base.general.favicon'))
-        <link
-            href="{{ $favicon = setting('admin_favicon') ? RvMedia::getImageUrl(setting('admin_favicon')) : url(config('core.base.general.favicon')) }}"
-            rel="icon shortcut"
-        >
-        <meta
-            property="og:image"
-            content="{{ $favicon }}"
-        >
-    @endif
+    @php
+        $faviconUrl = AdminHelper::getAdminFaviconUrl();
+        $faviconType = rescue(fn () => RvMedia::getMimeType(AdminHelper::getAdminFavicon()), 'image/x-icon');
+    @endphp
+    <link
+        href="{{ $faviconUrl }}"
+        rel="icon shortcut"
+        type="{{ $faviconType }}"
+    >
+    <meta
+        property="og:image"
+        content="{{ $faviconUrl }}"
+    >
 
     <style>
         body {

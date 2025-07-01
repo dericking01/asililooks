@@ -302,6 +302,26 @@ class HookServiceProvider extends ServiceProvider
                 $data['height'] = $shortcode->height;
             }
 
+            if ($shortcode->centered && $shortcode->centered === 'yes') {
+                $data['centered'] = true;
+            }
+
+            if ($shortcode->margin_top || $shortcode->margin_top === '0') {
+                $data['margin_top'] = (int) $shortcode->margin_top;
+            }
+
+            if ($shortcode->margin_bottom || $shortcode->margin_bottom === '0') {
+                $data['margin_bottom'] = (int) $shortcode->margin_bottom;
+            }
+
+            if ($shortcode->margin_start || $shortcode->margin_start === '0') {
+                $data['margin_start'] = (int) $shortcode->margin_start;
+            }
+
+            if ($shortcode->margin_end || $shortcode->margin_end === '0') {
+                $data['margin_end'] = (int) $shortcode->margin_end;
+            }
+
             $type = null;
 
             if (Youtube::isYoutubeURL($url)) {
@@ -368,6 +388,32 @@ class HookServiceProvider extends ServiceProvider
                 ->add('height', NumberField::class, [
                     'label' => __('Height'),
                     'default_value' => 315,
+                ])
+                ->add('centered', RadioField::class, [
+                    'label' => __('Center Video'),
+                    'values' => [
+                        'no' => __('No'),
+                        'yes' => __('Yes'),
+                    ],
+                    'default_value' => 'no',
+                ])
+                ->add('margin_top', NumberField::class, [
+                    'label' => __('Margin Top (px)'),
+                    'default_value' => 0,
+                ])
+                ->add('margin_bottom', NumberField::class, [
+                    'label' => __('Margin Bottom (px)'),
+                    'default_value' => 20,
+                ])
+                ->add('margin_start', NumberField::class, [
+                    'label' => __('Margin Start (px)'),
+                    'default_value' => 0,
+                    'helper' => __('Left margin in LTR, right margin in RTL'),
+                ])
+                ->add('margin_end', NumberField::class, [
+                    'label' => __('Margin End (px)'),
+                    'default_value' => 0,
+                    'helper' => __('Right margin in LTR, left margin in RTL'),
                 ]);
         });
 

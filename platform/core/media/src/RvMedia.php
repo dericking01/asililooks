@@ -516,6 +516,8 @@ class RvMedia
         try {
             $fileExtension = $fileUpload->getClientOriginalExtension() ?: $fileUpload->guessExtension();
 
+            $fileExtension = strtolower($fileExtension);
+
             if (
                 ! $skipValidation
                 && ! in_array(strtolower($fileExtension), explode(',', $allowedMimeTypes))
@@ -990,6 +992,44 @@ class RvMedia
         }
 
         try {
+            // For remote URLs (like S3), determine MIME type from extension
+            if (Str::contains($url, ['http://', 'https://'])) {
+                $fileExtension = pathinfo($url, PATHINFO_EXTENSION);
+
+                if (! $fileExtension) {
+                    return null;
+                }
+
+                if ($fileExtension == 'jfif') {
+                    return 'image/jpeg';
+                }
+
+                // Map common extensions to MIME types
+                return match (strtolower($fileExtension)) {
+                    'ico' => 'image/x-icon',
+                    'png' => 'image/png',
+                    'jpg', 'jpeg' => 'image/jpeg',
+                    'gif' => 'image/gif',
+                    'svg' => 'image/svg+xml',
+                    'webp' => 'image/webp',
+                    'pdf' => 'application/pdf',
+                    'doc' => 'application/msword',
+                    'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'xls' => 'application/vnd.ms-excel',
+                    'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    'ppt' => 'application/vnd.ms-powerpoint',
+                    'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                    'mp3' => 'audio/mpeg',
+                    'mp4' => 'video/mp4',
+                    'zip' => 'application/zip',
+                    'rar' => 'application/x-rar-compressed',
+                    'txt' => 'text/plain',
+                    'csv' => 'text/csv',
+                    default => null,
+                };
+            }
+
+            // For local files, use the existing method
             $realPath = $this->getRealPath($url);
 
             if (empty($realPath)) {

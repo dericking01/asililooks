@@ -46,7 +46,7 @@ class RevenueCard extends Card
                 ->whereIn('payments.status', [PaymentStatusEnum::COMPLETED, PaymentStatusEnum::PENDING])
                 ->whereDate('payments.created_at', '>=', $this->startDate)
                 ->whereDate('payments.created_at', '<=', $this->endDate)
-                ->where('is_finished', true)
+                ->where('ec_orders.is_finished', true)
                 ->groupBy('payments.status')
                 ->first();
         } else {

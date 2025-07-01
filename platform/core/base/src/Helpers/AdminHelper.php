@@ -3,6 +3,7 @@
 namespace Botble\Base\Helpers;
 
 use Botble\Base\Facades\BaseHelper;
+use Botble\Media\Facades\RvMedia;
 use Closure;
 use Illuminate\Routing\RouteRegistrar;
 use Illuminate\Support\Facades\Auth;
@@ -40,11 +41,33 @@ class AdminHelper
             return $default;
         }
 
-        return Auth::user()->getMeta('theme_mode', $default);
+        return Auth::user()->getMeta('theme_mode', $default) ?: $default;
     }
 
     public function isPreviewing(): bool
     {
         return Auth::check() && app('request')->input('preview');
+    }
+
+    public function getAdminFavicon(): ?string
+    {
+        $favicon = setting('admin_favicon');
+
+        if (! $favicon) {
+            return config('core.base.general.favicon');
+        }
+
+        return $favicon;
+    }
+
+    public function getAdminFaviconUrl(): ?string
+    {
+        $favicon = setting('admin_favicon');
+
+        if (! $favicon) {
+            return url(config('core.base.general.favicon'));
+        }
+
+        return RvMedia::getImageUrl($favicon);
     }
 }

@@ -38,7 +38,9 @@
                 </tbody>
             </table>
 
-            {!! $requests->links() !!}
+            <div class="tp-pagination">
+                {!! $requests->links() !!}
+            </div>
         </div>
     @else
         @include(EcommerceHelper::viewPath('customers.partials.empty-state'), [

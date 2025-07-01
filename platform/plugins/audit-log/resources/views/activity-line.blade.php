@@ -8,7 +8,7 @@
             />
         @else
             <img
-                src="{{ setting('admin_favicon') ? RvMedia::getImageUrl(setting('admin_favicon')) : asset(RvMedia::getDefaultImage()) }}"
+                src="{{ AdminHelper::getAdminFaviconUrl() }}"
                 class="avatar"
                 alt="{{ trans('plugins/audit-log::history.system') }}"
             />

@@ -87,7 +87,7 @@ class SocialLoginService
             'provider_id' => $oAuthData['id'],
             'token' => $oAuthData['token'],
             'refresh_token' => $oAuthData['refresh_token'] ?? null,
-            'token_expires_at' => $oAuthData['expires_in'] ? Carbon::now()->addSeconds($oAuthData['expires_in']) : null,
+            'token_expires_at' => $oAuthData['expires_in'] ? Carbon::now()->addSeconds((int) $oAuthData['expires_in']) : null,
             'provider_data' => [
                 'name' => $oAuthData['name'],
                 'email' => $oAuthData['email'],

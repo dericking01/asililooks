@@ -93,7 +93,7 @@ class OrderDetailResource extends JsonResource
                 'product_id' => $product->product_id,
                 'product_name' => $product->product_name,
                 'product_image' => RvMedia::getImageUrl($product->product_image, 'thumb', false, RvMedia::getDefaultImage()),
-                'product_url' => $originalProduct?->original_product?->url,
+                'product_slug' => $originalProduct?->original_product?->slug,
                 'sku' => Arr::get($product->options, 'sku'),
                 'attributes' => Arr::get($product->options, 'attributes'),
                 'amount' => $product->price,

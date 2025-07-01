@@ -18,6 +18,7 @@ class AvailableProductResource extends JsonResource
         return [
             'id' => $this->id,
             'slug' => $this->slug,
+            'url' => $this->url,
             'name' => $this->name,
             'sku' => $this->sku,
             'description' => $this->description,
@@ -32,6 +33,12 @@ class AvailableProductResource extends JsonResource
             'original_price_formatted' => $price->displayPriceOriginalAsText(),
             'reviews_avg' => $this->reviews_avg,
             'reviews_count' => $this->reviews_count,
+            'images' => $this->images ? array_map(function ($image) {
+                return RvMedia::getImageUrl($image);
+            }, $this->images) : [],
+            'images_thumb' => $this->images ? array_map(function ($image) {
+                return RvMedia::getImageUrl($image, 'thumb');
+            }, $this->images) : [],
             'image_with_sizes' => $this->images ? rv_get_image_list($this->images, array_unique([
                 'origin',
                 'thumb',

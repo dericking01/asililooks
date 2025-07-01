@@ -69,6 +69,7 @@ class MediaFileRepository extends RepositoriesAbstract implements MediaFileInter
             'filter' => 'everything',
             'take' => null,
             'with' => [],
+            'is_favorite' => false,
         ], $params);
 
         if ($withFolders) {
@@ -95,9 +96,16 @@ class MediaFileRepository extends RepositoriesAbstract implements MediaFileInter
 
             $folder = new MediaFolder();
 
-            $folder = $folder
-                ->where('parent_id', $folderId)
-                ->select($folderParams['select']);
+            // Only apply special handling for favorites view when folder_id is 0
+            if (isset($params['is_favorite']) && $params['is_favorite'] && empty($folderId)) {
+                // In root favorites view, don't filter by parent_id
+                $folder = $folder->select($folderParams['select']);
+            } else {
+                // Normal folder view or inside a folder in favorites view
+                $folder = $folder
+                    ->where('parent_id', $folderId)
+                    ->select($folderParams['select']);
+            }
 
             $this->applyConditions($folderParams['condition'], $folder);
 
@@ -105,7 +113,13 @@ class MediaFileRepository extends RepositoriesAbstract implements MediaFileInter
                 ->union($folder);
         }
 
-        if (empty($folderId)) {
+        // Only apply special handling for favorites view when folder_id is 0
+        if (isset($params['is_favorite']) && $params['is_favorite'] && empty($folderId)) {
+            // In root favorites view, don't filter by folder_id
+            $this->model = $this->model
+                ->leftJoin('media_folders', 'media_folders.id', '=', 'media_files.folder_id')
+                ->whereNull('media_files.deleted_at');
+        } elseif (empty($folderId)) {
             $this->model = $this->model
                 ->leftJoin('media_folders', 'media_folders.id', '=', 'media_files.folder_id')
                 ->where(function ($query) use ($folderId): void {
@@ -157,11 +171,20 @@ class MediaFileRepository extends RepositoriesAbstract implements MediaFileInter
             if (! $params['paginate']['current_paged'] || $params['paginate']['current_paged'] == 1) {
                 $currentFile = $this->originalModel;
 
-                $currentFile = $currentFile
-                    ->where('media_files.folder_id', $folderId)
-                    ->where('id', $params['selected_file_id'])
-                    ->select($params['select'])
-                    ->first();
+                // Only apply special handling for favorites view when folder_id is 0
+                if (isset($params['is_favorite']) && $params['is_favorite'] && empty($folderId)) {
+                    // In root favorites view, don't filter by folder_id
+                    $currentFile = $currentFile
+                        ->where('id', $params['selected_file_id'])
+                        ->select($params['select'])
+                        ->first();
+                } else {
+                    $currentFile = $currentFile
+                        ->where('media_files.folder_id', $folderId)
+                        ->where('id', $params['selected_file_id'])
+                        ->select($params['select'])
+                        ->first();
+                }
             }
         }
 

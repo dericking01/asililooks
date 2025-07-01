@@ -20,7 +20,7 @@ abstract class AuthForm extends FormFront
             ->template('plugins/ecommerce::customers.forms.auth');
     }
 
-    public function submitButton(string $label, string $icon = null, string $iconPosition = 'append'): static
+    public function submitButton(string $label, ?string $icon = null, string $iconPosition = 'append'): static
     {
         $iconHtml = $icon ? BaseHelper::renderIcon($icon) : '';
 

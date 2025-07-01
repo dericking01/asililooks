@@ -26,8 +26,8 @@ class FlashSaleController extends BaseController
     {
         if ($request->has('keys')) {
             $validator = Validator::make($request->all(), [
-                'keys' => 'required|array',
-                'keys.*' => 'string',
+                'keys' => ['required', 'array'],
+                'keys.*' => ['string'],
             ]);
 
             if ($validator->fails()) {
@@ -44,7 +44,7 @@ class FlashSaleController extends BaseController
             ->wherePublished()
             ->notExpired()
             ->with([
-                'products' => function ($query) {
+                'products' => function ($query): void {
                     $query
                         ->with(EcommerceHelper::withProductEagerLoadingRelations())
                         ->wherePublished();

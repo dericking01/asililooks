@@ -3,6 +3,7 @@
 namespace Botble\Base\Supports;
 
 use Botble\Media\Facades\RvMedia;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -139,7 +140,7 @@ class Avatar
         $base64 = $this->image->toJpeg()->toDataUri();
 
         if ($cacheEnabled) {
-            Cache::forever($key, $base64);
+            Cache::put($key, $base64, Carbon::now()->addDay());
         }
 
         return $base64;
@@ -189,7 +190,7 @@ class Avatar
             );
         } else {
             try {
-                $favicon = setting('admin_favicon');
+                $favicon = app('Botble\Base\Helpers\AdminHelper')->getAdminFavicon();
 
                 if ($favicon) {
                     $favicon = Storage::path($favicon);

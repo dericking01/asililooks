@@ -2,7 +2,7 @@
 
 @section('content')
     @if ($totalProducts)
-        <div class="text-end mb-5">
+        <div class="text-start text-sm-end mb-5">
             <x-core::button
                 type="button"
                 color="primary"

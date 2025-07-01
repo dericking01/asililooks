@@ -61,7 +61,7 @@ class FilterResource extends JsonResource
             'current_category_id' => $categoryId,
             'current_filter_categories' => $categoriesRequest,
             'attributes' => $attributeSets->map(function ($attributeSet) use ($selectedAttrs) {
-                $selected = isset($selectedAttrs[$attributeSet->slug]) ? $selectedAttrs[$attributeSet->slug] : [];
+                $selected = $selectedAttrs[$attributeSet->slug] ?? [];
 
                 return [
                     'id' => $attributeSet->id,

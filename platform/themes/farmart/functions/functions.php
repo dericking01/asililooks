@@ -167,6 +167,7 @@ app()->booted(function (): void {
             }
         }, 230);
 
+        
         if (function_exists('add_shortcode')) {
             add_shortcode('testimonial-slider', __('Testimonial Slider'), __('Customer testimonials slider'), function () {
                 return Theme::partial('shortcodes.testimonial-slider');

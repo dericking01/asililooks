@@ -21,6 +21,8 @@ class ProductSpecificationSeeder extends BaseSeeder
         SpecificationGroup::query()->truncate();
         DB::table('ec_specification_table_group')->truncate();
         DB::table('ec_specification_attributes_translations')->truncate();
+        DB::table('ec_specification_groups_translations')->truncate();
+        DB::table('ec_specification_tables_translations')->truncate();
         DB::table('ec_product_specification_attribute')->truncate();
 
         Setting::set('ecommerce_enable_product_specification', true)->save();

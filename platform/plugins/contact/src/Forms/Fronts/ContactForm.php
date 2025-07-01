@@ -245,22 +245,16 @@ class ContactForm extends FormFront
                         }
                     });
             })
-            ->addRowWrapper(
+            ->add(
                 'content',
-                function (self $form): void {
-                    $form
-                        ->add(
-                            'content',
-                            TextareaField::class,
-                            TextareaFieldOption::make()
-                                ->required()
-                                ->label(__('Message'))
-                                ->placeholder(__('Your Message'))
-                                ->wrapperAttributes(['class' => $this->formInputWrapperClass])
-                                ->cssClass($this->formInputClass)
-                                ->maxLength(-1)
-                        );
-                }
+                TextareaField::class,
+                TextareaFieldOption::make()
+                    ->required()
+                    ->label(__('Message'))
+                    ->placeholder(__('Your Message'))
+                    ->wrapperAttributes(['class' => $this->formInputWrapperClass])
+                    ->cssClass($this->formInputClass)
+                    ->maxLength(-1)
             )
             ->when(setting('contact_form_show_terms_checkbox', true), function (self $form): void {
                 $form->add(

@@ -52,8 +52,7 @@ class DownloadController extends BaseController
                             });
                     });
             })
-            ->where('product_type', ProductTypeEnum::DIGITAL)
-            ->orderByDesc('created_at')
+            ->where('product_type', ProductTypeEnum::DIGITAL)->latest()
             ->with(['order', 'product', 'productFiles', 'product.productFiles'])
             ->paginate($request->integer('per_page', 10));
 
@@ -254,9 +253,7 @@ class DownloadController extends BaseController
         $storageDisk = Storage::disk('local');
         $filePath = $storageDisk->path($filename);
 
-        if (! File::exists($filePath) || ! Hash::check($filePath, $token)) {
-            abort(404);
-        }
+        abort_if(! File::exists($filePath) || ! Hash::check($filePath, $token), 404);
 
         return response()->download($filePath)->deleteFileAfterSend();
     }

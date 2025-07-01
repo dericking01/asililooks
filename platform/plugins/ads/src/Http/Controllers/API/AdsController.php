@@ -26,8 +26,8 @@ class AdsController extends BaseController
     {
         if ($request->has('keys')) {
             $validator = Validator::make($request->all(), [
-                'keys' => 'required|array',
-                'keys.*' => 'string',
+                'keys' => ['required', 'array'],
+                'keys.*' => ['string'],
             ]);
 
             if ($validator->fails()) {
@@ -42,11 +42,11 @@ class AdsController extends BaseController
         // Build the base query
         $query = Ads::query()
             ->wherePublished()
-            ->where(function ($query) {
+            ->where(function ($query): void {
                 $query->where('expired_at', '>=', Carbon::now())
                     ->orWhere('ads_type', 'google_adsense');
             })
-            ->orderBy('order');
+            ->oldest('order');
 
         // Filter by keys if provided (either from GET or POST)
         $keys = $request->input('keys');

@@ -199,13 +199,17 @@ class OrderHelper
              */
             $product = Product::query()->find($orderProduct->product_id);
 
-            if ($product) {
-                if ($product->with_storehouse_management || $product->quantity >= $orderProduct->qty) {
-                    $product->quantity = $product->quantity >= $orderProduct->qty ? $product->quantity - $orderProduct->qty : 0;
-                    $product->save();
+            if (! $product) {
+                continue;
+            }
 
-                    event(new ProductQuantityUpdatedEvent($product));
-                }
+            // Only decrease quantity if storehouse management is enabled
+            if ($product->with_storehouse_management && $product->quantity >= $orderProduct->qty) {
+                $product->quantity = $product->quantity - $orderProduct->qty;
+                $product->save();
+
+                // Trigger event to update parent product if this is a variation
+                event(new ProductQuantityUpdatedEvent($product));
             }
         }
 
@@ -599,7 +603,7 @@ class OrderHelper
         return Cart::instance('cart')->content()->toArray();
     }
 
-    public function getProductOptionData(array $data, int|string $productId = null): array
+    public function getProductOptionData(array $data, int|string|null $productId = null): array
     {
         $result = [
             'optionCartValue' => [],
@@ -1100,19 +1104,19 @@ class OrderHelper
 
         foreach ($order->products as $orderProduct) {
             $product = $orderProduct->product;
-            $product->quantity += $orderProduct->qty;
-            $product->save();
 
-            if ($product->is_variation) {
-                $originalProduct = $product->original_product;
-
-                if ($originalProduct->id != $product->id) {
-                    $originalProduct->quantity += $orderProduct->qty;
-                    $originalProduct->save();
-                }
+            if (! $product) {
+                continue;
             }
 
-            event(new ProductQuantityUpdatedEvent($product));
+            // Only restore quantity if storehouse management is enabled
+            if ($product->with_storehouse_management) {
+                $product->quantity += $orderProduct->qty;
+                $product->save();
+
+                // Trigger event to update parent product if this is a variation
+                event(new ProductQuantityUpdatedEvent($product));
+            }
         }
 
         if ($order->coupon_code && $order->user_id) {
@@ -1250,26 +1254,34 @@ class OrderHelper
         /**
          * @var Order $order
          */
-        if (! $order->referral()->count()) {
-            $referrals = app(FootprinterInterface::class)->getFootprints();
 
-            if ($referrals) {
-                try {
-                    $order->referral()->create($referrals);
-                } catch (Throwable) {
-                    $referrals = array_map(function (?string $item) {
-                        return is_string($item) ? substr($item, 0, 190) : $item;
-                    }, $referrals);
-
-                    rescue(function () use ($order, $referrals): void {
-                        $order->referral()->create($referrals);
-                    }, report: false);
-                }
-            }
-        }
+        $this->captureFootprints($order);
 
         do_action('ecommerce_create_order_from_data', $data, $order);
 
         return $order;
+    }
+
+    public function captureFootprints(Order $order): void
+    {
+        if ($order->referral()->exists()) {
+            return;
+        }
+
+        $referrals = app(FootprinterInterface::class)->getFootprints();
+
+        if ($referrals) {
+            try {
+                $order->referral()->create($referrals);
+            } catch (Throwable) {
+                $referrals = array_map(function (?string $item) {
+                    return is_string($item) ? substr($item, 0, 190) : $item;
+                }, $referrals);
+
+                rescue(function () use ($order, $referrals): void {
+                    $order->referral()->create($referrals);
+                }, report: false);
+            }
+        }
     }
 }

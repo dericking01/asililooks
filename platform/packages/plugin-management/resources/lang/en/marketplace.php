@@ -17,6 +17,7 @@ return [
     'compatible_version' => 'Compatible with your version',
     'incompatible_version' => 'Incompatible with your version',
     'install_now' => 'Install now',
+    'buy_now' => 'Buy Now',
     'remove' => 'Remove',
     'detail' => 'Details',
     'activate' => 'Activate',

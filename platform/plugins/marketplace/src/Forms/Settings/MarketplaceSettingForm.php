@@ -72,7 +72,7 @@ class MarketplaceSettingForm extends SettingForm
             ])
             ->add('withdrawal_fee_type', 'customSelect', [
                 'label' => trans('plugins/marketplace::marketplace.settings.withdrawal_fee_type'),
-                'value' => MarketplaceHelper::getSetting('withdrawal_fee_type', WithdrawalFeeTypeEnum::FIXED),
+                'selected' => MarketplaceHelper::getSetting('withdrawal_fee_type', WithdrawalFeeTypeEnum::FIXED),
                 'choices' => WithdrawalFeeTypeEnum::labels(),
             ])
             ->add('check_valid_signature', OnOffCheckboxField::class, [

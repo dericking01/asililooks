@@ -15,11 +15,21 @@ class CartValidateSameStore
             return;
         }
 
-        $products = Cart::instance('cart')->products();
+        $cart = Cart::instance('cart');
+
+        if ($cart->isEmpty()) {
+            return;
+        }
+
+        $products = $cart->products();
+
+        if ($products->isEmpty()) {
+            return;
+        }
 
         if ($originalProduct) {
             $products->map(function (Product $product) use ($errorMessage, $originalProduct): void {
-                if ($product->store_id !== $originalProduct->store_id) {
+                if ($product->original_product->store_id !== $originalProduct->original_product->store_id) {
                     throw new Exception($errorMessage);
                 }
             });
@@ -27,7 +37,15 @@ class CartValidateSameStore
             return;
         }
 
-        if ($products->pluck('store_id')->unique()->count() > 1) {
+        $storeIds = [];
+
+        foreach ($products as $product) {
+            $storeIds[] = $product->original_product->store_id;
+        }
+
+        $storeIds = array_unique($storeIds);
+
+        if (count($storeIds) > 1) {
             throw new Exception($errorMessage);
         }
     }

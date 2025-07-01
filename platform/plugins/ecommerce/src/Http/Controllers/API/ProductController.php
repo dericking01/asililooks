@@ -6,6 +6,7 @@ use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Http\Resources\API\AvailableProductResource;
+use Botble\Ecommerce\Http\Resources\API\ProductDetailResource;
 use Botble\Ecommerce\Http\Resources\API\RelatedProductResource;
 use Botble\Ecommerce\Http\Resources\API\ReviewResource;
 use Botble\Ecommerce\Http\Resources\ProductVariationResource;
@@ -38,18 +39,18 @@ class ProductController extends BaseController
      * @group Products
      * @param Request $request
      * @param GetProductService $productService
-     * @queryParam include string Comma-separated list of relations to include (e.g. 'categories,tags'). No-example
-     * @queryParam is_featured int Filter by featured status (0 or 1). No-example
-     * @queryParam category string Filter by category slug. No-example
-     * @queryParam tag string Filter by tag slug. No-example
-     * @queryParam brand string Filter by brand slug. No-example
      * @queryParam categories string[] Filter by category IDs. No-example
      * @queryParam brands string[] Filter by brand IDs. No-example
      * @queryParam collections string[] Filter by collection IDs. No-example
-     * @queryParam search string Search term. No-example
-     * @queryParam order_by string Sort field. No-example
-     * @queryParam order string Sort direction (asc or desc). No-example
+     * @queryParam q string Search term. No-example
+     * @queryParam sort_by string Sort field. Value: default_sorting, date_asc, date_desc, price_asc, price_desc, name_asc, name_desc, rating_asc, rating_desc
+     * @queryParam page int The current page. No-example
      * @queryParam per_page int Number of items per page. No-example
+     * @queryParam discounted_only boolean Filter by discounted only. No-example
+     * @queryParam min_price int Minimum price. No-example
+     * @queryParam max_price int Maximum price. No-example
+     * @queryParam price_ranges array[] Price ranges. Example: [{"from": 10, "to": 20}, {"from": 30, "to": 40}]
+     * @queryParam attributes array[] Attributes. Example: [{"id": 1, "value": 1}, {"id": 2, "value": 2}]
      *
      * @return JsonResponse
      */
@@ -144,14 +145,14 @@ class ProductController extends BaseController
         }
 
         // Get attribute sets and attributes
-        $attributeSets = $product->productAttributeSets()->orderBy('order')->get();
+        $attributeSets = $product->productAttributeSets()->oldest('order')->get();
         $productAttributes = app(ProductInterface::class)->getRelatedProductAttributes($product)->sortBy('order');
 
         $price = $productVariation->price();
 
         return $this
             ->httpResponse()
-            ->setData(new AvailableProductResource($product))
+            ->setData(new ProductDetailResource($product))
             ->setAdditional([
                 'default_product_variation' => [
                     'id' => $productVariation->id,

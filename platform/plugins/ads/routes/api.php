@@ -7,6 +7,6 @@ Route::group([
     'middleware' => 'api',
     'prefix' => 'api/v1/ads',
     'namespace' => 'Botble\Ads\Http\Controllers\API',
-], function () {
+], function (): void {
     Route::get('/', [AdsController::class, 'index']);
 });

@@ -51,7 +51,7 @@ if (! function_exists('get_ecommerce_attribute_set')) {
         return ProductAttributeSet::query()
             ->wherePublished()
             ->where('is_searchable', true)
-            ->orderBy('order')
+            ->oldest('order')
             ->with('attributes')
             ->get();
     }

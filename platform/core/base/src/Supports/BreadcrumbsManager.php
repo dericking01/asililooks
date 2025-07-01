@@ -54,7 +54,7 @@ class BreadcrumbsManager
         $this->after[] = $callback;
     }
 
-    public function exists(string $name = null): bool
+    public function exists(?string $name = null): bool
     {
         if (empty($name)) {
             try {
@@ -94,12 +94,12 @@ class BreadcrumbsManager
         return [$name, $params];
     }
 
-    public function render(string $name = null, ...$params): string
+    public function render(?string $name = null, ...$params): string
     {
         return $this->view('core/base::layouts.partials.breadcrumbs', $name, ...$params)->toHtml();
     }
 
-    public function view(string $view, string $name = null, ...$params): HtmlString
+    public function view(string $view, ?string $name = null, ...$params): HtmlString
     {
         $breadcrumbs = $this->generate($name, ...$params);
 
@@ -108,7 +108,7 @@ class BreadcrumbsManager
         return new HtmlString($html);
     }
 
-    public function generate(string $name = null, ...$params): Collection
+    public function generate(?string $name = null, ...$params): Collection
     {
         // Route-bound breadcrumbs
         if ($name === null) {

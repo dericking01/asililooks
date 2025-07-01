@@ -4,7 +4,7 @@
 
 @section('content')
     @if (Cart::instance('cart')->isNotEmpty())
-        @if (is_plugin_active('payment') && $orderAmount)
+        @if (is_plugin_active('payment'))
             @include('plugins/payment::partials.header')
         @endif
 

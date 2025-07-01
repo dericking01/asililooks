@@ -333,6 +333,7 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
             'attributes' => [],
             'collections' => [],
             'collection' => null,
+            'discounted_only' => false,
         ], $filters);
 
         $isUsingDefaultCurrency = get_application_currency_id() == cms_currency()->getDefaultCurrency()->getKey();
@@ -733,6 +734,28 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
 
         if (! Arr::get($params, 'include_out_of_stock_products')) {
             $this->exceptOutOfStockProducts();
+        }
+
+        // Filter products that are on sale when discounted_only is set to true
+        if ($filters['discounted_only']) {
+            $this->model = $this->model->where(function ($query) {
+                $query->where(function ($subQuery) {
+                    // Products with sale price
+                    $subQuery->where('sale_type', 0)
+                        ->where('sale_price', '>', 0)
+                        ->whereColumn('sale_price', '<', 'price');
+                })->orWhere(function ($subQuery) {
+                    // Products with time-based sale
+                    $now = Carbon::now();
+                    $subQuery->where('sale_type', 1)
+                        ->where('start_date', '<=', $now)
+                        ->where(function ($q) use ($now) {
+                            $q->whereNull('end_date')
+                                ->orWhere('end_date', '>=', $now);
+                        })
+                        ->whereColumn('sale_price', '<', 'price');
+                });
+            });
         }
 
         $this->model = apply_filters('ecommerce_products_filter', $this->model, $filters, $params);

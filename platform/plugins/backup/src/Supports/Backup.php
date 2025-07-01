@@ -108,7 +108,7 @@ class Backup
         return [];
     }
 
-    public function backupDb(string $key = null): bool
+    public function backupDb(?string $key = null): bool
     {
         if (! $key) {
             $key = Carbon::now()->format('Y-m-d-H-i-s');
@@ -218,7 +218,7 @@ class Backup
         }
     }
 
-    public function backupFolder(string $source, string $key = null): bool
+    public function backupFolder(string $source, ?string $key = null): bool
     {
         if (! $key) {
             $key = Carbon::now()->format('Y-m-d-H-i-s');

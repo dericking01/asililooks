@@ -7,6 +7,7 @@ use Botble\ACL\Models\User;
 use Botble\ACL\Services\ActivateUserService;
 use Botble\Base\Supports\BaseSeeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 
 class UserSeeder extends BaseSeeder
@@ -22,7 +23,7 @@ class UserSeeder extends BaseSeeder
 
         $faker = $this->fake();
 
-        $superuser = $this->createUser([
+        $data = [
             'first_name' => $faker->firstName(),
             'last_name' => $faker->lastName(),
             'email' => $faker->companyEmail(),
@@ -30,7 +31,17 @@ class UserSeeder extends BaseSeeder
             'password' => config('core.base.general.demo.account.password'),
             'super_user' => 1,
             'manage_supers' => 1,
-        ]);
+        ];
+
+        if (File::isDirectory(database_path('seeders/files/users'))) {
+            $files = $this->uploadFiles('users');
+
+            if ($files) {
+                $data['avatar_id'] = $files[0]['data']->id;
+            }
+        }
+
+        $superuser = $this->createUser($data);
 
         $permissions = (new Role())->getAvailablePermissions();
 

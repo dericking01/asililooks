@@ -14,6 +14,7 @@ use Botble\Blog\Models\Tag;
 use Botble\Blog\Services\BlogService;
 use Botble\Dashboard\Events\RenderingDashboardWidgets;
 use Botble\Dashboard\Supports\DashboardWidgetInstance;
+use Botble\LanguageAdvanced\Supports\LanguageAdvancedManager;
 use Botble\Media\Facades\RvMedia;
 use Botble\Menu\Events\RenderingMenuOptions;
 use Botble\Menu\Facades\Menu;
@@ -36,6 +37,17 @@ class HookServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+        if (is_plugin_active('language') && is_plugin_active('language-advanced')) {
+            LanguageAdvancedManager::registerTranslationImportExport(
+                Post::class,
+                trans('plugins/blog::posts.post_translations'),
+                [
+                    'import' => 'post-translations.import',
+                    'export' => 'post-translations.export',
+                ]
+            );
+        }
+
         Menu::addMenuOptionModel(Category::class);
         Menu::addMenuOptionModel(Tag::class);
 

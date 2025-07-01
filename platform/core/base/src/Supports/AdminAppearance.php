@@ -21,7 +21,7 @@ class AdminAppearance
         return $this;
     }
 
-    public function forCurrentUser(string $guard = null): static
+    public function forCurrentUser(?string $guard = null): static
     {
         $auth = auth($guard);
 

@@ -10,6 +10,7 @@ use Botble\Payment\Models\Payment;
 use Botble\Payment\Repositories\Eloquent\PaymentRepository;
 use Botble\Payment\Repositories\Interfaces\PaymentInterface;
 use Botble\Payment\Supports\PaymentHelper;
+use Botble\Payment\Supports\PaymentMethods as PaymentMethodsSupport;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
@@ -26,6 +27,10 @@ class PaymentServiceProvider extends ServiceProvider
 
         $this->app->singleton(PaymentInterface::class, function () {
             return new PaymentRepository(new Payment());
+        });
+
+        $this->app->singleton(PaymentMethodsSupport::class, function () {
+            return new PaymentMethodsSupport();
         });
 
         $loader = AliasLoader::getInstance();

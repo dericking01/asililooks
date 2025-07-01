@@ -318,34 +318,6 @@ class ThemeSupport
                     'icon' => 'ti ti-brand-facebook',
                     'fields' => [
                         [
-                            'id' => 'facebook_chat_enabled',
-                            'type' => 'customSelect',
-                            'label' => __('Enable Facebook chat?'),
-                            'attributes' => [
-                                'name' => 'facebook_chat_enabled',
-                                'list' => [
-                                    'no' => __('No'),
-                                    'yes' => __('Yes'),
-                                ],
-                                'value' => 'no',
-                                'options' => [
-                                    'class' => 'form-control',
-                                ],
-                            ],
-                            'helper' => __(
-                                'To show chat box on that website, please go to :link and add :domain to whitelist domains!',
-                                [
-                                    'domain' => Html::link(url('')),
-                                    'link' => Html::link(
-                                        sprintf(
-                                            'https://www.facebook.com/%s/settings/?tab=messenger_platform',
-                                            theme_option('facebook_page_id', '[PAGE_ID]')
-                                        )
-                                    ),
-                                ]
-                            ),
-                        ],
-                        [
                             'id' => 'facebook_page_id',
                             'type' => 'text',
                             'label' => __('Facebook page ID'),
@@ -439,25 +411,6 @@ class ThemeSupport
                 }
             }
 
-            if (theme_option('facebook_chat_enabled', 'no') == 'yes' && theme_option('facebook_page_id')) {
-                $html .= '<link href="//connect.facebook.net" rel="dns-prefetch" />';
-            }
-
-            return $html;
-        }, 1180);
-
-        add_filter(THEME_FRONT_FOOTER, function (?string $html): string {
-            if (AdminHelper::isInAdmin()) {
-                return $html;
-            }
-
-            if (
-                theme_option('facebook_comment_enabled_in_post', 'no') == 'yes'
-                || (theme_option('facebook_chat_enabled', 'no') == 'yes' && theme_option('facebook_page_id'))
-            ) {
-                return $html . view('packages/theme::partials.facebook-integration')->render();
-            }
-
             return $html;
         }, 1180);
 
@@ -469,6 +422,14 @@ class ThemeSupport
             $commentHtml = apply_filters('facebook_comment_html', '', $object);
 
             if (! empty($commentHtml)) {
+                add_filter(THEME_FRONT_FOOTER, function (?string $html): string {
+                    if (AdminHelper::isInAdmin()) {
+                        return $html;
+                    }
+
+                    return $html . view('packages/theme::partials.facebook-integration')->render();
+                }, 1180);
+
                 return $html . $commentHtml;
             }
 

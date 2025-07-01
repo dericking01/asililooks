@@ -24,7 +24,7 @@ trait LoadAndPublishDataTrait
         return $this;
     }
 
-    protected function getPath(string $path = null): string
+    protected function getPath(?string $path = null): string
     {
         $reflection = new ReflectionClass($this);
 
@@ -139,7 +139,7 @@ trait LoadAndPublishDataTrait
         return $this->getPath('/database/migrations');
     }
 
-    protected function publishAssets(string $path = null): static
+    protected function publishAssets(?string $path = null): static
     {
         if (empty($path)) {
             $path = 'vendor/core/' . $this->getDashedNamespace();

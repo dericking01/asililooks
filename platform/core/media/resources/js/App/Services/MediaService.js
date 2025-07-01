@@ -36,9 +36,7 @@ export class MediaService {
 
         let params = Helpers.getRequestParams()
 
-        if (params.view_in === 'recent') {
-            params = { ...params, recent_items: RecentItems }
-        }
+        // We no longer need to pass recent_items as they're stored on the server
 
         if (is_popup === true) {
             params = { ...params, is_popup: true }

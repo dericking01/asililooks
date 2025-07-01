@@ -475,4 +475,6 @@ return [
     'session_cookie' => env('CMS_SESSION_COOKIE_KEY_NAME', 'botble_session'),
     'allowed_iframe_urls' => env('CMS_IFRAME_ALLOWED_URLS', ''),
     'iframe_regex' => env('CMS_IFRAME_FILTER_URL_REGEX', ''),
+    'static_ip' => env('CMS_STATIC_IP'),
+    'license_storage_method' => env('CMS_LICENSE_STORAGE_METHOD', 'file'), // 'file' or 'database'
 ];

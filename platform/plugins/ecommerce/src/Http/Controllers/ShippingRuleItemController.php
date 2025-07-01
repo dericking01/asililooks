@@ -3,10 +3,10 @@
 namespace Botble\Ecommerce\Http\Controllers;
 
 use Botble\Base\Events\CreatedContentEvent;
+use Botble\Base\Events\DeletedContentEvent;
 use Botble\Base\Events\UpdatedContentEvent;
 use Botble\Base\Facades\Assets;
 use Botble\Base\Facades\BaseHelper;
-use Botble\Base\Http\Actions\DeleteResourceAction;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Base\Supports\Breadcrumb;
 use Botble\Ecommerce\Exports\TemplateShippingRuleItemExport;
@@ -146,12 +146,14 @@ class ShippingRuleItemController extends BaseController
             ->withUpdatedSuccessMessage();
     }
 
-    public function destroy(int|string $id)
+    public function destroy(int|string $id, Request $request)
     {
         try {
             $item = ShippingRuleItem::query()->findOrFail($id);
 
-            DeleteResourceAction::make($item);
+            $item->delete();
+
+            event(new DeletedContentEvent(SHIPPING_RULE_ITEM_MODULE_SCREEN_NAME, $request, $item));
 
             return $this
                 ->httpResponse()
@@ -275,9 +277,8 @@ class ShippingRuleItemController extends BaseController
             $items = $items->orderBy($orderBy, $orderDir);
         }
         if (! in_array($orderBy, ['created_at', 'id'])) {
-            $items = $items
-                ->orderByDesc('created_at')
-                ->orderByDesc('id');
+            $items = $items->latest()
+                ->latest('id');
         }
 
         $items = $items->paginate($perPage ?: 12);

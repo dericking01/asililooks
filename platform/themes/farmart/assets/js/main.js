@@ -1172,6 +1172,23 @@ MartApp.isRTL = $('body').prop('dir') === 'rtl'
         })
     }
 
+    MartApp.initMegaMenu = function () {
+        setTimeout(function () {
+            const $megaMenu = $(document).find('.mega-menu-wrapper')
+
+            if (! $megaMenu.length) {
+                return
+            }
+
+            if ($(window).width() > 1200 && typeof $.fn.masonry !== 'undefined') {
+                $megaMenu.masonry({
+                    itemSelector: '.mega-menu__column',
+                    columnWidth: 200
+                })
+            }
+        }, 500)
+    }
+
     MartApp.stickyHeader = function () {
         let header = $('.header-js-handler')
         let checkpoint = header.height()
@@ -1183,7 +1200,7 @@ MartApp.isRTL = $('body').prop('dir') === 'rtl'
                     if (currentPosition > checkpoint) {
                         el.addClass('header--sticky')
 
-                        initMegaMenu()
+                        MartApp.initMegaMenu()
                     } else {
                         el.removeClass('header--sticky')
                     }
@@ -1493,25 +1510,8 @@ MartApp.isRTL = $('body').prop('dir') === 'rtl'
             }, 200)
         })
 
-        let initMegaMenu = function () {
-            setTimeout(function () {
-                const $megaMenu = $(document).find('.mega-menu-wrapper')
-
-                if (! $megaMenu.length) {
-                    return
-                }
-
-                if ($(window).width() > 1200 && typeof $.fn.masonry !== 'undefined') {
-                    $megaMenu.masonry({
-                        itemSelector: '.mega-menu__column',
-                        columnWidth: 200
-                    })
-                }
-            }, 500)
-        }
-
         $(document).ready(function() {
-            initMegaMenu()
+            MartApp.initMegaMenu()
         })
 
         document.addEventListener('ecommerce.product-filter.before', () => {
@@ -1523,7 +1523,7 @@ MartApp.isRTL = $('body').prop('dir') === 'rtl'
         })
 
         document.addEventListener('ecommerce.categories-dropdown.success', () => {
-            initMegaMenu()
+            MartApp.initMegaMenu()
         })
     })
 })(jQuery)

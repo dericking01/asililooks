@@ -164,7 +164,7 @@ class ProductForm extends BaseProductForm
                     ]);
             })
             ->when(EcommerceHelper::isTaxEnabled(), function (): void {
-                $taxes = Tax::query()->orderBy('percentage')->get()->pluck('title_with_percentage', 'id')->all();
+                $taxes = Tax::query()->oldest('percentage')->get()->pluck('title_with_percentage', 'id')->all();
 
                 if ($taxes) {
                     $selectedTaxes = [];

@@ -103,7 +103,7 @@ class CurrencySupport
 
         if ($this->currencies->count() == 0) {
             $this->currencies = Currency::query()
-                ->orderBy('order')
+                ->oldest('order')
                 ->get();
         }
 

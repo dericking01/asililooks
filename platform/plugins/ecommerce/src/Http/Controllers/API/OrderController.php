@@ -44,7 +44,7 @@ class OrderController extends BaseController
                 'is_finished' => 1,
             ])
             ->withCount(['products'])
-            ->with(['billingAddress', 'shipment', 'payment']);
+            ->with(['billingAddress', 'shipment', 'payment', 'products']);
 
         // Filter by order status
         if ($request->has('status') && $request->input('status')) {
@@ -53,14 +53,14 @@ class OrderController extends BaseController
 
         // Filter by shipping status
         if ($request->has('shipping_status') && $request->input('shipping_status')) {
-            $query->whereHas('shipment', function ($q) use ($request) {
+            $query->whereHas('shipment', function ($q) use ($request): void {
                 $q->where('status', $request->input('shipping_status'));
             });
         }
 
         // Filter by payment status
         if ($request->has('payment_status') && $request->input('payment_status')) {
-            $query->whereHas('payment', function ($q) use ($request) {
+            $query->whereHas('payment', function ($q) use ($request): void {
                 $q->where('status', $request->input('payment_status'));
             });
         }
@@ -93,8 +93,16 @@ class OrderController extends BaseController
                 'id' => $id,
                 'is_finished' => 1,
             ])
-            ->with(['products', 'shipment', 'payment', 'billingAddress'])
-            ->firstOrFail();
+            ->with(['products', 'shipment', 'payment', 'billingAddress', 'products'])
+            ->first();
+
+        if (! $order) {
+            return $this
+                ->httpResponse()
+                ->setError()
+                ->setMessage(__('Order not found'))
+                ->toApiResponse();
+        }
 
         return $this
             ->httpResponse()
@@ -118,13 +126,23 @@ class OrderController extends BaseController
      */
     public function cancel(int $id, CancelOrderRequest $request)
     {
-        /** @var Order $order */
+        /**
+         * @var Order $order
+         */
         $order = Order::query()
             ->where([
                 'id' => $id,
                 'user_id' => $request->user()->id,
             ])
-            ->firstOrFail();
+            ->first();
+
+        if (! $order) {
+            return $this
+                ->httpResponse()
+                ->setError()
+                ->setMessage(__('Order not found'))
+                ->toApiResponse();
+        }
 
         if (! $order->canBeCanceled()) {
             return $this
@@ -188,7 +206,15 @@ class OrderController extends BaseController
                 'id' => $id,
                 'user_id' => $request->user()->id,
             ])
-            ->firstOrFail();
+            ->first();
+
+        if (! $order) {
+            return $this
+                ->httpResponse()
+                ->setError()
+                ->setMessage(__('Order not found'))
+                ->toApiResponse();
+        }
 
         abort_unless($order->isInvoiceAvailable(), 404);
 
@@ -220,7 +246,7 @@ class OrderController extends BaseController
      *
      * @authenticated
      *
-     * @bodyParam file file required The payment proof file (jpeg, jpg, png, pdf, max 2MB). Example: proof.jpg
+     * @bodyParam file file required The payment proof file (jpeg, jpg, png, pdf, max 2MB).
      */
     public function uploadProof(int $id, UploadProofRequest $request)
     {
@@ -234,7 +260,16 @@ class OrderController extends BaseController
 
         $order = Order::query()
             ->where('user_id', $request->user()->id)
-            ->findOrFail($id);
+            ->where('id', $id)
+            ->first();
+
+        if (! $order) {
+            return $this
+                ->httpResponse()
+                ->setError()
+                ->setMessage(__('Order not found'))
+                ->toApiResponse();
+        }
 
         $storage = Storage::disk('local');
 
@@ -297,7 +332,16 @@ class OrderController extends BaseController
     {
         $order = Order::query()
             ->where('user_id', $request->user()->id)
-            ->findOrFail($id);
+            ->where('id', $id)
+            ->first();
+
+        if (! $order) {
+            return $this
+                ->httpResponse()
+                ->setError()
+                ->setMessage(__('Order not found'))
+                ->toApiResponse();
+        }
 
         abort_unless($order->proof_file, 404);
 
@@ -329,9 +373,7 @@ class OrderController extends BaseController
         $storage = Storage::disk('local');
         $filePath = 'proofs/' . $filename;
 
-        if (! $storage->exists($filePath) || hash('sha256', $filePath) !== $token) {
-            abort(404);
-        }
+        abort_if(! $storage->exists($filePath) || hash('sha256', $filePath) !== $token, 404);
 
         return response()->download($storage->path($filePath));
     }
@@ -352,7 +394,16 @@ class OrderController extends BaseController
         /** @var Order $order */
         $order = Order::query()
             ->where('user_id', $request->user()->id)
-            ->findOrFail($id);
+            ->where('id', $id)
+            ->first();
+
+        if (! $order) {
+            return $this
+                ->httpResponse()
+                ->setError()
+                ->setMessage(__('Order not found'))
+                ->toApiResponse();
+        }
 
         if (! $order->shipment->can_confirm_delivery) {
             return $this

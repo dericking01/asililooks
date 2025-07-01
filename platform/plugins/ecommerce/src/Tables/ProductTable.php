@@ -379,7 +379,15 @@ class ProductTable extends TableAbstract
                         ->select($query->getModel()->getTable() . '.*');
                 }
 
-                return $query->where('ec_product_category_product.category_id', $value);
+                $category = ProductCategory::query()->find($value);
+
+                if (! $category) {
+                    break;
+                }
+
+                $categoryIds = ProductCategory::getChildrenIds($category->activeChildren, [$category->getKey()]);
+
+                return $query->whereIn('ec_product_category_product.category_id', $categoryIds);
 
             case 'brand':
                 if (! $value) {

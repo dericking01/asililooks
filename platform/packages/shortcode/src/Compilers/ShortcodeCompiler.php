@@ -4,8 +4,10 @@ namespace Botble\Shortcode\Compilers;
 
 use Botble\Shortcode\View\View;
 use Botble\Theme\Facades\Theme;
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class ShortcodeCompiler
@@ -137,6 +139,7 @@ class ShortcodeCompiler
         $compiled = $this->compileShortcode($matches);
         $name = $compiled->getName();
 
+        // Handle lazy loading
         if ($compiled->enable_lazy_loading === 'yes' && ! request()->ajax()) {
             add_filter(THEME_FRONT_FOOTER, function (?string $html) {
                 return $html . view('packages/shortcode::partials.lazy-loading-script')->render();
@@ -154,6 +157,44 @@ class ShortcodeCompiler
             ]);
         }
 
+        // Check if caching is enabled from settings
+        if (setting('shortcode_cache_enabled', false) && ! request()->ajax()) {
+            // Create a cache key based on the shortcode name, attributes, and content
+            $cacheKey = 'shortcode_render_' . md5($name . serialize($compiled->toArray()) . ($compiled->getContent() ?? ''));
+
+            // Check if this shortcode should be cached for longer
+            $cacheable = $this->isShortcodeCacheable($name);
+
+            // Get cache durations from settings
+            $defaultTtl = (int) setting('shortcode_cache_ttl_default', 5);
+            $cacheableTtl = (int) setting('shortcode_cache_ttl_cacheable', 1800);
+
+            // Set cache duration based on whether the shortcode is cacheable
+            $cacheDuration = $cacheable
+                ? Carbon::now()->addSeconds($cacheableTtl)
+                : Carbon::now()->addSeconds($defaultTtl);
+
+            // Get from cache or render if not cached
+            return Cache::remember($cacheKey, $cacheDuration, function () use ($compiled, $name) {
+                $callback = apply_filters('shortcode_get_callback', $this->getCallback($name), $name);
+
+                // Render the shortcode through the callback
+                return apply_filters(
+                    'shortcode_content_compiled',
+                    call_user_func_array($callback, [
+                        $compiled,
+                        $compiled->getContent(),
+                        $this,
+                        $name,
+                    ]),
+                    $name,
+                    $callback,
+                    $this
+                );
+            });
+        }
+
+        // If caching is disabled, render directly
         $callback = apply_filters('shortcode_get_callback', $this->getCallback($name), $name);
 
         // Render the shortcode through the callback
@@ -337,5 +378,28 @@ class ShortcodeCompiler
     public function whitelistShortcodes(): array
     {
         return apply_filters('core_whitelist_shortcodes', ['media', 'youtube-video']);
+    }
+
+    /**
+     * Determine if a shortcode should be cached for a longer period
+     *
+     * @param string $name
+     * @return bool
+     */
+    protected function isShortcodeCacheable(string $name): bool
+    {
+        // List of shortcodes that should be cached for longer periods
+        // These are typically shortcodes that don't change frequently or don't contain dynamic content
+        $cacheableShortcodes = [
+            'static-block',
+            'featured-posts',
+            'gallery',
+            'youtube-video',
+            'google-map',
+            'contact-form',
+            'image',
+        ];
+
+        return in_array($name, $cacheableShortcodes);
     }
 }

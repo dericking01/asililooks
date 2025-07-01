@@ -23,7 +23,7 @@
                             </span>
                         </a>
                     </div>
-                    <!-- <div class="countdown-wrapper col-auto ps-md-5 py-2">
+                    <div class="countdown-wrapper col-auto ps-md-5 py-2">
                         <div class="header-countdown row align-items-center justify-content-center gx-2">
                             <div class="ends-text col-auto">
                                 <div class="d-flex align-items-center justify-content-center">
@@ -38,7 +38,7 @@
                             >
                             </div>
                         </div>
-                    </div> -->
+                    </div>
                 </div>
                 <div class="product-deals-day__body arrows-top-right">
                     <div

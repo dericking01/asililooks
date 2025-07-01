@@ -1,27 +1,26 @@
-let mix = require('laravel-mix')
-
+const mix = require('laravel-mix')
 const path = require('path')
-let directory = path.basename(path.resolve(__dirname))
 
-const source = 'platform/plugins/' + directory
-const dist = 'public/vendor/core/plugins/' + directory
+const directory = path.basename(path.resolve(__dirname))
+const source = `platform/plugins/${directory}`
+const dist = `public/vendor/core/plugins/${directory}`
 
 mix
-    .js(source + '/resources/assets/js/discount.js', dist + '/js')
-    .js(source + '/resources/assets/js/order-create.js', dist + '/js')
-    .js(source + '/resources/assets/js/front/checkout.js', dist + '/js')
-    .js(source + '/resources/assets/js/admin-review.js', dist + '/js')
-    .js(source + '/resources/assets/js/front/order-return.js', dist + '/js')
-    .js(source + '/resources/assets/js/front-review.js', dist + '/js')
+    .js(`${source}/resources/js/discount.js`, `${dist}/js`)
+    .js(`${source}/resources/js/order-create.js`, `${dist}/js`)
+    .js(`${source}/resources/js/front/checkout.js`, `${dist}/js`)
+    .js(`${source}/resources/js/admin-review.js`, `${dist}/js`)
+    .js(`${source}/resources/js/front/order-return.js`, `${dist}/js`)
+    .js(`${source}/resources/js/front-review.js`, `${dist}/js`)
 
 if (mix.inProduction()) {
     mix
-        .copy(dist + '/js/discount.js', source + '/public/js')
-        .copy(dist + '/js/order-create.js', source + '/public/js')
-        .copy(dist + '/js/checkout.js', source + '/public/js')
-        .copy(dist + '/js/admin-review.js', source + '/public/js')
-        .copy(dist + '/js/order-return.js', source + '/public/js')
-        .copy(dist + '/js/front-review.js', source + '/public/js')
+        .copy(`${dist}/js/discount.js`, `${source}/public/js`)
+        .copy(`${dist}/js/order-create.js`, `${source}/public/js`)
+        .copy(`${dist}/js/checkout.js`, `${source}/public/js`)
+        .copy(`${dist}/js/admin-review.js`, `${source}/public/js`)
+        .copy(`${dist}/js/order-return.js`, `${source}/public/js`)
+        .copy(`${dist}/js/front-review.js`, `${source}/public/js`)
 }
 
 const scripts = [
@@ -57,12 +56,12 @@ const scripts = [
 ];
 
 scripts.forEach(item => {
-    mix.js(source + '/resources/assets/js/' + item, dist + '/js')
+    mix.js(`${source}/resources/js/${item}`, `${dist}/js`)
 });
 
 if (mix.inProduction()) {
     scripts.forEach(item => {
-        mix.copy(dist + '/js/' + item, source + '/public/js')
+        mix.copy(`${dist}/js/${item}`, `${source}/public/js`)
     });
 }
 
@@ -86,11 +85,11 @@ const styles = [
 ]
 
 styles.forEach(item => {
-    mix.sass(source + '/resources/assets/sass/' + item, dist + '/css')
+    mix.sass(`${source}/resources/sass/${item}`, `${dist}/css`)
 })
 
 if (mix.inProduction()) {
     styles.forEach(item => {
-        mix.copy(dist + '/css/' + item.replace('.scss', '.css'), source + '/public/css')
+        mix.copy(`${dist}/css/${item.replace('.scss', '.css')}`, `${source}/public/css`)
     })
 }

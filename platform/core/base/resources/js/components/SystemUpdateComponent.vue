@@ -247,6 +247,13 @@ export default {
             margin: 0 auto;
             text-align: center;
 
+            .loader {
+                margin: 0 auto;
+                &::after {
+                    display: none;
+                }
+            }
+
             .percent {
                 font-size: 86px;
                 color: #fefefe;

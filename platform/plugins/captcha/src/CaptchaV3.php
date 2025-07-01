@@ -71,7 +71,7 @@ class CaptchaV3 extends CaptchaContract
 
         $this->rendered = true;
 
-        if (request()->ajax() || request()->wantsJson()) {
+        if (request()->expectsJson()) {
             $captchaContent .= $footerContent;
         }
 

@@ -10,7 +10,7 @@ class ToggleThemeModeController extends BaseController
 {
     public function __invoke(Request $request): RedirectResponse
     {
-        $request->validate(['theme' => 'required|in:light,dark']);
+        $request->validate(['theme' => ['required', 'in:light,dark']]);
 
         $themeMode = $request->query('theme');
 

@@ -54,9 +54,6 @@ class NewsletterTable extends TableAbstract
 
     public function getDefaultButtons(): array
     {
-        return [
-            'export',
-            'reload',
-        ];
+        return array_unique(array_merge(['export'], parent::getDefaultButtons()));
     }
 }

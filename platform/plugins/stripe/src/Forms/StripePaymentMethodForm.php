@@ -7,10 +7,12 @@ use Botble\Base\Forms\FieldOptions\SelectFieldOption;
 use Botble\Base\Forms\FieldOptions\TextFieldOption;
 use Botble\Base\Forms\Fields\SelectField;
 use Botble\Base\Forms\Fields\TextField;
+use Botble\Payment\Concerns\Forms\HasAvailableCountriesField;
 use Botble\Payment\Forms\PaymentMethodForm;
 
 class StripePaymentMethodForm extends PaymentMethodForm
 {
+    use HasAvailableCountriesField;
     public function setup(): void
     {
         parent::setup();
@@ -62,6 +64,7 @@ class StripePaymentMethodForm extends PaymentMethodForm
                     ->label(trans('plugins/stripe::stripe.webhook_secret'))
                     ->value(BaseHelper::hasDemoModeEnabled() ? '*******************************' : get_payment_setting('webhook_secret', 'stripe'))
                     ->placeholder('whsec_*************')
-            );
+            )
+            ->addAvailableCountriesField(STRIPE_PAYMENT_METHOD_NAME);
     }
 }

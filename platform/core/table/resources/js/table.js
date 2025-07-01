@@ -467,8 +467,7 @@
 
                         _self.closest('.modal').modal('hide')
                     })
-                    .catch((error) => {
-                        Botble.handleDatatableError(error)
+                    .catch(() => {
                         $('.modal-confirm-delete').modal('hide')
                     })
                     .finally(() => {
@@ -614,8 +613,8 @@
 
                         _self.closest('.modal').modal('hide')
                     })
-                    .catch((error) => {
-                        Botble.handleDatatableError(error)
+                    .catch(() => {
+                        _self.closest('.modal').modal('hide')
                     })
                     .finally(() => {
                         Botble.hideButtonLoading(_self)
@@ -690,9 +689,8 @@
 
                         typeof onSuccess === 'function' && onSuccess.apply(this, data)
                     })
-                    .catch((error) => {
-                        Botble.handleDatatableError(error)
-                        typeof onError === 'function' && onError.apply(this, error)
+                    .finally(() => {
+                        Botble.hideButtonLoading(_self)
                     })
             }
 

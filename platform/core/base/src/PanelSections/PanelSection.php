@@ -174,7 +174,7 @@ class PanelSection implements PanelSectionContract
         return $this->view;
     }
 
-    public function withEmptyStateView(string $view = null): static
+    public function withEmptyStateView(?string $view = null): static
     {
         $this->emptyState = true;
 

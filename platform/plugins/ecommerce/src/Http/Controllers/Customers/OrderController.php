@@ -37,8 +37,7 @@ class OrderController extends BaseController
                 'user_id' => auth('customer')->id(),
                 'is_finished' => 1,
             ])
-            ->withCount(['products'])
-            ->orderByDesc('created_at')
+            ->withCount(['products'])->latest()
             ->paginate(10);
 
         Theme::breadcrumb()

@@ -109,6 +109,27 @@ class Review extends BaseModel
         return Attribute::get(fn () => $this->user->name ?: $this->customer_name);
     }
 
+    protected function displayName(): Attribute
+    {
+        return Attribute::get(function () {
+            $customerName = $this->userName;
+
+            if (! get_ecommerce_setting('show_customer_full_name', true)) {
+                $customerNameCharCount = strlen($customerName);
+
+                if ($customerNameCharCount > 7) {
+                    $customerName = Str::mask($customerName, '*', $customerNameCharCount - 5, 5);
+                } elseif ($customerNameCharCount > 3) {
+                    $customerName = Str::mask($customerName, '*', $customerNameCharCount - 3, 3);
+                } else {
+                    $customerName = Str::mask($customerName, '*', 1, -1);
+                }
+            }
+
+            return $customerName;
+        });
+    }
+
     protected function orderCreatedAt(): Attribute
     {
         return Attribute::get(fn () => $this->user->orders()->first()?->created_at);
@@ -124,6 +145,10 @@ class Review extends BaseModel
         return Attribute::get(function () {
             if ($this->user->avatar) {
                 return RvMedia::getImageUrl($this->user->avatar, 'thumb');
+            }
+
+            if ($defaultAvatar = get_ecommerce_setting('customer_default_avatar')) {
+                return RvMedia::getImageUrl($defaultAvatar);
             }
 
             try {

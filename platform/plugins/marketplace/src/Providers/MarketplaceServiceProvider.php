@@ -169,6 +169,15 @@ class MarketplaceServiceProvider extends ServiceProvider
                     'icon' => null,
                     'url' => fn () => route('marketplace.reports.index'),
                     'permissions' => ['marketplace.reports'],
+                ])
+                ->registerItem([
+                    'id' => 'cms-plugins-marketplace-messages',
+                    'priority' => 10,
+                    'parent_id' => 'cms-plugins-marketplace',
+                    'name' => 'plugins/marketplace::message.name',
+                    'icon' => null,
+                    'url' => fn () => route('marketplace.messages.index'),
+                    'permissions' => ['marketplace.messages.index'],
                 ]);
         });
 

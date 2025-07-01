@@ -23,15 +23,17 @@ class GetProductService
         array $withCount = [],
         array $conditions = []
     ): Collection|LengthAwarePaginator {
-        $num = $request->integer('num') ?: $request->integer('per-page');
+        $num = $request->integer('num') ?: $request->integer('per-page') ?: $request->input('per_page');
         $shows = EcommerceHelper::getShowParams();
 
         if (! array_key_exists($num, $shows)) {
             $num = (int) theme_option('number_of_products_per_page', 12);
         }
 
+        $keyword = $request->input('q') ?: $request->input('keyword') ?: $request->input('search');
+
         $queryVar = [
-            'keyword' => BaseHelper::stringify($request->input('q')),
+            'keyword' => BaseHelper::stringify($keyword),
             'brands' => EcommerceHelper::parseFilterParams($request, 'brands'),
             'categories' => EcommerceHelper::parseFilterParams($request, 'categories'),
             'tags' => EcommerceHelper::parseFilterParams($request, 'tags'),
@@ -41,8 +43,9 @@ class GetProductService
             'max_price' => $request->input('max_price'),
             'min_price' => $request->input('min_price'),
             'price_ranges' => (array) $request->input('price_ranges', []),
-            'sort_by' => $request->input('sort-by'),
+            'sort_by' => $request->input('sort-by') ?: $request->input('sort_by'),
             'num' => $num,
+            'discounted_only' => (bool) $request->input('discounted_only'),
         ];
 
         if ($category) {
@@ -142,6 +145,7 @@ class GetProductService
             'brands' => $queryVar['brands'],
             'attributes' => $queryVar['attributes'],
             'order_by' => $orderBy,
+            'discounted_only' => $queryVar['discounted_only'],
         ], $params);
     }
 }

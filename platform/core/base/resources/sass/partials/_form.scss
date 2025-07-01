@@ -57,6 +57,10 @@ form {
             label {
                 &.form-check {
                     margin-bottom: 0;
+
+                    &.form-check-inline {
+                        margin-bottom: .75rem;
+                    }
                 }
             }
 

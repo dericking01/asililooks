@@ -23,6 +23,8 @@ class PrintShippingLabelController extends BaseController
 {
     public function __invoke(Shipment $shipment, Pdf $pdf): Response
     {
+        $this->pageTitle(trans('plugins/ecommerce::shipping.shipping_label.print_shipping_label'));
+
         $renderer = new ImageRenderer(
             new RendererStyle(400),
             new SvgImageBackEnd()

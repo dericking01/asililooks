@@ -4,6 +4,7 @@ namespace Botble\Ecommerce\Listeners;
 
 use Botble\Ecommerce\Enums\StockStatusEnum;
 use Botble\Ecommerce\Events\ProductQuantityUpdatedEvent;
+use Botble\Ecommerce\Models\Product;
 
 class UpdateProductStockStatus
 {
@@ -11,17 +12,35 @@ class UpdateProductStockStatus
     {
         $product = $event->product;
 
-        if (! $product->is_variation) {
-            return;
+        // If this is a variation, update the parent product
+        if ($product->is_variation) {
+            $this->updateParentProduct($product);
         }
 
-        $parentProduct = $product->original_product;
+        // If this is a parent product with variations, update it based on variations
+        if (! $product->is_variation && $product->variations()->exists()) {
+            $this->updateParentProductFromVariations($product);
+        }
+    }
+
+    protected function updateParentProduct(Product $variationProduct): void
+    {
+        $parentProduct = $variationProduct->original_product;
 
         if (! $parentProduct || ! $parentProduct->id || $parentProduct->is_variation) {
             return;
         }
 
+        $this->updateParentProductFromVariations($parentProduct);
+    }
+
+    protected function updateParentProductFromVariations(Product $parentProduct): void
+    {
         $variations = $parentProduct->variations()->with('product')->get();
+
+        if ($variations->isEmpty()) {
+            return;
+        }
 
         $quantity = 0;
         $withStorehouseManagement = false;
@@ -29,31 +48,41 @@ class UpdateProductStockStatus
         $allowCheckoutWhenOutOfStock = false;
 
         foreach ($variations as $variation) {
-            $product = $variation->product;
+            $variationProduct = $variation->product;
 
-            if (! $product || ! $product->is_variation) {
+            if (! $variationProduct || ! $variationProduct->is_variation) {
                 continue;
             }
 
-            if ($product->with_storehouse_management) {
-                $quantity += $product->quantity;
+            if ($variationProduct->with_storehouse_management) {
+                $quantity += $variationProduct->quantity;
                 $withStorehouseManagement = true;
             }
 
-            if ($product->allow_checkout_when_out_of_stock) {
+            if ($variationProduct->allow_checkout_when_out_of_stock) {
                 $allowCheckoutWhenOutOfStock = true;
             }
 
-            if (! $product->isOutOfStock()) {
-                $stockStatus = $product->stock_status == StockStatusEnum::ON_BACKORDER ? StockStatusEnum::ON_BACKORDER : StockStatusEnum::IN_STOCK;
+            if (! $variationProduct->isOutOfStock()) {
+                $stockStatus = $variationProduct->stock_status == StockStatusEnum::ON_BACKORDER
+                    ? StockStatusEnum::ON_BACKORDER
+                    : StockStatusEnum::IN_STOCK;
             }
         }
 
-        $parentProduct->quantity = $quantity;
-        $parentProduct->with_storehouse_management = $withStorehouseManagement;
-        $parentProduct->stock_status = $stockStatus;
-        $parentProduct->allow_checkout_when_out_of_stock = $allowCheckoutWhenOutOfStock;
+        // Only update if there are actual changes to prevent infinite loops
+        $hasChanges = $parentProduct->quantity != $quantity ||
+                     $parentProduct->with_storehouse_management != $withStorehouseManagement ||
+                     $parentProduct->stock_status != $stockStatus ||
+                     $parentProduct->allow_checkout_when_out_of_stock != $allowCheckoutWhenOutOfStock;
 
-        $parentProduct->save();
+        if ($hasChanges) {
+            $parentProduct->quantity = $quantity;
+            $parentProduct->with_storehouse_management = $withStorehouseManagement;
+            $parentProduct->stock_status = $stockStatus;
+            $parentProduct->allow_checkout_when_out_of_stock = $allowCheckoutWhenOutOfStock;
+
+            $parentProduct->saveQuietly(); // Use saveQuietly to prevent triggering events again
+        }
     }
 }

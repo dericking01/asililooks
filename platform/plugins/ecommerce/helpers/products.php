@@ -173,7 +173,7 @@ if (! function_exists('get_featured_product_categories')) {
         return ProductCategory::query()
             ->where('is_featured', true)
             ->wherePublished()
-            ->orderBy('order')->latest()
+            ->oldest('order')->latest()
             ->with('slugable')
             ->get();
     }

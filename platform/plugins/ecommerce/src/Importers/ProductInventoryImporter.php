@@ -5,6 +5,7 @@ namespace Botble\Ecommerce\Importers;
 use Botble\DataSynchronize\Importer\ImportColumn;
 use Botble\DataSynchronize\Importer\Importer;
 use Botble\Ecommerce\Enums\StockStatusEnum;
+use Botble\Ecommerce\Events\ProductQuantityUpdatedEvent;
 use Botble\Ecommerce\Models\Product;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -136,8 +137,19 @@ class ProductInventoryImporter extends Importer
 
     public function handle(array $data): int
     {
-        return Product::withoutTimestamps(function () use ($data) {
+        $result = Product::withoutTimestamps(function () use ($data) {
             return Product::query()->upsert($data, ['id'], ['with_storehouse_management', 'quantity', 'stock_status']) / 2;
         });
+
+        // Trigger events for updated products to recalculate parent product quantities
+        $updatedProductIds = collect($data)->pluck('id')->filter();
+        if ($updatedProductIds->isNotEmpty()) {
+            $products = Product::query()->whereIn('id', $updatedProductIds)->get();
+            foreach ($products as $product) {
+                event(new ProductQuantityUpdatedEvent($product));
+            }
+        }
+
+        return $result;
     }
 }

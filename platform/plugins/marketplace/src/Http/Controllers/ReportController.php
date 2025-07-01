@@ -5,6 +5,7 @@ namespace Botble\Marketplace\Http\Controllers;
 use Botble\Base\Facades\Assets;
 use Botble\Base\Widgets\Contracts\AdminWidget;
 use Botble\Ecommerce\Facades\EcommerceHelper;
+use Botble\Marketplace\Tables\RecentWithdrawalsTable;
 use Botble\Marketplace\Tables\StoreRevenueTable;
 use Illuminate\Http\Request;
 
@@ -45,5 +46,10 @@ class ReportController extends BaseController
     public function getStoreRevenues(StoreRevenueTable $storeRevenueTable)
     {
         return $storeRevenueTable->renderTable();
+    }
+
+    public function getRecentWithdrawals(RecentWithdrawalsTable $recentWithdrawalsTable)
+    {
+        return $recentWithdrawalsTable->renderTable();
     }
 }

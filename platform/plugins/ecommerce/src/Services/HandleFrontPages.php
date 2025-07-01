@@ -22,6 +22,7 @@ use Botble\Media\Facades\RvMedia;
 use Botble\SeoHelper\Entities\Twitter\Card;
 use Botble\SeoHelper\Facades\SeoHelper;
 use Botble\SeoHelper\SeoOpenGraph;
+use Botble\Shortcode\Facades\Shortcode;
 use Botble\Slug\Models\Slug;
 use Botble\Theme\Facades\AdminBar;
 use Botble\Theme\Facades\Theme;
@@ -412,6 +413,15 @@ class HandleFrontPages
 
         if (view()->exists($filtersView)) {
             $additional['filters_html'] = view($filtersView, compact('category'))->render();
+        }
+
+        $productListingDescriptionView = EcommerceHelper::viewPath('includes.product-listing-page-description');
+
+        if ($category && view()->exists($productListingDescriptionView)) {
+            $additional['product_listing_page_description_html'] = view($productListingDescriptionView, [
+                'pageName' => $category->name,
+                'pageDescription' => $category->description ? Shortcode::compile($category->description)->toHtml() : null,
+            ])->render();
         }
 
         $data = view(EcommerceHelper::viewPath('includes.product-items'), compact('products'))->render();

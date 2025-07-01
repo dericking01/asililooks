@@ -134,7 +134,11 @@ class Product extends BaseModel
         static::updated(function (Product $product): void {
             if ($product->is_variation && $product->original_product->defaultVariation->product_id == $product->getKey()) {
                 app(UpdateDefaultProductService::class)->execute($product);
+            }
 
+            // Trigger quantity updated event if quantity, stock status, or storehouse management changed
+            $quantityRelatedFields = ['quantity', 'stock_status', 'with_storehouse_management', 'allow_checkout_when_out_of_stock'];
+            if ($product->wasChanged($quantityRelatedFields)) {
                 ProductQuantityUpdatedEvent::dispatch($product);
             }
 
@@ -680,7 +684,7 @@ class Product extends BaseModel
 
     public function options(): HasMany
     {
-        return $this->hasMany(Option::class)->orderBy('order');
+        return $this->hasMany(Option::class)->oldest('order');
     }
 
     public function generateSku(): float|string|null

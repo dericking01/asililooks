@@ -14,11 +14,14 @@ use Botble\Base\Forms\Fields\TextareaField;
 use Botble\Ecommerce\Facades\Cart;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Http\Requests\SaveCheckoutInformationRequest;
+use Botble\Payment\Enums\PaymentMethodEnum;
+use Botble\Payment\Facades\PaymentMethods;
 use Botble\Theme\Facades\Theme;
 use Botble\Theme\FormFront;
 use Closure;
 use Detection\MobileDetect;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Throwable;
 
 class CheckoutForm extends FormFront
@@ -244,10 +247,12 @@ class CheckoutForm extends FormFront
                                         '<div data-bb-toggle="checkout-payment-methods-area">',
                                         '</div>',
                                         function (CheckoutForm $form) use ($model): void {
+                                            $filteredModel = $form->filterPaymentMethods($model);
+
                                             $form->add(
                                                 'payment_methods',
                                                 HtmlField::class,
-                                                HtmlFieldOption::make()->content(view('plugins/ecommerce::orders.partials.payment-methods', $model))
+                                                HtmlFieldOption::make()->content(view('plugins/ecommerce::orders.partials.payment-methods', $filteredModel))
                                             );
                                         }
                                     )
@@ -363,5 +368,29 @@ class CheckoutForm extends FormFront
         );
 
         return $this;
+    }
+
+    protected function cartContainsOnlyDigitalProducts(Collection $products): bool
+    {
+        if (! EcommerceHelper::isEnabledSupportDigitalProducts()) {
+            return false;
+        }
+
+        if ($products->isEmpty()) {
+            return false;
+        }
+
+        $digitalProductsCount = EcommerceHelper::countDigitalProducts($products);
+
+        return $digitalProductsCount > 0 && $digitalProductsCount === $products->count();
+    }
+
+    protected function filterPaymentMethods(array $model): array
+    {
+        if ($this->cartContainsOnlyDigitalProducts($model['products'])) {
+            PaymentMethods::excludeMethod(PaymentMethodEnum::COD);
+        }
+
+        return $model;
     }
 }

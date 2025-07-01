@@ -34,6 +34,13 @@ class IconUpdateCommand extends Command
 
         $tagName = str_replace('v', '', Arr::get($response, 'tag_name'));
         $downloadUrl = Arr::get($response, 'assets.0.browser_download_url');
+
+        if (! $downloadUrl) {
+            $this->components->error('Failed to fetch latest release of Tabler Icons.');
+
+            return self::FAILURE;
+        }
+
         $folderName = "core-icons-$tagName";
         $destination = storage_path("app/$folderName");
         $zipDestination = "$destination.zip";

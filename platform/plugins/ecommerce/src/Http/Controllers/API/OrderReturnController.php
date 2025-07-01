@@ -33,8 +33,7 @@ class OrderReturnController extends BaseController
         $user = $request->user();
 
         $orderReturns = OrderReturn::query()
-            ->where('user_id', $user->id)
-            ->orderByDesc('created_at')
+            ->where('user_id', $user->id)->latest()
             ->withCount('items')
             ->with(['items', 'order', 'latestHistory'])
             ->paginate($request->integer('per_page', 10));

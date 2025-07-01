@@ -23,7 +23,7 @@ class AddressController extends BaseController
     {
         $addresses = Address::query()
             ->where('customer_id', $request->user()->id)
-            ->orderByDesc('is_default')
+            ->latest('is_default')
             ->latest()
             ->paginate(10);
 

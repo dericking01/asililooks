@@ -14,6 +14,8 @@ return [
     'customer' => 'Customer',
     'vendor' => 'Vendor',
     'currency' => 'Currency',
+    'fee' => 'Fee',
+    'status' => 'Status',
     'forms' => [
         'amount' => 'Amount',
         'amount_placeholder' => 'Enter withdrawal amount',
@@ -74,4 +76,5 @@ return [
             'withdrawal_bank_info_full_name' => 'Account holder name',
         ],
     ],
+    'created_success_message' => 'Your withdrawal request has been created successfully.',
 ];

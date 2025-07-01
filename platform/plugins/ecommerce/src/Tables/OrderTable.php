@@ -129,7 +129,8 @@ class OrderTable extends TableAbstract
                         Html::mailto($item->user->email ?: $item->address->email, obfuscate: false),
                         $item->user->phone ?: $item->address->phone
                     );
-                }),
+                })
+                ->responsivePriority(99),
             Column::formatted('amount')
                 ->title(trans('plugins/ecommerce::order.amount')),
         ];
@@ -258,7 +259,7 @@ class OrderTable extends TableAbstract
 
     public function getDefaultButtons(): array
     {
-        return array_merge(['export'], parent::getDefaultButtons());
+        return array_unique(array_merge(['export'], parent::getDefaultButtons()));
     }
 
     public function saveBulkChangeItem(Model|Order $item, string $inputKey, ?string $inputValue): Model|bool
@@ -389,7 +390,7 @@ class OrderTable extends TableAbstract
             $keyword = '%' . $keyword . '%';
 
             return $query
-                ->where(function ($query) use ($keyword) {
+                ->where(function ($query) use ($keyword): void {
                     $query
                         ->whereHas('address', function ($subQuery) use ($keyword) {
                             return $subQuery

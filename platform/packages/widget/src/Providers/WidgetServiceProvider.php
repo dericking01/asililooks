@@ -82,5 +82,7 @@ class WidgetServiceProvider extends ServiceProvider
                 'widgets.index'
             );
         });
+
+        $this->app->register(HookServiceProvider::class);
     }
 }

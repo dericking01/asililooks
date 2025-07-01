@@ -116,7 +116,8 @@ class HookServiceProvider extends ServiceProvider
                     'value' => number_format((float) $paymentData['amount'], 2, '.', ''),
                 ],
                 'description' => $paymentData['description'],
-                'redirectUrl' => PaymentHelper::getRedirectURL(),
+                'redirectUrl' => PaymentHelper::getRedirectURL($paymentData['checkout_token']),
+                'cancelUrl' => PaymentHelper::getCancelURL($paymentData['checkout_token']),
                 'webhookUrl' => route('mollie.payment.callback', $paymentData['checkout_token']),
                 'metadata' => [
                     'order_id' => $paymentData['order_id'],

@@ -548,7 +548,7 @@ class LanguageManager
      * @param string|null $locale
      * @return string route with attributes changed
      */
-    protected function substituteAttributesInRoute(array $attributes, ?string $route, string $locale = null): string
+    protected function substituteAttributesInRoute(array $attributes, ?string $route, ?string $locale = null): string
     {
         foreach ($attributes as $key => $value) {
             if ($value instanceof Interfaces\LocalizedUrlRoutable) {

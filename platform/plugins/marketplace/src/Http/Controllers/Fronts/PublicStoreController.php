@@ -57,8 +57,7 @@ class PublicStoreController extends BaseController
                         ->where('is_variation', 0)
                         ->wherePublished();
                 },
-            ])
-            ->orderByDesc('created_at')
+            ])->latest()
             ->paginate(12);
 
         return Theme::scope('marketplace.stores', compact('stores'), MarketplaceHelper::viewPath('stores', false))->render();

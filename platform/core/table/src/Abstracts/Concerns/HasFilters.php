@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\Relation as EloquentRelation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 trait HasFilters
 {
@@ -79,6 +80,12 @@ trait HasFilters
 
             if ($result) {
                 return $result;
+            }
+        }
+
+        if ($value) {
+            if (Str::endsWith($value, '/export')) {
+                $value = Str::beforeLast($value, '/export');
             }
         }
 

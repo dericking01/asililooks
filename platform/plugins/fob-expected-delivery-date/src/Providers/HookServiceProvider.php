@@ -23,14 +23,13 @@ class HookServiceProvider extends ServiceProvider
             return $html;
         }, 150, 2);
 
-        // Add fields to product form
         add_action(BASE_ACTION_META_BOXES, function ($context, $object) {
             if (get_class($object) === Product::class && $context === 'advanced') {
                 MetaBox::addMetaBox(
                     'delivery_estimate_box',
                     trans('plugins/fob-expected-delivery-date::expected-delivery-date.name'),
                     function () use ($object) {
-                        $estimate = DeliveryEstimate::where('product_id', $object->id)->first();
+                        $estimate = DeliveryEstimate::query()->where('product_id', $object->getKey())->first();
 
                         return view('plugins/fob-expected-delivery-date::delivery-estimate-fields', compact('estimate'));
                     },
@@ -40,7 +39,6 @@ class HookServiceProvider extends ServiceProvider
             }
         }, 30, 2);
 
-        // Save product delivery estimate
         add_action(BASE_ACTION_AFTER_CREATE_CONTENT, function ($type, $request, $object) {
             if (get_class($object) === Product::class) {
                 $this->saveDeliveryEstimate($object, $request);
@@ -56,11 +54,11 @@ class HookServiceProvider extends ServiceProvider
 
     protected function saveDeliveryEstimate($product, $request): void
     {
-        DeliveryEstimate::updateOrCreate(
+        DeliveryEstimate::query()->updateOrCreate(
             ['product_id' => $product->id],
             [
-                'min_days' => $request->input('min_days', 3),
-                'max_days' => $request->input('max_days', 7),
+                'min_days' => $request->input('min_days', (int) setting('expected_delivery_date_default_min_days', 3)),
+                'max_days' => $request->input('max_days', (int) setting('expected_delivery_date_default_max_days', 7)),
                 'is_active' => $request->input('delivery_estimate_active', true),
             ]
         );

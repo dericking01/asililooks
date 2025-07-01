@@ -106,7 +106,7 @@ class NewsletterManager extends Manager implements Factory
                     'newsletter',
                     asset('vendor/core/plugins/newsletter/js/newsletter.js'),
                     ['jquery'],
-                    version: '1.2.8'
+                    version: '1.3.0'
                 );
 
             add_filter('theme_front_meta', function (?string $html): string {

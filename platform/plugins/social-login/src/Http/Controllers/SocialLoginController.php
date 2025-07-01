@@ -53,7 +53,7 @@ class SocialLoginController extends BaseController
         return Socialite::driver($provider)->redirect();
     }
 
-    protected function guard(Request $request = null)
+    protected function guard(?Request $request = null)
     {
         if ($request) {
             $guard = $request->input('guard');
@@ -139,6 +139,7 @@ class SocialLoginController extends BaseController
         }
 
         $avatarId = null;
+        $avatarUrl = null;
 
         $model = new $providerData['model']();
 
@@ -168,6 +169,7 @@ class SocialLoginController extends BaseController
                     $result = RvMedia::uploadFromUrl($url, 0, $model->upload_folder ?: 'accounts', 'image/png');
                     if (! $result['error']) {
                         $avatarId = $result['data']->id;
+                        $avatarUrl = $result['data']->url;
                     }
                 }
             } catch (Exception $exception) {
@@ -178,14 +180,22 @@ class SocialLoginController extends BaseController
                 'name' => $oAuth->getName() ?: $oAuth->getEmail(),
                 'email' => $oAuth->getEmail(),
                 'password' => Hash::make(Str::random(36)),
-                'avatar_id' => $avatarId,
             ];
 
             $data = apply_filters('social_login_before_saving_account', $data, $oAuth, $providerData);
 
             $account = $model;
+
             $account->fill($data);
+
+            if ($account->isFillable('avatar_id')) {
+                $account->avatar_id = $avatarId;
+            } elseif ($account->isFillable('avatar')) {
+                $account->avatar = $avatarUrl;
+            }
+
             $account->confirmed_at = Carbon::now();
+
             $account->save();
 
             event(new Registered($account));
@@ -221,8 +231,14 @@ class SocialLoginController extends BaseController
             $url = $oAuth->getAvatar();
             if ($url && (! $account->avatar_id || $account->avatar_id !== $avatarId)) {
                 $result = RvMedia::uploadFromUrl($url, 0, $model->upload_folder ?: 'accounts', 'image/png');
+
                 if (! $result['error']) {
-                    $account->avatar_id = $result['data']->id;
+                    if ($account->isFillable('avatar_id')) {
+                        $account->avatar_id = $result['data']->id;
+                    } elseif ($account->isFillable('avatar')) {
+                        $account->avatar = $result['data']->url;
+                    }
+
                     $account->save();
                 }
             }

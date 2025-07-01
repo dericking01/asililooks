@@ -31,7 +31,7 @@ class ProductCategoryController extends BaseController
                 'status',
                 'order',
             ])
-            ->orderBy('order')
+            ->oldest('order')
             ->latest()
             ->with('slugable')
             ->get();

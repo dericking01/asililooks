@@ -150,7 +150,6 @@ class EventServiceProvider extends ServiceProvider
             $files->delete(storage_path('cache_keys.json'));
 
             $files->deleteDirectory(storage_path('app/chunks'));
-            $files->deleteDirectory(storage_path('app/data-synchronize'));
             $files->deleteDirectory(storage_path('app/marketplace'));
         });
 

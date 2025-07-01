@@ -46,7 +46,7 @@ class ProductCategoryHelper
             }
 
             $query = $query
-                ->orderBy('order')->latest();
+                ->oldest('order')->latest();
 
             if ($select = Arr::get($params, 'select', [
                 'id',
