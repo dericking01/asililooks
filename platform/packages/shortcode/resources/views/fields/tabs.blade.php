@@ -91,6 +91,7 @@
                                                     'class' => 'form-control',
                                                     'placeholder' => $placeholder,
                                                     'data-name' => $key,
+                                                    'required' => Arr::get($field, 'required', false),
                                                 ]) !!}
                                                 @break
 
@@ -99,6 +100,26 @@
                                                     'class' => 'form-control',
                                                     'placeholder' => $placeholder,
                                                     'rows' => 3,
+                                                    'required' => Arr::get($field, 'required', false),
+                                                    ...$fieldAttributes,
+                                                ]) !!}
+                                                @break
+
+                                            @case('url')
+                                            @case('link')
+                                                {!! Form::url($name, $value, [
+                                                    'class' => 'form-control',
+                                                    'placeholder' => $placeholder,
+                                                    'required' => Arr::get($field, 'required', false),
+                                                    ...$fieldAttributes,
+                                                ]) !!}
+                                                @break
+
+                                            @case('email')
+                                                {!! Form::email($name, $value, [
+                                                    'class' => 'form-control',
+                                                    'placeholder' => $placeholder,
+                                                    'required' => Arr::get($field, 'required', false),
                                                     ...$fieldAttributes,
                                                 ]) !!}
                                                 @break
@@ -107,7 +128,10 @@
                                                 @php($options =  ['no' => __('No'), 'yes' => __('Yes')])
 
                                             @case('select')
-                                                {!! Form::customSelect($name, $options, $value, $fieldAttributes) !!}
+                                                {!! Form::customSelect($name, $options, $value, [
+                                                    'required' => Arr::get($field, 'required', false),
+                                                    ...$fieldAttributes,
+                                                ]) !!}
                                                 @break
 
                                             @case('onOff')
@@ -122,6 +146,7 @@
                                                 {!! Form::text($name, $value, [
                                                     'class' => 'form-control',
                                                     'placeholder' => $placeholder,
+                                                    'required' => Arr::get($field, 'required', false),
                                                     ...$fieldAttributes,
                                                 ]) !!}
                                         @endswitch

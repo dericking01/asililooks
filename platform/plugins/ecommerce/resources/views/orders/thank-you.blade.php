@@ -20,7 +20,7 @@
 
             @include('plugins/ecommerce::orders.thank-you.customer-info', compact('order'))
 
-            <a class="btn payment-checkout-btn" href="{{ BaseHelper::getHomepageUrl() }}">
+            <a class="btn payment-checkout-btn d-none d-md-inline-block mb-5" href="{{ BaseHelper::getHomepageUrl() }}">
                 {{ __('Continue shopping') }}
             </a>
         </div>
@@ -31,5 +31,12 @@
                 @include('plugins/ecommerce::orders.thank-you.total-info', ['order' => $order])
             </div>
         </div>
+    </div>
+
+    {{-- Continue shopping button for mobile, positioned at the bottom --}}
+    <div class="d-md-none mt-4 mb-4">
+        <a class="btn payment-checkout-btn w-100 mb-5" href="{{ BaseHelper::getHomepageUrl() }}">
+            {{ __('Continue shopping') }}
+        </a>
     </div>
 @stop

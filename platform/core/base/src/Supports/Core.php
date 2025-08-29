@@ -717,7 +717,7 @@ final class Core
 
             self::$coreFileData = $data;
 
-            $this->cache->forever('core_file_data', $data);
+            $this->cache->put('core_file_data', $data, Carbon::now()->addMinutes(30));
 
             return $data;
         } catch (FileNotFoundException) {

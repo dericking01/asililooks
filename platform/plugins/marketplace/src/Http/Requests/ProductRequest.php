@@ -8,6 +8,6 @@ class ProductRequest extends BaseProductRequest
 {
     public function rules(): array
     {
-        return parent::rules() + ['image_input' => 'image|mimes:jpg,jpeg,png'];
+        return parent::rules() + ['image_input' => 'image|mimes:jpg,jpeg,png,webp'];
     }
 }

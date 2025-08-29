@@ -40,6 +40,7 @@
                         <a href="{{ $product->store->url }}">
                             {{ $product->store->name }}
                         </a>
+                        {!! $product->store->badge !!}
                     </div>
                 @endif
 

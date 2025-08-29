@@ -14,13 +14,13 @@
                         </tr>
                         </tbody>
                     </table>
-                    <h1 class="bb-text-center bb-m-0 bb-mt-md">Pending product approval</h1>
+                    <h1 class="bb-text-center bb-m-0 bb-mt-md">{{ 'plugins/marketplace::marketplace.email_templates.pending_product_approval_title' | trans }}</h1>
                 </td>
             </tr>
             <tr>
                 <td class="bb-content">
-                    <p>Dear Admin,</p>
-                    <div>New product was created by {{ store_name }} <a href="{{ product_url }}">{{ product_name }}</a> is waiting for approval.</div>
+                    <p>{{ 'plugins/marketplace::marketplace.email_templates.dear_admin' | trans }}</p>
+                    <div>{{ 'plugins/marketplace::marketplace.email_templates.pending_product_approval_message' | trans({'store_name': store_name, 'product_url': product_url, 'product_name': product_name}) | raw }}</div>
                 </td>
             </tr>
         </tbody>

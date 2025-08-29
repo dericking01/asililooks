@@ -13,6 +13,7 @@ class CustomerSettingRequest extends Request
         return [
             'enable_customer_registration' => [$onOffRule = new OnOffRule()],
             'verify_customer_email' => [$onOffRule],
+            'verification_expire_minutes' => ['nullable', 'integer', 'min:1', 'max:10080'],
             'enabled_customer_account_deletion' => [$onOffRule],
             'login_using_phone' => [$onOffRule],
             'enabled_customer_dob_field' => [$onOffRule],

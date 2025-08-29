@@ -23,8 +23,7 @@ class TopPerformingStoresCard extends Card
                 DB::raw('COUNT(ec_orders.id) as total_orders'),
                 DB::raw('SUM(ec_orders.amount) as total_revenue'),
             ])
-            ->groupBy('mp_stores.id', 'mp_stores.name')
-            ->orderBy('total_revenue', 'desc')
+            ->groupBy('mp_stores.id', 'mp_stores.name')->latest('total_revenue')
             ->limit(5)
             ->get();
 
@@ -51,8 +50,7 @@ class TopPerformingStoresCard extends Card
                 DB::raw('COUNT(ec_orders.id) as total_orders'),
                 DB::raw('SUM(ec_orders.amount) as total_revenue'),
             ])
-            ->groupBy('mp_stores.id', 'mp_stores.name', 'mp_stores.logo')
-            ->orderBy('total_revenue', 'desc')
+            ->groupBy('mp_stores.id', 'mp_stores.name', 'mp_stores.logo')->latest('total_revenue')
             ->limit(5)
             ->get();
 

@@ -9,6 +9,11 @@ use Carbon\CarbonPeriod;
 
 class TaxCollectionSummaryCard extends Card
 {
+    public function getColumns(): int
+    {
+        return 6; // Half width for better layout
+    }
+
     public function getOptions(): array
     {
         $data = [];

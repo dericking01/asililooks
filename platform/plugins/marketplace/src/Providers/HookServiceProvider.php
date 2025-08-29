@@ -303,9 +303,7 @@ class HookServiceProvider extends ServiceProvider
                         RadioField::class,
                         RadioFieldOption::make()
                             ->label(__('Register as'))
-                            ->choices([0 => __('I am a customer'),
-                                // 1 => __('I am a vendor')
-                             ])
+                            ->choices([0 => __('I am a customer'), 1 => __('I am a vendor')])
                             ->defaultValue(0)
                     )
                     ->addAfter(
@@ -331,7 +329,9 @@ class HookServiceProvider extends ServiceProvider
                             ->placeholder(__('Store URL'))
                             ->attributes([
                                 'data-url' => route('public.ajax.check-store-url'),
+                                'style' => 'direction: ltr; text-align: left;',
                             ])
+                            ->wrapperAttributes(['class' => 'shop-url-wrapper mb-3 position-relative'])
                             ->prepend(
                                 sprintf(
                                     '<span class="position-absolute top-0 end-0 shop-url-status"></span><div class="input-group"><span class="input-group-text">%s</span>',
@@ -339,6 +339,7 @@ class HookServiceProvider extends ServiceProvider
                                 )
                             )
                             ->append('</div>')
+                            ->helperText(__('plugins/marketplace::store.forms.shop_url_helper'))
                             ->required(),
                     )
                     ->addAfter(
@@ -992,10 +993,10 @@ class HookServiceProvider extends ServiceProvider
 
         if (Auth::user()->hasPermission('products.index')) {
             $countPendingProducts = Product::query()
-                ->wherePublished()
+                ->where('status', BaseStatusEnum::PENDING)
                 ->where('created_by_type', Customer::class)
                 ->where('created_by_id', '!=', 0)
-                ->where('approved_by', 0)
+                ->where('is_variation', 0)
                 ->count();
 
             $data[] = [

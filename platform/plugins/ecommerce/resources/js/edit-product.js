@@ -394,12 +394,18 @@ class EcommerceProduct {
             createOrUpdateVariation($(event.currentTarget))
         })
 
-        $('#add-new-product-variation-modal').on('hidden.bs.modal', function () {
-            $(this).find('.modal-content .variation-form-wrapper').remove()
+        $('#add-new-product-variation-modal').on('hidden.bs.modal', function (e) {
+            // Only handle if this modal is the direct target, not a nested modal
+            if (e.target === this) {
+                $(this).find('.modal-content .variation-form-wrapper').remove()
+            }
         })
 
-        $('#edit-product-variation-modal').on('hidden.bs.modal', function () {
-            $(this).find('.modal-content .variation-form-wrapper').remove()
+        $('#edit-product-variation-modal').on('hidden.bs.modal', function (e) {
+            // Only handle if this modal is the direct target, not a nested modal
+            if (e.target === this) {
+                $(this).find('.modal-content .variation-form-wrapper').remove()
+            }
         })
 
         _self.$body.on('click', '[data-bb-toggle="generate-versions-button"]', (event) => {

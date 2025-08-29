@@ -1,3 +1,9 @@
+<!--
+category: E-commerce
+tags: [shop, store, buy, purchase, product, bag, trolley, supermarket, grocery]
+version: "1.39"
+unicode: "eedc"
+-->
 <svg
   xmlns="http://www.w3.org/2000/svg"
   width="24"
@@ -8,8 +14,7 @@
   stroke-width="2"
   stroke-linecap="round"
   stroke-linejoin="round"
-  >
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+>
   <path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
   <path d="M17 17a2 2 0 1 0 2 2" />
   <path d="M17 17h-11v-11" />

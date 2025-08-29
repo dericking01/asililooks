@@ -24,7 +24,7 @@
                     </div>
                 </div>
                 <div class="col">
-                    <div class="bb-customer-profile-info">
+                    <div class="bb-customer-profile-info text-md-center text-start">
                         <h2 class="h4 mb-2">
                             {!! BaseHelper::clean(__('Welcome back, <strong>:name</strong>!', ['name' => $customer->name])) !!}
                         </h2>
@@ -91,19 +91,19 @@
         <div class="card border-0 bg-info bg-opacity-10">
             <div class="card-body">
                 <div class="row align-items-center">
-                    <div class="col-auto">
-                        <div class="bg-info bg-opacity-20 rounded-circle p-3">
+                    <div class="col-12 col-md text-center text-md-start">
+                        <span class="bg-info bg-opacity-20 rounded-circle p-3 mb-3 mb-md-0 d-inline-block">
                             <x-core::icon name="ti ti-shopping-cart" class="text-white" size="lg" />
-                        </div>
+                        </span>
                     </div>
-                    <div class="col">
+                    <div class="col-12 col-md text-center text-md-start">
                         <h5 class="card-title h6 mb-1">{{ __('Ready to start shopping?') }}</h5>
-                        <p class="card-text text-muted small mb-0">
+                        <p class="card-text text-muted small mb-3 mb-md-0">
                             {{ __("You haven't placed any orders yet. Browse our products and find something you love!") }}
                         </p>
                     </div>
-                    <div class="col-auto">
-                        <a href="{{ route('public.products') }}" class="btn btn-info">
+                    <div class="col-12 col-md-auto">
+                        <a href="{{ route('public.products') }}" class="btn btn-info w-100 w-md-auto">
                             <x-core::icon name="ti ti-shopping-bag" class="me-1" />
                             {{ __('Browse Products') }}
                         </a>

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool decreaseProductQuantity(\Botble\Ecommerce\Models\Order $order)
  * @method static \Botble\Base\Supports\EmailHandler setEmailVariables(\Botble\Ecommerce\Models\Order $order)
  * @method static array getEmailVariables(\Botble\Ecommerce\Models\Order $order)
- * @method static bool sendOrderConfirmationEmail(\Botble\Ecommerce\Models\Order $order, bool $saveHistory = false)
+ * @method static bool sendOrderConfirmationEmail(\Botble\Ecommerce\Models\Order $order, bool $saveHistory = false, bool $force = false)
  * @method static void sendEmailForDigitalProducts(\Botble\Ecommerce\Models\Order $order)
  * @method static \Botble\Ecommerce\Models\Order setOrderCompleted(string|int $orderId, \Illuminate\Http\Request $request, string|int $userId = 0)
  * @method static array|string|null getShippingMethod(string $method, array|string|null $option = null)

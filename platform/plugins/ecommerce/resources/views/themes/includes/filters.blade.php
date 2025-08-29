@@ -1,6 +1,6 @@
 @if (EcommerceHelper::hasAnyProductFilters())
     @php
-        $dataForFilter = EcommerceHelper::dataForFilter($category ?? null, $request ?? null);
+        $dataForFilter = EcommerceHelper::dataForFilter($category ?? null);
         [$categories, $brands, $tags, $rand, $categoriesRequest, $urlCurrent, $categoryId, $maxFilterPrice] = $dataForFilter;
     @endphp
 

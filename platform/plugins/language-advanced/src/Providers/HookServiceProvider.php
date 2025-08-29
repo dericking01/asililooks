@@ -66,6 +66,7 @@ class HookServiceProvider extends ServiceProvider
         if (
             $priority == 'top' &&
             ! empty($object) &&
+            $object instanceof Model &&
             $object->getKey() &&
             LanguageAdvancedManager::isSupported($object) &&
             Language::getActiveLanguage([
@@ -76,7 +77,7 @@ class HookServiceProvider extends ServiceProvider
         ) {
             MetaBox::addMetaBox(
                 'language_advanced_wrap',
-                trans('plugins/language-advanced::language-advanced.name'),
+                trans('plugins/language::language.name'),
                 [$this, 'languageMetaField'],
                 $object::class,
                 'top'

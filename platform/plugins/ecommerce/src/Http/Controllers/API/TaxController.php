@@ -2,13 +2,13 @@
 
 namespace Botble\Ecommerce\Http\Controllers\API;
 
-use Botble\Base\Http\Controllers\BaseController;
+use Botble\Api\Http\Controllers\BaseApiController;
 use Botble\Ecommerce\Http\Requests\API\CalculateTaxRequest;
 use Botble\Ecommerce\Http\Resources\API\TaxCalculationResource;
 use Botble\Ecommerce\Services\Data\CalculateTaxData;
 use Botble\Ecommerce\Services\TaxCalculatorService;
 
-class TaxController extends BaseController
+class TaxController extends BaseApiController
 {
     public function __construct(protected TaxCalculatorService $taxCalculatorService)
     {
@@ -22,9 +22,9 @@ class TaxController extends BaseController
      * @param CalculateTaxRequest $request Request with cart items data
      * @return TaxCalculationResource JSON response with calculated tax details
      *
-     * @bodyParam products array[] required List of products. Example: [{"id": 1, "quantity": 2}]
-     * @bodyParam products[].id integer required Product ID. Example: 1
-     * @bodyParam products[].quantity integer required Product quantity. Example: 2
+     * @bodyParam products array required List of products with id and quantity.
+     * @bodyParam products.*.id integer required Product ID. Example: 1
+     * @bodyParam products.*.quantity integer required Product quantity. Example: 2
      * @bodyParam country string Country code. Example: US
      * @bodyParam state string State code. Example: CA
      * @bodyParam city string City name. Example: Los Angeles

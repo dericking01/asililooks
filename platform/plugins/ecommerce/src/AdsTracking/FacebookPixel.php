@@ -10,9 +10,21 @@ use Botble\SeoHelper\Facades\SeoHelper;
 class FacebookPixel
 {
     protected array $events = [];
+    protected FacebookPixelEnhanced $enhanced;
+
+    public function __construct()
+    {
+        $this->enhanced = new FacebookPixelEnhanced();
+    }
 
     public function view(Product $product): static
     {
+        if ($this->enhanced->isEnabled()) {
+            $this->enhanced->viewContent($product);
+
+            return $this;
+        }
+
         $this->pushEvent('ViewContent', [$product], [
             'content_category' => $product->categories()->first()->name ?? '',
             'content_name' => $product->name,
@@ -32,6 +44,12 @@ class FacebookPixel
 
     public function checkout(array $items, float $value): static
     {
+        if ($this->enhanced->isEnabled()) {
+            $this->enhanced->initiateCheckout($items, $value);
+
+            return $this;
+        }
+
         $this->pushEvent('InitiateCheckout', $items, [
             'content_name' => 'Checkout',
             'contents' => array_map(fn ($item) => [
@@ -48,6 +66,12 @@ class FacebookPixel
 
     public function purchase(Order $order): static
     {
+        if ($this->enhanced->isEnabled()) {
+            $this->enhanced->purchase($order);
+
+            return $this;
+        }
+
         $products = $order->getOrderProducts()->all();
 
         $this->pushEvent('Purchase', $products, [
@@ -66,6 +90,12 @@ class FacebookPixel
 
     public function addToCart(Product $product, int $quantity, float $value): self
     {
+        if ($this->enhanced->isEnabled()) {
+            $this->enhanced->addToCart($product, $quantity, $value);
+
+            return $this;
+        }
+
         $this->pushEvent('AddToCart', [$product], [
             'content_name' => 'Add to Cart',
             'content_type' => 'product',
@@ -84,7 +114,7 @@ class FacebookPixel
 
     public function isEnabled(): bool
     {
-        return get_ecommerce_setting('facebook_pixel_enabled', false) && get_ecommerce_setting('facebook_pixel_id');
+        return $this->enhanced->isEnabled();
     }
 
     public function pushEvent(string $event, array $items = [], array $data = []): void
@@ -97,6 +127,10 @@ class FacebookPixel
 
     public function render(): string
     {
+        if ($this->enhanced->isEnabled()) {
+            return $this->enhanced->render();
+        }
+
         if (empty($this->events)) {
             return '';
         }
@@ -129,5 +163,16 @@ class FacebookPixel
         add_filter('ecommerce_checkout_footer', function (?string $html) {
             return $html . SeoHelper::meta()->getAnalytics()->render() . $this->render();
         }, 999);
+    }
+
+    public function __call($method, $parameters)
+    {
+        if (method_exists($this->enhanced, $method)) {
+            $this->enhanced->$method(...$parameters);
+
+            return $this;
+        }
+
+        throw new \BadMethodCallException("Method {$method} does not exist.");
     }
 }

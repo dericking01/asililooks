@@ -89,7 +89,7 @@ class DatabaseSettingStore extends SettingStore
         return $this->parseReadData($this->newQuery()->get());
     }
 
-    public function parseReadData(Collection|array $data): array
+    public function parseReadData(Collection|array $data): ?array
     {
         $results = [];
 

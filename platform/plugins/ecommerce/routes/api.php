@@ -28,8 +28,8 @@ Route::group([
     'namespace' => 'Botble\Ecommerce\Http\Controllers\API',
 ], function (): void {
     // Public routes that use token-based security
-    Route::get('download/{token}/{filename}', [DownloadController::class, 'downloadFile'])->name('api.ecommerce.download.download-file');
-    Route::get('orders/download-proof/{token}/{filename}', [OrderController::class, 'downloadProofFile'])->name('api.ecommerce.orders.download-proof-file');
+    Route::get('download/{token}/{order_id}', [DownloadController::class, 'downloadFile'])->name('api.ecommerce.download.download-file');
+    Route::get('orders/download-proof/{token}/{order_id}', [OrderController::class, 'downloadProofFile'])->name('api.ecommerce.orders.download-proof-file');
     Route::get('products', [ProductController::class, 'index']);
     Route::get('products/{slug}', [ProductController::class, 'show']);
     Route::get('products/{slug}/related', [ProductController::class, 'relatedProducts']);
@@ -39,11 +39,11 @@ Route::group([
 
     Route::get('product-categories', [ProductCategoryController::class, 'index']);
     Route::get('product-categories/{slug}', [ProductCategoryController::class, 'show']);
-    Route::get('product-categories/{id}/products', [ProductCategoryController::class, 'products']);
+    Route::get('product-categories/{id}/products', [ProductCategoryController::class, 'products'])->wherePrimaryKey();
 
     Route::get('brands', [BrandController::class, 'index']);
     Route::get('brands/{slug}', [BrandController::class, 'show']);
-    Route::get('brands/{id}/products', [BrandController::class, 'products']);
+    Route::get('brands/{id}/products', [BrandController::class, 'products'])->wherePrimaryKey();
 
     Route::get('filters', [FilterController::class, 'getFilters']);
 
@@ -51,16 +51,16 @@ Route::group([
 
     Route::group(['middleware' => ['auth:sanctum']], function (): void {
         Route::get('orders', [OrderController::class, 'index']);
-        Route::get('orders/{id}', [OrderController::class, 'show']);
-        Route::post('orders/{id}/cancel', [OrderController::class, 'cancel']);
-        Route::get('orders/{id}/invoice', [OrderController::class, 'getInvoice']);
-        Route::post('orders/{id}/upload-proof', [OrderController::class, 'uploadProof']);
-        Route::get('orders/{id}/download-proof', [OrderController::class, 'downloadProof']);
-        Route::post('orders/{id}/confirm-delivery', [OrderController::class, 'confirmDelivery']);
+        Route::get('orders/{id}', [OrderController::class, 'show'])->wherePrimaryKey();
+        Route::post('orders/{id}/cancel', [OrderController::class, 'cancel'])->wherePrimaryKey();
+        Route::get('orders/{id}/invoice', [OrderController::class, 'getInvoice'])->wherePrimaryKey();
+        Route::post('orders/{id}/upload-proof', [OrderController::class, 'uploadProof'])->wherePrimaryKey();
+        Route::get('orders/{id}/download-proof', [OrderController::class, 'downloadProof'])->wherePrimaryKey();
+        Route::post('orders/{id}/confirm-delivery', [OrderController::class, 'confirmDelivery'])->wherePrimaryKey();
         Route::get('addresses', [AddressController::class, 'index']);
         Route::post('addresses', [AddressController::class, 'store']);
-        Route::put('addresses/{id}', [AddressController::class, 'update']);
-        Route::delete('addresses/{id}', [AddressController::class, 'destroy']);
+        Route::put('addresses/{id}', [AddressController::class, 'update'])->wherePrimaryKey();
+        Route::delete('addresses/{id}', [AddressController::class, 'destroy'])->wherePrimaryKey();
         Route::get('reviews', [ReviewController::class, 'index']);
         Route::post('reviews', [ReviewController::class, 'store']);
         Route::delete('reviews/{id}', [ReviewController::class, 'destroy'])->wherePrimaryKey();
@@ -81,6 +81,7 @@ Route::group([
 
     Route::post('cart/refresh', [CartController::class, 'refresh']);
 
+    Route::get('coupons', [CouponController::class, 'index']);
     Route::post('coupon/apply', [CouponController::class, 'apply']);
     Route::post('coupon/remove', [CouponController::class, 'remove']);
     Route::get('countries', [CountryController::class, 'index']);

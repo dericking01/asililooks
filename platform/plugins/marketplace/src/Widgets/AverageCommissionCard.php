@@ -17,7 +17,7 @@ class AverageCommissionCard extends Card
         $data = Revenue::query()
             ->whereDate('created_at', '>=', $this->startDate)
             ->whereDate('created_at', '<=', $this->endDate)
-            ->where(function ($query) {
+            ->where(function ($query): void {
                 $query->whereNull('type')
                     ->orWhere('type', RevenueTypeEnum::ADD_AMOUNT);
             })
@@ -44,7 +44,7 @@ class AverageCommissionCard extends Card
         $commission = Revenue::query()
             ->whereDate('created_at', '>=', $this->startDate)
             ->whereDate('created_at', '<=', $this->endDate)
-            ->where(function ($query) {
+            ->where(function ($query): void {
                 $query->whereNull('type')
                     ->orWhere('type', RevenueTypeEnum::ADD_AMOUNT);
             })
@@ -68,7 +68,7 @@ class AverageCommissionCard extends Card
         $previousCommission = Revenue::query()
             ->whereDate('created_at', '>=', $previousPeriod->getStartDate())
             ->whereDate('created_at', '<=', $previousPeriod->getEndDate())
-            ->where(function ($query) {
+            ->where(function ($query): void {
                 $query->whereNull('type')
                     ->orWhere('type', RevenueTypeEnum::ADD_AMOUNT);
             })

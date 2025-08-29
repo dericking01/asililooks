@@ -14,34 +14,34 @@
                         </tr>
                         </tbody>
                     </table>
-                    <h1 class="bb-text-center bb-m-0 bb-mt-md">Welcome vendor</h1>
+                    <h1 class="bb-text-center bb-m-0 bb-mt-md">{{ 'plugins/marketplace::marketplace.email_templates.welcome_vendor_title' | trans }}</h1>
                 </td>
             </tr>
             <tr>
                 <td class="bb-content bb-pb-0">
-                    <p>Dear {{ vendor_name }},</p>
-                    <p>We're delighted to welcome you to {{ store_name }}!</p>
+                    <p>{{ 'plugins/marketplace::marketplace.email_templates.dear_vendor' | trans({'vendor_name': vendor_name}) }}</p>
+                    <p>{{ 'plugins/marketplace::marketplace.email_templates.welcome_vendor_greeting' | trans({'store_name': store_name}) }}</p>
 
-                    <p>Your vendor registration has been successfully completed, and you're now part of our vibrant community of sellers.</p>
+                    <p>{{ 'plugins/marketplace::marketplace.email_templates.welcome_vendor_registration_complete' | trans }}</p>
 
-                    <p>Here's what you can do next:</p>
+                    <p>{{ 'plugins/marketplace::marketplace.email_templates.welcome_vendor_next_steps' | trans }}</p>
 
                     <ol>
-                        <li>Log in to your vendor account using your credentials.</li>
-                        <li>Add your products/services to your store. Ensure to provide detailed descriptions and captivating images to attract potential buyers.</li>
+                        <li>{{ 'plugins/marketplace::marketplace.email_templates.welcome_vendor_step_login' | trans }}</li>
+                        <li>{{ 'plugins/marketplace::marketplace.email_templates.welcome_vendor_step_add_products' | trans }}</li>
                     </ol>
 
-                    <p>If you have any questions or need assistance along the way, our support team is here to assist you. Feel free to reach out!</p>
+                    <p>{{ 'plugins/marketplace::marketplace.email_templates.welcome_vendor_support' | trans }}</p>
                 </td>
             </tr>
             <tr>
                 <td class="bb-content bb-text-center bb-pb-0">
-                    <a href="{{ site_url }}" class="bb-btn bb-bg-blue">Log in to your vendor account</a>
+                    <a href="{{ site_url }}" class="bb-btn bb-bg-blue">{{ 'plugins/marketplace::marketplace.email_templates.login_vendor_account_button' | trans }}</a>
                 </td>
             </tr>
             <tr>
                 <td class="bb-content bb-text-center">
-                    <div>We're excited to see your store flourish on {{ site_title }}!</div>
+                    <div>{{ 'plugins/marketplace::marketplace.email_templates.welcome_vendor_closing' | trans({'site_title': site_title}) }}</div>
                 </td>
             </tr>
         </tbody>

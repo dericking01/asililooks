@@ -70,7 +70,7 @@ trait HasUuidsOrIntegerIds
     public function ensureIdCanBeCreated(): void
     {
         if (static::getTypeOfId() !== 'BIGINT') {
-            $this->{$this->getKey()} = $this->newUniqueId();
+            $this->{$this->getKeyName()} = $this->newUniqueId();
         }
     }
 

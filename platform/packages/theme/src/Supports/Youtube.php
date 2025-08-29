@@ -16,19 +16,15 @@ class Youtube
             return $url;
         }
 
-        if (Str::contains($url, ['watch?v=', 'shorts/'])) {
-            $url = str_replace(['watch?v=', 'shorts/'], 'embed/', $url);
-        } else {
-            $exploded = explode('/', $url);
+        // Extract video ID from the URL
+        $videoId = self::getYoutubeVideoID($url);
 
-            if (count($exploded) > 1) {
-                $videoID = str_replace(['embed', 'watch?v=', 'shorts'], '', Arr::last($exploded));
-
-                $url = 'https://www.youtube.com/embed/' . $videoID;
-            }
+        if (! $videoId) {
+            return $url;
         }
 
-        return $url;
+        // Build clean embed URL with just the video ID
+        return 'https://www.youtube.com/embed/' . $videoId;
     }
 
     public static function getYoutubeWatchURL(?string $url): string
@@ -62,12 +58,24 @@ class Youtube
             return $url;
         }
 
-        $regExp = '/^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(shorts\/)|(watch\?))\??v?=?([^#&?]*).*/';
+        // Handle different YouTube URL formats
+        $patterns = [
+            // Standard watch URL: https://www.youtube.com/watch?v=VIDEO_ID
+            '/(?:youtube\.com\/watch\?v=|youtube\.com\/watch\?.*&v=)([a-zA-Z0-9_-]{11})/',
+            // Short URL: https://youtu.be/VIDEO_ID
+            '/youtu\.be\/([a-zA-Z0-9_-]{11})/',
+            // Embed URL: https://www.youtube.com/embed/VIDEO_ID
+            '/youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/',
+            // Shorts URL: https://www.youtube.com/shorts/VIDEO_ID
+            '/youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/',
+            // Mobile URL: https://m.youtube.com/watch?v=VIDEO_ID
+            '/m\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/',
+        ];
 
-        preg_match($regExp, $url, $matches);
-
-        if ($matches && strlen($matches[8]) == 11) {
-            return $matches[8];
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $url, $matches)) {
+                return $matches[1];
+            }
         }
 
         return null;

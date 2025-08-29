@@ -36,7 +36,9 @@ class MarketPlaceSettingFormRequest extends BaseProductRequest
             'hide_store_email' => 'sometimes|in:0,1',
             'hide_store_address' => 'sometimes|in:0,1',
             'allow_vendor_manage_shipping' => 'sometimes|in:0,1',
+            'charge_shipping_per_vendor' => 'sometimes|in:0,1',
             'hide_store_social_links' => 'sometimes|in:0,1',
+            'enable_vendor_categories_filter' => [new OnOffRule()],
             'fee_per_order' => 'sometimes|min:0|max:100|numeric',
             'fee_withdrawal' => 'sometimes|min:0|numeric',
             'withdrawal_fee_type' => ['required', Rule::in(WithdrawalFeeTypeEnum::values())],
@@ -49,6 +51,7 @@ class MarketPlaceSettingFormRequest extends BaseProductRequest
             'term_and_privacy_policy_url' => ['nullable', 'string'],
             'single_vendor_checkout' => [new OnOffRule()],
             'display_order_total_info_for_each_store' => [new OnOffRule()],
+            'show_vendor_info_at_checkout' => [new OnOffRule()],
             'media_mime_types_allowed' => ['nullable', 'array'],
             'media_mime_types_allowed.*' => ['nullable', 'string', Rule::in(explode(',', RvMedia::getConfig('allowed_mime_types')))],
         ];

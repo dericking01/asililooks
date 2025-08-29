@@ -10,4 +10,10 @@ return [
     'use_styles' => true,
     'styles_location' => '/vendor/core/packages/sitemap/styles/',
     'use_gzip' => false,
+    'indexnow_endpoints' => [
+        'bing' => 'https://api.indexnow.org/indexnow',
+        'yandex' => 'https://yandex.com/indexnow',
+        'seznam' => 'https://search.seznam.cz/indexnow',
+        'naver' => 'https://searchadvisor.naver.com/indexnow',
+    ],
 ];

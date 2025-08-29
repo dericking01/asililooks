@@ -61,4 +61,7 @@ return [
     'setup_site_language' => 'To set up the site language, please go to :link page. Or go to :appearance_link to set up the admin language.',
     'no_languages' => 'There are no languages in your site!',
     'update' => 'Update',
+    'default_language_warning' => 'You should set the default language only once during the initial setup and avoid changing it later.',
+    'default_language_warning_details' => 'Changing the default language does not automatically update your existing content — all previously entered data remains tied to the original default language.',
+    'default_language_warning_action' => 'If you decide to change the default language, you will need to manually update your site content to match the new default language, as it won\'t be updated automatically.',
 ];

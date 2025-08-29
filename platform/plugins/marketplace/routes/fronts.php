@@ -12,6 +12,11 @@ use Illuminate\Support\Facades\Route;
 Route::group([
     'namespace' => 'Botble\Marketplace\Http\Controllers\Fronts',
 ], function (): void {
+    Route::group(['middleware' => ['web', 'core']], function () {
+        Route::post('ajax/stores/check-store-url', [PublicStoreController::class, 'checkStoreUrl'])
+            ->name('public.ajax.check-store-url');
+    });
+
     Theme::registerRoutes(function (): void {
         $slugPrefix = SlugHelper::getPrefix(Store::class, 'stores');
 
@@ -22,9 +27,6 @@ Route::group([
             ->name('public.ajax.')
             ->middleware(RequiresJsonRequestMiddleware::class)
             ->group(function (): void {
-                Route::post('check-store-url', [PublicStoreController::class, 'checkStoreUrl'])->name(
-                    'check-store-url'
-                );
                 Route::post('{id}/contact', [ContactStoreController::class, 'store'])->name('stores.contact');
             });
 

@@ -4,6 +4,7 @@ return [
     'product_specification' => 'Product Specification',
     'specification_groups' => [
         'title' => 'Specification Groups',
+        'menu_name' => 'Groups',
 
         'create' => [
             'title' => 'Create Specification Group',
@@ -16,6 +17,7 @@ return [
 
     'specification_attributes' => [
         'title' => 'Specification Attributes',
+        'menu_name' => 'Attributes',
 
         'group' => 'Associated Group',
         'group_placeholder' => 'Choose any Group',
@@ -40,6 +42,7 @@ return [
 
     'specification_tables' => [
         'title' => 'Specification Tables',
+        'menu_name' => 'Tables',
 
         'create' => [
             'title' => 'Create Specification Table',

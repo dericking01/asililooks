@@ -10,7 +10,7 @@
 @php
     $color = match ($type) {
         'success' => 'alert-success',
-        'warning' => 'alert-warning bg-warning text-white',
+        'warning' => 'alert-warning',
         'danger' => 'alert-danger',
         default => 'alert-info',
     };
@@ -21,8 +21,6 @@
         'warning' => 'ti ti-alert-circle',
         default => 'ti ti-info-circle',
     };
-
-    $iconClass = $type === 'warning' ? 'text-white' : null;
 @endphp
 
 <div
@@ -32,7 +30,7 @@
     @if ($icon)
         <div class="d-flex gap-1">
             <div>
-                <x-core::icon :name="$icon" class="alert-icon {{ $iconClass ?: '' }}" />
+                <x-core::icon :name="$icon" class="alert-icon" />
             </div>
             <div class="w-100">
     @endif

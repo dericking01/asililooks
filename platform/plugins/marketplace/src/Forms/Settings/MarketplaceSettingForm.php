@@ -183,12 +183,28 @@ class MarketplaceSettingForm extends SettingForm
                     ->value(MarketplaceHelper::hideStoreSocialLinks())
             )
             ->add(
+                'enable_vendor_categories_filter',
+                OnOffCheckboxField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('plugins/marketplace::marketplace.settings.enable_vendor_categories_filter'))
+                    ->value(MarketplaceHelper::getSetting('enable_vendor_categories_filter', true))
+                    ->helperText(trans('plugins/marketplace::marketplace.settings.enable_vendor_categories_filter_description'))
+            )
+            ->add(
                 'allow_vendor_manage_shipping',
                 OnOffCheckboxField::class,
                 OnOffFieldOption::make()
                     ->label(trans('plugins/marketplace::marketplace.settings.allow_vendor_manage_shipping'))
                     ->value(MarketplaceHelper::allowVendorManageShipping())
                     ->helperText(trans('plugins/marketplace::marketplace.settings.allow_vendor_manage_shipping_description'))
+            )
+            ->add(
+                'charge_shipping_per_vendor',
+                OnOffCheckboxField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('plugins/marketplace::marketplace.settings.charge_shipping_per_vendor'))
+                    ->value(MarketplaceHelper::isChargeShippingPerVendor())
+                    ->helperText(trans('plugins/marketplace::marketplace.settings.charge_shipping_per_vendor_description'))
             )
             ->add(
                 'enabled_messaging_system',
@@ -234,6 +250,14 @@ class MarketplaceSettingForm extends SettingForm
                     ->label(trans('plugins/marketplace::marketplace.settings.display_order_total_info_for_each_store'))
                     ->value(MarketplaceHelper::getSetting('display_order_total_info_for_each_store', false))
                     ->helperText(trans('plugins/marketplace::marketplace.settings.display_order_total_info_for_each_store_helper'))
+            )
+            ->add(
+                'show_vendor_info_at_checkout',
+                OnOffCheckboxField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('plugins/marketplace::marketplace.settings.show_vendor_info_at_checkout'))
+                    ->value(MarketplaceHelper::getSetting('show_vendor_info_at_checkout', true))
+                    ->helperText(trans('plugins/marketplace::marketplace.settings.show_vendor_info_at_checkout_helper'))
             );
     }
 }

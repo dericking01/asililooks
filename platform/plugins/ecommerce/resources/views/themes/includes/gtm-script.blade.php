@@ -82,5 +82,99 @@
                 ],
             });
         });
+
+        $(document).on('click', '[data-bb-toggle="product-link"], .product-item a, .product-card a', function (e) {
+            var currentTarget = $(e.currentTarget);
+            var productElement = currentTarget.closest('[data-product-id]').length 
+                ? currentTarget.closest('[data-product-id]') 
+                : currentTarget;
+            
+            if (!productElement.data('product-id')) {
+                return;
+            }
+
+            var price = productElement.data('product-price');
+            var categories = formatItemCategories(productElement.data('product-categories'));
+            var listName = productElement.data('product-list-name') || 'Product List';
+            var listIndex = productElement.data('product-list-index') || 0;
+
+            gtag('event', 'select_item', {
+                item_list_id: listName.toLowerCase().replace(/\s+/g, '_'),
+                item_list_name: listName,
+                items: [
+                    {
+                        item_id: productElement.data('product-id'),
+                        item_name: productElement.data('product-name'),
+                        price: price,
+                        index: listIndex,
+                        item_brand: productElement.data('product-brand'),
+                        ...categories,
+                    },
+                ],
+            });
+        });
+
+        $(document).on('bb-promotion-view', function (e, promotionData) {
+            if (!promotionData || !promotionData.items) {
+                return;
+            }
+
+            gtag('event', 'view_promotion', {
+                promotion_id: promotionData.id || '',
+                promotion_name: promotionData.name || '',
+                creative_name: promotionData.creative || '',
+                creative_slot: promotionData.slot || '',
+                location_id: promotionData.location || '',
+                items: promotionData.items
+            });
+        });
+
+        $(document).on('click', '[data-bb-toggle="promotion-link"]', function (e) {
+            var currentTarget = $(e.currentTarget);
+            
+            gtag('event', 'select_promotion', {
+                promotion_id: currentTarget.data('promotion-id') || '',
+                promotion_name: currentTarget.data('promotion-name') || '',
+                creative_name: currentTarget.data('promotion-creative') || '',
+                creative_slot: currentTarget.data('promotion-slot') || '',
+                location_id: currentTarget.data('promotion-location') || ''
+            });
+        });
+
+        var scrollDepths = [25, 50, 75, 90];
+        var scrolledDepths = [];
+        
+        $(window).on('scroll', function() {
+            var scrollTop = $(window).scrollTop();
+            var docHeight = $(document).height();
+            var winHeight = $(window).height();
+            var scrollPercent = Math.round((scrollTop / (docHeight - winHeight)) * 100);
+            
+            scrollDepths.forEach(function(depth) {
+                if (scrollPercent >= depth && scrolledDepths.indexOf(depth) === -1) {
+                    scrolledDepths.push(depth);
+                    gtag('event', 'scroll', {
+                        percent_scrolled: depth
+                    });
+                }
+            });
+        });
+
+        var startTime = Date.now();
+        var timeEngagementThresholds = [10, 30, 60, 120, 180];
+        var firedThresholds = [];
+        
+        setInterval(function() {
+            var timeOnPage = Math.round((Date.now() - startTime) / 1000);
+            
+            timeEngagementThresholds.forEach(function(threshold) {
+                if (timeOnPage >= threshold && firedThresholds.indexOf(threshold) === -1) {
+                    firedThresholds.push(threshold);
+                    gtag('event', 'user_engagement', {
+                        engagement_time_msec: threshold * 1000
+                    });
+                }
+            });
+        }, 5000);
     });
 </script>

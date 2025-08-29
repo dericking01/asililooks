@@ -234,6 +234,22 @@ return [
                 'digital_products' => 'plugins/ecommerce::email.digital_products',
             ],
         ],
+        'digital_product_license_codes' => [
+            'title' => 'plugins/ecommerce::email.digital_product_license_codes_title',
+            'description' => 'plugins/ecommerce::email.digital_product_license_codes_description',
+            'subject' => 'plugins/ecommerce::email.digital_product_license_codes_subject',
+            'can_off' => false,
+            'variables' => [
+                'customer_name' => 'plugins/ecommerce::ecommerce.customer_name',
+                'customer_phone' => 'plugins/ecommerce::ecommerce.customer_phone',
+                'customer_address' => 'plugins/ecommerce::ecommerce.customer_address',
+                'payment_method' => 'plugins/ecommerce::ecommerce.payment_method',
+                'order_note' => 'plugins/ecommerce::ecommerce.order_note',
+                'order_id' => 'plugins/ecommerce::ecommerce.order_id',
+                'digital_product_list' => 'plugins/ecommerce::email.digital_product_list',
+                'digital_products' => 'plugins/ecommerce::email.digital_products',
+            ],
+        ],
         'customer-deletion-request-confirmation' => [
             'title' => 'plugins/ecommerce::email.customer_deletion_request_confirmation_title',
             'description' => 'plugins/ecommerce::email.customer_deletion_request_confirmation_description',

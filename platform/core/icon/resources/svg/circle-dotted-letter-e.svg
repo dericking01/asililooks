@@ -1,3 +1,9 @@
+<!--
+tags: [echo, vowel, fifth-letter, end, execute, eagle, expect, entry, east, earth]
+category: Letters
+unicode: "ff7b"
+version: "3.11"
+-->
 <svg
   xmlns="http://www.w3.org/2000/svg"
   width="24"
@@ -8,8 +14,7 @@
   stroke-width="2"
   stroke-linecap="round"
   stroke-linejoin="round"
-  >
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+>
   <path d="M14 8h-4v8h4" />
   <path d="M10 12h2.5" />
   <path d="M7.5 4.21v.01" />

@@ -23,5 +23,5 @@
 @stop
 
 @push('footer')
-    <script type="text/javascript" src="{{ asset('vendor/core/core/js-validation/js/js-validation.js') }}?v={{ get_cms_version() }}"></script>
+    <script type="text/javascript" src="{{ asset('vendor/core/core/js-validation/js/js-validation.js') }}?v={{ EcommerceHelper::getAssetVersion() }}"></script>
 @endpush

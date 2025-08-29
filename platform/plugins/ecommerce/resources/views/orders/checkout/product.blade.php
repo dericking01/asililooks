@@ -57,9 +57,35 @@
             {!! render_product_options_html($cartItem->options['options'], $product->original_price) !!}
         @endif
 
+        @if (EcommerceHelper::isTaxEnabled() && $cartItem->taxRate > 0)
+            <p class="mb-0">
+                <small class="text-muted">
+                    {{ __('Tax') }}: {{ format_price($cartItem->tax * $cartItem->qty) }}
+                    @if ($cartItem->options && $cartItem->options->taxClasses)
+                        (
+                        @foreach ($cartItem->options->taxClasses as $taxName => $taxRate)
+                            {{ $taxName }} {{ $taxRate }}%@if (!$loop->last), @endif
+                        @endforeach
+                        )
+                    @elseif ($cartItem->taxRate > 0)
+                        ({{ $cartItem->taxRate }}%)
+                    @endif
+                </small>
+            </p>
+        @endif
+
         {!! apply_filters('ecommerce_cart_after_item_content', null, $cartItem) !!}
     </div>
     <div class="col-auto text-end">
-        <p>{{ format_price($cartItem->price) }}</p>
+        <p class="mb-1">{{ format_price($cartItem->price) }}</p>
+        @if (EcommerceHelper::isTaxEnabled() && $cartItem->tax > 0)
+            <p class="mb-0">
+                <small class="text-muted">{{ __('Total') }}: {{ format_price(($cartItem->price + $cartItem->tax) * $cartItem->qty) }}</small>
+            </p>
+        @else
+            <p class="mb-0">
+                <small class="text-muted">{{ __('Total') }}: {{ format_price($cartItem->price * $cartItem->qty) }}</small>
+            </p>
+        @endif
     </div>
 </div>

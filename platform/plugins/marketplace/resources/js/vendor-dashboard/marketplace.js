@@ -20,6 +20,40 @@
         })
     }
 
+    function handleMenuToggle() {
+        // Handle menu toggle for 2-level menus
+        $('.menu a.submenu-toggle').on('click', function(e) {
+            e.preventDefault()
+
+            const $this = $(this)
+            const targetId = $this.attr('data-bs-target')
+            const $submenu = $(targetId)
+            const isExpanded = $this.attr('aria-expanded') === 'true'
+
+            // Toggle the submenu
+            if (isExpanded) {
+                $submenu.removeClass('show')
+                $this.attr('aria-expanded', 'false')
+            } else {
+                $submenu.addClass('show')
+                $this.attr('aria-expanded', 'true')
+            }
+        })
+
+        // Handle submenu item clicks
+        $('.menu-submenu a').on('click', function() {
+            // Remove active class from all menu items
+            $('.menu a').removeClass('active')
+            $('.menu-submenu a').removeClass('active')
+
+            // Add active class to clicked item
+            $(this).addClass('active')
+
+            // Add active class to parent menu item
+            $(this).closest('.has-children').find('> a').addClass('active')
+        })
+    }
+
     function tabs() {
         $('.ps-tab-list  li > a ').on('click', function(e) {
             e.preventDefault()
@@ -45,6 +79,7 @@
     $(function() {
         tabs()
         handleToggleDrawer()
+        handleMenuToggle()
 
         $('.custom-select-image').on('click', function(event) {
             event.preventDefault()

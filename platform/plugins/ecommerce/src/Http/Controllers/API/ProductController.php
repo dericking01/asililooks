@@ -2,8 +2,8 @@
 
 namespace Botble\Ecommerce\Http\Controllers\API;
 
+use Botble\Api\Http\Controllers\BaseApiController;
 use Botble\Base\Enums\BaseStatusEnum;
-use Botble\Base\Http\Controllers\BaseController;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Http\Resources\API\AvailableProductResource;
 use Botble\Ecommerce\Http\Resources\API\ProductDetailResource;
@@ -18,6 +18,7 @@ use Botble\Ecommerce\Repositories\Interfaces\ProductInterface;
 use Botble\Ecommerce\Services\Products\GetProductService;
 use Botble\Ecommerce\Services\Products\GetProductWithCrossSalesBySlugService;
 use Botble\Ecommerce\Services\Products\ProductCrossSalePriceService;
+use Botble\Ecommerce\Services\Products\ProductImageService;
 use Botble\Ecommerce\Services\Products\UpdateDefaultProductService;
 use Botble\Media\Facades\RvMedia;
 use Botble\Slug\Facades\SlugHelper;
@@ -26,7 +27,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
-class ProductController extends BaseController
+class ProductController extends BaseApiController
 {
     public function __construct(
         protected ProductCrossSalePriceService $productCrossSalePriceService
@@ -49,8 +50,8 @@ class ProductController extends BaseController
      * @queryParam discounted_only boolean Filter by discounted only. No-example
      * @queryParam min_price int Minimum price. No-example
      * @queryParam max_price int Maximum price. No-example
-     * @queryParam price_ranges array[] Price ranges. Example: [{"from": 10, "to": 20}, {"from": 30, "to": 40}]
-     * @queryParam attributes array[] Attributes. Example: [{"id": 1, "value": 1}, {"id": 2, "value": 2}]
+     * @queryParam price_ranges string Price ranges as JSON string. Example: [{"from":10,"to":20},{"from":30,"to":40}]
+     * @queryParam attributes string Attributes as JSON string. Example: [{"id":1,"value":1},{"id":2,"value":2}]
      *
      * @return JsonResponse
      */
@@ -358,8 +359,10 @@ class ProductController extends BaseController
 
         $star = $request->integer('star');
         $perPage = $request->integer('per_page', 10);
+        $search = $request->string('search', '');
+        $sortBy = $request->string('sort_by', 'newest');
 
-        $reviews = EcommerceHelper::getProductReviews($product, $star, $perPage);
+        $reviews = EcommerceHelper::getProductReviews($product, $star, $perPage, $search, $sortBy);
 
         // Check if the current user has reviewed this product
         $hasReviewed = false;
@@ -407,7 +410,7 @@ class ProductController extends BaseController
      * @param ProductInterface $productRepository
      * @param GetProductWithCrossSalesBySlugService $getProductWithCrossSalesBySlugService
      *
-     * @queryParam attributes array Array of attribute IDs. Example: [1, 2]
+     * @queryParam attributes string[] Array of attribute IDs. Example: 1,2
      * @queryParam reference_product string Reference product slug. No-example
      */
     public function getProductVariation(
@@ -487,33 +490,8 @@ class ProductController extends BaseController
         }
 
         if ($product) {
-            if ($product->images) {
-                $originalImages = $product->images;
-
-                if (get_ecommerce_setting(
-                    'how_to_display_product_variation_images'
-                ) == 'variation_images_and_main_product_images') {
-                    $parentImages = is_array(
-                        $product->original_images
-                    ) ? $product->original_images : (array) json_decode($product->original_images, true);
-
-                    if ($parentImages) {
-                        $originalImages = array_merge($originalImages, $parentImages);
-                    }
-                }
-            } else {
-                $originalImages = $product->original_images ?: $product->original_product->images;
-
-                if (! is_array($originalImages)) {
-                    $originalImages = json_decode($originalImages, true);
-                }
-            }
-
-            $product->image_with_sizes = rv_get_image_list($originalImages, array_unique([
-                'origin',
-                'thumb',
-                ...array_keys(RvMedia::getSizes()),
-            ]));
+            $imageData = app(ProductImageService::class)->getProductImagesWithSizes($product);
+            $product->image_with_sizes = $imageData['image_with_sizes'];
 
             if ($product->stock_status == 'on_backorder') {
                 $product->warningMessage = __('Warning: This product is on backorder and may take longer to ship.');

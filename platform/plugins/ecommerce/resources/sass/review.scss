@@ -178,136 +178,6 @@
                 color: #fab528;
             }
         }
-
-        .ecommerce-image-viewer__item {
-            position: relative;
-            -webkit-transition: all 0.3s cubic-bezier(0.46, 0.03, 0.52, 0.96);
-            transition: all 0.3s cubic-bezier(0.46, 0.03, 0.52, 0.96);
-            text-align: initial;
-            margin-right: 2px;
-            background-color: #eee;
-            width: 70px;
-            height: 70px;
-            border: 1px solid #c4c6cf;
-            margin-top: 5px;
-
-            img {
-                height: 100%;
-                width: 100%;
-                object-fit: contain;
-            }
-        }
-
-        .ecommerce-image-upload__uploader-container {
-            display: inline-block;
-
-            &:hover {
-                cursor: pointer;
-            }
-
-            .ecommerce-image-upload__uploader {
-                width: 70px;
-                height: 70px;
-                border: 1px dashed #c4c6cf;
-                -webkit-box-orient: vertical;
-                -webkit-box-direction: normal;
-                -ms-flex-direction: column;
-                flex-direction: column;
-                -webkit-box-pack: center;
-                -ms-flex-pack: center;
-                justify-content: center;
-                -webkit-box-align: center;
-                -ms-flex-align: center;
-                align-items: center;
-                position: relative;
-                display: -webkit-box;
-                display: -ms-flexbox;
-                display: flex;
-
-                &:hover {
-                    background: #d9edf7;
-
-                    .ecommerce-image-upload__file-input {
-                        cursor: pointer;
-                    }
-                }
-            }
-        }
-
-        .ecommerce-image-upload__icon {
-            color: #333;
-            font-size: 20px;
-            margin-bottom: 8px;
-        }
-
-        .ecommerce-image-upload__text {
-            color: #333;
-            font-size: 10px;
-            padding: 0 3px;
-            text-align: center;
-        }
-
-        .ecommerce-image-upload__file-input {
-            position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .ecommerce-image-viewer__item {
-            display: inline-block;
-        }
-
-        .ecommerce-image-viewer__list {
-            display: block;
-            width: 100%;
-        }
-
-        .ecommerce-image-viewer__icon-remove {
-            position: absolute;
-            top: -1px;
-            right: 2px;
-            z-index: 1;
-            cursor: pointer;
-
-            i {
-                color: #ffffff;
-                background: #848484;
-                border-radius: 50%;
-                display: inline-block;
-                width: 20px;
-                height: 20px;
-                text-align: center;
-                line-height: 20px;
-                font-size: 10px;
-            }
-        }
-
-        .ecommerce-image-viewer__list.is-loading {
-            .loading {
-                display: block !important;
-            }
-        }
-
-        .ecommerce-image-upload__viewer {
-            .ecommerce-image-viewer__list {
-                .loading {
-                    position: absolute;
-                    width: 100%;
-                    background-color: rgba(146, 162, 177, 52%);
-                    top: 0;
-                    bottom: 0;
-                    display: none;
-
-                    .half-circle-spinner {
-                        width: 30px;
-                        height: 30px;
-                    }
-                }
-            }
-        }
     }
 }
 
@@ -332,4 +202,134 @@
 .required:after {
     color: #cb4321;
     content: ' *';
+}
+
+.ecommerce-image-viewer__item {
+    position: relative;
+    -webkit-transition: all 0.3s cubic-bezier(0.46, 0.03, 0.52, 0.96);
+    transition: all 0.3s cubic-bezier(0.46, 0.03, 0.52, 0.96);
+    text-align: initial;
+    margin-right: 2px;
+    background-color: #eee;
+    width: 70px;
+    height: 70px;
+    border: 1px solid #c4c6cf;
+    margin-top: 5px;
+
+    img {
+        height: 100%;
+        width: 100%;
+        object-fit: contain;
+    }
+}
+
+.ecommerce-image-upload__uploader-container {
+    display: inline-block;
+
+    &:hover {
+        cursor: pointer;
+    }
+
+    .ecommerce-image-upload__uploader {
+        width: 70px;
+        height: 70px;
+        border: 1px dashed #c4c6cf;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
+        position: relative;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+
+        &:hover {
+            background: #d9edf7;
+
+            .ecommerce-image-upload__file-input {
+                cursor: pointer;
+            }
+        }
+    }
+}
+
+.ecommerce-image-upload__icon {
+    color: #333;
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+.ecommerce-image-upload__text {
+    color: #333;
+    font-size: 10px;
+    padding: 0 3px;
+    text-align: center;
+}
+
+.ecommerce-image-upload__file-input {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.ecommerce-image-viewer__item {
+    display: inline-block;
+}
+
+.ecommerce-image-viewer__list {
+    display: block;
+    width: 100%;
+}
+
+.ecommerce-image-viewer__icon-remove {
+    position: absolute;
+    top: -1px;
+    right: 2px;
+    z-index: 1;
+    cursor: pointer;
+
+    i {
+        color: #ffffff;
+        background: #848484;
+        border-radius: 50%;
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        text-align: center;
+        line-height: 20px;
+        font-size: 10px;
+    }
+}
+
+.ecommerce-image-viewer__list.is-loading {
+    .loading {
+        display: block !important;
+    }
+}
+
+.ecommerce-image-upload__viewer {
+    .ecommerce-image-viewer__list {
+        .loading {
+            position: absolute;
+            width: 100%;
+            background-color: rgba(146, 162, 177, 52%);
+            top: 0;
+            bottom: 0;
+            display: none;
+
+            .half-circle-spinner {
+                width: 30px;
+                height: 30px;
+            }
+        }
+    }
 }

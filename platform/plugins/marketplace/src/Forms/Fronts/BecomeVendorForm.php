@@ -55,7 +55,9 @@ class BecomeVendorForm extends FormAbstract
                     ->placeholder(__('Store URL'))
                     ->attributes([
                         'data-url' => route('public.ajax.check-store-url'),
+                        'style' => 'direction: ltr; text-align: left;',
                     ])
+                    ->wrapperAttributes(['class' => 'shop-url-wrapper mb-3 position-relative'])
                     ->prepend(
                         sprintf(
                             '<span class="position-absolute top-0 end-0 shop-url-status"></span><div class="input-group"><span class="input-group-text">%s</span>',
@@ -63,6 +65,7 @@ class BecomeVendorForm extends FormAbstract
                         )
                     )
                     ->append('</div>')
+                    ->helperText(__('plugins/marketplace::store.forms.shop_url_helper'))
                     ->required(),
             )
             ->add(

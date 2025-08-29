@@ -36,7 +36,14 @@ class SvgDriver extends IconDriver
 
         $contents = $this->getContents($name);
 
+        // Remove XML declaration
         $contents = trim(preg_replace('/^(<\?xml.+?\?>)/', '', $contents));
+
+        // Remove HTML comments (including multi-line comments)
+        $contents = preg_replace('/<!--.*?-->/s', '', $contents);
+
+        // Clean up any extra whitespace
+        $contents = trim($contents);
 
         return str_replace(
             '<svg',

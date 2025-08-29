@@ -4,6 +4,7 @@ namespace Botble\Ecommerce\Http\Controllers\Customers;
 
 use Botble\Ecommerce\Enums\OrderCancellationReasonEnum;
 use Botble\Ecommerce\Enums\OrderHistoryActionEnum;
+use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Facades\InvoiceHelper;
 use Botble\Ecommerce\Facades\OrderHelper;
 use Botble\Ecommerce\Forms\Fronts\CancelOrderForm;
@@ -20,7 +21,7 @@ class OrderController extends BaseController
 {
     public function __construct()
     {
-        $version = get_cms_version();
+        $version = EcommerceHelper::getAssetVersion();
 
         Theme::asset()
             ->add('customer-style', 'vendor/core/plugins/ecommerce/css/customer.css', ['bootstrap-css'], version: $version);

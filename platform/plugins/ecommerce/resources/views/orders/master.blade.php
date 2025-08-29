@@ -102,5 +102,45 @@
 
     {!! apply_filters('ecommerce_checkout_footer', null) !!}
 
+    <script>
+        // Initialize floating labels for checkout forms
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add placeholder=" " to all inputs in form-input-wrapper to enable :placeholder-shown
+            document.querySelectorAll('.form-input-wrapper input.form-control').forEach(function(input) {
+                if (!input.hasAttribute('placeholder')) {
+                    input.setAttribute('placeholder', ' ');
+                }
+                
+                // Check if input has value on load (for autofilled or pre-filled fields)
+                if (input.value && input.value.trim() !== '') {
+                    input.classList.add('has-value');
+                }
+                
+                // Add/remove class on input change
+                input.addEventListener('input', function() {
+                    if (this.value && this.value.trim() !== '') {
+                        this.classList.add('has-value');
+                    } else {
+                        this.classList.remove('has-value');
+                    }
+                });
+                
+                // Handle autofill
+                input.addEventListener('change', function() {
+                    if (this.value && this.value.trim() !== '') {
+                        this.classList.add('has-value');
+                    } else {
+                        this.classList.remove('has-value');
+                    }
+                });
+            });
+            
+            // Handle select elements - they should always have floating labels
+            document.querySelectorAll('.form-input-wrapper select.form-control').forEach(function(select) {
+                select.classList.add('has-value');
+            });
+        });
+    </script>
+
 </body>
 </html>

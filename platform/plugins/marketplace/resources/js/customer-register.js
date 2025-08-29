@@ -55,7 +55,7 @@ $(() => {
             autoProcessQueue: false,
             paramName: 'certificate_file',
             maxFiles: 1,
-            acceptedFiles: '.pdf,.jpg,.jpeg,.png',
+            acceptedFiles: '.pdf,.jpg,.jpeg,.png,.webp',
             addRemoveLinks: true,
             dictDefaultMessage: $('#certificate-dropzone').data('placeholder'),
             maxfilesexceeded: function(file) {
@@ -68,7 +68,7 @@ $(() => {
             autoProcessQueue: false,
             paramName: 'government_id_file',
             maxFiles: 1,
-            acceptedFiles: '.pdf,.jpg,.jpeg,.png',
+            acceptedFiles: '.pdf,.jpg,.jpeg,.png,.webp',
             addRemoveLinks: true,
             dictDefaultMessage: $('#government-id-dropzone').data('placeholder'),
             maxfilesexceeded: function(file) {

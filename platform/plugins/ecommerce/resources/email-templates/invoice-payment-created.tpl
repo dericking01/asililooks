@@ -14,24 +14,24 @@
                         </tr>
                     </tbody>
                 </table>
-                <h1 class="bb-text-center bb-m-0 bb-mt-md">Invoice Payment Detail</h1>
+                <h1 class="bb-text-center bb-m-0 bb-mt-md">{{ 'plugins/ecommerce::email-templates.invoice_payment_created_title' | trans }}</h1>
             </td>
         </tr>
         <tr>
             <td class="bb-content">
-                <p class="h1">Dear {{ customer_name }},</p>
-                <p>You're receiving email from <strong>{{ site_title }}</p>
+                <p class="h1">{{ 'plugins/ecommerce::email-templates.invoice_payment_created_greeting' | trans({'customer_name': customer_name}) }}</p>
+                <p>{{ 'plugins/ecommerce::email-templates.invoice_payment_created_message' | trans({'site_title': site_title}) | raw }}</p>
 
                 {% if invoice_link %}
-                    <p>The invoice <a href="{{ invoice_link }}">{{ invoice_code }}</a> is attached with this email.</p>
+                    <p>{{ 'plugins/ecommerce::email-templates.invoice_payment_created_invoice_link_message' | trans({'invoice_link': invoice_link, 'invoice_code': invoice_code}) | raw }}</p>
 
                     <div class="bb-pt-md bb-text-center">
                         <a href="{{ invoice_link }}" class="bb-btn bb-bg-blue bb-border-blue">
-                            <span class="btn-span">View Online</span>
+                            <span class="btn-span">{{ 'plugins/ecommerce::email-templates.invoice_payment_created_view_online' | trans }}</span>
                         </a>
                     </div>
                 {% else %}
-                    <p>The invoice {{ invoice_code }} is attached with this email.</p>
+                    <p>{{ 'plugins/ecommerce::email-templates.invoice_payment_created_invoice_message' | trans({'invoice_code': invoice_code}) }}</p>
                 {% endif %}
             </td>
         </tr>

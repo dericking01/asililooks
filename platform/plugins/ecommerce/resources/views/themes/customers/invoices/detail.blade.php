@@ -143,7 +143,7 @@
                         <p class="font-sm">
                             @if ($invoice->created_at)
                                 <strong>{{ trans('plugins/ecommerce::invoice.detail.issue_at') }}:</strong>
-                                {{ $invoice->created_at->format('j F, Y') }}<br>
+                                {{ $invoice->created_at->translatedFormat('j F, Y') }}<br>
                             @endif
                             @if ($invoice->company_name)
                                 <strong>{{ trans('plugins/ecommerce::invoice.detail.invoice_to') }}:</strong>

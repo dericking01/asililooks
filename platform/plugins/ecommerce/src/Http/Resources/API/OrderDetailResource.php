@@ -6,6 +6,7 @@ use Botble\Ecommerce\Models\Order;
 use Botble\Media\Facades\RvMedia;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @mixin Order
@@ -59,6 +60,7 @@ class OrderDetailResource extends JsonResource
             'payment_method' => $this->payment->payment_channel ?? null,
             'payment_status' => $this->payment->status ?? null,
             'payment_status_html' => $this->payment->status->toHtml() ?? null,
+            'payment_proof' => $this->getPaymentProofInfo(),
             'products' => $this->getProductData(),
             'discount_amount' => $this->discount_amount,
             'discount_amount_formatted' => format_price($this->discount_amount),
@@ -130,5 +132,52 @@ class OrderDetailResource extends JsonResource
 
             return $item;
         });
+    }
+
+    private function getPaymentProofInfo(): array
+    {
+        if (! $this->proof_file) {
+            return [
+                'has_proof' => false,
+                'file_name' => null,
+                'file_size' => null,
+                'uploaded_at' => null,
+                'download_url' => null,
+            ];
+        }
+
+        $storage = Storage::disk('local');
+        $fileName = null;
+        $fileSize = null;
+
+        if ($storage->exists($this->proof_file)) {
+            $fileName = basename($this->proof_file);
+            $fileSize = $storage->size($this->proof_file);
+        }
+
+        return [
+            'has_proof' => true,
+            'file_name' => $fileName,
+            'file_size' => $fileSize,
+            'file_size_formatted' => $fileSize ? $this->formatFileSize($fileSize) : null,
+            'uploaded_at' => $this->updated_at?->translatedFormat('Y-m-d\TH:i:sP'),
+            'download_url' => route('api.ecommerce.orders.download-proof-file', [
+                'token' => hash('sha256', $this->proof_file),
+                'order_id' => $this->id,
+            ]),
+        ];
+    }
+
+    private function formatFileSize(int $bytes): string
+    {
+        if ($bytes >= 1073741824) {
+            return number_format($bytes / 1073741824, 2) . ' GB';
+        } elseif ($bytes >= 1048576) {
+            return number_format($bytes / 1048576, 2) . ' MB';
+        } elseif ($bytes >= 1024) {
+            return number_format($bytes / 1024, 2) . ' KB';
+        }
+
+        return $bytes . ' bytes';
     }
 }

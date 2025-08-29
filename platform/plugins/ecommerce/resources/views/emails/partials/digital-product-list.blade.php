@@ -10,6 +10,9 @@
             <th style="text-align: left">
                 {{ trans('plugins/ecommerce::products.download') }}
             </th>
+            <th style="text-align: left">
+                {{ trans('plugins/ecommerce::products.license_codes.code') }}
+            </th>
         </tr>
 
         @foreach ($order->digitalProducts() as $orderProduct)
@@ -41,6 +44,15 @@
                         <div>
                             <a href="{{ $orderProduct->download_external_url }}">{{ __('External link downloads') }}</a>
                         </div>
+                    @endif
+                </td>
+                <td>
+                    @if ($orderProduct->license_code)
+                        <code style="background-color: #f8f9fa; padding: 4px 8px; border-radius: 4px; font-family: monospace;">
+                            {{ $orderProduct->license_code }}
+                        </code>
+                    @else
+                        <span style="color: #6c757d;">{{ __('N/A') }}</span>
                     @endif
                 </td>
             </tr>

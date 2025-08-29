@@ -1,19 +1,18 @@
 @extends(BaseHelper::getAdminMasterLayoutTemplate())
+
 @section('content')
-    <div class="flexbox-grid">
-        <div class="flexbox-content">
-            <div class="body">
-                <div class="box-wrap-emptyTmpl text-center col-12">
-                    <h1 class="mt20 mb20 ws-nm font-size-emptyDisplayTmpl">
-                        {{ trans('plugins/ecommerce::product-categories.intro.title') }}</h1>
-                    <p class="text-info-displayTmpl">{{ trans('plugins/ecommerce::product-categories.intro.description') }}
-                    </p>
-                    <div class="empty-displayTmpl-pdtop">
-                        <div class="empty-displayTmpl-image">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 518 270"
-                            >
+    <x-plugins-ecommerce::intro
+        :title="trans('plugins/ecommerce::product-categories.intro.title')"
+        :subtitle="trans('plugins/ecommerce::product-categories.intro.description')"
+        :action-url="route('product-categories.create')"
+        :action-label="trans('plugins/ecommerce::product-categories.intro.button_text')"
+    >
+        <x-slot:icon>
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 518 270"
+                width="500px"
+            >
                                 <path
                                     fill="#D3DCE6"
                                     d="M409.064 190.02h-137.98a.992.992 0 0 1-.994-.993V.994c0-.55.445-.994.995-.994h137.98c.55 0 .994.445.994.994v188.033c0 .55-.45.994-1 .994zm-136.985-1.987h135.99V1.988H272.08v186.045z"
@@ -725,16 +724,14 @@
                                     d="M176.652 243.646a.994.994 0 0 1-.995-.994V226.31a.994.994 0 1 1 1.99 0v16.342c0 .55-.446.994-.995.994z"
                                 ></path>
                             </svg>
-                        </div>
-                    </div>
-                    <div class="empty-displayTmpl-btn">
-                        <a
-                            class="btn btn-primary btn-lg"
-                            href="{{ route('product-categories.create') }}"
-                        >{{ trans('plugins/ecommerce::product-categories.intro.button_text') }}</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                        </x-slot:icon>
+
+                        @if (Auth::user()->hasPermission('product-categories.import'))
+                            <x-slot:extra>
+                                <div class="mt-3">
+                                    <a href="{{ route('tools.data-synchronize.import.product-categories.index') }}">{{ trans('plugins/ecommerce::product-categories.import.description') }}</a>
+                                </div>
+                            </x-slot:extra>
+                        @endif
+                    </x-plugins-ecommerce::intro>
 @stop

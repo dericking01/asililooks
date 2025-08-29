@@ -43,12 +43,17 @@ class InvoiceHelper
         $invoiceData = [
             'reference_id' => $order->getKey(),
             'reference_type' => Order::class,
-            'customer_name' => $taxInformation ? $taxInformation->company_name : ($address->name ?: $order->user->name),
             'company_name' => '',
             'company_logo' => null,
+            'customer_name' => $taxInformation ? $taxInformation->company_name : ($address->name ?: $order->user->name),
             'customer_email' => $taxInformation ? $taxInformation->company_email : ($address->email ?: $order->user->email),
             'customer_phone' => $taxInformation ? $taxInformation->company_phone : $address->phone,
             'customer_address' => $taxInformation ? $taxInformation->company_address : $address->full_address,
+            'customer_country' => $address->country_name,
+            'customer_state' => $address->state_name,
+            'customer_city' => $address->city_name,
+            'customer_zip_code' => $address->zip_code,
+            'customer_address_line' => $address->address,
             'customer_tax_id' => $taxInformation?->company_tax_code,
             'payment_id' => null,
             'status' => InvoiceStatusEnum::COMPLETED,
@@ -232,6 +237,41 @@ class InvoiceHelper
             return $item;
         });
 
+        $taxGroups = [];
+        $hasMultipleProducts = $invoice->items->count() > 1;
+        $hasProductOptions = false;
+
+        foreach ($invoice->items as $item) {
+            if (! $hasProductOptions && ! empty($item->options) &&
+                (! empty($item->options['attributes']) || ! empty($item->options['product_options']) || ! empty($item->options['license_code']))) {
+                $hasProductOptions = true;
+            }
+
+            if ($item->tax_amount > 0 && ! empty($item->options['taxClasses'])) {
+                foreach ($item->options['taxClasses'] as $taxName => $taxRate) {
+                    $taxKey = $taxName . ' - ' . $taxRate . '%';
+                    if (! isset($taxGroups[$taxKey])) {
+                        $taxGroups[$taxKey] = 0;
+                    }
+                    $taxGroups[$taxKey] += $item->tax_amount;
+                }
+            }
+        }
+
+        // Fix rounding discrepancies between total tax and sum of individual tax amounts
+        if ($taxGroups) {
+            $taxGroupsTotal = array_sum($taxGroups);
+            $invoiceTaxTotal = $invoice->tax_amount;
+
+            // If there's a small rounding difference (typically 0.01), adjust the largest tax group
+            $difference = round($invoiceTaxTotal - $taxGroupsTotal, 2);
+            if (abs($difference) > 0 && abs($difference) <= 0.02) {
+                // Find the largest tax group and adjust it
+                $largestTaxKey = array_keys($taxGroups, max($taxGroups))[0];
+                $taxGroups[$largestTaxKey] += $difference;
+            }
+        }
+
         $data = [
             'invoice' => $invoice->toArray(),
             'logo' => $logo,
@@ -266,9 +306,16 @@ class InvoiceHelper
             'ecommerce_invoice_footer' => apply_filters('ecommerce_invoice_footer', null, $invoice),
             'invoice_payment_info_filter' => apply_filters('invoice_payment_info_filter', null, $invoice),
             'tax_classes_name' => $invoice->taxClassesName,
+            'tax_groups' => $taxGroups,
+            'has_multiple_products' => $hasMultipleProducts,
+            'has_product_options' => $hasProductOptions,
+            'summary_colspan' => 4 + ($hasMultipleProducts ? 1 : 0),
         ];
 
         $data['settings']['font_css'] = null;
+
+        $invoiceCssPath = plugin_path('ecommerce/resources/templates/invoice.css');
+        $data['invoice_css'] = file_exists($invoiceCssPath) ? file_get_contents($invoiceCssPath) : '';
 
         if ($data['settings']['using_custom_font_for_invoice'] && $data['settings']['font_family']) {
             $data['settings']['font_css'] = BaseHelper::googleFonts(
@@ -380,6 +427,15 @@ class InvoiceHelper
             'company_phone' => trans('plugins/ecommerce::invoice-template.variables.company_phone'),
             'company_email' => trans('plugins/ecommerce::invoice-template.variables.company_email'),
             'company_tax_id' => trans('plugins/ecommerce::invoice-template.variables.company_tax_id'),
+            'customer_name' => trans('plugins/ecommerce::invoice-template.variables.customer_name'),
+            'customer_email' => trans('plugins/ecommerce::invoice-template.variables.customer_email'),
+            'customer_phone' => trans('plugins/ecommerce::invoice-template.variables.customer_phone'),
+            'customer_address' => trans('plugins/ecommerce::invoice-template.variables.customer_address'),
+            'customer_country' => trans('plugins/ecommerce::invoice-template.variables.customer_country'),
+            'customer_state' => trans('plugins/ecommerce::invoice-template.variables.customer_state'),
+            'customer_city' => trans('plugins/ecommerce::invoice-template.variables.customer_city'),
+            'customer_zip_code' => trans('plugins/ecommerce::invoice-template.variables.customer_zipcode'),
+            'customer_address_line' => trans('plugins/ecommerce::invoice-template.variables.customer_address_line'),
             'payment_method' => __('Payment method'),
             'payment_status' => __('Payment status'),
             'payment_description' => __('Payment description'),
@@ -459,25 +515,13 @@ class InvoiceHelper
         ];
     }
 
-    /**
-     * Get the URL to view/print an invoice
-     *
-     * @param Invoice $invoice
-     * @return string
-     */
     public function getInvoiceUrl(Invoice $invoice): string
     {
-        return route('customer.invoices.generate', $invoice->id) . '?type=print';
+        return route('customer.invoices.generate_invoice', $invoice->getKey()) . '?type=print';
     }
 
-    /**
-     * Get the URL to download an invoice
-     *
-     * @param Invoice $invoice
-     * @return string
-     */
     public function getInvoiceDownloadUrl(Invoice $invoice): string
     {
-        return route('customer.invoices.generate', $invoice->id);
+        return route('customer.invoices.generate_invoice', $invoice->getKey());
     }
 }

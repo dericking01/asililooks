@@ -49,6 +49,8 @@ if (! function_exists('get_products')) {
             ...$params,
         ];
 
+        $params = array_merge($params, EcommerceHelper::withReviewsParams());
+
         return app(ProductInterface::class)->getProducts($params, $filters);
     }
 }
@@ -278,7 +280,14 @@ if (! function_exists('get_related_products')) {
             $params['condition'][] = ['ec_products.id', 'IN', $relatedIds];
         } else {
             $params['condition'][] = ['ec_products.id', '!=', $product->getKey()];
-            $filters = ['categories' => $product->categories()->pluck('ec_product_categories.id')->all()];
+
+            $relatedProductsSource = get_ecommerce_setting('related_products_source', 'category');
+
+            if ($relatedProductsSource === 'brand' && $product->brand_id) {
+                $filters = ['brands' => [$product->brand_id]];
+            } else {
+                $filters = ['categories' => $product->categories()->pluck('ec_product_categories.id')->all()];
+            }
         }
 
         return app(ProductInterface::class)->filterProducts($filters, $params);

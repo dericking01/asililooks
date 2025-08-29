@@ -537,7 +537,6 @@ a, a:hover, a:focus, a:active {
     border-radius: 10px;
     width: 50px;
     height: 50px;
-    border-radius: 10px;
     background-color: #fff;
 }
 
@@ -1151,6 +1150,87 @@ a, a:hover, a:focus, a:active {
     opacity: 1;
 }
 
+.menu > li.has-children > a {
+    display: flex !important;
+    align-items: center;
+    padding-right: 15px;
+    gap: 5px;
+
+    .menu-arrow {
+        transition: transform 0.3s ease;
+        font-size: 14px;
+        flex-shrink: 0;
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    &.submenu-toggle {
+        cursor: pointer;
+
+        &:hover {
+            color: $primary-color;
+        }
+    }
+}
+
+.menu > li > a {
+    i {
+        margin-right: 12px !important;
+    }
+}
+
+.menu-submenu {
+    list-style: none;
+    padding: 0 0 0 20px !important;
+    margin: 0 0 0 15px !important;
+    transition: all 0.3s ease;
+    overflow: hidden;
+
+    &.collapse:not(.show) {
+        display: none;
+    }
+
+    &.collapse.show {
+        display: block;
+    }
+
+    li {
+        display: block;
+
+        a {
+            position: relative;
+            display: block;
+            padding: 8px 0;
+            font-size: 14px;
+            line-height: 18px;
+            color: #666;
+            font-weight: 400;
+            transition: all 0.3s ease;
+
+            i {
+                margin-right: 12px;
+                font-size: 14px;
+            }
+
+            &:hover,
+            &.active {
+                color: $primary-color;
+                padding-left: 10px;
+            }
+
+            &.active {
+                font-weight: 500;
+            }
+
+            &:after {
+                display: none !important;
+            }
+        }
+    }
+}
+
 .header--mobile {
     position: fixed;
     top: 0;
@@ -1471,4 +1551,102 @@ a, a:hover, a:focus, a:active {
 .ps-dashboard.report-chart-content .dashboard-widget-item .details .number {
     font-size: 35px;
     line-height: 55px;
+}
+
+// Store Verified Badge Styles
+.store-verified-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 4px;
+    vertical-align: middle;
+    position: relative;
+    
+    &.badge-xl {
+        margin-left: 8px;
+        
+        svg {
+            width: 28px;
+            height: 28px;
+        }
+    }
+    
+    &.badge-lg {
+        margin-left: 6px;
+        
+        svg {
+            width: 24px;
+            height: 24px;
+        }
+    }
+    
+    &.badge-md {
+        margin-left: 4px;
+        
+        svg {
+            width: 20px;
+            height: 20px;
+        }
+    }
+    
+    &.badge-sm {
+        margin-left: 3px;
+        
+        svg {
+            width: 16px;
+            height: 16px;
+        }
+    }
+    
+    svg {
+        width: 20px;
+        height: 20px;
+        color: #1d9bf0;
+        fill: currentColor;
+        transition: all 0.2s ease;
+    }
+    
+    &[data-bs-toggle="tooltip"] {
+        cursor: pointer;
+    }
+    
+    &:hover svg {
+        color: #1a8cd8;
+        transform: scale(1.1);
+    }
+}
+
+// Store name with verified badge inline
+.store-name-verified {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    
+    .store-verified-badge {
+        margin-left: 0;
+    }
+}
+
+// For store cards and listings
+.bb-store-item {
+    h4, .store-title {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        
+        .store-verified-badge {
+            margin-left: 0;
+        }
+    }
+}
+
+// For store detail banner
+.bb-shop-banner-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    
+    .store-verified-badge {
+        margin-left: 0;
+    }
 }

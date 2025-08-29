@@ -264,24 +264,30 @@ class OrderTable extends TableAbstract
 
     public function saveBulkChangeItem(Model|Order $item, string $inputKey, ?string $inputValue): Model|bool
     {
-        if ($inputKey === 'status' && $inputValue == OrderStatusEnum::CANCELED) {
-            /**
-             * @var Order $item
-             */
-            if (! $item->canBeCanceledByAdmin()) {
-                throw new Exception(trans('plugins/ecommerce::order.order_cannot_be_canceled'));
+        if ($inputKey === 'status') {
+            if ($inputValue == OrderStatusEnum::CANCELED) {
+                /**
+                 * @var Order $item
+                 */
+                if (! $item->canBeCanceledByAdmin()) {
+                    throw new Exception(trans('plugins/ecommerce::order.order_cannot_be_canceled'));
+                }
+
+                OrderHelper::cancelOrder($item);
+
+                OrderHistory::query()->create([
+                    'action' => OrderHistoryActionEnum::CANCEL_ORDER,
+                    'description' => trans('plugins/ecommerce::order.order_was_canceled_by'),
+                    'order_id' => $item->getKey(),
+                    'user_id' => Auth::id(),
+                ]);
+
+                return $item;
+            } elseif ($inputValue == OrderStatusEnum::COMPLETED) {
+                OrderHelper::setOrderCompleted($item->getKey(), request(), Auth::id());
+
+                return $item;
             }
-
-            OrderHelper::cancelOrder($item);
-
-            OrderHistory::query()->create([
-                'action' => OrderHistoryActionEnum::CANCEL_ORDER,
-                'description' => trans('plugins/ecommerce::order.order_was_canceled_by'),
-                'order_id' => $item->getKey(),
-                'user_id' => Auth::id(),
-            ]);
-
-            return $item;
         }
 
         return parent::saveBulkChangeItem($item, $inputKey, $inputValue);

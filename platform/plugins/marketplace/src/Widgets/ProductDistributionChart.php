@@ -29,8 +29,7 @@ class ProductDistributionChart extends Chart
                 'mp_stores.name',
                 DB::raw('COUNT(ec_products.id) as total_products'),
             ])
-            ->groupBy('mp_stores.id', 'mp_stores.name')
-            ->orderBy('total_products', 'desc')
+            ->groupBy('mp_stores.id', 'mp_stores.name')->latest('total_products')
             ->limit(10)
             ->get();
 

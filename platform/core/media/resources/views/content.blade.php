@@ -306,11 +306,11 @@
                         </form>
                     </div>
                 </div>
-                <div class="w-100 d-flex flex-wrap gap-3 p-2">
-                    <div class="d-flex w-100 w-md-auto align-items-center rv-media-breadcrumb">
+                <div class="row w-100 p-2">
+                    <div class="col p-2 d-flex align-items-center rv-media-breadcrumb">
                         <ul class="breadcrumb"></ul>
                     </div>
-                    <div class="d-flex justify-content-between justify-content-md-end align-items-center rv-media-tools w-100 w-md-auto">
+                    <div class="col-md-auto d-flex justify-content-between justify-content-md-end align-items-center rv-media-tools">
                         <div
                             class="btn-list"
                             role="group"
@@ -357,7 +357,7 @@
                         <x-core::button
                             tag="label"
                             for="media_details_collapse"
-                            class="collapse-panel ms-2 d-none d-sm-flex"
+                            class="collapse-panel ms-2 d-none d-lg-flex"
                             icon="ti ti-arrow-bar-right"
                             :icon-only="true"
                         />

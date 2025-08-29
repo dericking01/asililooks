@@ -2,9 +2,9 @@
 
 namespace Botble\Blog\Http\Controllers\API;
 
+use Botble\Api\Http\Controllers\BaseApiController;
 use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Facades\BaseHelper;
-use Botble\Base\Http\Controllers\BaseController;
 use Botble\Blog\Http\Resources\ListPostResource;
 use Botble\Blog\Http\Resources\PostResource;
 use Botble\Blog\Models\Post;
@@ -13,7 +13,7 @@ use Botble\Blog\Supports\FilterPost;
 use Botble\Slug\Facades\SlugHelper;
 use Illuminate\Http\Request;
 
-class PostController extends BaseController
+class PostController extends BaseApiController
 {
     public function __construct(protected PostInterface $postRepository)
     {
@@ -23,6 +23,30 @@ class PostController extends BaseController
      * List posts
      *
      * @group Blog
+     *
+     * @queryParam per_page integer The number of items to return per page (default: 10).
+     * @queryParam page integer The page number to retrieve (default: 1).
+     *
+     * @response 200 {
+     *   "error": false,
+     *   "data": [
+     *     {
+     *       "id": 1,
+     *       "title": "Sample Post",
+     *       "slug": "sample-post",
+     *       "excerpt": "This is a sample post excerpt",
+     *       "content": "Full post content here...",
+     *       "published_at": "2023-01-01T00:00:00.000000Z",
+     *       "author": {
+     *         "id": 1,
+     *         "name": "John Doe"
+     *       },
+     *       "categories": [],
+     *       "tags": []
+     *     }
+     *   ],
+     *   "message": null
+     * }
      */
     public function index(Request $request)
     {
@@ -45,9 +69,30 @@ class PostController extends BaseController
     /**
      * Search post
      *
+     * @group Blog
+     *
      * @bodyParam q string required The search keyword.
      *
-     * @group Blog
+     * @response 200 {
+     *   "error": false,
+     *   "data": {
+     *     "items": [
+     *       {
+     *         "id": 1,
+     *         "title": "Sample Post",
+     *         "slug": "sample-post",
+     *         "excerpt": "This is a sample post excerpt"
+     *       }
+     *     ],
+     *     "query": "sample",
+     *     "count": 1
+     *   }
+     * }
+     *
+     * @response 400 {
+     *   "error": true,
+     *   "message": "No search result"
+     * }
      */
     public function getSearch(Request $request, PostInterface $postRepository)
     {

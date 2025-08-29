@@ -2,8 +2,8 @@
 
 namespace Botble\Ecommerce\Http\Controllers\API;
 
+use Botble\Api\Http\Controllers\BaseApiController;
 use Botble\Base\Facades\EmailHandler;
-use Botble\Base\Http\Controllers\BaseController;
 use Botble\Ecommerce\Enums\OrderCancellationReasonEnum;
 use Botble\Ecommerce\Enums\OrderHistoryActionEnum;
 use Botble\Ecommerce\Facades\EcommerceHelper;
@@ -17,10 +17,11 @@ use Botble\Ecommerce\Models\Order;
 use Botble\Ecommerce\Models\OrderHistory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 
-class OrderController extends BaseController
+class OrderController extends BaseApiController
 {
     /**
      * Get list of orders by customer
@@ -190,11 +191,12 @@ class OrderController extends BaseController
      *
      * @param int $id
      * @param Request $request
-     * @return JsonResponse
+     * @return JsonResponse|Response
      *
      * @authenticated
      *
      * @queryParam type string Type of response (print or download). Example: download
+     * @queryParam format string Response format (url or pdf). Use 'pdf' for direct PDF content, 'url' for URL response. Default: url
      */
     public function getInvoice(int $id, Request $request)
     {
@@ -218,20 +220,46 @@ class OrderController extends BaseController
 
         abort_unless($order->isInvoiceAvailable(), 404);
 
-        if ($request->input('type') == 'print') {
-            $url = InvoiceHelper::getInvoiceUrl($order->invoice);
+        $format = $request->input('format', 'url');
+        $type = $request->input('type', 'download');
+
+        // If format is 'pdf', return the actual PDF content for Flutter apps
+        if ($format === 'pdf') {
+            if ($type === 'print') {
+                return InvoiceHelper::streamInvoice($order->invoice);
+            }
+
+            return InvoiceHelper::downloadInvoice($order->invoice);
+        }
+
+        // For URL format, return token-based URLs that work for API clients
+        $baseUrl = config('app.url');
+        $token = $request->bearerToken();
+
+        if ($type === 'print') {
+            // Return direct API URL with token for viewing
+            $url = $baseUrl . '/api/v1/ecommerce/orders/' . $id . '/invoice?format=pdf&type=print';
 
             return $this
                 ->httpResponse()
-                ->setData(['url' => $url])
+                ->setData([
+                    'url' => $url,
+                    'requires_auth' => true,
+                    'auth_header' => 'Bearer ' . $token,
+                ])
                 ->toApiResponse();
         }
 
-        $url = InvoiceHelper::getInvoiceDownloadUrl($order->invoice);
+        // Return direct API URL with token for downloading
+        $url = $baseUrl . '/api/v1/ecommerce/orders/' . $id . '/invoice?format=pdf&type=download';
 
         return $this
             ->httpResponse()
-            ->setData(['url' => $url])
+            ->setData([
+                'url' => $url,
+                'requires_auth' => true,
+                'auth_header' => 'Bearer ' . $token,
+            ])
             ->toApiResponse();
     }
 
@@ -324,7 +352,7 @@ class OrderController extends BaseController
      *
      * @param int $id
      * @param Request $request
-     * @return JsonResponse
+     * @return JsonResponse|mixed
      *
      * @authenticated
      */
@@ -349,10 +377,31 @@ class OrderController extends BaseController
 
         abort_unless($storage->exists($order->proof_file), 404);
 
-        // For API, we'll return a download URL instead of directly downloading the file
+        // Check if client wants direct file stream
+        $format = $request->input('format', 'url');
+
+        if ($format === 'stream' || $format === 'file') {
+            // Return the actual file
+            $file = $storage->path($order->proof_file);
+            $mimeType = $storage->mimeType($order->proof_file);
+            $fileName = basename($order->proof_file);
+
+            // Use 'attachment' for download, 'inline' for viewing
+            $disposition = $request->input('type', 'view') === 'download' ? 'attachment' : 'inline';
+
+            return response()->file($file, [
+                'Content-Type' => $mimeType,
+                'Content-Disposition' => $disposition . '; filename="' . $fileName . '"',
+                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                'Pragma' => 'no-cache',
+                'Expires' => '0',
+            ]);
+        }
+
+        // Default: return download URL
         $downloadUrl = route('api.ecommerce.orders.download-proof-file', [
             'token' => hash('sha256', $order->proof_file),
-            'filename' => basename($order->proof_file),
+            'order_id' => $order->id,
         ]);
 
         return $this
@@ -365,17 +414,22 @@ class OrderController extends BaseController
      * Download a proof file using a token
      *
      * @param string $token
-     * @param string $filename
+     * @param string $order_id
      * @return mixed
      */
-    public function downloadProofFile(string $token, string $filename)
+    public function downloadProofFile(string $token, string $order_id)
     {
+        $order = Order::query()->findOrFail($order_id);
+
+        abort_unless($order->proof_file, 404);
+
+        $expectedToken = hash('sha256', $order->proof_file);
+        abort_if($token !== $expectedToken, 404);
+
         $storage = Storage::disk('local');
-        $filePath = 'proofs/' . $filename;
+        abort_unless($storage->exists($order->proof_file), 404);
 
-        abort_if(! $storage->exists($filePath) || hash('sha256', $filePath) !== $token, 404);
-
-        return response()->download($storage->path($filePath));
+        return response()->download($storage->path($order->proof_file));
     }
 
     /**

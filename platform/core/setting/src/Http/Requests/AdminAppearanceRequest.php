@@ -17,6 +17,7 @@ class AdminAppearanceRequest extends Request
             'admin_logo' => ['nullable', 'string'],
             'admin_logo_max_height' => ['nullable', 'integer', 'min:10', 'max:300'],
             'admin_favicon' => ['nullable', 'string'],
+            'admin_favicon_type' => ['nullable', 'string', 'in:image/x-icon,image/png,image/svg+xml,image/gif,image/jpeg,image/webp'],
             'login_screen_backgrounds' => ['nullable', 'array'],
             'login_screen_backgrounds*' => ['string', 'required'],
             'admin_title' => ['nullable', 'string', 'max:255'],

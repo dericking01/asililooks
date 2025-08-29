@@ -51,6 +51,7 @@ class ProductVersionRequest extends Request
             'attribute_sets' => ['nullable', 'array'],
             'attribute_sets.*' => ['required'],
             'general_license_code' => ['nullable', 'in:0,1'],
+            'auto_generate_sku' => ['nullable', 'boolean'],
         ];
     }
 

@@ -121,6 +121,24 @@ class CustomerController extends BaseController
             ->withUpdatedSuccessMessage();
     }
 
+    public function resendVerificationEmail(int|string $id)
+    {
+        $customer = Customer::query()->findOrFail($id);
+
+        if ($customer->confirmed_at) {
+            return $this
+                ->httpResponse()
+                ->setError()
+                ->setMessage(trans('plugins/ecommerce::customer.email_already_verified'));
+        }
+
+        $customer->sendEmailVerificationNotification();
+
+        return $this
+            ->httpResponse()
+            ->setMessage(trans('plugins/ecommerce::customer.verification_email_sent'));
+    }
+
     public function getListCustomerForSelect()
     {
         $customers = Customer::query()
@@ -216,5 +234,24 @@ class CustomerController extends BaseController
     public function ajaxReviews(int|string $id, CustomerReviewTable $customerReviewTable)
     {
         return $customerReviewTable->customerId($id)->renderTable();
+    }
+
+    public function view($id)
+    {
+        $customer = Customer::query()->findOrFail($id);
+
+        $this->pageTitle(trans('plugins/ecommerce::customer.view', ['name' => $customer->name]));
+
+        Assets::addScriptsDirectly('vendor/core/plugins/ecommerce/js/customer.js');
+
+        $totalSpent = $customer->completedOrders()->sum('amount');
+        $totalOrders = $customer->orders()->count();
+        $completedOrders = $customer->completedOrders()->count();
+        $totalProducts = $customer->completedOrders()
+            ->withCount('products')
+            ->get()
+            ->sum('products_count');
+
+        return view('plugins/ecommerce::customers.view', compact('customer', 'totalSpent', 'totalOrders', 'completedOrders', 'totalProducts'));
     }
 }

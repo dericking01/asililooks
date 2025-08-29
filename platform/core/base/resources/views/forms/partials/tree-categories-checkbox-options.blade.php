@@ -21,7 +21,7 @@
                         'selected' => $selected,
                         'currentId' => $currentId,
                         'name' => $name,
-                        'class' => 'ms-4 mt-2'
+                        'class' => 'ms-3 me-0 mt-2'
                     ])
                 @endif
             </li>

@@ -2,8 +2,8 @@
 
 namespace Botble\Ecommerce\Http\Controllers\API;
 
+use Botble\Api\Http\Controllers\BaseApiController;
 use Botble\Base\Enums\BaseStatusEnum;
-use Botble\Base\Http\Controllers\BaseController;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Http\Requests\API\ReviewRequest;
 use Botble\Ecommerce\Http\Resources\API\ReviewResource;
@@ -14,7 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
-class ReviewController extends BaseController
+class ReviewController extends BaseApiController
 {
     use CheckReviewConditionForApiTrait;
 

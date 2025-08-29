@@ -88,42 +88,44 @@ class StripeConnectServiceProvider extends ServiceProvider
                 return $html . view('plugins/stripe-connect::withdrawal-payout-info');
             }, 999);
 
-            PayoutInformationForm::extend(function (PayoutInformationForm $form): void {
-                /**
-                 * @var Customer $customer
-                 */
-                $customer = $form->getModel();
+            if (is_plugin_active('marketplace')) {
+                PayoutInformationForm::extend(function (PayoutInformationForm $form): void {
+                    /**
+                     * @var Customer $customer
+                     */
+                    $customer = $form->getModel();
 
-                $form->when(! is_in_admin(true), function (PayoutInformationForm $form) use ($customer): void {
-                    $form->addAfter(
-                        'payout_payment_method',
-                        'stripe_connect',
-                        HtmlField::class,
-                        HtmlFieldOption::make()
-                            ->collapsible(
-                                'payout_payment_method',
-                                'stripe',
-                                $customer->vendorInfo->payout_payment_method
-                            )
-                            ->content(view('plugins/stripe-connect::stripe-connect', compact('customer')))
-                    );
-                }, function (PayoutInformationForm $form) use ($customer): void {
-                    $form->when(
-                        $customer->stripe_account_id,
-                        function (PayoutInformationForm $form) use ($customer): void {
-                            $form->addAfter(
-                                'payout_payment_method',
-                                'stripe_account_id',
-                                TextField::class,
-                                TextFieldOption::make()
-                                    ->label(trans('plugins/stripe-connect::stripe-connect.stripe_account_id'))
-                                    ->value($customer->stripe_account_id)
-                                    ->disabled()
-                            );
-                        }
-                    );
+                    $form->when(! is_in_admin(true), function (PayoutInformationForm $form) use ($customer): void {
+                        $form->addAfter(
+                            'payout_payment_method',
+                            'stripe_connect',
+                            HtmlField::class,
+                            HtmlFieldOption::make()
+                                ->collapsible(
+                                    'payout_payment_method',
+                                    'stripe',
+                                    $customer->vendorInfo->payout_payment_method
+                                )
+                                ->content(view('plugins/stripe-connect::stripe-connect', compact('customer')))
+                        );
+                    }, function (PayoutInformationForm $form) use ($customer): void {
+                        $form->when(
+                            $customer->stripe_account_id,
+                            function (PayoutInformationForm $form) use ($customer): void {
+                                $form->addAfter(
+                                    'payout_payment_method',
+                                    'stripe_account_id',
+                                    TextField::class,
+                                    TextFieldOption::make()
+                                        ->label(trans('plugins/stripe-connect::stripe-connect.stripe_account_id'))
+                                        ->value($customer->stripe_account_id)
+                                        ->disabled()
+                                );
+                            }
+                        );
+                    });
                 });
-            });
+            }
         });
     }
 }

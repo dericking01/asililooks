@@ -116,6 +116,7 @@
                             <span class="cart-checkout-top-title fw-bold">{{ __('Subtotal') }}</span>
                             <span data-bb-value="cart-subtotal" class="cart-checkout-top-price fw-bold">{{ format_price(Cart::instance('cart')->rawSubTotal()) }}</span>
                         </div>
+                        {!! apply_filters('ecommerce_cart_after_subtotal', null, Cart::instance('cart')->products()) !!}
                         @if (EcommerceHelper::isTaxEnabled())
                             <div class="cart-checkout-tax d-flex align-items-center justify-content-between mb-2">
                                 <span class="cart-checkout-tax-title">{{ __('Tax') }}</span>

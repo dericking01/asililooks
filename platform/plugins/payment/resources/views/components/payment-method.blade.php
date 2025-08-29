@@ -35,9 +35,9 @@
         @if ($feeValue > 0)
             <p class="text-warning">
                 @if ($feeType === \Botble\Payment\Enums\PaymentFeeTypeEnum::PERCENTAGE)
-                    {{ __('plugins/payment::payment.payment_fee') }}: {{ format_price($fee) }} ({{ $feeValue }}%)
+                    {{ trans('plugins/payment::payment.payment_fee') }}: {{ format_price($fee) }} ({{ $feeValue }}%)
                 @else
-                    {{ __('plugins/payment::payment.payment_fee') }}: {{ format_price($fee) }}
+                    {{ trans('plugins/payment::payment.payment_fee') }}: {{ format_price($fee) }}
                 @endif
                 <input type="hidden" name="payment_fee" value="{{ $fee }}" class="payment-fee-input" data-method="{{ $name }}">
             </p>

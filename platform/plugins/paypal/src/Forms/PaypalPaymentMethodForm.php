@@ -13,6 +13,7 @@ use Botble\Payment\Forms\PaymentMethodForm;
 class PaypalPaymentMethodForm extends PaymentMethodForm
 {
     use HasAvailableCountriesField;
+
     public function setup(): void
     {
         parent::setup();

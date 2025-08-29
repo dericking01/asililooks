@@ -67,7 +67,7 @@ class HookServiceProvider extends ServiceProvider
                 $paymentService = (new PaystackPaymentService());
                 $paymentDetail = $paymentService->getPaymentDetails($payment);
                 if ($paymentDetail) {
-                    $data = view(
+                    $data .= view(
                         'plugins/paystack::detail',
                         ['payment' => $paymentDetail, 'paymentModel' => $payment]
                     )->render();

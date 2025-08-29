@@ -7,10 +7,15 @@
         href="{{ $url }}"
     >
         @php
-            $social = $social === 'linkedin-openid' ? 'linkedin' : $social;
+            $iconName = $social;
+            if ($social === 'linkedin-openid') {
+                $iconName = 'linkedin';
+            } elseif ($social === 'x') {
+                $iconName = 'x';
+            }
         @endphp
 
-        <x-core::icon name="ti ti-brand-{{ $social }}" />
+        <x-core::icon name="ti ti-brand-{{ $iconName }}" />
         <span>{{ $label }}</span>
     </a>
 </li>

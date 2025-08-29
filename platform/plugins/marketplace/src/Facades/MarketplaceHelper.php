@@ -29,6 +29,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static array getAllowedSocialLinks()
  * @method static bool isSingleVendorCheckout()
  * @method static array mediaMimeTypesAllowed()
+ * @method static bool isEnabledVendorCategoriesFilter()
+ * @method static \Illuminate\Support\Collection getCategoriesForVendor(string|int $storeId)
  *
  * @see \Botble\Marketplace\Supports\MarketplaceHelper
  */

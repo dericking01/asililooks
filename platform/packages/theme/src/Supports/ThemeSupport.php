@@ -118,6 +118,8 @@ class ThemeSupport
                         'default_value' => 500,
                     ]);
             });
+
+        shortcode()->ignoreLazyLoading(['google-map']);
     }
 
     public static function getCustomJS(string $location): string
@@ -204,6 +206,7 @@ class ThemeSupport
                             'class' => 'form-control',
                         ],
                     ],
+                    'priority' => 35,
                 ])
                 ->when(count(static::getPreloaderVersions()) > 1, function () {
                     return theme_option()
@@ -220,6 +223,7 @@ class ThemeSupport
                                     'class' => 'form-control',
                                 ],
                             ],
+                            'priority' => 40,
                         ]);
                 });
         });
@@ -549,9 +553,9 @@ class ThemeSupport
         return static::convertSocialLinksToArray($data);
     }
 
-    public static function convertSocialLinksToArray(array $data): array
+    public static function convertSocialLinksToArray(array|string $data): array
     {
-        if (empty($data)) {
+        if (empty($data) || is_string($data)) {
             return [];
         }
 
@@ -687,6 +691,7 @@ class ThemeSupport
         ) {
             if (
                 AdminHelper::isInAdmin()
+                || request()->expectsJson()
                 || Arr::get($attributes, 'data-bb-lazy') !== 'true'
             ) {
                 return $html;
@@ -723,7 +728,7 @@ class ThemeSupport
                     });
 
                     document.addEventListener('shortcode.loaded', function () {
-                        Theme.lazyLoadInstance.update()
+                        Theme.lazyLoadInstance.update();
                     });
                 </script>
             HTML;
@@ -963,34 +968,50 @@ class ThemeSupport
 
     public static function renderGoogleTagManagerScript(): string
     {
-        $googleTagManagerCode = setting('google_tag_manager_code');
-        $googleTagManagerId = setting('google_tag_manager_id', setting('google_analytics'));
-        $renderType = setting(
-            'google_tag_manager_type',
-            $googleTagManagerCode ? 'code' : 'id'
-        );
+        return GoogleTagManagerEnhanced::renderGoogleTagManagerScript();
+    }
 
-        if (! BaseHelper::hasDemoModeEnabled() && $renderType === 'code' && $googleTagManagerCode) {
-            return trim($googleTagManagerCode);
+    public static function renderGoogleTagManagerNoscript(): string
+    {
+        return GoogleTagManagerEnhanced::renderGoogleTagManagerNoscript();
+    }
+
+    public static function isGoogleTagManagerEnabled(): bool
+    {
+        $type = setting('google_tag_manager_type');
+
+        return match ($type) {
+            'gtm' => (bool) setting('gtm_container_id'),
+            'id' => (bool) (setting('google_tag_manager_id') || setting('google_analytics')),
+            'custom', 'code' => (bool) (setting('custom_tracking_header_js') || setting('custom_tracking_body_html') || setting('google_tag_manager_code')),
+            default => (bool) (setting('gtm_container_id') || setting('google_tag_manager_id') || setting('google_analytics') || setting('custom_tracking_header_js') || setting('custom_tracking_body_html') || setting('google_tag_manager_code'))
+        };
+    }
+
+    public static function isGoogleTagManagerDebugEnabled(): bool
+    {
+        return (bool) setting('gtm_debug_mode', false);
+    }
+
+    public static function getGoogleTagManagerType(): ?string
+    {
+        $type = setting('google_tag_manager_type');
+
+        if ($type === 'code') {
+            return 'custom';
         }
 
-        if ($renderType === 'id' && $googleTagManagerId) {
-            return trim(
-                <<<HTML
-                <!-- Global site tag (gtag.js) - Google Analytics -->
-                <script async defer src='https://www.googletagmanager.com/gtag/js?id=$googleTagManagerId'></script>
-                <script>
-                  window.dataLayer = window.dataLayer || [];
-                  function gtag(){dataLayer.push(arguments);}
-                  gtag('js', new Date());
-
-                  gtag('config', '$googleTagManagerId');
-                </script>
-            HTML
-            );
+        if (! $type) {
+            if (setting('gtm_container_id')) {
+                return 'gtm';
+            } elseif (setting('custom_tracking_header_js') || setting('custom_tracking_body_html') || setting('google_tag_manager_code')) {
+                return 'custom';
+            } elseif (setting('google_tag_manager_id') || setting('google_analytics')) {
+                return 'id';
+            }
         }
 
-        return '';
+        return $type;
     }
 
     public static function registerSiteLogoHeight(int $defaultValue = 50): void

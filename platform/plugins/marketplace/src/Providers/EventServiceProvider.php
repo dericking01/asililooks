@@ -6,6 +6,7 @@ use Botble\Base\Events\RenderingAdminWidgetEvent;
 use Botble\Ecommerce\Events\OrderCancelledEvent;
 use Botble\Ecommerce\Events\OrderCreated;
 use Botble\Marketplace\Events\WithdrawalRequested;
+use Botble\Marketplace\Listeners\ClearVendorCategoriesCacheOnSync;
 use Botble\Marketplace\Listeners\OrderCancelledEmailNotification;
 use Botble\Marketplace\Listeners\OrderCreatedEmailNotification;
 use Botble\Marketplace\Listeners\RegisterMarketplaceWidget;
@@ -38,6 +39,15 @@ class EventServiceProvider extends ServiceProvider
         ],
         RenderingAdminWidgetEvent::class => [
             RegisterMarketplaceWidget::class,
+        ],
+        'eloquent.pivotAttached: Botble\Ecommerce\Models\Product' => [
+            ClearVendorCategoriesCacheOnSync::class,
+        ],
+        'eloquent.pivotDetached: Botble\Ecommerce\Models\Product' => [
+            ClearVendorCategoriesCacheOnSync::class,
+        ],
+        'eloquent.pivotUpdated: Botble\Ecommerce\Models\Product' => [
+            ClearVendorCategoriesCacheOnSync::class,
         ],
     ];
 }

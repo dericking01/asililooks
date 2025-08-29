@@ -17,6 +17,18 @@ AdminHelper::registerRoutes(function (): void {
                     'uses' => 'SitemapSettingController@update',
                     'permission' => 'sitemap.settings',
                 ]);
+
+                Route::post('generate-key', [
+                    'as' => 'sitemap.settings.generate-key',
+                    'uses' => 'SitemapSettingController@generateKey',
+                    'permission' => 'sitemap.settings',
+                ]);
+
+                Route::post('create-key-file', [
+                    'as' => 'sitemap.settings.create-key-file',
+                    'uses' => 'SitemapSettingController@createKeyFile',
+                    'permission' => 'sitemap.settings',
+                ]);
             });
         });
     });

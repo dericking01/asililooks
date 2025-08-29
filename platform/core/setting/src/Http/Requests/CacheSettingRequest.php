@@ -20,10 +20,8 @@ class CacheSettingRequest extends Request
             'widget_cache_enabled' => [$onOffRule],
             'plugin_cache_enabled' => [$onOffRule],
             'cache_time_site_map' => ['nullable', 'required_if:enable_cache_site_map,1', 'integer', 'min:1'],
-            'shortcode_cache_ttl_default' => ['nullable', 'required_if:shortcode_cache_enabled,1', 'integer', 'min:1'],
-            'shortcode_cache_ttl_cacheable' => ['nullable', 'required_if:shortcode_cache_enabled,1', 'integer', 'min:1'],
-            'widget_cache_ttl_default' => ['nullable', 'required_if:widget_cache_enabled,1', 'integer', 'min:1'],
-            'widget_cache_ttl_cacheable' => ['nullable', 'required_if:widget_cache_enabled,1', 'integer', 'min:1'],
+            'shortcode_cache_ttl' => ['nullable', 'required_if:shortcode_cache_enabled,1', 'integer', 'min:1'],
+            'widget_cache_ttl' => ['nullable', 'required_if:widget_cache_enabled,1', 'integer', 'min:1'],
         ];
     }
 }

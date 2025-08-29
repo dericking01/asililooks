@@ -5,6 +5,7 @@ namespace Botble\Ecommerce\Repositories\Eloquent;
 use Botble\Ecommerce\Repositories\Interfaces\FlashSaleInterface;
 use Botble\Support\Repositories\Eloquent\RepositoriesAbstract;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class FlashSaleRepository extends RepositoriesAbstract implements FlashSaleInterface
 {
@@ -19,6 +20,15 @@ class FlashSaleRepository extends RepositoriesAbstract implements FlashSaleInter
             ->latest();
 
         if ($with) {
+            // If products are included, filter out sold-out products
+            if (in_array('products', $with)) {
+                $with = [
+                    'products' => function ($query) {
+                        $query->wherePivot('quantity', '>', DB::raw('sold'));
+                    },
+                ];
+            }
+
             $data = $data->with($with);
         }
 

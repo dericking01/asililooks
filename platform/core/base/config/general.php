@@ -41,7 +41,6 @@ return [
             'date_time' => env('CMS_JS_DATE_TIME_FORMAT', 'yyyy-mm-dd H:i:s'),
         ],
     ],
-    'locale' => env('APP_LOCALE', 'en'),
     'demo' => [
         'account' => [
             'username' => env('CMS_DEMO_ACCOUNT_USERNAME', 'admin'),
@@ -309,6 +308,7 @@ return [
         'default' => [
             'HTML.Doctype' => 'HTML 4.01 Transitional',
             'HTML.Allowed' => 'div,b,strong,i,em,u,a[href|title|rel|style|target|dofollow|nofollow],ul,ol,li,p[style],br,span[style],img[width|height|alt|src|style|loading],button,ins[style|data-ad-client|data-ad-slot|data-ad-format|data-full-width-responsive],video[src|type|width|height|preload|controls|autoplay|autostart|poster|id|class,muted,loop],meta[name|content|property],link[media|type|rel|href]',
+            'URI.AllowedSchemes' => 'http,https,mailto,tel,viber,ftp,data',
             'HTML.AllowedElements' => [
                 'a',
                 'b',

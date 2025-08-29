@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\DB;
 
 class FlashSale extends BaseModel
 {
@@ -48,9 +49,14 @@ class FlashSale extends BaseModel
         return $query->whereDate('end_date', '<', Carbon::now());
     }
 
+    protected function isAvailable(): Attribute
+    {
+        return Attribute::get(fn (): bool => ! $this->expired && ! $this->is_sold_out);
+    }
+
     protected function expired(): Attribute
     {
-        return Attribute::get(fn (): bool => $this->end_date->lessThan(Carbon::now()->startOfDay()));
+        return Attribute::get(fn (): bool => $this->end_date->lessThan(Carbon::today()));
     }
 
     protected function saleCountLeftLabel(): Attribute
@@ -73,5 +79,21 @@ class FlashSale extends BaseModel
 
             return $this->pivot->quantity > 0 ? ($this->pivot->sold / $this->pivot->quantity) * 100 : 0;
         })->shouldCache();
+    }
+
+    protected function isSoldOut(): Attribute
+    {
+        return Attribute::get(function (): bool {
+            if (! $this->pivot) {
+                return false;
+            }
+
+            return $this->pivot->sold >= $this->pivot->quantity;
+        })->shouldCache();
+    }
+
+    public function availableProducts(): BelongsToMany
+    {
+        return $this->products()->wherePivot('quantity', '>', DB::raw('sold'));
     }
 }

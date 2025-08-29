@@ -13,20 +13,7 @@ return [
     */
     'cache' => [
         'enabled' => env('SHORTCODE_CACHE_ENABLED', true),
-        'ttl' => [
-            'default' => env('SHORTCODE_CACHE_TTL_DEFAULT', 5), // seconds
-            'cacheable' => env('SHORTCODE_CACHE_TTL_CACHEABLE', 1800), // 30 minutes
-        ],
-        'cacheable_shortcodes' => [
-            'static-block',
-            'featured-posts',
-            'gallery',
-            'youtube-video',
-            'google-map',
-            'contact-form',
-            'image',
-            // Add more cacheable shortcodes here
-        ],
+        'ttl' => env('SHORTCODE_CACHE_TTL', 1800), // 30 minutes
     ],
     
     /*

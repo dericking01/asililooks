@@ -7,16 +7,19 @@ use Illuminate\Support\Facades\Schema;
 return new class () extends Migration {
     public function up(): void
     {
-        Schema::table('ec_customers', function (Blueprint $table) {
-            $table->dropUnique('ec_customers_email_unique');
-            $table->string('email')->nullable()->change();
-
-        });
+        try {
+            Schema::table('ec_customers', function (Blueprint $table): void {
+                $table->dropUnique('ec_customers_email_unique');
+                $table->string('email')->nullable()->change();
+            });
+        } catch (Throwable) {
+            // Do nothing
+        }
     }
 
     public function down(): void
     {
-        Schema::table('ec_customers', function (Blueprint $table) {
+        Schema::table('ec_customers', function (Blueprint $table): void {
             $table->string('email')->unique()->change();
         });
     }

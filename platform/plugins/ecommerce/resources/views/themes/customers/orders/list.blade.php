@@ -14,14 +14,14 @@
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
                                     <h3 class="bb-customer-card-title h6 mb-1">
-                                        {{ __('Order') }} #{{ $order->code }}
+                                        {{ __('Order :code', ['code' => $order->code]) }}
                                     </h3>
+                                    <div class="bb-customer-card-status">
+                                        {!! BaseHelper::clean($order->status->toHtml()) !!}
+                                    </div>
                                     <p class="text-muted small mb-0">
-                                        {{ $order->created_at->format('M d, Y \a\t g:i A') }}
+                                        {{ $order->created_at->translatedFormat('M d, Y \a\t g:i A') }}
                                     </p>
-                                </div>
-                                <div class="bb-customer-card-status">
-                                    {!! BaseHelper::clean($order->status->toHtml()) !!}
                                 </div>
                             </div>
                         </div>

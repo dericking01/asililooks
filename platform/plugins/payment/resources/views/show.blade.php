@@ -84,6 +84,8 @@
                     </x-core::card.body>
                 </x-core::card>
 
+                @include('plugins/payment::partials.payment-logs', ['payment' => $payment])
+
                 @php
                     do_action(BASE_ACTION_META_BOXES, 'advanced', $payment);
                 @endphp

@@ -29,6 +29,7 @@ class ProductAttributeSet extends BaseModel
 
     protected $casts = [
         'status' => BaseStatusEnum::class,
+        'order' => 'int',
     ];
 
     protected static function booted(): void

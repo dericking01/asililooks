@@ -1,4 +1,8 @@
-@if (($attributes = $attributes->where('attribute_set_id', $set->id)) && $attributes->isNotEmpty())
+@php
+    $displayAttributes = $attributes->where('attribute_set_id', $set->id);
+@endphp
+
+@if ($displayAttributes && $displayAttributes->isNotEmpty())
     <div
         class="bb-product-attribute-swatch text-swatches-wrapper attribute-swatches-wrapper"
         data-type="text"
@@ -6,13 +10,16 @@
     >
         <h4 class="bb-product-attribute-swatch-title">{{ $set->title }}:</h4>
         <ul class="bb-product-attribute-swatch-list text-swatch attribute-swatch">
-            @foreach ($attributes as $attribute)
+            @foreach ($displayAttributes as $attribute)
+                @php
+                    $isDisabled = ! $variationInfo->where('id', $attribute->id)->isNotEmpty();
+                @endphp
                 <li
                     data-slug="{{ $attribute->slug }}"
                     data-id="{{ $attribute->id }}"
                     @class([
                         'bb-product-attribute-swatch-item attribute-swatch-item',
-                        'disabled' => ! $variationInfo->where('id', $attribute->id)->isNotEmpty(),
+                        'disabled' => $isDisabled,
                     ])
                 >
                     <label>
@@ -24,6 +31,7 @@
                             value="{{ $attribute->id }}"
                             @checked($selected->where('id', $attribute->id)->isNotEmpty())
                             class="product-filter-item"
+                            @if($isDisabled) disabled @endif
                         >
                         <span class="bb-product-attribute-text-display">{{ $attribute->title }}</span>
                     </label>

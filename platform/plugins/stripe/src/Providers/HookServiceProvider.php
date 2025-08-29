@@ -64,7 +64,7 @@ class HookServiceProvider extends ServiceProvider
             if ($payment->payment_channel == STRIPE_PAYMENT_METHOD_NAME) {
                 $paymentDetail = (new StripePaymentService())->getPaymentDetails($payment->charge_id);
 
-                $data = view('plugins/stripe::detail', ['payment' => $paymentDetail])->render();
+                $data .= view('plugins/stripe::detail', ['payment' => $paymentDetail])->render();
             }
 
             return $data;

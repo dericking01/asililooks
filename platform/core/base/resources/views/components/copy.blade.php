@@ -21,6 +21,6 @@
 >
     <span class="sr-only">{{ trans('core/base::base.copy')  }}</span>
 
-    <x-core::icon name="ti ti-clipboard" data-clipboard-icon="true" />
-    <x-core::icon name="ti ti-check" data-clipboard-success-icon="true" class="text-success d-none" />
+    <x-core::icon name="ti ti-clipboard" data-clipboard-icon="true" class="me-0" />
+    <x-core::icon name="ti ti-check" data-clipboard-success-icon="true" class="text-success d-none me-0" />
 </a>

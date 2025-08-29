@@ -47,7 +47,7 @@ class PublicController extends BaseController
 {
     public function __construct()
     {
-        $version = get_cms_version();
+        $version = EcommerceHelper::getAssetVersion();
 
         Theme::asset()
             ->add('customer-style', 'vendor/core/plugins/ecommerce/css/customer.css', ['bootstrap-css'], version: $version);

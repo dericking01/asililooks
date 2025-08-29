@@ -1265,7 +1265,6 @@ class Botble {
                         folderId: 0,
                     })
                     .then(({ data }) => {
-                        form[0].reset()
                         modal.modal('hide')
 
                         const $imageBox = $(form.find('input[name="image-box-target"]').val())
@@ -1274,9 +1273,12 @@ class Botble {
                         $imageBox.find('[data-bb-toggle="image-picker-remove"]').show()
                         $imageBox.find('.preview-image').removeClass('default-image')
                         $imageBox.find('.preview-image-wrapper').show()
+
+                        setTimeout(function() {
+                            form[0].reset()
+                        }, 1000)
                     })
             } else {
-                form[0].reset()
                 modal.modal('hide')
 
                 const $imageBox = $(form.find('input[name="image-box-target"]').val())
@@ -1285,6 +1287,10 @@ class Botble {
                 $imageBox.find('[data-bb-toggle="image-picker-remove"]').show()
                 $imageBox.find('.preview-image').removeClass('default-image')
                 $imageBox.find('.preview-image-wrapper').show()
+
+                setTimeout(function() {
+                    form[0].reset()
+                }, 1000)
             }
         })
 

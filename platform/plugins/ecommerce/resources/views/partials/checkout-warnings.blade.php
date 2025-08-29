@@ -8,7 +8,7 @@
                 padding: 16px 20px;
                 margin-bottom: 12px;
                 font-size: 14px;
-                line-height: 1.5;
+                line-height: 28px;
                 color: #856404;
                 display: flex;
                 align-items: flex-start;

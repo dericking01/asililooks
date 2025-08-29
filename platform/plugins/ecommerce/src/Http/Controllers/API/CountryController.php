@@ -2,10 +2,10 @@
 
 namespace Botble\Ecommerce\Http\Controllers\API;
 
-use Botble\Base\Http\Controllers\BaseController;
+use Botble\Api\Http\Controllers\BaseApiController;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 
-class CountryController extends BaseController
+class CountryController extends BaseApiController
 {
     /**
      * Get list of available countries
@@ -26,8 +26,11 @@ class CountryController extends BaseController
     public function index()
     {
         $countries = collect(EcommerceHelper::getAvailableCountries())
-            ->filter(fn ($name, $code) => $code !== '')
             ->map(function ($name, $code) {
+                if (! $code) {
+                    $code = '';
+                }
+
                 return [
                     'name' => $name,
                     'code' => $code,

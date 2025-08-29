@@ -3,6 +3,7 @@
 namespace Botble\Ecommerce\Http\Requests;
 
 use Botble\Base\Rules\EmailRule;
+use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Models\Customer;
 use Botble\Support\Http\Requests\Request;
 use Illuminate\Validation\Rule;
@@ -14,7 +15,8 @@ class CustomerEditRequest extends Request
         $rules = [
             'name' => ['required', 'max:120', 'min:2'],
             'email' => [
-                'required',
+                'nullable',
+                Rule::requiredIf(! EcommerceHelper::isLoginUsingPhone()),
                 new EmailRule(),
                 Rule::unique((new Customer())->getTable(), 'email')->ignore($this->route('customer.id')),
             ],

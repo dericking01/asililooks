@@ -23,6 +23,8 @@ class Brand extends BaseModel
 
     protected $casts = [
         'status' => BaseStatusEnum::class,
+        'is_featured' => 'bool',
+        'order' => 'int',
     ];
 
     protected static function booted(): void

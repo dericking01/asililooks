@@ -74,7 +74,7 @@ class HookServiceProvider extends ServiceProvider
                     do_action('payment_after_api_response', MOLLIE_PAYMENT_METHOD_NAME, ['payment_id' => $payment->charge_id], (array) $paymentDetail);
 
                     if ($paymentDetail) {
-                        $data = view('plugins/mollie::detail', ['payment' => $paymentDetail])->render();
+                        $data .= view('plugins/mollie::detail', ['payment' => $paymentDetail])->render();
                     }
                 } catch (Exception) {
                     return $data;

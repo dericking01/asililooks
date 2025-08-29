@@ -4,6 +4,7 @@ namespace Botble\SocialLogin\Supports;
 
 use Botble\Base\Facades\BaseHelper;
 use Botble\SocialLogin\Models\SocialLogin;
+use Botble\SocialLogin\Services\SocialLoginService;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -94,6 +95,7 @@ class SocialService
             'github' => $this->getDataProviderDefault(),
             'linkedin' => $this->getDataProviderDefault(),
             'linkedin-openid' => $this->getDataProviderDefault(),
+            'x' => $this->getDataProviderDefault(),
         ]);
     }
 
@@ -153,6 +155,7 @@ class SocialService
             'facebook' => 'https://graph.facebook.com/v18.0/oauth/access_token',
             'github' => 'https://github.com/login/oauth/access_token',
             'linkedin' => 'https://www.linkedin.com/oauth/v2/accessToken',
+            'x' => 'https://api.x.com/2/oauth2/token',
             default => throw new \InvalidArgumentException("Unsupported provider: {$provider}"),
         };
     }
@@ -208,23 +211,19 @@ class SocialService
             ]);
         }
 
-        // Create new social login
-        return SocialLogin::query()
-                ->create([
-                    'user_id' => $user->getKey(),
-                    'user_type' => $modelClass,
-                    'provider' => $provider,
-                    'provider_id' => $socialData['id'],
-                    'token' => $socialData['token'],
-                    'refresh_token' => $socialData['refresh_token'] ?? null,
-                    'token_expires_at' => $socialData['expires_in'] ? Carbon::now()->addSeconds(
-                        $socialData['expires_in']
-                    ) : null,
-                    'provider_data' => [
-                        'name' => $socialData['name'],
-                        'email' => $socialData['email'],
-                        'avatar' => $socialData['avatar'],
-                    ],
-                ]) !== null;
+        // Create new social login using the service to handle duplicates properly
+        $socialLoginService = app(SocialLoginService::class);
+        $socialLoginData = $socialLoginService->createSocialLoginData([
+            'provider' => $provider,
+            'id' => $socialData['id'],
+            'token' => $socialData['token'],
+            'refresh_token' => $socialData['refresh_token'] ?? null,
+            'expires_in' => $socialData['expires_in'],
+            'name' => $socialData['name'],
+            'email' => $socialData['email'],
+            'avatar' => $socialData['avatar'],
+        ]);
+
+        return $socialLoginService->createOrUpdateSocialLogin($user, $socialLoginData) !== null;
     }
 }

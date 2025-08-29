@@ -1,3 +1,9 @@
+<!--
+tags: [wi-fi, communication, internet, wireless]
+category: Buildings
+unicode: "f356"
+version: "1.88"
+-->
 <svg
   xmlns="http://www.w3.org/2000/svg"
   width="24"
@@ -8,8 +14,7 @@
   stroke-width="2"
   stroke-linecap="round"
   stroke-linejoin="round"
-  >
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+>
   <path d="M15 22v-2" />
   <path d="M18 22v-4" />
   <path d="M21 22v-6" />

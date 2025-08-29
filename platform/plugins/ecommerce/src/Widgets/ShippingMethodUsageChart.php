@@ -27,7 +27,7 @@ class ShippingMethodUsageChart extends Chart
                 DB::raw('count(*) as total'),
             ])
             ->groupBy('shipping_company_name')
-            ->orderByDesc('total')
+            ->latest('total')
             ->get();
 
         $data = [];

@@ -28,12 +28,11 @@
         const dismissBtn = document.querySelector('.dismiss-widget-suggestion');
         if (dismissBtn) {
             dismissBtn.addEventListener('click', function() {
-                // Set a cookie to dismiss the suggestion for a week
                 const expiryDate = new Date();
                 expiryDate.setDate(expiryDate.getDate() + 7);
-                document.cookie = 'widget_cache_suggestion_dismissed=1; expires=' + expiryDate.toUTCString() + '; path=/';
+                const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+                document.cookie = 'widget_cache_suggestion_dismissed=1; expires=' + expiryDate.toUTCString() + '; path=/; SameSite=Lax' + secure;
 
-                // Hide the suggestion
                 document.getElementById('widget-cache-suggestion').style.display = 'none';
             });
         }

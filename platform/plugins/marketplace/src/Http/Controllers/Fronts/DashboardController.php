@@ -176,7 +176,7 @@ class DashboardController extends BaseController
 
         if (! RvMedia::isChunkUploadEnabled()) {
             $validator = Validator::make($request->all(), [
-                'file.0' => ['required', 'image', 'mimes:jpg,jpeg,png'],
+                'file.0' => ['required', 'image', 'mimes:jpg,jpeg,png,webp'],
             ]);
 
             if ($validator->fails()) {

@@ -56,7 +56,7 @@
                                             <p class="mb-3">{{ __('The order is currently being processed. For expedited processing, kindly upload a copy of your payment proof:') }}</p>
                                         @else
                                             <p class="mb-2">{{ __('You have uploaded a copy of your payment proof.') }}</p>
-                                            <div class="bb-payment-proof-card-file mb-3">
+                                            <div class="bb-payment-proof-card-file mb-3 bg-light">
                                                 <span class="label">{{ __('View Receipt:') }}</span>
                                                 <a href="{{ route('customer.orders.download-proof', $order) }}" target="_blank" class="value">
                                                     <x-core::icon name="ti ti-file" />

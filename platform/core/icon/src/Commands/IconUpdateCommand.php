@@ -33,7 +33,7 @@ class IconUpdateCommand extends Command
         $response = $response->json();
 
         $tagName = str_replace('v', '', Arr::get($response, 'tag_name'));
-        $downloadUrl = Arr::get($response, 'assets.0.browser_download_url');
+        $downloadUrl = Arr::get($response, 'zipball_url');
 
         if (! $downloadUrl) {
             $this->components->error('Failed to fetch latest release of Tabler Icons.');
@@ -80,7 +80,27 @@ class IconUpdateCommand extends Command
 
         $currentIconsCount = count(File::allFiles($iconsDestination));
 
-        foreach (File::allFiles("$destination/svg/outline") as $file) {
+        $extractedFolders = File::directories($destination);
+        if (empty($extractedFolders)) {
+            $this->components->error('No extracted folder found.');
+            File::delete($zipDestination);
+            File::deleteDirectory($destination);
+
+            return self::FAILURE;
+        }
+
+        $extractedFolder = $extractedFolders[0];
+        $svgOutlinePath = "$extractedFolder/icons/outline";
+
+        if (! File::exists($svgOutlinePath)) {
+            $this->components->error('SVG outline folder not found in extracted archive.');
+            File::delete($zipDestination);
+            File::deleteDirectory($destination);
+
+            return self::FAILURE;
+        }
+
+        foreach (File::allFiles($svgOutlinePath) as $file) {
             $fileName = $file->getFilename();
 
             File::move($file->getPathname(), "$iconsDestination/$fileName");

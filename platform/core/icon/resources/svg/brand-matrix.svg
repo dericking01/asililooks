@@ -1,3 +1,9 @@
+<!--
+tags: [non, profit, communication, ip, devices]
+category: Brand
+unicode: "f5eb"
+version: "1.113"
+-->
 <svg
   xmlns="http://www.w3.org/2000/svg"
   width="24"
@@ -8,8 +14,7 @@
   stroke-width="2"
   stroke-linecap="round"
   stroke-linejoin="round"
-  >
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+>
   <path d="M4 3h-1v18h1" />
   <path d="M20 21h1v-18h-1" />
   <path d="M7 9v6" />

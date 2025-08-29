@@ -15,23 +15,23 @@
                         </tbody>
                     </table>
 
-                    <h1 class="bb-text-center bb-m-0 bb-mt-md">Your order has been cancelled</h1>
+                    <h1 class="bb-text-center bb-m-0 bb-mt-md">{{ 'plugins/ecommerce::email-templates.customer_cancel_order_title' | trans }}</h1>
                 </td>
             </tr>
             <tr>
                 <td class="bb-content">
-                    <p>Dear {{ customer_name }},</p>
-                    <p>Your order <strong>{{ order_id }}</strong> has been canceled as you requested due to reason {{ cancellation_reason }} and your payment was cancelled too.</p>
-                    <p>We're sorry to hear that you've decided to cancel your order. If you have any questions or concerns, please don't hesitate to contact us.</p>
+                    <p>{{ 'plugins/ecommerce::email-templates.customer_cancel_order_greeting' | trans({'customer_name': customer_name}) }}</p>
+                    <p>{{ 'plugins/ecommerce::email-templates.customer_cancel_order_message' | trans({'order_id': order_id, 'cancellation_reason': cancellation_reason}) }}</p>
+                    <p>{{ 'plugins/ecommerce::email-templates.customer_cancel_order_apology' | trans }}</p>
                 </td>
             </tr>
             <tr>
                 <td class="bb-content bb-pt-0">
-                    <h4>Here's what you ordered:</h4>
+                    <h4>{{ 'plugins/ecommerce::email-templates.customer_cancel_order_products' | trans }}</h4>
                     {{ product_list }}
 
                     {% if order_note %}
-                    <div>Note: {{ order_note }}</div>
+                    <div>{{ 'plugins/ecommerce::email-templates.customer_cancel_order_note' | trans }}: {{ order_note }}</div>
                     {% endif %}
                 </td>
             </tr>

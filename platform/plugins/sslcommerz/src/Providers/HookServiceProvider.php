@@ -66,7 +66,7 @@ class HookServiceProvider extends ServiceProvider
                 $paymentService = (new SslCommerzPaymentService());
                 $paymentDetail = $paymentService->getPaymentDetails($payment->charge_id);
                 if ($paymentDetail) {
-                    $data = view(
+                    $data .= view(
                         'plugins/sslcommerz::detail',
                         ['payment' => $paymentDetail, 'paymentModel' => $payment]
                     )->render();

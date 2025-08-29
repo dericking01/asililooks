@@ -13,6 +13,7 @@ use Botble\Contact\Http\Requests\EditContactRequest;
 use Botble\Contact\Models\Contact;
 use Botble\Contact\Models\ContactReply;
 use Botble\Contact\Tables\ContactTable;
+use Botble\Theme\Facades\Theme;
 use Illuminate\Validation\ValidationException;
 
 class ContactController extends BaseController
@@ -58,7 +59,19 @@ class ContactController extends BaseController
             throw ValidationException::withMessages(['message' => trans('validation.required', ['attribute' => 'message'])]);
         }
 
-        EmailHandler::send($message, sprintf('Re: %s', $contact->subject), $contact->email);
+        $args = [
+            'contact_name' => $contact->name,
+            'contact_subject' => $contact->subject,
+            'contact_email' => $contact->email,
+            'contact_content' => $contact->content,
+            'admin_reply_message' => $message,
+            'site_title' => Theme::getSiteTitle(),
+        ];
+
+        $emailHandler = EmailHandler::setModule(CONTACT_MODULE_SCREEN_NAME)
+            ->setVariableValues($args);
+
+        $emailHandler->sendUsingTemplate('admin-reply', $contact->email);
 
         ContactReply::query()->create([
             'message' => $message,

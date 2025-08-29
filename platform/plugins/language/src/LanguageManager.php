@@ -889,7 +889,9 @@ class LanguageManager
         $defaultLanguage = $this->getDefaultLanguage(['lang_id']);
         if (! empty($defaultLanguage)) {
             if ($data && in_array(get_class($data), $this->supportedModels())) {
-                if ($currentLanguageCode = $request->input('language')) {
+                $currentLanguageCode = $request->input('language') ?: $request->header('X-LANGUAGE');
+
+                if ($currentLanguageCode) {
                     $uniqueKey = null;
                     $meta = LanguageMeta::query()
                         ->where([
@@ -1006,7 +1008,7 @@ class LanguageManager
             // it tries to get it from the first segment of the url
             $locale = $this->request->segment(1);
 
-            $localeFromRequest = $this->request->input('language');
+            $localeFromRequest = $this->request->input('language') ?: $this->request->header('X-LANGUAGE');
 
             if ($localeFromRequest && is_string($localeFromRequest) && array_key_exists($localeFromRequest, $supportedLocales)) {
                 $locale = $localeFromRequest;

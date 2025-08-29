@@ -2,23 +2,24 @@
 
 namespace Botble\Ecommerce\Http\Controllers\API;
 
-use Botble\Base\Http\Controllers\BaseController;
+use Botble\Api\Http\Controllers\BaseApiController;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Http\Resources\API\FlashSaleProductResource;
 use Botble\Ecommerce\Models\FlashSale;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class FlashSaleController extends BaseController
+class FlashSaleController extends BaseApiController
 {
     /**
      * Get flash sales
      *
      * @group Flash Sale
      *
-     * @queryParam keys array Array of flash sale keys to filter by. Example: ["winter-sale", "summer-sale"]
-     * @bodyParam keys array Array of flash sale keys to filter by. Example: ["winter-sale", "summer-sale"]
+     * @queryParam keys string[] Array of flash sale keys to filter by. Example: winter-sale,summer-sale
+     * @bodyParam keys string[] Array of flash sale keys to filter by. Example: winter-sale,summer-sale
      *
      * @return BaseHttpResponse
      */
@@ -47,7 +48,8 @@ class FlashSaleController extends BaseController
                 'products' => function ($query): void {
                     $query
                         ->with(EcommerceHelper::withProductEagerLoadingRelations())
-                        ->wherePublished();
+                        ->wherePublished()
+                        ->wherePivot('quantity', '>', DB::raw('sold'));
 
                     if (EcommerceHelper::isReviewEnabled()) {
                         $reviewParams = EcommerceHelper::withReviewsParams();

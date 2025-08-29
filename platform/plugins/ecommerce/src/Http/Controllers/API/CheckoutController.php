@@ -2,16 +2,16 @@
 
 namespace Botble\Ecommerce\Http\Controllers\API;
 
+use Botble\Api\Http\Controllers\BaseApiController;
 use Botble\Ecommerce\Facades\Cart;
 use Botble\Ecommerce\Facades\OrderHelper;
-use Botble\Ecommerce\Http\Controllers\BaseController;
 use Botble\Ecommerce\Models\Customer;
 use Botble\Ecommerce\Services\HandleApplyCouponService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
-class CheckoutController extends BaseController
+class CheckoutController extends BaseApiController
 {
     /**
      * @group Checkout

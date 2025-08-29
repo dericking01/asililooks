@@ -65,6 +65,8 @@ return [
         'merchant_return_policy_url' => 'Merchant return policy URL',
         'merchant_return_policy_url_placeholder' => 'https://example.com/merchant-return-policy',
         'merchant_return_days' => 'Merchant return days',
+        'merchant_return_applicable_country' => 'Merchant return applicable country',
+        'merchant_return_applicable_country_placeholder' => 'US, CA, GB (ISO country codes separated by commas)',
         'seo_name' => 'Ecommerce SEO',
         'seo_description' => 'Settings meta tags for ecommerce pages and other SEO info.',
         'page_seo_title' => ':page SEO title',
@@ -91,4 +93,5 @@ return [
     'download_link' => 'Download link',
     'update_time' => 'Time to update',
     'product_files' => 'Product files',
+    'saving' => 'Saving...',
 ];

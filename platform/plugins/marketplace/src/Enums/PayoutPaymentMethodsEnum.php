@@ -12,6 +12,7 @@ use Illuminate\Validation\Rule;
 /**
  * @method static PayoutPaymentMethodsEnum BANK_TRANSFER()
  * @method static PayoutPaymentMethodsEnum PAYPAL()
+ * @method static PayoutPaymentMethodsEnum CASH()
  */
 class PayoutPaymentMethodsEnum extends Enum
 {
@@ -19,12 +20,15 @@ class PayoutPaymentMethodsEnum extends Enum
 
     public const PAYPAL = 'paypal';
 
+    public const CASH = 'cash';
+
     public static $langPath = 'plugins/marketplace::marketplace.payout_payment_methods';
 
     public function toHtml(): HtmlString|string
     {
         $color = match ($this->value) {
             self::BANK_TRANSFER => 'info',
+            self::CASH => 'success',
             default => 'primary',
         };
 
@@ -79,6 +83,26 @@ class PayoutPaymentMethodsEnum extends Enum
                     'paypal_id' => [
                         'title' => __('PayPal ID'),
                         'rules' => 'max:120',
+                    ],
+                ],
+            ],
+            self::CASH => [
+                'is_enabled' => (bool) Arr::get(MarketplaceHelper::getSetting('payout_methods'), self::CASH, false),
+                'key' => self::CASH,
+                'label' => self::CASH()->label(),
+                'fields' => [
+                    'pickup_location' => [
+                        'title' => __('Pickup Location'),
+                        'rules' => 'max:500',
+                        'helper_text' => __('Where would you like to collect your cash payout?'),
+                    ],
+                    'contact_name' => [
+                        'title' => __('Contact Name'),
+                        'rules' => 'max:120',
+                    ],
+                    'contact_phone' => [
+                        'title' => __('Contact Phone'),
+                        'rules' => 'max:20',
                     ],
                 ],
             ],

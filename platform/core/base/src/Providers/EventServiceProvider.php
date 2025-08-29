@@ -33,7 +33,6 @@ use Botble\Base\Listeners\UpdatedContentListener;
 use Botble\Base\Models\AdminNotification;
 use Botble\Dashboard\Events\RenderingDashboardWidgets;
 use Botble\Support\Http\Middleware\BaseMiddleware;
-use Botble\Support\Services\Cache\Cache;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Config\Repository;
 use Illuminate\Database\Events\MigrationsStarted;
@@ -106,16 +105,18 @@ class EventServiceProvider extends ServiceProvider
             });
 
             add_filter(BASE_FILTER_TOP_HEADER_LAYOUT, function ($options) {
+                if (! Auth::guard()->check()) {
+                    return $options;
+                }
+
                 try {
-                    $cache = Cache::make(AdminNotification::class);
-
-                    if ($cache->has('admin-notifications-count')) {
-                        $countNotificationUnread = $cache->get('admin-notifications-count');
-                    } else {
-                        $countNotificationUnread = AdminNotification::countUnread();
-
-                        $cache->put('admin-notifications-count', $countNotificationUnread, 60 * 60 * 24);
-                    }
+                    $countNotificationUnread = cache()->remember(
+                        'admin-notifications-count-' . Auth::guard()->id(),
+                        86400,
+                        function () {
+                            return AdminNotification::countUnread();
+                        }
+                    );
                 } catch (Throwable) {
                     $countNotificationUnread = 0;
                 }

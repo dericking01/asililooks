@@ -231,6 +231,11 @@ Route::group([
             'as' => 'update-shipping-status',
             'uses' => 'ShipmentController@postUpdateStatus',
         ])->wherePrimaryKey();
+
+        Route::get('download-proof/{order}', [
+            'as' => 'download-proof',
+            'uses' => 'OrderController@downloadProof',
+        ]);
     });
 
     Route::group(['prefix' => 'order-returns', 'as' => 'order-returns.'], function (): void {

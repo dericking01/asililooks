@@ -3,14 +3,14 @@
 namespace Botble\Ads\Http\Controllers\API;
 
 use Botble\Ads\Models\Ads;
-use Botble\Base\Http\Controllers\BaseController;
+use Botble\Api\Http\Controllers\BaseApiController;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 
-class AdsController extends BaseController
+class AdsController extends BaseApiController
 {
     /**
      * Get ads

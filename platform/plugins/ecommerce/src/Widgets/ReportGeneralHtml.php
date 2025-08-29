@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\DB;
 
 class ReportGeneralHtml extends Html
 {
+    public function getColumns(): int
+    {
+        return 12; // Full width for detailed analytics
+    }
+
     public function getContent(): string
     {
         if (! is_plugin_active('payment')) {

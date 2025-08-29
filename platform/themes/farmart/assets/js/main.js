@@ -7,7 +7,9 @@ MartApp.$iconChevronLeft =
 MartApp.$iconChevronRight =
     '<span class="slick-next-arrow svg-icon"><svg><use href="#svg-icon-chevron-right" xlink:href="#svg-icon-chevron-right"></use></svg></span>'
 
-window._scrollBar = new ScrollBarHelper()
+if (typeof ScrollBarHelper !== 'undefined') {
+    window._scrollBar = new ScrollBarHelper()
+}
 
 MartApp.isRTL = $('body').prop('dir') === 'rtl'
 ;(function ($) {
@@ -96,6 +98,147 @@ MartApp.isRTL = $('body').prop('dir') === 'rtl'
         })
     })
 
+    MartApp.showModal = function ($modal) {
+        if (typeof $.fn.modal === 'function') {
+            $modal.modal('show')
+        } else {
+            // Fallback: show modal manually
+            $modal.addClass('show')
+            $modal.css('display', 'block')
+            $modal.attr('aria-hidden', 'false')
+            $('body').addClass('modal-open')
+
+            // Create backdrop if it doesn't exist
+            if (!$('.modal-backdrop').length) {
+                $('<div class="modal-backdrop fade show"></div>').appendTo('body')
+            }
+        }
+    }
+
+    MartApp.hideModal = function ($modal) {
+        if (typeof $.fn.modal === 'function') {
+            $modal.modal('hide')
+        } else {
+            // Fallback: hide modal manually
+            $modal.removeClass('show')
+            $modal.css('display', 'none')
+            $modal.attr('aria-hidden', 'true')
+            $('body').removeClass('modal-open')
+            $('.modal-backdrop').remove()
+        }
+    }
+    
+    MartApp.initQuickShopVariationListeners = function ($modal) {
+        // Save original callbacks
+        const originalSuccessCallback = window.onChangeSwatchesSuccess
+        
+        // Save original history methods
+        const originalPushState = window.history.pushState
+        const originalReplaceState = window.history.replaceState
+        
+        // Override history methods to prevent URL updates in quick shop modal
+        window.history.pushState = function() {
+            // Check if we're dealing with product attribute changes in quick shop modal
+            if (arguments[0] && arguments[0].product_attributes_id && 
+                $('#' + arguments[0].product_attributes_id).closest('#product-quick-shop-modal').length) {
+                // Skip the pushState for quick shop modal
+                return
+            }
+            // Otherwise, call the original method
+            return originalPushState.apply(window.history, arguments)
+        }
+        
+        window.history.replaceState = function() {
+            // Check if we're dealing with product attribute changes in quick shop modal
+            if (arguments[0] && arguments[0].product_attributes_id && 
+                $('#' + arguments[0].product_attributes_id).closest('#product-quick-shop-modal').length) {
+                // Skip the replaceState for quick shop modal
+                return
+            }
+            // Otherwise, call the original method
+            return originalReplaceState.apply(window.history, arguments)
+        }
+        
+        // Override the success callback to update stock status
+        window.onChangeSwatchesSuccess = function(res, $productAttributes) {
+            // Call original callback if exists
+            if (originalSuccessCallback && typeof originalSuccessCallback === 'function') {
+                originalSuccessCallback(res, $productAttributes)
+            }
+            
+            // Update stock status only if in quick shop modal
+            if ($productAttributes.closest('#product-quick-shop-modal').length) {
+                const data = res.data
+                if (data) {
+                    const $availabilityStatus = $modal.find('.availability-status .status-value')
+                    const $addToCartBtn = $modal.find('.add-to-cart-button')
+                    const $quantityInput = $modal.find('input[name="qty"]')
+                    
+                    const inStockText = $availabilityStatus.data('in-stock-text') || 'In stock'
+                    const outOfStockText = $availabilityStatus.data('out-of-stock-text') || 'Out of stock'
+                    
+                    if (data.product && data.product.is_out_of_stock) {
+                        $availabilityStatus.html('<span class="text-danger">' + outOfStockText + '</span>')
+                        $addToCartBtn.addClass('disabled').prop('disabled', true)
+                        if ($quantityInput.length) {
+                            $quantityInput.prop('readonly', true)
+                        }
+                    } else if (data.product && data.product.with_storehouse_management && data.product.quantity < 1) {
+                        $availabilityStatus.html('<span class="text-danger">' + outOfStockText + '</span>')
+                        $addToCartBtn.addClass('disabled').prop('disabled', true)
+                        if ($quantityInput.length) {
+                            $quantityInput.prop('readonly', true)
+                        }
+                    } else {
+                        $availabilityStatus.html('<span class="text-success">' + inStockText + '</span>')
+                        $addToCartBtn.removeClass('disabled').prop('disabled', false)
+                        if ($quantityInput.length) {
+                            $quantityInput.prop('readonly', false)
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Restore original methods when modal is closed
+        $modal.on('hidden.bs.modal', function() {
+            window.onChangeSwatchesSuccess = originalSuccessCallback
+            window.history.pushState = originalPushState
+            window.history.replaceState = originalReplaceState
+        })
+    }
+
+    MartApp.updateQuickShopAvailability = function ($modal) {
+        const $form = $modal.find('form.cart-form')
+        const $availabilityStatus = $modal.find('.availability-status .status-value')
+        const $addToCartBtn = $form.find('.add-to-cart-button')
+        const $quantityInput = $form.find('input[name="qty"]')
+        
+        if (!$availabilityStatus.length) {
+            return
+        }
+
+        // Check if product is available based on the form state
+        const isOutOfStock = $addToCartBtn.hasClass('disabled') || $addToCartBtn.prop('disabled')
+        
+        const inStockText = $availabilityStatus.data('in-stock-text') || 'In stock'
+        const outOfStockText = $availabilityStatus.data('out-of-stock-text') || 'Out of stock'
+        
+        if (isOutOfStock) {
+            $availabilityStatus.html('<span class="text-danger">' + outOfStockText + '</span>')
+            // Disable quantity input when out of stock
+            if ($quantityInput.length) {
+                $quantityInput.prop('readonly', true)
+            }
+        } else {
+            $availabilityStatus.html('<span class="text-success">' + inStockText + '</span>')
+            // Enable quantity input when in stock
+            if ($quantityInput.length) {
+                $quantityInput.prop('readonly', false)
+            }
+        }
+    }
+
     MartApp.init = function () {
         MartApp.$body = $(document.body)
 
@@ -106,6 +249,7 @@ MartApp.isRTL = $('body').prop('dir') === 'rtl'
 
         this.lazyLoad(null, true)
         this.productQuickView()
+        this.productQuickShop()
         this.slickSlides()
         this.productQuantity()
         this.addProductToWishlist()
@@ -189,6 +333,128 @@ MartApp.isRTL = $('body').prop('dir') === 'rtl'
                 complete: () => {
                     $modal.addClass('loaded').removeClass('loading')
                     _self.removeClass('loading')
+                },
+            })
+        })
+    }
+
+    MartApp.productQuickShop = function () {
+        MartApp.$body.on('click', '.js-quick-shop-button', function (e) {
+            e.preventDefault()
+            e.stopPropagation()
+
+            const $btn = $(this)
+            const $modal = $('#product-quick-shop-modal')
+
+            if ($btn.hasClass('loading')) {
+                return
+            }
+
+            $btn.addClass('loading')
+            $modal.removeClass('loaded').addClass('loading')
+
+            MartApp.showModal($modal)
+
+            $.ajax({
+                url: $btn.data('url'),
+                type: 'GET',
+                success: (res) => {
+                    if (!res.error) {
+                        $modal.find('.product-quick-shop-content').html(res.data)
+
+                        // Mark the quick shop form to prevent duplicate handling
+                        $modal.find('form.cart-form').addClass('quick-shop-form')
+
+                        // Wrap the content with product-attributes class if needed
+                        if (!$modal.find('.product-attributes').length && $modal.find('.attribute-swatches-wrapper').length) {
+                            $modal.find('.ps-product--quickshop').addClass('product-attributes')
+                        }
+
+                        // Initialize product swatches
+                        if (typeof window.ChangeProductSwatches !== 'undefined') {
+                            // Trigger the swatch initialization
+                            $modal.find('.attribute-swatches-wrapper input:checked').trigger('change')
+                        }
+
+                        if (typeof MartApp.initProductQuantity === 'function') {
+                            MartApp.initProductQuantity($modal)
+                        }
+                        
+                        // Initialize variation change listeners for stock availability updates
+                        MartApp.initQuickShopVariationListeners($modal)
+                        // Initial availability update
+                        MartApp.updateQuickShopAvailability($modal)
+                    } else {
+                        MartApp.showError(res.message)
+                        MartApp.hideModal($modal)
+                    }
+                },
+                error: (res) => {
+                    MartApp.handleError(res)
+                    $modal.modal('hide')
+                },
+                complete: () => {
+                    $modal.addClass('loaded').removeClass('loading')
+                    $btn.removeClass('loading')
+                },
+            })
+        })
+
+        // Handle modal close button
+        MartApp.$body.on('click', '#product-quick-shop-modal .btn-close', function (e) {
+            e.preventDefault()
+            MartApp.hideModal($('#product-quick-shop-modal'))
+        })
+
+        // Handle backdrop click
+        MartApp.$body.on('click', '.modal-backdrop', function (e) {
+            e.preventDefault()
+            MartApp.hideModal($('#product-quick-shop-modal'))
+        })
+
+        // Handle quick shop form submission
+        MartApp.$body.on('click', '.quick-shop-form button[type=submit]', function (e) {
+            e.preventDefault()
+            e.stopPropagation()
+
+            const $btn = $(this)
+            const $form = $btn.closest('form.cart-form')
+            const $modal = $('#product-quick-shop-modal')
+
+            $btn.addClass('loading')
+
+            let data = $form.serializeArray()
+            data.push({ name: 'checkout', value: $btn.prop('name') === 'checkout' ? 1 : 0 })
+
+            $.ajax({
+                type: 'POST',
+                url: $form.prop('action'),
+                data: $.param(data),
+                success: (res) => {
+                    if (res.error) {
+                        MartApp.showError(res.message)
+                        if (res.data && res.data.next_url !== undefined) {
+                            setTimeout(() => {
+                                window.location.href = res.data.next_url
+                            }, 500)
+                        }
+                        return false
+                    }
+
+                    if (res.data && res.data.next_url !== undefined) {
+                        window.location.href = res.data.next_url
+                        return false
+                    }
+
+                    MartApp.hideModal($modal)
+                    MartApp.showSuccess(res.message)
+                    MartApp.loadAjaxCart()
+                },
+                error: (res) => {
+                    MartApp.handleError(res, $form)
+                },
+                complete: () => {
+                    $btn.removeClass('loading')
                 },
             })
         })
@@ -459,6 +725,12 @@ MartApp.isRTL = $('body').prop('dir') === 'rtl'
         MartApp.$body.on('click', 'form.cart-form button[type=submit]', function (e) {
             e.preventDefault()
             const $form = $(this).closest('form.cart-form')
+
+            // Skip if this is a quick shop form (handled separately)
+            if ($form.hasClass('quick-shop-form')) {
+                return
+            }
+
             const $btn = $(this)
             $btn.addClass('loading')
 
@@ -1283,7 +1555,9 @@ MartApp.isRTL = $('body').prop('dir') === 'rtl'
         MartApp.init()
 
         window.onBeforeChangeSwatches = function (data, $attrs) {
-            const $product = $attrs.closest('.product-details')
+            const $product = $attrs.closest('.product-details').length ?
+                $attrs.closest('.product-details') :
+                $attrs.closest('.ps-product--quickshop')
             const $form = $product.find('.cart-form')
 
             $product.find('.error-message').hide()
@@ -1298,7 +1572,9 @@ MartApp.isRTL = $('body').prop('dir') === 'rtl'
         }
 
         window.onChangeSwatchesSuccess = function (res, $attrs) {
-            const $product = $attrs.closest('.product-details')
+            const $product = $attrs.closest('.product-details').length ?
+                $attrs.closest('.product-details') :
+                $attrs.closest('.ps-product--quickshop')
             const $form = $product.find('.cart-form')
             const $footerCartForm = $('.footer-cart-form')
             $product.find('.error-message').hide()
@@ -1317,9 +1593,12 @@ MartApp.isRTL = $('body').prop('dir') === 'rtl'
                     $footerCartForm.find('.hidden-product-id').val('')
                 } else {
                     const data = res.data
-                    const $price = $(document).find('.js-product-content')
-                    const $salePrice = $price.find('.product-price-sale')
-                    const $originalPrice = $price.find('.product-price-original')
+                    // Find the price container in either product details or quick shop modal
+                    let $priceContainer = $product.find('.ps-product__header').length ?
+                        $product.find('.ps-product__header') :
+                        $(document).find('.js-product-content')
+                    const $salePrice = $priceContainer.find('.product-price-sale')
+                    const $originalPrice = $priceContainer.find('.product-price-original')
 
                     if (data.sale_price !== data.price) {
                         $salePrice.removeClass('d-none')
@@ -1358,19 +1637,23 @@ MartApp.isRTL = $('body').prop('dir') === 'rtl'
                         $product.find('.number-items-available').html('').hide()
                     }
 
+                    $product.find('.bb-product-attribute-swatch-item').removeClass('disabled')
+                    $product.find('.bb-product-attribute-swatch-list select option').prop('disabled', false)
+
                     const unavailableAttributeIds = data.unavailable_attribute_ids || []
-                    $product.find('.attribute-swatch-item').removeClass('disabled')
-                    $product.find('.product-filter-item option').prop('disabled', false)
-                    if (unavailableAttributeIds && unavailableAttributeIds.length) {
-                        unavailableAttributeIds.map(function (id) {
-                            let $item = $product.find('.attribute-swatch-item[data-id="' + id + '"]')
-                            if ($item.length) {
-                                $item.addClass('disabled')
-                                $item.find('input').prop('checked', false)
+
+                    if (unavailableAttributeIds.length) {
+                        unavailableAttributeIds.map((id) => {
+                            let $swatchItem = $product.find(`.bb-product-attribute-swatch-item[data-id="${id}"]`)
+
+                            if ($swatchItem.length) {
+                                $swatchItem.addClass('disabled')
+                                $swatchItem.find('input').prop('checked', false)
                             } else {
-                                $item = $product.find('.product-filter-item option[data-id="' + id + '"]')
-                                if ($item.length) {
-                                    $item.prop('disabled', 'disabled').prop('selected', false)
+                                $swatchItem = $product.find(`.bb-product-attribute-swatch-list select option[data-id="${id}"]`)
+
+                                if ($swatchItem.length) {
+                                    $swatchItem.prop('disabled', true)
                                 }
                             }
                         })
@@ -1524,6 +1807,14 @@ MartApp.isRTL = $('body').prop('dir') === 'rtl'
 
         document.addEventListener('ecommerce.categories-dropdown.success', () => {
             MartApp.initMegaMenu()
+        })
+        
+        // Listen for quick shop completed event to initialize variation listeners
+        document.addEventListener('ecommerce.quick-shop.completed', (e) => {
+            const { modal } = e.detail
+            if (modal && modal.length) {
+                MartApp.initQuickShopVariationListeners(modal)
+            }
         })
     })
 })(jQuery)

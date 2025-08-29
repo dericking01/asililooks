@@ -6,6 +6,7 @@ use Botble\Base\Facades\AdminHelper;
 use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Facades\Html;
 use Botble\Media\Facades\RvMedia;
+use Botble\SeoHelper\Facades\SeoHelper;
 use Botble\Setting\Facades\Setting;
 use Botble\Theme\Contracts\Theme as ThemeContract;
 use Botble\Theme\Exceptions\UnknownPartialFileException;
@@ -839,6 +840,20 @@ class Theme implements ThemeContract
                 ->container('header')
                 ->writeScript('breadcrumb-schema', $schema, attributes: ['type' => 'application/ld+json']);
         }
+
+        $websiteSchema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'WebSite',
+            'name' => rescue(fn () => SeoHelper::openGraph()->getProperty('site_name')),
+            'url' => url(''),
+        ];
+
+        $websiteSchema = json_encode($websiteSchema, JSON_UNESCAPED_UNICODE);
+
+        $this
+            ->asset()
+            ->container('header')
+            ->writeScript('website-schema', $websiteSchema, attributes: ['type' => 'application/ld+json']);
 
         return $this->view->make('packages/theme::partials.header')->render();
     }

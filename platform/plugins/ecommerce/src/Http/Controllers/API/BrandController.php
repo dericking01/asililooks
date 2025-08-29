@@ -2,7 +2,7 @@
 
 namespace Botble\Ecommerce\Http\Controllers\API;
 
-use Botble\Base\Http\Controllers\BaseController;
+use Botble\Api\Http\Controllers\BaseApiController;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Http\Requests\API\BrandRequest;
 use Botble\Ecommerce\Http\Resources\API\AvailableProductResource;
@@ -13,14 +13,14 @@ use Botble\Slug\Facades\SlugHelper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class BrandController extends BaseController
+class BrandController extends BaseApiController
 {
     /**
      * Get list of brands
      *
      * @group Brands
      * @param BrandRequest $request
-     * @queryParam brands nullable array List of brand IDs if you need filter by brands, (e.g. [1,2,3]). No-example
+     * @queryParam brands string[] List of brand IDs if you need filter by brands. Example: 1,2,3
      * @queryParam page int Page number. Default: 1. No-example
      * @queryParam per_page int Number of items per page. Default: 16. No-example
      *

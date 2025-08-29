@@ -14,13 +14,13 @@
                         </tr>
                     </tbody>
                 </table>
-                <h1 class="bb-text-center bb-m-0 bb-mt-md">Payment for order {{ order_id }} was confirmed!</h1>
+                <h1 class="bb-text-center bb-m-0 bb-mt-md">{{ 'plugins/ecommerce::email-templates.order_confirm_payment_title' | trans({'order_id': order_id}) }}</h1>
             </td>
         </tr>
         <tr>
             <td class="bb-content">
-                <p>Dear {{ customer_name }},</p>
-                <div>Thank you for purchasing our product.</div>
+                <p>{{ 'plugins/ecommerce::email-templates.order_confirm_payment_greeting' | trans({'customer_name': customer_name}) }}</p>
+                <div>{{ 'plugins/ecommerce::email-templates.order_confirm_payment_thanks' | trans }}</div>
             </td>
         </tr>
         <tr>
@@ -29,16 +29,16 @@
                     <tbody>
                         <tr>
                             <td class="bb-bb-col">
-                                <h4 class="bb-m-0">Customer Information</h4>
-                                <div>Name: <strong>{{ customer_name }}</strong></div>
+                                <h4 class="bb-m-0">{{ 'plugins/ecommerce::email-templates.order_confirm_payment_customer_info' | trans }}</h4>
+                                <div>{{ 'plugins/ecommerce::email-templates.order_confirm_payment_name' | trans }}: <strong>{{ customer_name }}</strong></div>
                                 {% if customer_phone %}
-                                <div>Phone: <strong>{{ customer_phone }}</strong></div>
+                                <div>{{ 'plugins/ecommerce::email-templates.order_confirm_payment_phone' | trans }}: <strong>{{ customer_phone }}</strong></div>
                                 {% endif %}
                                 {% if customer_email %}
-                                <div>Email: <strong>{{ customer_email }}</strong></div>
+                                <div>{{ 'plugins/ecommerce::email-templates.order_confirm_payment_email' | trans }}: <strong>{{ customer_email }}</strong></div>
                                 {% endif %}
                                 {% if customer_address %}
-                                <div>Address: <strong>{{ customer_address }}</strong></div>
+                                <div>{{ 'plugins/ecommerce::email-templates.order_confirm_payment_address' | trans }}: <strong>{{ customer_address }}</strong></div>
                                 {% endif %}
                             </td>
                         </tr>
@@ -48,11 +48,11 @@
         </tr>
         <tr>
             <td class="bb-content bb-pt-0">
-                <h4>Here's what you ordered:</h4>
+                <h4>{{ 'plugins/ecommerce::email-templates.order_confirm_payment_order_summary' | trans }}</h4>
                 {{ product_list }}
 
                 {% if order_note %}
-                    <div>Note: {{ order_note }}</div>
+                    <div>{{ 'plugins/ecommerce::email-templates.order_confirm_payment_note' | trans }}: {{ order_note }}</div>
                 {% endif %}
             </td>
         </tr>
@@ -63,7 +63,7 @@
                         <tr>
                             <td class="bb-col">
                                 {% if shipping_method %}
-                                <h4 class="bb-m-0">Shipping Method</h4>
+                                <h4 class="bb-m-0">{{ 'plugins/ecommerce::email-templates.order_confirm_payment_shipping_method' | trans }}</h4>
                                 <div>
                                     {{ shipping_method }}
                                 </div>
@@ -72,7 +72,7 @@
 
                         <td class="bb-col-spacer"></td>
                         <td class="bb-bb-col">
-                            <h4 class="bb-m-0">Order number</h4>
+                            <h4 class="bb-m-0">{{ 'plugins/ecommerce::email-templates.order_confirm_payment_order_number' | trans }}</h4>
                             <div>{{ order_id }}</div>
                         </td>
                     </tr>
@@ -83,7 +83,7 @@
                         <tbody>
                             <tr>
                             <td class="bb-col">
-                                <h4 class="bb-m-0">Payment Method</h4>
+                                <h4 class="bb-m-0">{{ 'plugins/ecommerce::email-templates.order_confirm_payment_method' | trans }}</h4>
                                 <div>
                                     {{ payment_method }}
                                 </div>

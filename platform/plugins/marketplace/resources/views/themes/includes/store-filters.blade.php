@@ -1,7 +1,12 @@
 @php
     $currentMainFilterUrl = $store->url;
-
-    $categories = ProductCategoryHelper::getProductCategoriesWithUrl();
+    $showCategoriesFilter = false;
+    
+    if (\Botble\Marketplace\Facades\MarketplaceHelper::isEnabledVendorCategoriesFilter()) {
+        $categories = \Botble\Marketplace\Facades\MarketplaceHelper::getCategoriesForVendor($store->id);
+        $showCategoriesFilter = $categories->isNotEmpty();
+    }
+    
     $categoriesRequest = (array) request()->input('categories', []);
     $categoryId = Arr::get($categoriesRequest, 0);
 @endphp
@@ -25,7 +30,9 @@
                 <input name="categories[]" type="hidden" value="{{ $categoryId }}">
 
                 @include(EcommerceHelper::viewPath('includes.filters.search'))
-                @include(EcommerceHelper::viewPath('includes.filters.categories'))
+                @if($showCategoriesFilter)
+                    @include(EcommerceHelper::viewPath('includes.filters.categories'))
+                @endif
             </form>
         </div>
     </div>

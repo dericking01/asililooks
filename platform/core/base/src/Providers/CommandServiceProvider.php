@@ -3,6 +3,7 @@
 namespace Botble\Base\Providers;
 
 use Botble\Base\Commands\ActivateLicenseCommand;
+use Botble\Base\Commands\CacheWarmCommand;
 use Botble\Base\Commands\CleanupSystemCommand;
 use Botble\Base\Commands\ClearExpiredCacheCommand;
 use Botble\Base\Commands\ClearLogCommand;
@@ -28,6 +29,7 @@ class CommandServiceProvider extends ServiceProvider
 
         $this->commands([
             ActivateLicenseCommand::class,
+            CacheWarmCommand::class,
             CleanupSystemCommand::class,
             ClearExpiredCacheCommand::class,
             ClearLogCommand::class,

@@ -103,6 +103,11 @@ class Pdf
 
     public function compile(): DomPDF
     {
+        // Check if libxml extension is available
+        if (! extension_loaded('libxml')) {
+            throw new \Exception('The libxml extension is required for PDF generation. Please install the PHP libxml extension or switch to mPDF in your settings.');
+        }
+
         $fontsPath = storage_path('fonts');
 
         if (! File::isDirectory($fontsPath)) {
@@ -249,22 +254,52 @@ class Pdf
 
     public function compileMpdf(string $fileName, string $mode = 'D'): ?string
     {
-        $mpdf = new Mpdf();
+        $format = $this->convertPaperSizeForMpdf($this->paperSize ?? 'A4');
+
+        $config = [
+            'mode' => 'utf-8',
+            'format' => $format,
+            'tempDir' => storage_path('app'),
+        ];
+
+        $mpdf = new Mpdf($config);
+
+        $mpdf->autoLangToFont = true;
 
         $inlineCss = new CssToInlineStyles();
 
-        $content = $inlineCss->convert($this->getContent($this->templatePath, $this->destinationPath, true));
+        $content = $this->getContent($this->templatePath, $this->destinationPath, true);
 
-        $mpdf->autoLangToFont = true;
+        $content = $inlineCss->convert($content);
 
         $mpdf->WriteHTML($content);
 
         return $mpdf->Output($fileName, $mode);
     }
 
+    protected function convertPaperSizeForMpdf(array|string $paperSize): array|string
+    {
+        if (is_string($paperSize)) {
+            return $paperSize;
+        }
+
+        if (is_array($paperSize) && count($paperSize) === 4) {
+            $widthMm = ($paperSize[2] - $paperSize[0]) * 0.352778;
+            $heightMm = ($paperSize[3] - $paperSize[1]) * 0.352778;
+
+            return [round($widthMm, 2), round($heightMm, 2)];
+        }
+
+        if (is_array($paperSize) && count($paperSize) === 2) {
+            return $paperSize;
+        }
+
+        return 'A4';
+    }
+
     public function stream(string $fileName = 'document.pdf'): Response|string|null
     {
-        if ($this->getProcessingLibrary() == 'mpdf') {
+        if ($this->getProcessingLibrary() == 'mpdf' || ! extension_loaded('libxml')) {
             return $this->compileMpdf($fileName, 'I');
         }
 
@@ -273,7 +308,7 @@ class Pdf
 
     public function download(string $fileName): Response|string|null
     {
-        if ($this->getProcessingLibrary() == 'mpdf') {
+        if ($this->getProcessingLibrary() == 'mpdf' || ! extension_loaded('libxml')) {
             return $this->compileMpdf($fileName);
         }
 
@@ -282,7 +317,7 @@ class Pdf
 
     public function save(string $filePath): DomPDF|string|null
     {
-        if ($this->getProcessingLibrary() == 'mpdf') {
+        if ($this->getProcessingLibrary() == 'mpdf' || ! extension_loaded('libxml')) {
             return $this->compileMpdf($filePath, 'F');
         }
 

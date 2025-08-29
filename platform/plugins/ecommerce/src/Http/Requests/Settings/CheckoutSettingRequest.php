@@ -36,6 +36,8 @@ class CheckoutSettingRequest extends Request
             'checkout_product_quantity_editable' => $onOffRule,
             'show_terms_and_policy_checkbox' => $onOffRule,
             'terms_and_policy_checkbox_checked_by_default' => $onOffRule,
+            'checkout_acceptance_message_enabled' => $onOffRule,
+            'hide_customer_info_at_checkout' => $onOffRule,
         ];
     }
 }

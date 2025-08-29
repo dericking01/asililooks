@@ -41,4 +41,14 @@ return [
         'subscribed' => 'Subscribed',
         'unsubscribed' => 'Unsubscribed',
     ],
+    'email_templates' => [
+        // Admin email template
+        'admin_new_subscriber_title' => 'New Subscriber',
+        'admin_new_subscriber_message' => 'New user has been subscribed your newsletter:',
+
+        // Subscriber email template
+        'subscriber_success_title' => 'Subscribe Successfully',
+        'subscriber_thank_you_message' => 'Thank you for subscribing our newsletter!',
+        'subscriber_unsubscribe_instruction' => 'To unsubscribe newsletter, click :newsletter_unsubscribe_link',
+    ],
 ];

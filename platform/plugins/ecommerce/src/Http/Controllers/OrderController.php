@@ -343,7 +343,7 @@ class OrderController extends BaseController
 
     public function postResendOrderConfirmationEmail(Order $order)
     {
-        $result = OrderHelper::sendOrderConfirmationEmail($order);
+        $result = OrderHelper::sendOrderConfirmationEmail($order, false, true);
 
         if (! $result) {
             return $this
@@ -498,10 +498,10 @@ class OrderController extends BaseController
     public function postUpdateTaxInformation(OrderTaxInformation $taxInformation, Request $request)
     {
         $validated = $request->validate([
-            'company_tax_code' => 'required|string|min:3|max:20',
-            'company_name' => 'required|string|min:3|max:120',
-            'company_address' => 'required|string|min:3|max:255',
-            'company_email' => 'required|email|min:6|max:60',
+            'company_tax_code' => ['required', 'string', 'min:3', 'max:20'],
+            'company_name' => ['required', 'string', 'min:3', 'max:120'],
+            'company_address' => ['required', 'string', 'min:3', 'max:255'],
+            'company_email' => ['required', 'email', 'min:6', 'max:60'],
         ]);
 
         $taxInformation->load(['order']);

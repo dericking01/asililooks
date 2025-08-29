@@ -12,6 +12,7 @@ use Botble\Ecommerce\Forms\ProductCategoryForm;
 use Botble\Ecommerce\Http\Requests\ProductCategoryRequest;
 use Botble\Ecommerce\Http\Resources\ProductCategoryResource;
 use Botble\Ecommerce\Models\ProductCategory;
+use Botble\Ecommerce\Tables\ProductCategoryTable;
 use Botble\Support\Services\Cache\Cache as CacheService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -19,9 +20,13 @@ use Illuminate\Support\Facades\Auth;
 
 class ProductCategoryController extends BaseController
 {
-    public function index(Request $request)
+    public function index(Request $request, ProductCategoryTable $dataTable)
     {
         $this->pageTitle(trans('plugins/ecommerce::product-categories.name'));
+
+        if ($request->get('as') === 'table') {
+            return $dataTable->renderTable();
+        }
 
         $categories = ProductCategory::query()
             ->select([
@@ -48,8 +53,9 @@ class ProductCategoryController extends BaseController
         Assets::addStylesDirectly(['vendor/core/core/base/css/tree-category.css'])
             ->addScriptsDirectly(['vendor/core/core/base/js/tree-category.js']);
 
-        $form = ProductCategoryForm::create(['template' => 'core/base::forms.form-tree-category']);
+        $form = ProductCategoryForm::create(['template' => 'plugins/ecommerce::product-categories.form-tree-category']);
         $form = $this->setFormOptions($form, null, compact('categories'));
+        $form->setUrl(route('product-categories.create'));
 
         return $form->renderForm();
     }
@@ -109,7 +115,9 @@ class ProductCategoryController extends BaseController
 
         $this->pageTitle(trans('core/base::forms.edit_item', ['name' => $productCategory->name]));
 
-        return ProductCategoryForm::createFromModel($productCategory)->renderForm();
+        return ProductCategoryForm::createFromModel($productCategory)
+            ->setUrl(route('product-categories.edit', $productCategory->getKey()))
+            ->renderForm();
     }
 
     public function update(ProductCategory $productCategory, ProductCategoryRequest $request)
@@ -165,6 +173,12 @@ class ProductCategoryController extends BaseController
         $form = ProductCategoryForm::create($options);
 
         $form = $this->setFormOptions($form, $model);
+
+        if (! $model) {
+            $form->setUrl(route('product-categories.create'));
+        } else {
+            $form->setUrl(route('product-categories.edit', $model->getKey()));
+        }
 
         return $form->renderForm();
     }

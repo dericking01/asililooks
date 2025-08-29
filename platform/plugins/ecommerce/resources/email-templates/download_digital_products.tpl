@@ -14,19 +14,19 @@
                         </tr>
                     </tbody>
                 </table>
-                <h1 class="bb-text-center bb-m-0 bb-mt-md">Download digital products</h1>
+                <h1 class="bb-text-center bb-m-0 bb-mt-md">{{ 'plugins/ecommerce::email-templates.download_digital_products_title' | trans }}</h1>
             </td>
         </tr>
         <tr>
             <td class="bb-content">
-                <p>Dear {{ customer_name }},</p>
-                <div>Thank you for purchasing our product.</div>
-                <div>You can now download digital product(s) you have purchased here:</div>
+                <p>{{ 'plugins/ecommerce::email-templates.download_digital_products_greeting' | trans({'customer_name': customer_name}) }}</p>
+                <div>{{ 'plugins/ecommerce::email-templates.download_digital_products_thanks' | trans }}</div>
+                <div>{{ 'plugins/ecommerce::email-templates.download_digital_products_message' | trans }}</div>
             </td>
         </tr>
         <tr>
             <td class="bb-content bb-pt-0">
-                <h4>Here's what you ordered:</h4>
+                <h4>{{ 'plugins/ecommerce::email-templates.download_digital_products_order_summary' | trans }}</h4>
 
                 <div class="table">
                     <table>
@@ -38,7 +38,7 @@
                                 &nbsp;
                             </th>
                             <th style="text-align: left">
-                                Download
+                                {{ 'plugins/ecommerce::email-templates.download_digital_products_download' | trans }}
                             </th>
                         </tr>
 
@@ -65,12 +65,12 @@
                                 <td>
                                     {% if product.product_file_internal_count %}
                                         <div>
-                                            <a href="{{ product.download_hash_url }}">All files</a>
+                                            <a href="{{ product.download_hash_url }}">{{ 'plugins/ecommerce::email-templates.download_digital_products_all_files' | trans }}</a>
                                         </div>
                                     {% endif %}
                                     {% if product.product_file_external_count %}
                                         <div>
-                                            <a href="{{ product.download_external_url }}">External link downloads</a>
+                                            <a href="{{ product.download_external_url }}">{{ 'plugins/ecommerce::email-templates.download_digital_products_external_link_downloads' | trans }}</a>
                                         </div>
                                     {% endif %}
                                 </td>
@@ -83,7 +83,7 @@
         {% if payment_method %}
             <tr>
                 <td class="bb-content bb-pt-0">
-                    <h4>Payment Method</h4>
+                    <h4>{{ 'plugins/ecommerce::email-templates.download_digital_products_payment_method' | trans }}</h4>
                     {{ payment_method }}
                 </td>
             </tr>

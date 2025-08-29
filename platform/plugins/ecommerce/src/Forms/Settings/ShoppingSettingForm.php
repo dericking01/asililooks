@@ -45,16 +45,40 @@ class ShoppingSettingForm extends SettingForm
                 OnOffFieldOption::make()
                     ->label(trans('plugins/ecommerce::setting.shopping.form.enable_order_tracking'))
                     ->helperText(trans('plugins/ecommerce::setting.shopping.form.enable_order_tracking_helper', ['url' => route('public.orders.tracking')]))
-                    ->value(EcommerceHelper::isOrderTrackingEnabled())
+                    ->value($orderTrackingEnabled = EcommerceHelper::isOrderTrackingEnabled())
             )
+            ->addOpenCollapsible('order_tracking_enabled', '1', $orderTrackingEnabled == '1')
+            ->add(
+                'order_tracking_method',
+                RadioField::class,
+                RadioFieldOption::make()
+                    ->label(trans('plugins/ecommerce::setting.shopping.form.order_tracking_method'))
+                    ->helperText(trans('plugins/ecommerce::setting.shopping.form.order_tracking_method_helper'))
+                    ->choices([
+                        'email' => trans('plugins/ecommerce::setting.shopping.form.order_tracking_method_email'),
+                        'phone' => trans('plugins/ecommerce::setting.shopping.form.order_tracking_method_phone'),
+                    ])
+                    ->selected(get_ecommerce_setting('order_tracking_method', 'email'))
+            )
+            ->addCloseCollapsible('order_tracking_enabled', '1')
             ->add(
                 'payment_proof_enabled',
                 OnOffCheckboxField::class,
                 OnOffFieldOption::make()
                     ->label(trans('plugins/ecommerce::setting.shopping.form.enable_payment_proof'))
                     ->helperText(trans('plugins/ecommerce::setting.shopping.form.enable_payment_proof_helper'))
-                    ->value(EcommerceHelper::isPaymentProofEnabled())
+                    ->value($paymentProofEnabled = EcommerceHelper::isPaymentProofEnabled())
             )
+            ->addOpenCollapsible('payment_proof_enabled', '1', $paymentProofEnabled == '1')
+            ->add(
+                'guest_payment_proof_enabled',
+                OnOffCheckboxField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('plugins/ecommerce::setting.shopping.form.enable_guest_payment_proof'))
+                    ->helperText(trans('plugins/ecommerce::setting.shopping.form.enable_guest_payment_proof_helper'))
+                    ->value(get_ecommerce_setting('guest_payment_proof_enabled', true))
+            )
+            ->addCloseCollapsible('payment_proof_enabled', '1')
             ->add(
                 'enable_quick_buy_button',
                 OnOffCheckboxField::class,

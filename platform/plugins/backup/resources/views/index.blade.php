@@ -9,7 +9,7 @@
     @endif
 
     @if ($driver === 'mysql')
-        <x-core::alert type="warning">
+        <x-core::alert type="warning" :important="true">
             <p>- {!! BaseHelper::clean(trans('plugins/backup::backup.important_message1')) !!}</p>
             <p>- {!! BaseHelper::clean(trans('plugins/backup::backup.important_message2')) !!}</p>
             <p>- {!! BaseHelper::clean(trans('plugins/backup::backup.important_message3')) !!}</p>

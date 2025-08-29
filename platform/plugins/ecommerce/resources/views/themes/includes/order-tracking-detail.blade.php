@@ -140,6 +140,49 @@
                                                 {!! render_product_options_html($orderProduct->product_options, $orderProduct->price) !!}
                                             @endif
 
+                                            @if ($orderProduct->license_code)
+                                                @php
+                                                    $licenseCodes = $orderProduct->license_codes_array;
+                                                    $hasMultipleCodes = count($licenseCodes) > 1;
+                                                @endphp
+                                                <div class="bb-order-product-card-license-code mt-2">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <x-core::icon name="ti ti-key" class="text-primary" />
+                                                        <span class="fw-semibold">
+                                                            {{ $hasMultipleCodes 
+                                                                ? trans('plugins/ecommerce::products.license_codes.codes') . ' (' . count($licenseCodes) . ')' 
+                                                                : trans('plugins/ecommerce::products.license_codes.code') }}:
+                                                        </span>
+                                                    </div>
+                                                    <div class="mt-1">
+                                                        @if ($hasMultipleCodes)
+                                                            <div class="d-flex flex-column gap-2">
+                                                                @foreach ($licenseCodes as $index => $code)
+                                                                    <div class="d-flex align-items-center">
+                                                                        <span class="text-muted me-2">{{ $index + 1 }}.</span>
+                                                                        <code class="bg-light p-2 rounded d-inline-block">{{ $code }}</code>
+                                                                        <button type="button"
+                                                                                class="btn btn-sm btn-outline-secondary ms-2"
+                                                                                onclick="navigator.clipboard.writeText('{{ $code }}'); this.innerHTML='<i class=\'ti ti-check\'></i> Copied!'; setTimeout(() => this.innerHTML='<i class=\'ti ti-copy\'></i> Copy', 2000)">
+                                                                            <x-core::icon name="ti ti-copy" />
+                                                                            {{ __('Copy') }}
+                                                                        </button>
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
+                                                        @else
+                                                            <code class="bg-light p-2 rounded d-inline-block">{{ $licenseCodes[0] ?? $orderProduct->license_code }}</code>
+                                                            <button type="button"
+                                                                    class="btn btn-sm btn-outline-secondary ms-2"
+                                                                    onclick="navigator.clipboard.writeText('{{ $licenseCodes[0] ?? $orderProduct->license_code }}'); this.innerHTML='<i class=\'ti ti-check\'></i> Copied!'; setTimeout(() => this.innerHTML='<i class=\'ti ti-copy\'></i> Copy', 2000)">
+                                                                <x-core::icon name="ti ti-copy" />
+                                                                {{ __('Copy') }}
+                                                            </button>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            @endif
+
                                             @if (is_plugin_active('marketplace') && ($product = $orderProduct->product) && $product->original_product->store?->id)
                                                 <div class="bb-order-product-card-vendor">
                                                     <small>{{ __('Sold by') }}: <a

@@ -2,7 +2,7 @@
 
 namespace Botble\Ecommerce\Http\Controllers\API;
 
-use Botble\Base\Http\Controllers\BaseController;
+use Botble\Api\Http\Controllers\BaseApiController;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Http\Requests\API\CategoryRequest;
 use Botble\Ecommerce\Http\Resources\API\AvailableProductResource;
@@ -14,7 +14,7 @@ use Botble\Slug\Facades\SlugHelper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class ProductCategoryController extends BaseController
+class ProductCategoryController extends BaseApiController
 {
     /**
      * Get list of product categories

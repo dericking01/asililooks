@@ -11,6 +11,7 @@ use Botble\Base\Traits\HasTreeCategory;
 use Botble\Ecommerce\Tables\ProductTable;
 use Botble\Media\Facades\RvMedia;
 use Botble\Support\Services\Cache\Cache;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -42,6 +43,8 @@ class ProductCategory extends BaseModel implements HasTreeCategoryContract
 
     protected $casts = [
         'status' => BaseStatusEnum::class,
+        'is_featured' => 'bool',
+        'order' => 'int',
     ];
 
     protected static function booted(): void
@@ -150,16 +153,28 @@ class ProductCategory extends BaseModel implements HasTreeCategoryContract
     protected function countAllProducts(): Attribute
     {
         return Attribute::get(function (): int {
-            $categoryIds = static::getChildrenIds($this->activeChildren);
+            $cache = Cache::make(static::class);
+            $cacheKey = 'count_all_products_' . $this->getKey() . app()->getLocale();
 
-            if (empty($categoryIds)) {
-                $categoryIds = [$this->getKey()];
+            if ($cache->has($cacheKey)) {
+                return $cache->get($cacheKey);
             }
 
-            return DB::table('ec_product_category_product')
+            $categoryIds = static::getChildrenIds($this->activeChildren);
+
+            $categoryIds[] = $this->getKey();
+
+            $count = DB::table('ec_product_category_product')
+                ->join('ec_products', 'ec_product_category_product.product_id', '=', 'ec_products.id')
                 ->whereIn('category_id', $categoryIds)
+                ->where('ec_products.status', BaseStatusEnum::PUBLISHED)
+                ->where('ec_products.is_variation', 0)
                 ->distinct('product_id')
                 ->count();
+
+            $cache->put($cacheKey, $count, Carbon::now()->addHours(2));
+
+            return $count;
         });
     }
 

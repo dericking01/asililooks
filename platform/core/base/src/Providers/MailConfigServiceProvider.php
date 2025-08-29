@@ -26,6 +26,14 @@ class MailConfigServiceProvider extends ServiceProvider
             }
 
             $this->app->resolving(MailManager::class, function () use ($config): void {
+                static $configured = false;
+
+                if ($configured) {
+                    return;
+                }
+
+                $configured = true;
+
                 $setting = $this->app->make(SettingStore::class);
 
                 $defaultMailDriver = function_exists('proc_open') ? 'sendmail' : 'smtp';
@@ -38,13 +46,6 @@ class MailConfigServiceProvider extends ServiceProvider
                         'from' => [
                             'address' => $setting->get('email_from_address', $config->get('mail.from.address')),
                             'name' => $setting->get('email_from_name', $config->get('mail.from.name')),
-                        ],
-                        'stream' => [
-                            'ssl' => [
-                                'allow_self_signed' => true,
-                                'verify_peer' => false,
-                                'verify_peer_name' => false,
-                            ],
                         ],
                     ]),
                 ]);

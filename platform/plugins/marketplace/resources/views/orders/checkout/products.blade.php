@@ -29,27 +29,29 @@
             $orderAmount += (float) $shippingAmount;
         @endphp
         <div class="mt-3 bg-light mb-3">
-            <div class="p-2" style="background: antiquewhite;">
-                <img
-                    class="img-fluid rounded"
-                    src="{{ RvMedia::getImageUrl($store->logo_square ?: $store->logo, null, false, RvMedia::getDefaultImage()) }}"
-                    alt="{{ $store->name }}"
-                    style="max-width: 30px; margin-inline-end: 3px;"
-                >
-                <span class="font-weight-bold">{!! BaseHelper::clean($store->name) !!}</span>
-                @if ($store->id && EcommerceHelper::isReviewEnabled())
-                    <div class="d-flex align-items-center gap-2">
-                        @include(EcommerceHelper::viewPath('includes.rating-star'), ['avg' => $store->reviews()->avg('star')])
-                        <span class="small text-muted">
-                            @if (($reviewsCount = $store->reviews()->count()) === 1)
-                                ({{ __('1 Review') }})
-                            @else
-                                ({{ __(':count Reviews', ['count' => number_format($reviewsCount)]) }})
-                            @endif
-                        </span>
-                    </div>
-                @endif
-            </div>
+            @if (MarketplaceHelper::getSetting('show_vendor_info_at_checkout', true))
+                <div class="p-2 vendor-information-section" style="background: antiquewhite;">
+                    <img
+                        class="img-fluid rounded"
+                        src="{{ RvMedia::getImageUrl($store->logo_square ?: $store->logo, null, false, RvMedia::getDefaultImage()) }}"
+                        alt="{{ $store->name }}"
+                        style="max-width: 30px; margin-inline-end: 3px;"
+                    >
+                    <span class="font-weight-bold">{!! BaseHelper::clean($store->name) !!}</span>
+                    @if ($store->id && EcommerceHelper::isReviewEnabled())
+                        <div class="d-flex align-items-center gap-2">
+                            @include(EcommerceHelper::viewPath('includes.rating-star'), ['avg' => $store->reviews()->avg('star')])
+                            <span class="small text-muted">
+                                @if (($reviewsCount = $store->reviews()->count()) === 1)
+                                    ({{ __('1 Review') }})
+                                @else
+                                    ({{ __(':count Reviews', ['count' => number_format($reviewsCount)]) }})
+                                @endif
+                            </span>
+                        </div>
+                    @endif
+                </div>
+            @endif
 
             <div class="py-3">
                 @foreach ($grouped['products'] as $product)
@@ -61,7 +63,7 @@
                 @endforeach
             </div>
 
-            @if ($isAvailableShipping)
+            @if ($isAvailableShipping && MarketplaceHelper::isChargeShippingPerVendor())
                 <div class="shipping-method-wrapper py-3" @style(['display: none' => (bool) get_ecommerce_setting('disable_shipping_options', false)])>
                     @if (!empty($shipping))
                         <div class="payment-checkout-form">
@@ -137,7 +139,7 @@
                         </div>
                     @endif
 
-                    @if ($isAvailableShipping)
+                    @if ($isAvailableShipping && MarketplaceHelper::isChargeShippingPerVendor())
                         <div class="row">
                             <div class="col-6">
                                 <p>{{ __('Shipping fee') }}:</p>

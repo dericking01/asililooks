@@ -10,4 +10,5 @@ Route::group([
     Route::post('apple', 'AppleLoginController@login');
     Route::post('google', 'GoogleLoginController@login');
     Route::post('facebook', 'FacebookLoginController@login');
+    Route::post('x', 'XLoginController@login');
 });

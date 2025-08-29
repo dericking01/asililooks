@@ -14,13 +14,14 @@
                             </tr>
                         </tbody>
                     </table>
-                    <h1 class="bb-text-center bb-m-0 bb-mt-md">Welcome to {{ site_title }}!</h1>
+                    <h1 class="bb-text-center bb-m-0 bb-mt-md">{{ 'plugins/ecommerce::email-templates.welcome_message' | trans({'site_title': site_title}) }}</h1>
                 </td>
             </tr>
             <tr>
                 <td class="bb-content bb-text-center">
-                    <p class="h1">We're glad to have you here, {{ customer_name }}!</p>
-                    <p>If you need any help, feel free to response to this email!</p>
+                    <p class="h1">{{ 'plugins/ecommerce::email-templates.welcome_greeting' | trans({'customer_name': customer_name}) }}</p>
+                    <p>{{ 'plugins/ecommerce::email-templates.welcome_register_success' | trans({'site_title': site_title}) }}</p>
+                    <p>{{ 'plugins/ecommerce::email-templates.welcome_explore' | trans }}</p>
                 </td>
             </tr>
             <tr>
@@ -33,7 +34,7 @@
                                     <tr>
                                         <td align="center" valign="top" class="lh-1">
                                             <a href="{{ site_url }}" class="bb-btn bb-bg-blue bb-border-blue">
-                                                <span class="btn-span">Start buying!</span>
+                                                <span class="btn-span">{{ 'plugins/ecommerce::email-templates.welcome_visit_shop' | trans }}</span>
                                             </a>
                                         </td>
                                     </tr>

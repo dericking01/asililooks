@@ -4,6 +4,8 @@ namespace Botble\StripeConnect\Listeners;
 
 use Botble\AffiliatePro\Enums\PayoutPaymentMethodsEnum;
 use Botble\AffiliatePro\Enums\WithdrawalStatusEnum;
+use Botble\AffiliatePro\Events\WithdrawalApprovedEvent;
+use Botble\AffiliatePro\Events\WithdrawalRejectedEvent;
 use Botble\AffiliatePro\Events\WithdrawalRequestedEvent;
 use Botble\Base\Facades\BaseHelper;
 use Botble\StripeConnect\StripeConnect;
@@ -37,6 +39,25 @@ class AffiliateStripeConnectListener
             $withdrawal->status = WithdrawalStatusEnum::APPROVED;
             $withdrawal->transaction_id = $transfer->id;
             $withdrawal->save();
+
+            // Update affiliate total_withdrawn (balance was already deducted when withdrawal was created)
+            $affiliate = $withdrawal->affiliate;
+            if ($affiliate) {
+                $affiliate->total_withdrawn += $withdrawal->amount;
+                $affiliate->save();
+
+                // Create transaction record
+                $affiliate->transactions()->create([
+                    'amount' => -$withdrawal->amount,
+                    'description' => 'Withdrawal approved via Stripe: ' . $withdrawal->transaction_id,
+                    'type' => 'withdrawal',
+                    'reference_id' => $withdrawal->id,
+                    'reference_type' => get_class($withdrawal),
+                ]);
+            }
+
+            // Fire withdrawal approved event
+            event(new WithdrawalApprovedEvent($withdrawal));
         } catch (Exception $e) {
             BaseHelper::logError($e);
 
@@ -49,7 +70,19 @@ class AffiliateStripeConnectListener
             if ($affiliate) {
                 $affiliate->balance += $withdrawal->amount;
                 $affiliate->save();
+
+                // Create transaction record for the refund
+                $affiliate->transactions()->create([
+                    'amount' => $withdrawal->amount,
+                    'description' => 'Withdrawal rejected via Stripe - amount refunded: ' . $e->getMessage(),
+                    'type' => 'refund',
+                    'reference_id' => $withdrawal->id,
+                    'reference_type' => get_class($withdrawal),
+                ]);
             }
+
+            // Fire withdrawal rejected event
+            event(new WithdrawalRejectedEvent($withdrawal, $e->getMessage()));
         }
     }
 }

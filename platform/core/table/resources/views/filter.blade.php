@@ -145,6 +145,7 @@
                 data-bb-toggle="datatable-reset-filter"
                 @style(['display: none' => !request()->has('filter_table_id')])
                 icon="ti ti-refresh"
+                class="w-6"
                 :icon-only="true"
             />
         </div>

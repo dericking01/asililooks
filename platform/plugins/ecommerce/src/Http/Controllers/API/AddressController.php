@@ -2,7 +2,7 @@
 
 namespace Botble\Ecommerce\Http\Controllers\API;
 
-use Botble\Base\Http\Controllers\BaseController;
+use Botble\Api\Http\Controllers\BaseApiController;
 use Botble\Ecommerce\Http\Requests\API\CreateAddressRequest;
 use Botble\Ecommerce\Http\Requests\API\UpdateAddressRequest;
 use Botble\Ecommerce\Http\Resources\API\AddressResource;
@@ -10,7 +10,7 @@ use Botble\Ecommerce\Models\Address;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class AddressController extends BaseController
+class AddressController extends BaseApiController
 {
     /**
      * Get list of address by customer
@@ -127,7 +127,7 @@ class AddressController extends BaseController
      *
      * @return JsonResponse
      */
-    public function update(UpdateAddressRequest $request, int $id)
+    public function update(UpdateAddressRequest $request, int|string $id)
     {
         $address = Address::query()->findOrFail($id);
         $address->update($request->validated()) ;
@@ -157,7 +157,7 @@ class AddressController extends BaseController
      *
      * @return JsonResponse
      */
-    public function destroy(int $id)
+    public function destroy(int|string $id)
     {
         $address = Address::query()
             ->where('customer_id', request()->user()->id)
@@ -211,7 +211,7 @@ class AddressController extends BaseController
      *
      * @return JsonResponse
      */
-    public function show(int $id)
+    public function show(int|string $id)
     {
         $address = Address::query()
             ->where('customer_id', request()->user()->id)

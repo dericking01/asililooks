@@ -76,7 +76,7 @@ class EmailSettingForm extends SettingForm
                     ->value(old('email_username', setting('email_username', config('mail.mailers.smtp.username'))))
                     ->placeholder(trans('core/setting::setting.email.username_placeholder'))
                     ->helperText(trans('core/setting::setting.email.username_helper'))
-                    ->maxLength(120)
+                    ->maxLength(255)
             )
             ->add(
                 'email_password',
@@ -220,7 +220,7 @@ class EmailSettingForm extends SettingForm
                         $logChannels = array_keys(config('logging.channels', [])),
                         $logChannels,
                     ))
-                    ->selected(old('email_log_channel', setting('email_log_channel', config('mail.mailers.log.channel'))))
+                    ->selected(old('email_log_channel', setting('email_log_channel', config('mail.mailers.log.channel'))) ?: 'single')
                     ->placeholder(trans('core/setting::setting.general.select'))
                     ->helperText(trans('core/setting::setting.email.log_channel_helper'))
             )

@@ -14,6 +14,7 @@ use Botble\Base\Supports\RepositoryHelper;
 use Botble\Blog\Forms\CategoryForm;
 use Botble\Blog\Http\Requests\CategoryRequest;
 use Botble\Blog\Models\Category;
+use Botble\Blog\Tables\CategoryTable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -26,9 +27,14 @@ class CategoryController extends BaseController
             ->add(trans('plugins/blog::categories.menu'), route('categories.index'));
     }
 
-    public function index(Request $request)
+    public function index(Request $request, CategoryTable $dataTable)
     {
         $this->pageTitle(trans('plugins/blog::categories.menu'));
+
+        // Handle table view
+        if ($request->get('as') === 'table') {
+            return $dataTable->renderTable();
+        }
 
         $categories = Category::query()
             ->latest('is_default')
@@ -49,8 +55,9 @@ class CategoryController extends BaseController
         Assets::addStylesDirectly('vendor/core/core/base/css/tree-category.css')
             ->addScriptsDirectly('vendor/core/core/base/js/tree-category.js');
 
-        $form = CategoryForm::create(['template' => 'core/base::forms.form-tree-category']);
+        $form = CategoryForm::create(['template' => 'plugins/blog::categories.form-tree-category']);
         $form = $this->setFormOptions($form, null, compact('categories'));
+        $form->setUrl(route('categories.create'));
 
         return $form->renderForm();
     }
@@ -122,7 +129,9 @@ class CategoryController extends BaseController
 
         $this->pageTitle(trans('core/base::forms.edit_item', ['name' => $category->name]));
 
-        return CategoryForm::createFromModel($category)->renderForm();
+        return CategoryForm::createFromModel($category)
+            ->setUrl(route('categories.edit', $category->getKey()))
+            ->renderForm();
     }
 
     public function update(Category $category, CategoryRequest $request)
@@ -167,6 +176,27 @@ class CategoryController extends BaseController
             ->withUpdatedSuccessMessage();
     }
 
+    public function getSearch(Request $request)
+    {
+        $term = $request->input('search') ?: $request->input('q');
+
+        $categories = Category::query()
+            ->select(['id', 'name'])
+            ->where('name', 'LIKE', '%' . $term . '%')
+            ->paginate(10);
+
+        $data = $categories->map(function ($category) {
+            return [
+                'id' => $category->id,
+                'text' => $category->name,
+            ];
+        });
+
+        return $this
+            ->httpResponse()
+            ->setData($data)->toApiResponse();
+    }
+
     protected function getForm(?Category $model = null): string
     {
         $options = ['template' => 'core/base::forms.form-no-wrap'];
@@ -178,6 +208,12 @@ class CategoryController extends BaseController
         $form = CategoryForm::create($options);
 
         $form = $this->setFormOptions($form, $model);
+
+        if (! $model) {
+            $form->setUrl(route('categories.create'));
+        } else {
+            $form->setUrl(route('categories.edit', $model->getKey()));
+        }
 
         return $form->renderForm();
     }

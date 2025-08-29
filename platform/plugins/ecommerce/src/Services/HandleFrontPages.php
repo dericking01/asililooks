@@ -420,7 +420,7 @@ class HandleFrontPages
         if ($category && view()->exists($productListingDescriptionView)) {
             $additional['product_listing_page_description_html'] = view($productListingDescriptionView, [
                 'pageName' => $category->name,
-                'pageDescription' => $category->description ? Shortcode::compile($category->description)->toHtml() : null,
+                'pageDescription' => $category->description ? Shortcode::compile($category->description, true)->toHtml() : null,
             ])->render();
         }
 

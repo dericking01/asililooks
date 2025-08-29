@@ -1,3 +1,9 @@
+<!--
+tags: [emotion, feeling, happy, face, add, new]
+category: Mood
+version: "2.7"
+unicode: "f7b9"
+-->
 <svg
   xmlns="http://www.w3.org/2000/svg"
   width="24"
@@ -8,8 +14,7 @@
   stroke-width="2"
   stroke-linecap="round"
   stroke-linejoin="round"
-  >
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+>
   <path d="M20.985 12.528a9 9 0 1 0 -8.45 8.456" />
   <path d="M16 19h6" />
   <path d="M19 16v6" />

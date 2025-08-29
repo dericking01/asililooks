@@ -39,10 +39,10 @@ class GetProductService
             'tags' => EcommerceHelper::parseFilterParams($request, 'tags'),
             'collections' => EcommerceHelper::parseFilterParams($request, 'collections'),
             'collection' => $request->input('collection'),
-            'attributes' => is_array($request->input('attributes')) ? $request->input('attributes') : [],
+            'attributes' => $this->parseJsonParam($request->input('attributes')),
             'max_price' => $request->input('max_price'),
             'min_price' => $request->input('min_price'),
-            'price_ranges' => (array) $request->input('price_ranges', []),
+            'price_ranges' => $this->parseJsonParam($request->input('price_ranges')),
             'sort_by' => $request->input('sort-by') ?: $request->input('sort_by'),
             'num' => $num,
             'discounted_only' => (bool) $request->input('discounted_only'),
@@ -147,5 +147,10 @@ class GetProductService
             'order_by' => $orderBy,
             'discounted_only' => $queryVar['discounted_only'],
         ], $params);
+    }
+
+    protected function parseJsonParam($param): array
+    {
+        return EcommerceHelper::parseJsonParam($param);
     }
 }

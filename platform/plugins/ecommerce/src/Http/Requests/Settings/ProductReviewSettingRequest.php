@@ -16,6 +16,7 @@ class ProductReviewSettingRequest extends Request
             'only_allow_customers_purchased_to_review' => $onOffRule,
             'review_need_to_be_approved' => $onOffRule,
             'show_customer_full_name' => $onOffRule,
+            'hide_rating_when_no_reviews' => $onOffRule,
         ];
     }
 }

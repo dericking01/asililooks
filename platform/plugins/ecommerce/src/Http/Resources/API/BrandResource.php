@@ -20,6 +20,7 @@ class BrandResource extends JsonResource
             'description' => $this->description,
             'is_featured' => $this->is_featured,
             'slug' => $this->slug,
+            'logo' => $this->logo ? RvMedia::getImageUrl($this->logo) : null,
             'logo_with_sizes' => $this->logo ? rv_get_image_sizes($this->logo, array_unique([
                 'origin',
                 'thumb',

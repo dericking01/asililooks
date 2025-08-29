@@ -334,6 +334,44 @@ app('events')->listen(RenderingThemeOptionSettings::class, function (): void {
             ],
         ])
         ->setSection([
+            'title' => __('Bottom Bar Menu'),
+            'id' => 'opt-text-subsection-bottom-bar-menu',
+            'subsection' => true,
+            'icon' => 'ti ti-category-2',
+        ])
+        ->setField([
+            'id' => 'bottom_bar_menu_show_text',
+            'section_id' => 'opt-text-subsection-bottom-bar-menu',
+            'type' => 'customSelect',
+            'label' => __('Show menu text'),
+            'attributes' => [
+                'name' => 'bottom_bar_menu_show_text',
+                'list' => [
+                    'yes' => trans('core/base::base.yes'),
+                    'no' => trans('core/base::base.no'),
+                ],
+                'value' => 'yes',
+                'options' => [
+                    'class' => 'form-control',
+                ],
+            ],
+        ])
+        ->setField([
+            'id' => 'bottom_bar_menu_text_font_size',
+            'section_id' => 'opt-text-subsection-bottom-bar-menu',
+            'type' => 'number',
+            'label' => __('Menu text font size (px)'),
+            'attributes' => [
+                'name' => 'bottom_bar_menu_text_font_size',
+                'value' => 11,
+                'options' => [
+                    'class' => 'form-control',
+                    'min' => 8,
+                    'max' => 20,
+                ],
+            ],
+        ])
+        ->setSection([
             'title' => __('Social links'),
             'id' => 'opt-text-subsection-social-links',
             'subsection' => true,

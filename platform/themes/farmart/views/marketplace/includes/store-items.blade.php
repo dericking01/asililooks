@@ -23,6 +23,7 @@
                                 <div class="store-title d-flex align-items-center">
                                     <h2 class="h5 mb-0">
                                         <a href="{{ $store->url }}">{{ $store->name }}</a>
+                                        {!! $store->badge !!}
                                     </h2>
                                 </div>
                                 @if (EcommerceHelper::isReviewEnabled())

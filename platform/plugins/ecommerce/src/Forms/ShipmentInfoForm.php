@@ -57,6 +57,7 @@ class ShipmentInfoForm extends FormAbstract
                     ->label(trans('plugins/ecommerce::shipping.note'))
                     ->placeholder(trans('plugins/ecommerce::shipping.add_note'))
                     ->rows(3)
+                    ->maxLength(10000)
             )
             ->addSubmitButton(trans('core/base::forms.save_and_continue'), 'ti ti-circle-check');
     }

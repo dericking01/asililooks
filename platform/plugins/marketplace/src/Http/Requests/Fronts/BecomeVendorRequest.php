@@ -17,8 +17,8 @@ class BecomeVendorRequest extends Request
             'shop_phone' => ['required', 'string', ...BaseHelper::getPhoneValidationRule(true)],
             'shop_url' => ['required', 'string', 'max:200'],
             'agree_terms_and_policy' => ['sometimes', 'accepted:1'],
-            'certificate_file' => ['sometimes', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:' . $maxSize],
-            'government_id_file' => ['sometimes', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:' . $maxSize],
+            'certificate_file' => ['sometimes', 'file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:' . $maxSize],
+            'government_id_file' => ['sometimes', 'file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:' . $maxSize],
         ];
     }
 }

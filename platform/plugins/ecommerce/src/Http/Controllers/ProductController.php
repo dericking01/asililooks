@@ -64,6 +64,9 @@ class ProductController extends BaseController
 
         $this->pageTitle(trans('plugins/ecommerce::products.edit', ['name' => $product->name]));
 
+        // Load license codes with their order relationships for displaying order links
+        $product->load(['licenseCodes.assignedOrderProduct.order']);
+
         event(new BeforeEditContentEvent($request, $product));
 
         return ProductForm::createFromModel($product)->renderForm();

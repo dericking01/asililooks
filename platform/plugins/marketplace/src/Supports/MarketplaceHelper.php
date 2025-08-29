@@ -2,15 +2,20 @@
 
 namespace Botble\Marketplace\Supports;
 
+use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Facades\EmailHandler;
 use Botble\Base\Supports\EmailHandler as BaseEmailHandler;
 use Botble\Ecommerce\Enums\DiscountTypeOptionEnum;
 use Botble\Ecommerce\Facades\OrderHelper;
 use Botble\Ecommerce\Models\Order as OrderModel;
+use Botble\Ecommerce\Models\ProductCategory;
 use Botble\Media\Facades\RvMedia;
 use Botble\Theme\Facades\Theme;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection as SupportCollection;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class MarketplaceHelper
@@ -41,12 +46,12 @@ class MarketplaceHelper
 
     public function discountTypes(): array
     {
-        return Arr::except(DiscountTypeOptionEnum::labels(), [DiscountTypeOptionEnum::SAME_PRICE]);
+        return Arr::except(DiscountTypeOptionEnum::labels(), [DiscountTypeOptionEnum::SAME_PRICE, DiscountTypeOptionEnum::SHIPPING]);
     }
 
     public function getAssetVersion(): string
     {
-        return '1.2.2';
+        return '2.1.6';
     }
 
     public function hideStorePhoneNumber(): bool
@@ -72,6 +77,11 @@ class MarketplaceHelper
     public function allowVendorManageShipping(): bool
     {
         return (bool) $this->getSetting('allow_vendor_manage_shipping', false);
+    }
+
+    public function isChargeShippingPerVendor(): bool
+    {
+        return (bool) $this->getSetting('charge_shipping_per_vendor', true);
     }
 
     public function sendMailToVendorAfterProcessingOrder($orders)
@@ -245,5 +255,74 @@ class MarketplaceHelper
         }
 
         return $allowedMimeTypes;
+    }
+
+    public function isEnabledVendorCategoriesFilter(): bool
+    {
+        return (bool) $this->getSetting('enable_vendor_categories_filter', true);
+    }
+
+    /**
+     * Get categories for a specific vendor/store
+     *
+     * @param string|int $storeId
+     * @return SupportCollection
+     */
+    public function getCategoriesForVendor(string|int $storeId): SupportCollection
+    {
+        $cacheKey = 'marketplace_store_categories_' . $storeId;
+
+        return Cache::remember($cacheKey, 3600, function () use ($storeId) {
+            // Optimized query using a single query with subquery
+            $categoryIds = DB::table('ec_product_category_product')
+                ->whereIn('product_id', function ($query) use ($storeId) {
+                    $query->select('id')
+                        ->from('ec_products')
+                        ->where('store_id', $storeId)
+                        ->where('is_variation', 0)
+                        ->where('status', BaseStatusEnum::PUBLISHED);
+                })
+                ->distinct()
+                ->pluck('category_id');
+
+            if ($categoryIds->isEmpty()) {
+                return collect();
+            }
+
+            // Get categories with their parents in a single query using recursive CTE (if supported)
+            // or fallback to the iterative approach
+            $allCategoryIds = collect($categoryIds);
+            $parentIds = $categoryIds;
+
+            // Iteratively get all parent categories
+            while ($parentIds->isNotEmpty()) {
+                $parentIds = ProductCategory::query()
+                    ->whereIn('id', $parentIds)
+                    ->whereNotNull('parent_id')
+                    ->where('parent_id', '>', 0)
+                    ->pluck('parent_id')
+                    ->unique();
+
+                if ($parentIds->isNotEmpty()) {
+                    $allCategoryIds = $allCategoryIds->merge($parentIds)->unique();
+                }
+            }
+
+            // Get all categories in a single query
+            $categories = ProductCategory::query()
+                ->whereIn('id', $allCategoryIds)
+                ->wherePublished()
+                ->with(['slugable'])
+                ->orderBy('parent_id')
+                ->orderBy('order')
+                ->get();
+
+            // Transform categories to include URL
+            return $categories->map(function ($category) {
+                $category->url = $category->slugable ? route('public.single', $category->slugable->key) : '#';
+
+                return $category;
+            });
+        });
     }
 }

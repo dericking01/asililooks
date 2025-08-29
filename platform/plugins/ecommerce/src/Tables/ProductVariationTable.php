@@ -257,6 +257,7 @@ class ProductVariationTable extends TableAbstract
                 'title' => $attributeSet->title,
                 'class' => 'text-start',
                 'orderable' => false,
+                'searchable' => false,
                 'width' => '90',
                 'search_data' => [
                     'attribute_set_id' => $attributeSet->id,

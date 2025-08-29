@@ -11,6 +11,7 @@ use Botble\Payment\Forms\PaymentMethodForm;
 class MolliePaymentMethodForm extends PaymentMethodForm
 {
     use HasAvailableCountriesField;
+
     public function setup(): void
     {
         parent::setup();

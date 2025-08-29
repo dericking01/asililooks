@@ -26,10 +26,34 @@
 @endif
 
 @if (EcommerceHelper::isTaxEnabled() && (float) $order->tax_amount)
-    @include('plugins/ecommerce::orders.thank-you.total-row', [
-        'label' => __('Tax'),
-        'value' => format_price($order->tax_amount),
-    ])
+    @php
+        $taxGroups = [];
+        foreach ($order->products as $orderProduct) {
+            if ($orderProduct->tax_amount > 0 && !empty($orderProduct->options['taxClasses'])) {
+                foreach ($orderProduct->options['taxClasses'] as $taxName => $taxRate) {
+                    $taxKey = $taxName . ' (' . $taxRate . '%)';
+                    if (!isset($taxGroups[$taxKey])) {
+                        $taxGroups[$taxKey] = 0;
+                    }
+                    $taxGroups[$taxKey] += $orderProduct->tax_amount;
+                }
+            }
+        }
+    @endphp
+
+    @if (!empty($taxGroups))
+        @foreach ($taxGroups as $taxName => $taxAmount)
+            @include('plugins/ecommerce::orders.thank-you.total-row', [
+                'label' => __('Tax') . ' <small>(' . $taxName . ')</small>',
+                'value' => format_price($taxAmount),
+            ])
+        @endforeach
+    @else
+        @include('plugins/ecommerce::orders.thank-you.total-row', [
+            'label' => __('Tax'),
+            'value' => format_price($order->tax_amount),
+        ])
+    @endif
 @endif
 
 @if ((float) $order->discount_amount)

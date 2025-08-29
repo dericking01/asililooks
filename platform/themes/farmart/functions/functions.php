@@ -48,6 +48,7 @@ app()->booted(function (): void {
     ThemeSupport::registerSiteLogoHeight(45);
     ThemeSupport::registerSiteCopyright();
     ThemeSupport::registerDateFormatOption();
+    ThemeSupport::registerToastNotification();
 
     if (is_plugin_active('newsletter')) {
         Newsletter::registerNewsletterPopup();
@@ -166,8 +167,8 @@ app()->booted(function (): void {
                 MetaBox::saveMetaBoxData($store, 'socials', $socials);
             }
         }, 230);
-
-        
+    
+        // CUSTOM SHORTCODES FOR ASILI LOOKS THEME
         if (function_exists('add_shortcode')) {
             add_shortcode('testimonial-slider', __('Testimonial Slider'), __('Customer testimonials slider'), function () {
                 return Theme::partial('shortcodes.testimonial-slider');

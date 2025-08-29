@@ -24,7 +24,7 @@
                                         >
                                     </div>
                                     <div class="vendor-store-info col">
-                                        <h4 class="vendor-name">{{ $store->name }}</h4>
+                                        <h4 class="vendor-name">{{ $store->name }} {!! $store->badge !!}</h4>
                                         @if (EcommerceHelper::isReviewEnabled())
                                             <div class="vendor-store-rating mb-3">
                                                 {!! Theme::partial('star-rating', [

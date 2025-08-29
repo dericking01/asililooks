@@ -1,4 +1,8 @@
-class ScrollBarHelper {
+// ScrollBarHelper with mod_pagespeed compatibility
+(function(window) {
+    'use strict';
+    
+    class ScrollBarHelper {
   constructor() {
       this._element = document.body;
   }
@@ -110,3 +114,13 @@ class ScrollBarHelper {
       return this.getWidth() > 0;
   }
 }
+    
+    // Make ScrollBarHelper globally available
+    window.ScrollBarHelper = ScrollBarHelper;
+    
+    // Also attach to jQuery if available
+    if (typeof jQuery !== 'undefined') {
+        jQuery.ScrollBarHelper = ScrollBarHelper;
+    }
+    
+})(window);

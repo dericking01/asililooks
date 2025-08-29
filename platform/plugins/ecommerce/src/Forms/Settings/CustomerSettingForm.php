@@ -3,9 +3,11 @@
 namespace Botble\Ecommerce\Forms\Settings;
 
 use Botble\Base\Forms\FieldOptions\MediaImageFieldOption;
+use Botble\Base\Forms\FieldOptions\NumberFieldOption;
 use Botble\Base\Forms\FieldOptions\OnOffFieldOption;
 use Botble\Base\Forms\FieldOptions\RadioFieldOption;
 use Botble\Base\Forms\Fields\MediaImageField;
+use Botble\Base\Forms\Fields\NumberField;
 use Botble\Base\Forms\Fields\OnOffCheckboxField;
 use Botble\Base\Forms\Fields\RadioField;
 use Botble\Ecommerce\Facades\EcommerceHelper;
@@ -37,8 +39,21 @@ class CustomerSettingForm extends SettingForm
                 OnOffFieldOption::make()
                     ->label(trans('plugins/ecommerce::setting.customer.form.verify_customer_email'))
                     ->helperText(trans('plugins/ecommerce::setting.customer.form.verify_customer_email_helper'))
-                    ->value(EcommerceHelper::isEnableEmailVerification())
+                    ->value($verifyEmailEnabled = EcommerceHelper::isEnableEmailVerification())
             )
+            ->addOpenCollapsible('verify_customer_email', '1', $verifyEmailEnabled == '1')
+            ->add(
+                'verification_expire_minutes',
+                NumberField::class,
+                NumberFieldOption::make()
+                    ->label(trans('plugins/ecommerce::setting.customer.form.verification_expire_minutes'))
+                    ->helperText(trans('plugins/ecommerce::setting.customer.form.verification_expire_minutes_helper'))
+                    ->value(get_ecommerce_setting('verification_expire_minutes', config('plugins.ecommerce.general.verification_expire_minutes', 60)))
+                    ->min(1)
+                    ->max(10080)
+                    ->step(1)
+            )
+            ->addCloseCollapsible('verify_customer_email', '1')
             ->add(
                 'enabled_phone_field_in_registration_form',
                 OnOffCheckboxField::class,

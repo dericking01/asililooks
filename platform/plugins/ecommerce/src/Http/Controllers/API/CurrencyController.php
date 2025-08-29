@@ -2,11 +2,11 @@
 
 namespace Botble\Ecommerce\Http\Controllers\API;
 
-use Botble\Base\Http\Controllers\BaseController;
+use Botble\Api\Http\Controllers\BaseApiController;
 use Botble\Ecommerce\Facades\Currency as CurrencyFacade;
 use Illuminate\Http\JsonResponse;
 
-class CurrencyController extends BaseController
+class CurrencyController extends BaseApiController
 {
     /**
      * Get list of available currencies

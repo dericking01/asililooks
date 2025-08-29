@@ -46,6 +46,7 @@ class RegisterForm extends AuthForm
                 TextFieldOption::make()
                     ->label(__('Full name'))
                     ->placeholder(__('Your full name'))
+                    ->required()
                     ->icon('ti ti-user')
             )
             ->when(! EcommerceHelper::isLoginUsingPhone() || get_ecommerce_setting('keep_email_field_in_registration_form', true), function (FormAbstract $form): void {
@@ -57,6 +58,8 @@ class RegisterForm extends AuthForm
                             ->label(__('Email'))
                             ->when(EcommerceHelper::isLoginUsingPhone(), function (EmailFieldOption $fieldOption): void {
                                 $fieldOption->label(__('Email (optional)'));
+                            }, function (EmailFieldOption $fieldOption): void {
+                                $fieldOption->required();
                             })
                             ->placeholder(__('Your email'))
                             ->icon('ti ti-mail')
@@ -87,6 +90,7 @@ class RegisterForm extends AuthForm
                     ->label(__('Password'))
                     ->placeholder(__('Password'))
                     ->icon('ti ti-lock')
+                    ->required()
             )
             ->add(
                 'password_confirmation',
@@ -95,6 +99,7 @@ class RegisterForm extends AuthForm
                     ->label(__('Password confirmation'))
                     ->placeholder(__('Password confirmation'))
                     ->icon('ti ti-lock')
+                    ->required()
             )
             ->add(
                 'agree_terms_and_policy',

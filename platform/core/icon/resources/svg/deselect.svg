@@ -1,3 +1,8 @@
+<!--
+tags: [unselect, clear-selection, deselection, unpick, uncheck, deactivate, unmark, remove-selection, untag, unchoose]
+version: "2.11"
+unicode: "f9f3"
+-->
 <svg
   xmlns="http://www.w3.org/2000/svg"
   width="24"
@@ -8,8 +13,7 @@
   stroke-width="2"
   stroke-linecap="round"
   stroke-linejoin="round"
-  >
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+>
   <path d="M12 8h3a1 1 0 0 1 1 1v3" />
   <path d="M16 16h-7a1 1 0 0 1 -1 -1v-7" />
   <path d="M12 20v.01" />

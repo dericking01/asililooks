@@ -738,18 +738,18 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
 
         // Filter products that are on sale when discounted_only is set to true
         if ($filters['discounted_only']) {
-            $this->model = $this->model->where(function ($query) {
-                $query->where(function ($subQuery) {
+            $this->model = $this->model->where(function ($query): void {
+                $query->where(function ($subQuery): void {
                     // Products with sale price
                     $subQuery->where('sale_type', 0)
                         ->where('sale_price', '>', 0)
                         ->whereColumn('sale_price', '<', 'price');
-                })->orWhere(function ($subQuery) {
+                })->orWhere(function ($subQuery): void {
                     // Products with time-based sale
                     $now = Carbon::now();
                     $subQuery->where('sale_type', 1)
                         ->where('start_date', '<=', $now)
-                        ->where(function ($q) use ($now) {
+                        ->where(function ($q) use ($now): void {
                             $q->whereNull('end_date')
                                 ->orWhere('end_date', '>=', $now);
                         })

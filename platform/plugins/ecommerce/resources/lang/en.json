@@ -530,5 +530,6 @@
     "million": "million",
     "times": "times",
     "when shipping fee less than or equal :amount": "when shipping fee less than or equal :amount",
-    "✅ Purchased :time": "✅ Purchased :time"
+    "✅ Purchased :time": "✅ Purchased :time",
+    "By placing an order, you agree to our Terms of Service and acknowledge that you have read our Privacy Policy. Your payment will be processed securely according to our payment provider's privacy policy.": "By placing an order, you agree to our Terms of Service and acknowledge that you have read our Privacy Policy. Your payment will be processed securely according to our payment provider's privacy policy."
 }

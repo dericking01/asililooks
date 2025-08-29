@@ -33,7 +33,7 @@
                     {% if site_email %}
                         <tr>
                             <td class="bb-pt-md">
-                                If you have any questions, feel free to message us at <a href="mailto:{{ site_email }}">{{ site_email }}</a>.
+                                {{ 'core/base::base.email_template.footer_contact_message' | trans({'site_email': site_email}) }}
                             </td>
                         </tr>
                     {% endif %}

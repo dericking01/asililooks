@@ -64,9 +64,21 @@ class ProductSearchSettingForm extends SettingForm
                 OnOffCheckboxField::class,
                 OnOffFieldOption::make()
                     ->label(trans('plugins/ecommerce::setting.product_search.form.enable_filter_products_by_tags'))
-                    ->value(EcommerceHelper::isEnabledFilterProductsByTags())
+                    ->value($enableFilterByTags = EcommerceHelper::isEnabledFilterProductsByTags())
                     ->defaultValue(true)
             )
+            ->addOpenCollapsible('enable_filter_products_by_tags', '1', $enableFilterByTags)
+            ->add(
+                'number_of_popular_tags_for_filter',
+                NumberField::class,
+                NumberFieldOption::make()
+                    ->label(trans('plugins/ecommerce::setting.product_search.form.number_of_popular_tags_for_filter'))
+                    ->placeholder(trans('plugins/ecommerce::setting.product_search.form.number_of_popular_tags_for_filter_placeholder'))
+                    ->helperText(trans('plugins/ecommerce::setting.product_search.form.number_of_popular_tags_for_filter_helper'))
+                    ->value(get_ecommerce_setting('number_of_popular_tags_for_filter', 10))
+                    ->defaultValue(10)
+            )
+            ->addCloseCollapsible('enable_filter_products_by_tags', '1')
             ->add(
                 'enable_filter_products_by_attributes',
                 OnOffCheckboxField::class,

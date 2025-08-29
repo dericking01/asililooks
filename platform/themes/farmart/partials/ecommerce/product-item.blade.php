@@ -48,6 +48,7 @@
                     href="{{ $product->store->url }}"
                     tabindex="0"
                 >{{ $product->store->name }}</a>
+                {!! $product->store->badge !!}
             </div>
         @endif
         <h3 class="product__title">

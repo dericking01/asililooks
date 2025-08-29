@@ -15,6 +15,7 @@ class ProductSettingRequest extends Request
             'show_out_of_stock_products' => $onOffRule,
             'is_enabled_product_options' => $onOffRule,
             'is_enabled_related_products' => $onOffRule,
+            'related_products_source' => ['nullable', 'in:category,brand'],
             'is_enabled_cross_sale_products' => $onOffRule,
             'auto_generate_product_sku' => $onOffRule,
             'enable_product_specification' => $onOffRule,

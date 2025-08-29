@@ -2,6 +2,7 @@
 
 namespace Botble\Marketplace\Models;
 
+use Botble\ACL\Models\User;
 use Botble\Base\Casts\SafeContent;
 use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Models\BaseModel;
@@ -48,6 +49,10 @@ class Store extends BaseModel
         'certificate_file',
         'government_id_file',
         'tax_id',
+        'is_verified',
+        'verified_at',
+        'verified_by',
+        'verification_note',
     ];
 
     protected $casts = [
@@ -57,6 +62,9 @@ class Store extends BaseModel
         'content' => SafeContent::class,
         'address' => SafeContent::class,
         'company' => SafeContent::class,
+        'is_verified' => 'boolean',
+        'verified_at' => 'datetime',
+        'verification_note' => SafeContent::class,
     ];
 
     protected static function booted(): void
@@ -94,6 +102,11 @@ class Store extends BaseModel
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class)->withDefault();
+    }
+
+    public function verifiedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'verified_by');
     }
 
     public function products(): HasMany
@@ -138,6 +151,19 @@ class Store extends BaseModel
                 $folder = $this->id ? 'stores/' . ($this->slug ?: $this->id) : 'stores';
 
                 return apply_filters('marketplace_store_upload_folder', $folder, $this);
+            }
+        );
+    }
+
+    protected function badge(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                if (! $this->is_verified) {
+                    return '';
+                }
+
+                return view('plugins/marketplace::partials.verified-badge', ['size' => 'sm'])->render();
             }
         );
     }

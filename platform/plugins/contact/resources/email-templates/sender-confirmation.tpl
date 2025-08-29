@@ -14,7 +14,7 @@
                             </tr>
                         </tbody>
                     </table>
-                    <h1 class="bb-text-center bb-m-0 bb-mt-md">Thank You for Contacting Us!</h1>
+                    <h1 class="bb-text-center bb-m-0 bb-mt-md">{{ 'plugins/contact::contact.email_templates.sender_confirmation_title' | trans }}</h1>
                 </td>
             </tr>
             <tr>
@@ -23,11 +23,11 @@
                         <tbody>
                             <tr>
                                 <td class="bb-content">
-                                    <p>Dear Admin,</p>
+                                    <p>{{ 'plugins/contact::contact.email_templates.sender_confirmation_greeting' | trans({'contact_name': contact_name}) }}</p>
 
-                                    <p>Thank you for reaching out to us! We have received your message and our team will review it shortly. One of our representatives will get back to you as soon as possible.</p>
+                                    <p>{{ 'plugins/contact::contact.email_templates.sender_confirmation_thank_you' | trans }}</p>
 
-                                    <h4>Here are the details of your submission:</h4>
+                                    <h4>{{ 'plugins/contact::contact.email_templates.sender_confirmation_submission_details' | trans }}</h4>
 
                                     <table class="bb-table" cellspacing="0" cellpadding="0">
                                         <thead>
@@ -38,31 +38,31 @@
                                         <tbody>
                                             {% if contact_name %}
                                                 <tr>
-                                                    <td>Name:</td>
+                                                    <td>{{ 'plugins/contact::contact.email_templates.field_name' | trans }}</td>
                                                     <td class="bb-font-strong bb-text-left"> {{ contact_name }} </td>
                                                 </tr>
                                             {% endif %}
                                             {% if contact_subject %}
                                                 <tr>
-                                                    <td>Subject:</td>
+                                                    <td>{{ 'plugins/contact::contact.email_templates.field_subject' | trans }}</td>
                                                     <td class="bb-font-strong bb-text-left"> {{ contact_subject }} </td>
                                                 </tr>
                                             {% endif %}
                                             {% if contact_email %}
                                                 <tr>
-                                                    <td>Email:</td>
+                                                    <td>{{ 'plugins/contact::contact.email_templates.field_email' | trans }}</td>
                                                     <td class="bb-font-strong bb-text-left"> {{ contact_email }} </td>
                                                 </tr>
                                             {% endif %}
                                             {% if contact_address %}
                                                 <tr>
-                                                    <td>Address:</td>
+                                                    <td>{{ 'plugins/contact::contact.email_templates.field_address' | trans }}</td>
                                                     <td class="bb-font-strong bb-text-left"> {{ contact_address }} </td>
                                                 </tr>
                                             {% endif %}
                                             {% if contact_phone %}
                                                 <tr>
-                                                    <td>Phone:</td>
+                                                    <td>{{ 'plugins/contact::contact.email_templates.field_phone' | trans }}</td>
                                                     <td class="bb-font-strong bb-text-left"> {{ contact_phone }} </td>
                                                 </tr>
                                             {% endif %}
@@ -74,7 +74,7 @@
                                             {% endfor %}
                                             {% if contact_content %}
                                                 <tr>
-                                                    <td colspan="2">Content:</td>
+                                                    <td colspan="2">{{ 'plugins/contact::contact.email_templates.field_content' | trans }}</td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="2" class="bb-font-strong"><i>{{ contact_content }}</i></td>
@@ -86,9 +86,9 @@
                             </tr>
                             <tr>
                                 <td class="bb-content bb-text-center bb-pt-0 bb-pb-xl" align="center">
-                                    <p>If you have any additional information or questions, feel free to reply to this email.</p>
+                                    <p>{{ 'plugins/contact::contact.email_templates.sender_confirmation_additional_info' | trans }}</p>
 
-                                    <p>We appreciate your interest and will be in touch soon!</p>
+                                    <p>{{ 'plugins/contact::contact.email_templates.sender_confirmation_appreciate' | trans }}</p>
                                 </td>
                             </tr>
                         </tbody>

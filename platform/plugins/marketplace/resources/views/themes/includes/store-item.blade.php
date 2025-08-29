@@ -1,10 +1,13 @@
 <div class="card bb-store-item">
     <div class="bb-store-item-content">
         <a href="{{ $store->url }}">
-            <h4>{{ $store->name }}</h4>
+            <h4>
+                {{ $store->name }}
+                {!! $store->badge !!}
+            </h4>
         </a>
 
-        @if (EcommerceHelper::isReviewEnabled())
+        @if (EcommerceHelper::isReviewEnabled() && (!EcommerceHelper::hideRatingWhenNoReviews() || $store->reviews->count() > 0))
             <div class="d-flex align-items-center gap-1 bb-store-item-rating">
                 @include(EcommerceHelper::viewPath('includes.rating-star'), ['avg' => $store->reviews()->avg('star')])
                 <a href="{{ $store->url }}" class="small">{{ __('(:count reviews)', ['count' => number_format($store->reviews->count())]) }}</a>

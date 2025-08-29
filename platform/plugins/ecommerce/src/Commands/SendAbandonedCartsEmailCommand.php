@@ -32,9 +32,6 @@ class SendAbandonedCartsEmailCommand extends Command
                 $mailer = EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME);
                 $order->dont_show_order_info_in_product_list = true;
 
-                /**
-                 * @var Order $order
-                 */
                 OrderHelper::setEmailVariables($order);
 
                 $mailer->sendUsingTemplate('order_recover', $email);

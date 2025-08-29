@@ -2,7 +2,7 @@
 
 namespace Botble\Ecommerce\Http\Controllers\API;
 
-use Botble\Base\Http\Controllers\BaseController;
+use Botble\Api\Http\Controllers\BaseApiController;
 use Botble\Ecommerce\Enums\ProductTypeEnum;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Http\Resources\API\DigitalProductResource;
@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-class DownloadController extends BaseController
+class DownloadController extends BaseApiController
 {
     /**
      * Get list of digital products available for download
@@ -225,7 +225,7 @@ class DownloadController extends BaseController
             // For API, we'll return a download URL instead of directly downloading the file
             $downloadUrl = route('api.ecommerce.download.download-file', [
                 'token' => Hash::make($fileName),
-                'filename' => $zipName,
+                'order_id' => $orderProduct->order_id,
             ]);
 
             return $this
@@ -245,16 +245,40 @@ class DownloadController extends BaseController
      * Download a file using a token
      *
      * @param string $token
-     * @param string $filename
+     * @param string $order_id
      * @return mixed
      */
-    public function downloadFile(string $token, string $filename)
+    public function downloadFile(string $token, string $order_id)
     {
+        // Find the order product by order_id and validate token
+        $orderProduct = OrderProduct::query()
+            ->whereHas('order', function (Builder $query) use ($order_id): void {
+                $query->where('id', $order_id);
+            })
+            ->where('product_type', ProductTypeEnum::DIGITAL)
+            ->first();
+
+        abort_unless($orderProduct, 404);
+
+        // For digital products, we need to find the generated zip file
+        // The token should match the hashed file path
         $storageDisk = Storage::disk('local');
-        $filePath = $storageDisk->path($filename);
 
-        abort_if(! File::exists($filePath) || ! Hash::check($filePath, $token), 404);
+        // Get all files in the storage and find the one that matches the token
+        $files = $storageDisk->allFiles();
+        $targetFile = null;
 
-        return response()->download($filePath)->deleteFileAfterSend();
+        foreach ($files as $file) {
+            $filePath = $storageDisk->path($file);
+            if (Hash::check($filePath, $token)) {
+                $targetFile = $filePath;
+
+                break;
+            }
+        }
+
+        abort_unless($targetFile && File::exists($targetFile), 404);
+
+        return response()->download($targetFile)->deleteFileAfterSend();
     }
 }

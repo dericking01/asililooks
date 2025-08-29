@@ -12,7 +12,7 @@
     $userInfo = $order->address->id ? $order->address : $order->user;
 @endphp
 
-<div class="order-customer-info">
+<div class="order-customer-info mt-3 mt-md-4 mb-0 mb-sm-4">
     <h3> {{ __('Customer information') }}</h3>
     @if ($userInfo->id)
         @if ($userInfo->name)
@@ -69,6 +69,9 @@
         @if (setting('payment_bank_transfer_display_bank_info_at_the_checkout_success_page', false) &&
                 ($bankInfo = OrderHelper::getOrderBankInfo($orders)))
             {!! $bankInfo !!}
+        @else
+            {{-- Show payment proof upload for all other payment methods --}}
+            @include('plugins/ecommerce::orders.partials.payment-proof-upload')
         @endif
     @endif
 

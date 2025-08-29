@@ -48,6 +48,9 @@ class UserTable extends TableAbstract
                     ->title(trans('core/acl::users.username'))
                     ->alignStart(),
                 EmailColumn::make()->linkable(),
+                FormattedColumn::make('phone')
+                    ->title(trans('core/acl::users.phone'))
+                    ->alignStart(),
                 FormattedColumn::make('role_name')
                     ->title(trans('core/acl::users.role'))
                     ->searchable(false)
@@ -133,6 +136,7 @@ class UserTable extends TableAbstract
                         'id',
                         'username',
                         'email',
+                        'phone',
                         'updated_at',
                         'created_at',
                         'super_user',

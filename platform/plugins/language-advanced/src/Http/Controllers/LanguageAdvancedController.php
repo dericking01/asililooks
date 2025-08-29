@@ -33,7 +33,7 @@ class LanguageAdvancedController extends BaseController
 
         $slugId = $request->input('slug_id');
 
-        $language = $request->input('language');
+        $language = $request->input('language') ?: $request->header('X-LANGUAGE');
 
         if ($slugId && $language) {
             $table = 'slugs_translations';

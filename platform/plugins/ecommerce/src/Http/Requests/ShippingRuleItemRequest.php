@@ -11,6 +11,16 @@ use Illuminate\Validation\Rule;
 
 class ShippingRuleItemRequest extends Request
 {
+    protected function isBasedOnLocationRule(): bool
+    {
+        return ShippingRule::query()
+            ->where([
+                'id' => $this->input('shipping_rule_id'),
+                'type' => ShippingRuleTypeEnum::BASED_ON_LOCATION,
+            ])
+            ->exists();
+    }
+
     public function rules(): array
     {
         return [
@@ -21,7 +31,7 @@ class ShippingRuleItemRequest extends Request
                 }),
             ],
             'country' => ['required'],
-            'state' => [
+            'state' => array_filter([
                 'sometimes',
                 Rule::requiredIf(function () {
                     return ShippingRule::query()
@@ -31,9 +41,19 @@ class ShippingRuleItemRequest extends Request
                         ])
                         ->exists();
                 }),
-                Rule::exists('states', 'id'),
-            ],
-            'city' => ['nullable', 'required_without:state'] + (EcommerceHelper::useCityFieldAsTextField() ? [] : ['exists:cities,id']),
+                $this->isBasedOnLocationRule() ? Rule::exists('states', 'id') : null,
+            ]),
+            'city' => array_filter([
+                'nullable',
+                Rule::requiredIf(function () {
+                    return $this->isBasedOnLocationRule() && ! $this->filled('state');
+                }),
+                ...(
+                    EcommerceHelper::useCityFieldAsTextField() || ! $this->isBasedOnLocationRule()
+                    ? []
+                    : [Rule::exists('cities', 'id')]
+                ),
+            ]),
             'zip_code' => [
                 'nullable',
                 ...BaseHelper::getZipcodeValidationRule(true),

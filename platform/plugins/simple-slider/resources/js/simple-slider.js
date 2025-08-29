@@ -104,4 +104,10 @@ class SimpleSliderManagement {
 
 $(() => {
     new SimpleSliderManagement().init()
+
+    document.addEventListener('shortcode.loaded', function (event) {
+        if (event.detail.name === 'simple-slider') {
+            new SimpleSliderManagement().init()
+        }
+    });
 })

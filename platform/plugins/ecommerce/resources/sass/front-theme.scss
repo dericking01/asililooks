@@ -100,7 +100,7 @@ input[type='checkbox'] {
 
 .checkout-content-wrap {
     select.form-control:not([size]):not([multiple]) {
-        height: calc(2.25rem + 9px);
+        height: calc(2.25rem + 12px);
     }
 }
 
@@ -167,6 +167,10 @@ label {
 input.form-control,
 select.form-control {
     height: 45px;
+}
+
+input[type="file"].form-control {
+    height: auto;
 }
 
 .form-group {
@@ -995,4 +999,554 @@ body,
     width: var(--bb-rating-size)
 }
 
+// Bank Transfer Info Styles
+.bank-transfer-info {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 0.25rem;
+
+    &__content {
+        display: flex;
+        align-items: flex-start;
+    }
+
+    &__icon {
+        margin-right: 0.75rem;
+        width: 24px;
+        height: 24px;
+        color: var(--bs-primary);
+    }
+
+    &__details {
+        flex-grow: 1;
+    }
+
+    &__text {
+        font-size: 14px;
+        color: #495057;
+    }
+
+    &__amount,
+    &__description {
+        margin-top: 0.5rem;
+        margin-bottom: 0.25rem;
+        font-size: 14px;
+        color: #737373;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+
+// Customer order upload receipt form
+.customer-order-upload-receipt {
+    input[type="file"] {
+        padding: 6px 16px;
+    }
+}
+
+// Payment Proof Upload Styles
+.payment-proof-upload {
+    margin-top: 1rem;
+
+    &__header {
+        display: flex;
+        align-items: flex-start;
+    }
+
+    &__icon {
+        margin-right: 0.75rem;
+        width: 30px;
+        height: 30px;
+        color: var(--bs-primary);
+    }
+
+    &__content {
+        flex-grow: 1;
+    }
+
+    &__title {
+        margin-bottom: 0.5rem;
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    &__message {
+        margin-bottom: 0.75rem;
+        font-size: 14px;
+        color: #737373;
+    }
+
+    &__file-preview {
+        margin-bottom: 0.75rem;
+        padding: 0.5rem;
+        background-color: white;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+
+        &-label {
+            font-size: 14px;
+            color: #737373;
+        }
+
+        &-link {
+            margin-left: 0.5rem;
+            color: var(--bs-primary);
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+
+            .icon {
+                width: 16px;
+                height: 16px;
+            }
+        }
+    }
+
+    &__replace-text {
+        margin-bottom: 0.75rem;
+        font-size: 14px;
+        color: #737373;
+        font-weight: 500;
+    }
+
+    &__upload-form {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        .form-control {
+            flex: 1;
+        }
+
+        .btn {
+            padding: 6px 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+
+            .icon {
+                width: 18px;
+                height: 18px;
+            }
+        }
+    }
+
+    &__help-text {
+        display: block;
+        margin-top: 0.5rem;
+        font-size: 12px;
+        color: #737373;
+    }
+}
+
 @import "front/mobile-coupon";
+
+/* Shopify-style checkout inputs */
+.checkout-form,
+.form-checkout,
+.checkout-content-wrap {
+    .form-group {
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .form-control {
+        background-color: #fff;
+        border: 1px solid #d9d9d9;
+        border-radius: 5px;
+        color: #333;
+        font-size: 16px;
+        height: 48px;
+        padding: 12px 16px;
+        transition: all 0.2s ease;
+        width: 100%;
+        
+        &:hover:not(:focus):not(:disabled) {
+            border-color: #999;
+        }
+        
+        &:focus {
+            border-color: #197bbd;
+            border-width: 2px;
+            box-shadow: none;
+            outline: none;
+            padding: 11px 15px; // Compensate for 2px border
+        }
+        
+        &:disabled {
+            background-color: #fafafa;
+            color: #999;
+            cursor: not-allowed;
+        }
+        
+        // Remove browser defaults
+        &::-webkit-inner-spin-button,
+        &::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    }
+    
+    // Select dropdowns - use default browser appearance to avoid duplicate caret
+    select.form-control {
+        // Keep default appearance to avoid duplicate caret icons
+        padding-right: 16px;
+    }
+    
+    // Textarea
+    textarea.form-control {
+        height: auto;
+        min-height: 100px;
+        padding: 12px 16px;
+        resize: vertical;
+    }
+    
+    // Labels
+    label {
+        color: #545454;
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 6px;
+        
+        .required {
+            color: #d73502;
+        }
+    }
+    
+    // Error states
+    .form-control.is-invalid,
+    .field-has-error {
+        border-color: #d73502 !important;
+        
+        &:focus {
+            border-color: #d73502 !important;
+            box-shadow: 0 0 0 3px rgba(215, 53, 2, 0.1);
+        }
+    }
+    
+    .invalid-feedback {
+        color: #d73502;
+        display: block;
+        font-size: 13px;
+        margin-top: 4px;
+    }
+    
+    // Success states
+    .form-control.is-valid {
+        border-color: #168643;
+        
+        &:focus {
+            border-color: #168643;
+            box-shadow: 0 0 0 3px rgba(22, 134, 67, 0.1);
+        }
+    }
+    
+    // Floating label styles
+    .form-input-wrapper {
+        position: relative;
+        
+        label {
+            background: #fff;
+            color: #6c757d;
+            font-size: 14px;
+            font-weight: 400;
+            left: 16px;
+            padding: 0 4px;
+            pointer-events: none;
+            position: absolute;
+            top: 15px;
+            transition: all 0.15s ease;
+            z-index: 1;
+        }
+        
+        .form-control {
+            // Add transparent placeholder to enable :placeholder-shown selector
+            &::placeholder {
+                color: transparent;
+            }
+            
+            // Float label when focused or has value
+            &:focus + label,
+            &:not(:placeholder-shown) + label,
+            &.has-value + label {
+                background: #fff;
+                color: #197bbd;
+                font-size: 12px;
+                font-weight: 500;
+                left: 12px;
+                padding: 0 4px;
+                top: -8px;
+            }
+            
+            // Handle autofilled inputs
+            &:-webkit-autofill + label {
+                background: #fff;
+                color: #197bbd;
+                font-size: 12px;
+                font-weight: 500;
+                left: 12px;
+                padding: 0 4px;
+                top: -8px;
+            }
+            
+            &.is-invalid + label {
+                color: #d73502;
+            }
+        }
+        
+        // For select elements, always float the label
+        select.form-control + label {
+            background: #fff;
+            color: #197bbd;
+            font-size: 12px;
+            font-weight: 500;
+            left: 12px;
+            padding: 0 4px;
+            top: -8px;
+        }
+    }
+}
+
+// Shopify-style checkbox and radio
+.checkout-form {
+    .magic-checkbox,
+    .magic-radio {
+        + label {
+            align-items: center;
+            cursor: pointer;
+            display: flex;
+            font-size: 16px;
+            font-weight: 400;
+            padding-left: 32px;
+            position: relative;
+            
+            &:before {
+                background: #fff;
+                border: 2px solid #d9d9d9;
+                content: "";
+                height: 20px;
+                left: 0;
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                transition: all 0.2s ease;
+                width: 20px;
+            }
+            
+            &:hover:before {
+                border-color: #999;
+            }
+        }
+        
+        &:checked + label:before {
+            background-color: #197bbd;
+            border-color: #197bbd;
+        }
+        
+        &:checked + label:after {
+            content: "";
+            display: block;
+            position: absolute;
+        }
+        
+        &:focus + label:before {
+            box-shadow: 0 0 0 3px rgba(25, 123, 189, 0.12);
+        }
+    }
+    
+    .magic-checkbox + label {
+        &:before {
+            border-radius: 4px;
+        }
+        
+        &:after {
+            border: 2px solid #fff;
+            border-right: none;
+            border-top: none;
+            height: 6px;
+            left: 6px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-45deg);
+            width: 10px;
+        }
+    }
+    
+    .magic-radio + label {
+        &:before {
+            border-radius: 50%;
+        }
+        
+        &:after {
+            background: #fff;
+            border-radius: 50%;
+            height: 8px;
+            left: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+        }
+    }
+}
+
+// Improved shipping method cards - Shopify style
+.shipping-method-wrapper {
+    .list-group {
+        border: none;
+        box-shadow: none;
+    }
+    
+    .list-group-item {
+        background: #fff;
+        border: 1px solid #d4d6d9 !important; // Override payment.css
+        border-radius: 8px;
+        cursor: pointer;
+        margin-bottom: 8px;
+        padding: 12px;
+        transition: all 0.15s ease;
+        position: relative;
+        
+        &:last-child {
+            margin-bottom: 0;
+        }
+        
+        &:hover {
+            border-color: #197bbd !important;
+        }
+        
+        &.active,
+        &.selected {
+            background-color: #f0f8ff;
+            border-color: #197bbd !important;
+            box-shadow: 0 0 0 1px #197bbd;
+        }
+        
+        label {
+            margin-bottom: 0;
+        }
+        
+        .form-check-input {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border: 1px solid #8a8e93;
+            border-radius: 50%;
+            margin: 0;
+            top: 50%;
+            left: 12px;
+            transform: translateY(-50%);
+            
+            &:checked {
+                background-color: #1a1a1a;
+                border-color: #1a1a1a;
+                
+                &::after {
+                    content: '';
+                    position: absolute;
+                    width: 6px;
+                    height: 6px;
+                    background: white;
+                    border-radius: 50%;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                }
+            }
+            
+            &:focus {
+                border-color: #197bbd;
+                box-shadow: 0 0 0 3px rgba(25, 123, 189, 0.12);
+                outline: none;
+            }
+        }
+        
+        .shipping-method-label {
+            margin-left: 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .method-name {
+            color: #1a1a1a;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.4;
+        }
+        
+        .method-price {
+            color: #545454;
+            font-size: 14px;
+            font-weight: 400;
+        }
+    }
+}
+
+// Payment method cards
+.payment-method-wrapper {
+    .payment-method-item {
+        background: #fff;
+        border: 2px solid #d9d9d9;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-bottom: 12px;
+        padding: 16px;
+        position: relative;
+        transition: all 0.2s ease;
+        
+        &:hover {
+            border-color: #999;
+        }
+        
+        &.selected {
+            background-color: #f7fafe;
+            border-color: #197bbd;
+        }
+        
+        .payment-method-name {
+            align-items: center;
+            display: flex;
+            font-size: 16px;
+            font-weight: 500;
+            
+            img {
+                height: 24px;
+                margin-right: 12px;
+            }
+        }
+    }
+}
+
+/* Safari zoom fix for checkout inputs */
+@media (max-width: 768px) {
+    /* Prevent Safari zoom on input focus by ensuring 16px minimum font size */
+    .checkout-form,
+    .form-checkout,
+    .checkout-content-wrap,
+    .billing-address-form-wrapper,
+    .customer-address-payment-form,
+    .customer-tax-information-form {
+        input,
+        select,
+        textarea {
+            font-size: 16px !important;
+        }
+    }
+    
+    .form-control {
+        font-size: 16px !important;
+    }
+    
+    /* Maintain proper height for inputs with 16px font */
+    input.form-control:not([type="file"]),
+    select.form-control {
+        height: 48px;
+    }
+}

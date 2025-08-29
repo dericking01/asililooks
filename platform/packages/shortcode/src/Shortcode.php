@@ -45,8 +45,12 @@ class Shortcode
         return $this;
     }
 
-    public function compile(string $value, bool $force = false): HtmlString
+    public function compile(?string $value, bool $force = false): HtmlString
     {
+        if (! $value) {
+            return new HtmlString();
+        }
+
         $html = $this->compiler->compile($value, $force);
 
         return new HtmlString($html);
@@ -70,6 +74,21 @@ class Shortcode
     public function modifyAdminConfig(string $key, callable $callback): void
     {
         $this->compiler->modifyAdminConfig($key, $callback);
+    }
+
+    public static function ignoreCaches(array $shortcodes): void
+    {
+        ShortcodeCompiler::ignoreCaches($shortcodes);
+    }
+
+    public static function ignoreLazyLoading(array $shortcodes): void
+    {
+        ShortcodeCompiler::ignoreLazyLoading($shortcodes);
+    }
+
+    public static function registerLoadingState(string $shortcodeName, string $view): void
+    {
+        ShortcodeCompiler::registerLoadingState($shortcodeName, $view);
     }
 
     public function generateShortcode(string $name, array $attributes = [], ?string $content = null, bool $lazy = false): string

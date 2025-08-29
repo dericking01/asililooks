@@ -55,6 +55,20 @@
                 .dropdown-toggle:after {
                     display: none;
                 }
+                
+                .dropdown-menu {
+                    max-height: 300px;
+                    overflow-y: auto;
+                    overflow-x: hidden;
+                    
+                    @media (max-height: 600px) {
+                        max-height: 200px;
+                    }
+                    
+                    @media (max-height: 400px) {
+                        max-height: 150px;
+                    }
+                }
             }
         }
     }

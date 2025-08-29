@@ -3,6 +3,7 @@
 namespace Botble\Ecommerce\Http\Resources\API;
 
 use Botble\Ecommerce\Facades\EcommerceHelper;
+use Botble\Media\Facades\RvMedia;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class FilterResource extends JsonResource
@@ -31,7 +32,7 @@ class FilterResource extends JsonResource
                     'url' => $category->url,
                     'parent_id' => $category->parent_id,
                 ];
-            }),
+            })->all(),
             'brands' => $brands->map(function ($brand) {
                 // For brands, we need to extract the slug from the slugable relationship
                 $slug = $brand->slugable->key ?? '';
@@ -43,7 +44,7 @@ class FilterResource extends JsonResource
                     'url' => $brand->url ?? route('public.products', ['brands[]' => $brand->id]),
                     'products_count' => $brand->products_count,
                 ];
-            }),
+            })->all(),
             'tags' => $tags->map(function ($tag) {
                 // For tags, we need to extract the slug from the slugable relationship
                 $slug = $tag->slugable->key ?? '';
@@ -55,7 +56,7 @@ class FilterResource extends JsonResource
                     'url' => $tag->url ?? route('public.products', ['tags[]' => $tag->id]),
                     'products_count' => $tag->products_count,
                 ];
-            }),
+            })->all(),
             'price_ranges' => $priceRanges,
             'max_price' => $maxFilterPrice,
             'current_category_id' => $categoryId,
@@ -74,13 +75,13 @@ class FilterResource extends JsonResource
                             'title' => $attribute->title,
                             'slug' => $attribute->slug,
                             'color' => $attribute->color,
-                            'image' => $attribute->image ? get_image_url($attribute->image) : null,
+                            'image' => $attribute->image ? RvMedia::getImageUrl($attribute->image) : null,
                             'is_default' => $attribute->is_default,
                             'is_selected' => in_array($attribute->id, (array) $selected),
                         ];
                     }),
                 ];
-            }),
+            })->all(),
         ];
     }
 }

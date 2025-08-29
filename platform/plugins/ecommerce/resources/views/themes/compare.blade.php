@@ -92,9 +92,11 @@
                         <th>{{ __('Rating') }}</th>
                         @foreach ($products as $product)
                             <td>
-                                <div class="compare-rating d-flex justify-content-center">
-                                    @include(EcommerceHelper::viewPath('includes.rating-star'), ['avg' => $product->reviews_avg, 'size' => 80])
-                                </div>
+                                @if (EcommerceHelper::isReviewEnabled() && (!EcommerceHelper::hideRatingWhenNoReviews() || $product->reviews_count > 0))
+                                    <div class="compare-rating d-flex justify-content-center">
+                                        @include(EcommerceHelper::viewPath('includes.rating-star'), ['avg' => $product->reviews_avg, 'size' => 80])
+                                    </div>
+                                @endif
                             </td>
                         @endforeach
                     </tr>

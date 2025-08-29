@@ -2,11 +2,12 @@
 
 namespace Botble\Ecommerce\Http\Controllers\API;
 
-use Botble\Base\Http\Controllers\BaseController;
+use Botble\Api\Http\Controllers\BaseApiController;
 use Botble\Base\Models\BaseQueryBuilder;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Http\Requests\API\OrderTrackingRequest;
 use Botble\Ecommerce\Models\Order;
+use Botble\Media\Facades\RvMedia;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 
@@ -15,7 +16,7 @@ use Illuminate\Http\JsonResponse;
  *
  * APIs for order tracking
  */
-class OrderTrackingController extends BaseController
+class OrderTrackingController extends BaseApiController
 {
     /**
      * Track an order
@@ -114,9 +115,27 @@ class OrderTrackingController extends BaseController
                     ->where('ec_orders.code', $code)
                     ->orWhere('ec_orders.code', '#' . $code);
             })
-            ->with(['address', 'products', 'histories', 'shipment', 'payment'])
+            ->with([
+                'address',
+                'products' => function ($query): void {
+                    $query
+                        ->select([
+                            'order_id',
+                            'product_name',
+                            'product_image',
+                            'qty',
+                            'price',
+                        ]);
+                },
+                'histories' => function ($query): void {
+                    $query
+                        ->select(['order_id', 'action', 'description', 'created_at']);
+                },
+                'shipment',
+                'payment',
+            ])
             ->select('ec_orders.*')
-            ->when(EcommerceHelper::isLoginUsingPhone(), function (BaseQueryBuilder $query) use ($request): void {
+            ->when(EcommerceHelper::isOrderTrackingUsingPhone(), function (BaseQueryBuilder $query) use ($request): void {
                 $query->where(function (BaseQueryBuilder $query) use ($request): void {
                     $query
                         ->whereHas('address', fn ($subQuery) => $subQuery->where('phone', $request->input('phone')))
@@ -141,10 +160,17 @@ class OrderTrackingController extends BaseController
                 ->toApiResponse();
         }
 
+        $data = $order->toArray();
+
+        foreach ($data['products'] as &$product) {
+            $product['product_image'] = RvMedia::getImageUrl($product['product_image']);
+            $product['price_formatted'] = format_price($product['price']);
+        }
+
         return $this
             ->httpResponse()
             ->setData([
-                'order' => $order->toArray(),
+                'order' => $data,
             ])
             ->setMessage(__('Order found successfully'))
             ->toApiResponse();

@@ -116,7 +116,13 @@ class RegisterController extends BaseController
 
     public function confirm(int|string $id, Request $request)
     {
-        abort_unless(URL::hasValidSignature($request), 404);
+        if (! URL::hasValidSignature($request)) {
+            return $this
+                ->httpResponse()
+                ->setError()
+                ->setNextUrl(route('customer.login'))
+                ->setMessage(trans('plugins/ecommerce::customer.email_verification_link_expired'));
+        }
 
         /**
          * @var Customer $customer

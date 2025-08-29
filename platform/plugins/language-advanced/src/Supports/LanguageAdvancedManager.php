@@ -30,7 +30,7 @@ class LanguageAdvancedManager
             return false;
         }
 
-        $language = $request->input('language');
+        $language = $request->input('language') ?: $request->header('X-LANGUAGE');
 
         if (! $language) {
             $language = Language::getCurrentAdminLocaleCode();

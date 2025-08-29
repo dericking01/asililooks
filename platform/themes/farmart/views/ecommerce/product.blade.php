@@ -36,12 +36,21 @@
                         </div>
                         {!! Theme::partial('ecommerce.product-price', compact('product')) !!}
 
+                        @if ($product->tax_description)
+                            <div class="product-tax-description my-2">
+                                <small class="text-secondary">
+                                    {{ $product->tax_description }}
+                                </small>
+                            </div>
+                        @endif
+
                         @if (is_plugin_active('marketplace') && $product->store_id)
                             <div class="product-meta-sold-by my-2">
                                 <span class="d-inline-block me-1">{{ __('Sold By') }}: </span>
                                 <a href="{{ $product->store->url }}">
                                     {{ $product->store->name }}
                                 </a>
+                                {!! $product->store->badge !!}
                             </div>
                         @endif
 

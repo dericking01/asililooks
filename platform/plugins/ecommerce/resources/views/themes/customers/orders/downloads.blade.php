@@ -28,15 +28,19 @@
                             'ec_products.created_at',
                         ],
                     ]);
+
+                    $hasDigitalFiles = $orderProduct->product_file_internal_count || $orderProduct->product_file_external_count;
                 @endphp
                 <div class="bb-customer-card">
                     <div class="bb-customer-card-header">
                         <div class="bb-customer-card-title">
                             <span class="value">{{ __('Digital Product') }}</span>
                         </div>
-                        <div class="bb-customer-card-status">
-                            <span>{{ __('Downloaded') }}: {{ $orderProduct->times_downloaded }} {{ __('times') }}</span>
-                        </div>
+                        @if ($hasDigitalFiles)
+                            <div class="bb-customer-card-status">
+                                <span>{{ __('Downloaded') }}: {{ $orderProduct->times_downloaded }} {{ __('times') }}</span>
+                            </div>
+                        @endif
                     </div>
                     <div class="bb-customer-card-body">
                         <div class="bb-customer-card-content">
@@ -88,29 +92,78 @@
                                 @if (!empty($orderProduct->product_options) && is_array($orderProduct->product_options))
                                     {!! render_product_options_html($orderProduct->product_options, $orderProduct->price) !!}
                                 @endif
+
+                                @if ($orderProduct->license_code)
+                                    @php
+                                        $licenseCodes = $orderProduct->license_codes_array;
+                                        $hasMultipleCodes = count($licenseCodes) > 1;
+                                    @endphp
+                                    <div class="bb-customer-card-license-code mt-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <x-core::icon name="ti ti-key" class="text-primary" />
+                                            <span class="fw-semibold">
+                                                {{ $hasMultipleCodes
+                                                    ? trans('plugins/ecommerce::products.license_codes.codes') . ' (' . count($licenseCodes) . ')'
+                                                    : trans('plugins/ecommerce::products.license_codes.code') }}:
+                                            </span>
+                                        </div>
+                                        <div class="mt-1">
+                                            @if ($hasMultipleCodes)
+                                                <div class="d-flex flex-column gap-2">
+                                                    @foreach ($licenseCodes as $index => $code)
+                                                        <div class="d-flex align-items-center">
+                                                            <span class="text-muted me-2">{{ $index + 1 }}.</span>
+                                                            <code class="bg-light p-2 rounded d-inline-block">{{ $code }}</code>
+                                                            <button type="button"
+                                                                    class="btn btn-sm btn-outline-secondary ms-2"
+                                                                    data-ecommerce-clipboard
+                                                                    data-clipboard-text="{{ $code }}"
+                                                                    data-clipboard-message="{{ __('License code copied!') }}">
+                                                                <x-core::icon name="ti ti-copy" />
+                                                                {{ __('Copy') }}
+                                                            </button>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                <code class="bg-light p-2 rounded d-inline-block">{{ $licenseCodes[0] ?? $orderProduct->license_code }}</code>
+                                                <button type="button"
+                                                        class="btn btn-sm btn-outline-secondary ms-2"
+                                                        data-ecommerce-clipboard
+                                                        data-clipboard-text="{{ $licenseCodes[0] ?? $orderProduct->license_code }}"
+                                                        data-clipboard-message="{{ __('License code copied!') }}">
+                                                    <x-core::icon name="ti ti-copy" />
+                                                    {{ __('Copy') }}
+                                                </button>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
-                    <div class="bb-customer-card-footer">
-                        @if ($orderProduct->product_file_internal_count)
-                            <a
-                                class="btn btn-primary"
-                                href="{{ route('customer.downloads.product', $orderProduct->id) }}"
-                            >
-                                <x-core::icon name="ti ti-download" class="me-1" />
-                                <span>{{ __('Download all files') }}</span>
-                            </a>
-                        @endif
-                        @if ($orderProduct->product_file_external_count)
-                            <a
-                                class="btn btn-info"
-                                href="{{ route('customer.downloads.product', [$orderProduct->id, 'external' => true]) }}"
-                            >
-                                <x-core::icon name="ti ti-link" class="me-1" />
-                                <span>{{ __('External link downloads') }}</span>
-                            </a>
-                        @endif
-                    </div>
+                    @if ($hasDigitalFiles)
+                        <div class="bb-customer-card-footer">
+                            @if ($orderProduct->product_file_internal_count)
+                                <a
+                                    class="btn btn-primary"
+                                    href="{{ route('customer.downloads.product', $orderProduct->id) }}"
+                                >
+                                    <x-core::icon name="ti ti-download" class="me-1" />
+                                    <span>{{ __('Download all files') }}</span>
+                                </a>
+                            @endif
+                            @if ($orderProduct->product_file_external_count)
+                                <a
+                                    class="btn btn-info"
+                                    href="{{ route('customer.downloads.product', [$orderProduct->id, 'external' => true]) }}"
+                                >
+                                    <x-core::icon name="ti ti-link" class="me-1" />
+                                    <span>{{ __('External link downloads') }}</span>
+                                </a>
+                            @endif
+                        </div>
+                    @endif
                 </div>
             @endforeach
         </div>

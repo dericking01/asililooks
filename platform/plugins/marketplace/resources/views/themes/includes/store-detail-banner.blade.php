@@ -4,9 +4,12 @@
         {{ RvMedia::image($store->logo, $store->name, useDefaultImage: true, attributes: ['class' => 'bb-shop-banner-logo']) }}
 
         <div class="bb-shop-banner-info">
-            <h2 class="bb-shop-banner-name">{{ $store->name }}</h2>
+            <h2 class="bb-shop-banner-name">
+                {{ $store->name }}
+                {!! $store->badge !!}
+            </h2>
 
-            @if (EcommerceHelper::isReviewEnabled())
+            @if (EcommerceHelper::isReviewEnabled() && (!EcommerceHelper::hideRatingWhenNoReviews() || $store->reviews->count() > 0))
                 <div class="bb-shop-banner-rating">
                     @include(EcommerceHelper::viewPath('includes.rating-star'), ['avg' => $store->reviews()->avg('star'), 'size' => 80])
                     <small>{{ __('(:count reviews)', ['count' => number_format($store->reviews->count())]) }}</small>

@@ -15,13 +15,13 @@
                         </tbody>
                     </table>
 
-                    <h1 class="bb-text-center bb-m-0 bb-mt-md">Your order is delivering!</h1>
+                    <h1 class="bb-text-center bb-m-0 bb-mt-md">{{ 'plugins/ecommerce::email-templates.customer_delivery_order_title' | trans }}</h1>
                 </td>
             </tr>
             <tr>
                 <td class="bb-content">
-                    <p>Dear {{ customer_name }},</p>
-                    <p>Your products are on the way.</p>
+                    <p>{{ 'plugins/ecommerce::email-templates.customer_delivery_order_greeting' | trans({'customer_name': customer_name}) }}</p>
+                    <p>{{ 'plugins/ecommerce::email-templates.customer_delivery_order_message' | trans }}</p>
                     {% if order_delivery_notes %}
                         <p><i>" {{ order_delivery_notes }} "</i></p>
                     {% endif %}
@@ -30,11 +30,11 @@
             {% if product_list %}
                 <tr>
                     <td class="bb-content bb-pt-0">
-                        <h4>Here's what you ordered:</h4>
+                        <h4>{{ 'plugins/ecommerce::email-templates.customer_delivery_order_order_summary' | trans }}</h4>
                         {{ product_list }}
 
                         {% if order_note %}
-                        <div>Note: {{ order_note }}</div>
+                        <div>{{ 'plugins/ecommerce::email-templates.customer_delivery_order_note' | trans }}: {{ order_note }}</div>
                         {% endif %}
                     </td>
                 </tr>

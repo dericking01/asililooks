@@ -133,6 +133,18 @@ class ProductImporter extends Importer implements WithMapping
         ]);
     }
 
+    protected function getBarcodeValidationRules(): array
+    {
+        $rules = ['nullable', 'string', 'max:150'];
+
+        // Only add unique validation when not updating existing products
+        if (! $this->updateExisting) {
+            $rules[] = 'unique:ec_products,barcode';
+        }
+
+        return $rules;
+    }
+
     public function columns(): array
     {
         $columns = [
@@ -200,7 +212,7 @@ class ProductImporter extends Importer implements WithMapping
             ImportColumn::make('cost_per_item')
                 ->rules(['nullable', 'numeric', 'min:0'], trans('plugins/ecommerce::products.import.rules.nullable_numeric_min', ['attribute' => 'Cost per item'])),
             ImportColumn::make('barcode')
-                ->rules(['nullable', 'string', 'unique:ec_products,barcode', 'max:50'], trans('plugins/ecommerce::products.import.rules.nullable_string_max', ['attribute' => 'Barcode', 'max' => 50])),
+                ->rules($this->getBarcodeValidationRules(), trans('plugins/ecommerce::products.import.rules.nullable_string_max', ['attribute' => 'Barcode', 'max' => 150])),
             ImportColumn::make('content')
                 ->rules(['nullable', 'string'], trans('plugins/ecommerce::products.import.rules.nullable_string', ['attribute' => 'Content'])),
             ImportColumn::make('tags')
@@ -664,21 +676,38 @@ class ProductImporter extends Importer implements WithMapping
 
         $addedAttributes = $request->input('attribute_sets', []);
 
-        $result = ProductVariation::getVariationByAttributesOrCreate($product->getKey(), $addedAttributes);
+        // Check for existing variation by SKU first
+        $existingVariationProduct = null;
+        $existingVariation = null;
 
-        $variation = $result['variation'];
-
-        $version = array_merge($variation->toArray(), $request->toArray());
-
-        if (
-            ($sku = Arr::get($version, 'sku')) &&
-            $existingVariation = $this->getProductQuery()
+        if ($sku = $request->input('sku')) {
+            $existingVariationProduct = $this->getProductQuery()
                 ->where('is_variation', true)
                 ->where('sku', $sku)
-                ->first()
-        ) {
+                ->first();
+
+            if ($existingVariationProduct) {
+                $existingVariation = ProductVariation::query()
+                    ->where('product_id', $existingVariationProduct->id)
+                    ->first();
+            }
+        }
+
+        // If existing variation found and update existing is not enabled, return existing
+        if ($existingVariation && ! $this->updateExisting) {
             return $existingVariation;
         }
+
+        // If we're updating an existing variation, use it; otherwise create new
+        if ($existingVariation && $this->updateExisting) {
+            $variation = $existingVariation;
+            $result = ['variation' => $variation, 'created' => false];
+        } else {
+            $result = ProductVariation::getVariationByAttributesOrCreate($product->getKey(), $addedAttributes);
+            $variation = $result['variation'];
+        }
+
+        $version = array_merge($variation->toArray(), $request->toArray());
 
         $version['variation_default_id'] = Arr::get($version, 'is_variation_default') ? $version['id'] : null;
         $version['attribute_sets'] = $addedAttributes;
@@ -691,8 +720,29 @@ class ProductImporter extends Importer implements WithMapping
             $version['content'] = BaseHelper::clean($version['content']);
         }
 
-        $productRelatedToVariation = new Product();
-        $productRelatedToVariation->fill($version);
+        // Use existing variation product if found and updating, otherwise create new
+        if ($existingVariationProduct && $this->updateExisting) {
+            $productRelatedToVariation = $existingVariationProduct;
+            // Only update specific fields to avoid overwriting important data
+            $allowedFields = [
+                'price', 'sale_price', 'quantity', 'weight', 'length', 'wide', 'height',
+                'cost_per_item', 'stock_status', 'with_storehouse_management',
+                'allow_checkout_when_out_of_stock', 'sale_type', 'start_date', 'end_date',
+                'description', 'content', 'images',
+            ];
+
+            // Only include barcode if it's provided and different from current
+            if (isset($version['barcode']) && $version['barcode'] !== $productRelatedToVariation->barcode) {
+                $allowedFields[] = 'barcode';
+            }
+
+            $productRelatedToVariation->fill(array_filter($version, function ($key) use ($allowedFields) {
+                return in_array($key, $allowedFields);
+            }, ARRAY_FILTER_USE_KEY));
+        } else {
+            $productRelatedToVariation = new Product();
+            $productRelatedToVariation->fill($version);
+        }
 
         $productRelatedToVariation->name = $product->name;
         $productRelatedToVariation->status = $product->status;
@@ -758,7 +808,23 @@ class ProductImporter extends Importer implements WithMapping
 
         $variation->product_id = $productRelatedToVariation->getKey();
 
-        $variation->is_default = Arr::get($version, 'variation_default_id', 0) == $variation->id;
+        // Handle is_variation_default logic
+        $isVariationDefault = (bool) Arr::get($version, 'is_variation_default', false);
+
+        if ($isVariationDefault) {
+            // If this variation should be default, unset all other defaults for this configurable product
+            ProductVariation::query()
+                ->where('configurable_product_id', $product->getKey())
+                ->where('id', '!=', $variation->id)
+                ->update(['is_default' => false]);
+
+            $variation->is_default = true;
+        } else {
+            // Only update is_default if we're updating existing and it was explicitly set to false
+            if ($this->updateExisting || ! $result['created']) {
+                $variation->is_default = false;
+            }
+        }
 
         $variation->save();
 
@@ -1240,20 +1306,23 @@ class ProductImporter extends Importer implements WithMapping
         Arr::set($row, $key, $value);
 
         if ($value && $key == 'barcode') {
-            if ($barcode = $this->barcodes->firstWhere('value', $value)) {
-                $this->onFailure(
-                    $this->currentRow,
-                    'Barcode',
-                    [
-                        __(
-                            'Barcode ":value" has been duplicated on row #:row',
-                            ['value' => $value, 'row' => Arr::get($barcode, 'row')]
-                        ),
-                    ],
-                    [$value]
-                );
-            } else {
-                $this->barcodes->push(['row' => $this->currentRow, 'value' => $value]);
+            // Only check for duplicates when not updating existing products
+            if (! $this->updateExisting) {
+                if ($barcode = $this->barcodes->firstWhere('value', $value)) {
+                    $this->onFailure(
+                        $this->currentRow,
+                        'Barcode',
+                        [
+                            __(
+                                'Barcode ":value" has been duplicated on row #:row',
+                                ['value' => $value, 'row' => Arr::get($barcode, 'row')]
+                            ),
+                        ],
+                        [$value]
+                    );
+                } else {
+                    $this->barcodes->push(['row' => $this->currentRow, 'value' => $value]);
+                }
             }
         }
 

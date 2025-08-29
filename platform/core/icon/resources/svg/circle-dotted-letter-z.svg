@@ -1,3 +1,9 @@
+<!--
+tags: [alphabet, monogram, typography, symbol, emblem, character, initial, graphic, design, decoration]
+category: Letters
+unicode: "ff66"
+version: "3.11"
+-->
 <svg
   xmlns="http://www.w3.org/2000/svg"
   width="24"
@@ -8,8 +14,7 @@
   stroke-width="2"
   stroke-linecap="round"
   stroke-linejoin="round"
-  >
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+>
   <path d="M10 8h4l-4 8h4" />
   <path d="M7.5 4.21v.01" />
   <path d="M4.21 7.5v.01" />

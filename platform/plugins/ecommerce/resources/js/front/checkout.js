@@ -217,7 +217,7 @@ class MainCheckout {
         $(document).on('change', 'input.shipping_method_input', (event) => {
             const data = {}
 
-            if ($('.checkout-products-marketplace').length) {
+            if ($(event.currentTarget).closest('.checkout-products-marketplace').length) {
                 const shippingMethods = $(shippingForm).find('input.shipping_method_input')
 
                 if (shippingMethods.length) {
@@ -294,6 +294,14 @@ class MainCheckout {
         if ($checkoutForm.find('.list-customer-address').length) {
             calculateShippingFee()
         }
+
+        // Trigger initial calculation to ensure payment fee is calculated on page load
+        $(document).ready(() => {
+            const paymentMethod = $(document).find('input[name=payment_method]:checked').first()
+            if (paymentMethod.length) {
+                paymentMethod.trigger('change')
+            }
+        })
 
         const onChangeShippingForm = (event) => {
             const _self = $(event.currentTarget)

@@ -27,9 +27,11 @@ class HookServiceProvider extends ServiceProvider
             return $html;
         }
 
-        if ($total = count(SocialService::supportedModules())) {
+        $supportedModules = SocialService::supportedModules();
+
+        if ($total = count($supportedModules)) {
             $params = [];
-            $data = collect(SocialService::supportedModules())->firstWhere('model', $module);
+            $data = collect($supportedModules)->firstWhere('model', $module);
 
             if ($total > 1) {
                 $params = ['guard' => $data['guard']];
@@ -50,6 +52,8 @@ class HookServiceProvider extends ServiceProvider
             }
 
             $view = Arr::get($data, 'view', 'plugins/social-login::login-options');
+
+            $view = apply_filters('social_login_view_path', $view, $module);
 
             return $html . view($view, compact('params'))->render();
         }

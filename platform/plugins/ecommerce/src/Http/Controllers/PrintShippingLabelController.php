@@ -21,7 +21,7 @@ use Illuminate\Support\Str;
 
 class PrintShippingLabelController extends BaseController
 {
-    public function __invoke(Shipment $shipment, Pdf $pdf): Response
+    public function __invoke(Shipment $shipment, Pdf $pdf): ?Response
     {
         $this->pageTitle(trans('plugins/ecommerce::shipping.shipping_label.print_shipping_label'));
 
@@ -43,7 +43,7 @@ class PrintShippingLabelController extends BaseController
 
             $orderAddress  = $shipment->order->address;
 
-            if (EcommerceHelper::isLoginUsingPhone()) {
+            if (EcommerceHelper::isOrderTrackingUsingPhone()) {
                 $params['phone'] = $orderAddress->phone ?: $customer->phone;
             } else {
                 $params['email'] = $orderAddress->email ?: $customer->email;

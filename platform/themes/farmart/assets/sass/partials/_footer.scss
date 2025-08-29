@@ -16,7 +16,8 @@
         padding: 0;
 
         li {
-            flex-grow: 1;
+            flex: 1 1 0;
+            min-width: 0;
             padding: 5px 0 !important;
             position: relative;
 
@@ -25,8 +26,10 @@
                 text-align: center;
                 z-index: 1;
                 position: relative;
-                padding: 0.25rem 1rem;
+                padding: 0.25rem 0.5rem;
                 color: #000;
+                width: 100%;
+                box-sizing: border-box;
 
                 i {
                     display: inline-block;
@@ -35,7 +38,12 @@
 
                 span {
                     color: #000;
-                    font-size: 12px;
+                    font-size: var(--bottom-bar-menu-text-font-size, 12px);
+                    display: block;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    max-width: 100%;
                 }
 
                 .icon-cart {
@@ -56,6 +64,22 @@
                         line-height: 1;
                         min-width: 18px;
                     }
+                }
+            }
+        }
+    }
+
+    &[data-hide-text="true"] {
+        .menu--footer {
+            li {
+                padding: 12px 0 !important;
+
+                a {
+                    padding: 0.5rem 0.5rem;
+                }
+
+                span {
+                    display: none;
                 }
             }
         }

@@ -53,6 +53,7 @@ class DiscountController extends BaseController
     {
         $request->merge([
             'can_use_with_promotion' => 0,
+            'display_at_checkout' => false,
         ]);
 
         if ($request->input('is_unlimited')) {

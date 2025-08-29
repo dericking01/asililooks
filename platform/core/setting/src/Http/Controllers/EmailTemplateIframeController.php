@@ -32,9 +32,17 @@ class EmailTemplateIframeController extends BaseController
             $content = get_setting_email_template_content($type, $module, $template);
         }
 
+        if (! $content) {
+            return null;
+        }
+
         $inlineCss = new CssToInlineStyles();
 
         $content = $emailHandler->prepareData($content);
+
+        if (! $content) {
+            return null;
+        }
 
         return $inlineCss->convert($content, $emailHandler->getCssContent());
     }

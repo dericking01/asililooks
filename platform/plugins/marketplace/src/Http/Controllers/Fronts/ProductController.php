@@ -254,6 +254,16 @@ class ProductController extends BaseController
             'images' => array_filter((array) $request->input('images', [])),
         ]);
 
+        $customer = auth('customer')->user();
+
+        if ($request->hasFile('image_input')) {
+            $result = RvMedia::handleUpload($request->file('image_input'), 0, $customer->upload_folder);
+            if (! $result['error']) {
+                $file = $result['data'];
+                $request->merge(['image' => $file->url]);
+            }
+        }
+
         $except = [
             'is_featured',
             'status',

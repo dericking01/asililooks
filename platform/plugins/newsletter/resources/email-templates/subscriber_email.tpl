@@ -19,15 +19,15 @@
                                        </tbody>
                                     </table>
 
-                                    <h1 class="bb-text-center bb-m-0">Subscribe Successfully</h1>
+                                    <h1 class="bb-text-center bb-m-0">{{ 'plugins/newsletter::newsletter.email_templates.subscriber_success_title' | trans }}</h1>
 
-                                    <p class="bb-text-center bb-mt-sm bb-mb-0 bb-text-muted">Thank you for subscribing our newsletter!</p>
+                                    <p class="bb-text-center bb-mt-sm bb-mb-0 bb-text-muted">{{ 'plugins/newsletter::newsletter.email_templates.subscriber_thank_you_message' | trans }}</p>
                                 </td>
                             </tr>
 
                             <tr>
                                 <td class="bb-content bb-text-muted bb-text-center">
-                                    To unsubscribe newsletter, click {{ newsletter_unsubscribe_link }}
+                                    {{ 'plugins/newsletter::newsletter.email_templates.subscriber_unsubscribe_instruction' | trans({'newsletter_unsubscribe_link': newsletter_unsubscribe_link}) }}
                                 </td>
                             </tr>
                         </tbody>

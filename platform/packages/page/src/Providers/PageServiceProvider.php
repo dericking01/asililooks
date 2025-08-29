@@ -36,6 +36,10 @@ class PageServiceProvider extends ServiceProvider
             ->loadRoutes()
             ->loadMigrations();
 
+        if (class_exists('ApiHelper')) {
+            $this->loadRoutes(['api']);
+        }
+
         DashboardMenu::default()->beforeRetrieving(function (): void {
             DashboardMenu::make()
                 ->registerItem(

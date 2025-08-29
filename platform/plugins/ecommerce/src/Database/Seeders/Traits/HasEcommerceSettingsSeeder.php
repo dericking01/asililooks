@@ -19,6 +19,8 @@ trait HasEcommerceSettingsSeeder
             'plugins_ecommerce_customer_new_order_status' => false,
             'plugins_ecommerce_admin_new_order_status' => false,
             'ecommerce_is_enabled_support_digital_products' => true,
+            'ecommerce_enable_license_codes_for_digital_products' => true,
+            'ecommerce_auto_complete_digital_orders_after_payment' => true,
             'ecommerce_load_countries_states_cities_from_location_plugin' => false,
             'ecommerce_product_sku_format' => 'SF-2443-%s%s%s%s',
             'ecommerce_store_order_prefix' => 'SF',

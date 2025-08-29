@@ -13,13 +13,15 @@ class ProductCategoryResource extends JsonResource
 {
     public function toArray($request): array
     {
+        $isUsingUuid = ProductCategory::isUsingStringId();
+
         return [
             'id' => $this->id,
             'name' => $this->name,
             'icon' => $this->icon,
             'icon_image' => $this->icon_image,
             'is_featured' => $this->is_featured,
-            'parent_id' => $this->parent_id,
+            'parent_id' => $isUsingUuid ? $this->parent_id : (int) $this->parent_id,
             'slug' => $this->slug,
             'image_with_sizes' => $this->image ? rv_get_image_sizes($this->image, array_unique([
                 'origin',

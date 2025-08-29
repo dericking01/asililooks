@@ -14,13 +14,13 @@
                             </tr>
                         </tbody>
                     </table>
-                    <h1 class="bb-text-center bb-m-0 bb-mt-md">Order successfully!</h1>
+                    <h1 class="bb-text-center bb-m-0 bb-mt-md">{{ 'plugins/marketplace::marketplace.email_templates.store_new_order_title' | trans }}</h1>
                 </td>
             </tr>
             <tr>
                 <td class="bb-content">
-                    <div>Dear {{ store_name }},</div>
-                    <div>You got a new order on {{ site_title}}!</div>
+                    <div>{{ 'plugins/marketplace::marketplace.email_templates.dear_vendor' | trans({'vendor_name': store_name}) }}</div>
+                    <div>{{ 'plugins/marketplace::marketplace.email_templates.store_new_order_message' | trans({'site_title': site_title}) }}</div>
                 </td>
             </tr>
             <tr>
@@ -29,16 +29,16 @@
                         <tbody>
                             <tr>
                                 <td class="bb-bb-col">
-                                    <h4 class="bb-m-0">Customer Information</h4>
-                                    <div>Name: <strong>{{ customer_name }}</strong></div>
+                                    <h4 class="bb-m-0">{{ 'plugins/marketplace::marketplace.email_templates.customer_information' | trans }}</h4>
+                                    <div>{{ 'plugins/marketplace::marketplace.email_templates.field_name' | trans }}: <strong>{{ customer_name }}</strong></div>
                                     {% if customer_phone %}
-                                    <div>Phone: <strong>{{ customer_phone }}</strong></div>
+                                    <div>{{ 'plugins/marketplace::marketplace.email_templates.field_phone' | trans }}: <strong>{{ customer_phone }}</strong></div>
                                     {% endif %}
                                     {% if customer_email %}
-                                    <div>Email: <strong>{{ customer_email }}</strong></div>
+                                    <div>{{ 'plugins/marketplace::marketplace.email_templates.field_email' | trans }}: <strong>{{ customer_email }}</strong></div>
                                     {% endif %}
                                     {% if customer_address %}
-                                    <div>Address: <strong>{{ customer_address }}</strong></div>
+                                    <div>{{ 'plugins/marketplace::marketplace.email_templates.field_address' | trans }}: <strong>{{ customer_address }}</strong></div>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -48,11 +48,11 @@
             </tr>
             <tr>
                 <td class="bb-content bb-pt-0">
-                    <h4>Here's what you ordered:</h4>
+                    <h4>{{ 'plugins/marketplace::marketplace.email_templates.order_items_header' | trans }}</h4>
                     {{ product_list }}
 
                     {% if order_note %}
-                        <div>Note: {{ order_note }}</div>
+                        <div>{{ 'plugins/marketplace::marketplace.email_templates.field_note' | trans }}: {{ order_note }}</div>
                     {% endif %}
                 </td>
             </tr>
@@ -62,12 +62,12 @@
                         <tbody>
                             <tr>
                                 <td class="bb-bb-col">
-                                    <h4 class="bb-m-0">Order number</h4>
+                                    <h4 class="bb-m-0">{{ 'plugins/marketplace::marketplace.email_templates.order_number' | trans }}</h4>
                                     <div>{{ order.code }}</div>
                                 </td>
                                 <td class="bb-col-spacer"></td>
                                 <td class="bb-col">
-                                    <h4 class="bb-mb-0">Order date</h4>
+                                    <h4 class="bb-mb-0">{{ 'plugins/marketplace::marketplace.email_templates.order_date' | trans }}</h4>
                                     <div>{{ order.created_at }}</div>
                                 </td>
                             </tr>
@@ -78,7 +78,7 @@
                             <tr>
                                 <td class="bb-col">
                                     {% if shipping_method %}
-                                    <h4 class="bb-m-0">Shipping Method</h4>
+                                    <h4 class="bb-m-0">{{ 'plugins/marketplace::marketplace.email_templates.shipping_method' | trans }}</h4>
                                     <div>
                                         {{ shipping_method }}
                                     </div>
@@ -87,7 +87,7 @@
 
                                 <td class="bb-col-spacer"></td>
                                 <td class="bb-col">
-                                    <h4 class="bb-m-0">Payment Method</h4>
+                                    <h4 class="bb-m-0">{{ 'plugins/marketplace::marketplace.email_templates.payment_method' | trans }}</h4>
                                     <div>
                                         {{ payment_method }}
                                     </div>

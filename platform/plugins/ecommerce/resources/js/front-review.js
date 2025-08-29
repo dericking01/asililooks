@@ -8,13 +8,21 @@ $(() => {
         })
     }
 
-    const getReviewList = (url, successCallback) => {
+    const getReviewList = (url, successCallback, additionalParams = {}) => {
         if (!url) {
             return
         }
 
+        // Build URL with search and sort parameters
+        const urlObj = new URL(url, window.location.origin)
+        Object.keys(additionalParams).forEach(key => {
+            if (additionalParams[key]) {
+                urlObj.searchParams.set(key, additionalParams[key])
+            }
+        })
+
         $.ajax({
-            url: url,
+            url: urlObj.toString(),
             method: 'GET',
             beforeSend: () => {
                 $reviewListContainer.append('<div class="loading-spinner"></div>')
@@ -37,6 +45,27 @@ $(() => {
                 $reviewListContainer.find('.loading-spinner').remove()
             },
         })
+    }
+
+    const getCurrentSearchParams = () => {
+        return {
+            search: $('.review-search-input').val() || '',
+            sort_by: $('.review-sort-select').val() || 'newest',
+            star: $('.review-star-filter').val() || ''
+        }
+    }
+
+    // Update clear button visibility
+    const updateClearButtonVisibility = () => {
+        const hasSearch = $('.review-search-input').val().trim() !== ''
+        const hasFilter = $('.review-star-filter').val() !== ''
+        const hasSort = $('.review-sort-select').val() !== 'newest'
+
+        if (hasSearch || hasFilter || hasSort) {
+            $('.review-clear-btn').removeClass('d-none')
+        } else {
+            $('.review-clear-btn').addClass('d-none')
+        }
     }
 
     const loadPreviewImage = function (input) {
@@ -89,7 +118,7 @@ $(() => {
 
     if ($reviewListContainer.length) {
         initLightGallery($('.review-images'))
-        getReviewList($reviewListContainer.data('ajax-url'))
+        getReviewList($reviewListContainer.data('ajax-url'), null, getCurrentSearchParams())
     }
 
     $reviewListContainer.on('click', '.pagination a', (e) => {
@@ -101,7 +130,7 @@ $(() => {
             $('html, body').animate({
                 scrollTop: $reviewListContainer.offset().top - 130,
             })
-        })
+        }, getCurrentSearchParams())
     })
 
     $(document).on('submit', '.product-review-container form', (e) => {
@@ -135,7 +164,7 @@ $(() => {
                         if (!$('.review-list').length) {
                             setTimeout(() => window.location.reload(), 1000)
                         }
-                    })
+                    }, getCurrentSearchParams())
                 } else {
                     Theme.showError(message)
                 }
@@ -217,7 +246,7 @@ $(() => {
                     if (!$('.review-list .review-item').length) {
                         setTimeout(() => window.location.reload(), 1000)
                     }
-                })
+                }, getCurrentSearchParams())
             },
             error: (xhr) => {
                 let message = 'An error occurred while deleting the review.'
@@ -230,6 +259,129 @@ $(() => {
                 $button.prop('disabled', false).removeClass('loading')
             }
         })
+    })
+
+    // Search functionality
+    let searchTimeout
+    $(document).on('input', '[data-bb-toggle="review-search"]', function() {
+        clearTimeout(searchTimeout)
+        searchTimeout = setTimeout(() => {
+            updateClearButtonVisibility()
+            if ($reviewListContainer.length) {
+                getReviewList($reviewListContainer.data('ajax-url'), null, getCurrentSearchParams())
+            }
+        }, 500) // Debounce search for 500ms
+    })
+
+    // Sort functionality
+    $(document).on('change', '[data-bb-toggle="review-sort"]', function() {
+        updateClearButtonVisibility()
+        if ($reviewListContainer.length) {
+            getReviewList($reviewListContainer.data('ajax-url'), null, getCurrentSearchParams())
+        }
+    })
+
+    // Star filter functionality
+    $(document).on('change', '[data-bb-toggle="review-star-filter"]', function() {
+        updateClearButtonVisibility()
+        if ($reviewListContainer.length) {
+            getReviewList($reviewListContainer.data('ajax-url'), null, getCurrentSearchParams())
+        }
+    })
+
+    // Star filter progress bar click functionality
+    $(document).on('click', '[data-bb-toggle="review-star-filter-bar"]', function() {
+        const star = $(this).data('star')
+        $('.review-star-filter').val(star)
+        if ($reviewListContainer.length) {
+            getReviewList($reviewListContainer.data('ajax-url'), null, getCurrentSearchParams())
+        }
+    })
+
+    // Handle keyboard navigation for progress bars
+    $(document).on('keydown', '[data-bb-toggle="review-star-filter-bar"]', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            $(this).click()
+        }
+    })
+
+    // Toggle search box
+    $(document).on('click', '[data-bb-toggle="review-search-toggle"]', function() {
+        const $container = $('.review-search-container')
+        const $button = $(this)
+
+        if ($container.hasClass('d-none')) {
+            // Hide other containers
+            $('.review-filter-container, .review-sort-container').addClass('d-none')
+            $('.review-control-buttons .btn').removeClass('active')
+
+            // Show search container
+            $container.removeClass('d-none')
+            $button.addClass('active')
+            $('.review-search-input').focus()
+        } else {
+            $container.addClass('d-none')
+            $button.removeClass('active')
+        }
+        updateClearButtonVisibility()
+    })
+
+    // Toggle filter dropdown
+    $(document).on('click', '[data-bb-toggle="review-filter-toggle"]', function() {
+        const $container = $('.review-filter-container')
+        const $button = $(this)
+
+        if ($container.hasClass('d-none')) {
+            // Hide other containers
+            $('.review-search-container, .review-sort-container').addClass('d-none')
+            $('.review-control-buttons .btn').removeClass('active')
+
+            // Show filter container
+            $container.removeClass('d-none')
+            $button.addClass('active')
+        } else {
+            $container.addClass('d-none')
+            $button.removeClass('active')
+        }
+        updateClearButtonVisibility()
+    })
+
+    // Toggle sort dropdown
+    $(document).on('click', '[data-bb-toggle="review-sort-toggle"]', function() {
+        const $container = $('.review-sort-container')
+        const $button = $(this)
+
+        if ($container.hasClass('d-none')) {
+            // Hide other containers
+            $('.review-search-container, .review-filter-container').addClass('d-none')
+            $('.review-control-buttons .btn').removeClass('active')
+
+            // Show sort container
+            $container.removeClass('d-none')
+            $button.addClass('active')
+        } else {
+            $container.addClass('d-none')
+            $button.removeClass('active')
+        }
+        updateClearButtonVisibility()
+    })
+
+    // Clear filters functionality
+    $(document).on('click', '[data-bb-toggle="review-clear-filters"]', function() {
+        $('.review-search-input').val('')
+        $('.review-star-filter').val('')
+        $('.review-sort-select').val('newest')
+
+        // Hide all containers and remove active states
+        $('.review-search-container, .review-filter-container, .review-sort-container').addClass('d-none')
+        $('.review-control-buttons .btn').removeClass('active')
+
+        updateClearButtonVisibility()
+
+        if ($reviewListContainer.length) {
+            getReviewList($reviewListContainer.data('ajax-url'), null, getCurrentSearchParams())
+        }
     })
 
     if (sessionStorage.reloadReviewsTab) {

@@ -11,7 +11,6 @@ use Botble\Base\Forms\FieldOptions\TextFieldOption;
 use Botble\Base\Forms\Fields\CheckboxField;
 use Botble\Base\Forms\Fields\HtmlField;
 use Botble\Base\Forms\Fields\TextareaField;
-use Botble\Ecommerce\Facades\Cart;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Http\Requests\SaveCheckoutInformationRequest;
 use Botble\Payment\Enums\PaymentMethodEnum;
@@ -167,7 +166,7 @@ class CheckoutForm extends FormFront
                                             );
                                     })
                                     ->when(
-                                        ! is_plugin_active('marketplace')
+                                        apply_filters('ecommerce_checkout_show_shipping_section', ! is_plugin_active('marketplace'))
                                         && Arr::get($model, 'sessionCheckoutData.is_available_shipping', true)
                                         && (! (bool) get_ecommerce_setting('disable_shipping_options', false)),
                                         function (CheckoutForm $form) use ($model): void {
@@ -270,13 +269,6 @@ class CheckoutForm extends FormFront
                                             ->label(__('Order notes'))
                                             ->placeholder(__('Notes about your order, e.g. special notes for delivery.'))
                                     )
-                                    ->when(EcommerceHelper::getMinimumOrderAmount() > $model['rawTotal'], function (CheckoutForm $form): void {
-                                        $form->add(
-                                            'minimum_order_amount_alert',
-                                            HtmlField::class,
-                                            HtmlFieldOption::make()->content('<div role="alert" class="alert alert-warning">' . __('Minimum order amount is :amount, you need to buy more :more to place an order!', ['amount' => format_price(EcommerceHelper::getMinimumOrderAmount()), 'more' => format_price(EcommerceHelper::getMinimumOrderAmount() - Cart::instance('cart')->rawSubTotal())]) . '</div>')
-                                        );
-                                    })
                                     ->when(EcommerceHelper::isDisplayTaxFieldsAtCheckoutPage(), function (CheckoutForm $form) use ($model): void {
                                         $form->add(
                                             'tax_information',
@@ -301,6 +293,17 @@ class CheckoutForm extends FormFront
                                                 ->checked(get_ecommerce_setting('terms_and_policy_checkbox_checked_by_default', false)),
                                         );
                                     })
+                                    ->when(get_ecommerce_setting('checkout_acceptance_message_enabled', false), function (CheckoutForm $form): void {
+                                        $form->add(
+                                            'checkout_acceptance_message',
+                                            HtmlField::class,
+                                            HtmlFieldOption::make()->content(
+                                                '<div class="alert alert-info mb-3" style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 0.375rem; padding: 0.75rem 1rem; color: #6c757d; font-size: 14px; line-height: 1.5;">' .
+                                                __('By placing an order, you agree to our Terms of Service and acknowledge that you have read our Privacy Policy. Your payment will be processed securely according to our payment provider\'s privacy policy.') .
+                                                '</div>'
+                                            )
+                                        );
+                                    })
                                     ->add(
                                         'filters_ecommerce_checkout_form_after',
                                         HtmlField::class,
@@ -308,7 +311,7 @@ class CheckoutForm extends FormFront
                                     )
                                     ->addWrapper(
                                         'footer_actions_wrapper',
-                                        '<div class="w-100 row align-items-center g-3 mb-5">',
+                                        '<div class="row align-items-center mb-5">',
                                         '</div>',
                                         function (CheckoutForm $form) use ($model): void {
                                             $form

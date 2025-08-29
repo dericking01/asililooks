@@ -98,6 +98,39 @@
                                 'contact': $(document).find('#address_phone').val()
                             },
                             'notes' : @json($paymentService->getOrderNotes()),
+                            'config': {
+                                'display': {
+                                    'blocks': {
+                                        'utib': {
+                                            'name': 'Pay using UPI',
+                                            'instruments': [
+                                                {
+                                                    'method': 'upi'
+                                                }
+                                            ]
+                                        },
+                                        'other': {
+                                            'name': 'Other Payment modes',
+                                            'instruments': [
+                                                {
+                                                    'method': 'card',
+                                                    'issuers': ['HDFC', 'ICIC', 'SBIN', 'AXIS', 'UTIB', 'KKBK', 'YESB', 'INDB']
+                                                },
+                                                {
+                                                    'method': 'netbanking'
+                                                },
+                                                {
+                                                    'method': 'wallet'
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    'sequence': ['block.utib', 'block.other'],
+                                    'preferences': {
+                                        'show_default_blocks': false
+                                    }
+                                }
+                            }
                         });
                         window.rzpay.open();
                     });

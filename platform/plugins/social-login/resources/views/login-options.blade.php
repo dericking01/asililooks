@@ -16,10 +16,10 @@
                 <li>
                     <a href="{{ route('auth.social', array_merge([$item], $params)) }}" class="social-login {{ $item }}-login">
                         @php
-                            $item = $item === 'linkedin-openid' ? 'linkedin' : $item;
+                            $iconName = $item === 'linkedin-openid' ? 'linkedin' : $item;
                         @endphp
 
-                        <img src="{{ asset('vendor/core/plugins/social-login/images/icons/logo-' . $item . '.svg') }}" alt="{{ Str::ucfirst($item) }}" />
+                        <img src="{{ asset('vendor/core/plugins/social-login/images/icons/logo-' . $iconName . '.svg') }}" alt="{{ Str::ucfirst($item) }}" />
                         <span>{{ trans('plugins/social-login::social-login.sign_in_with', ['provider' => trans('plugins/social-login::social-login.socials.' . $item)]) }}</span>
                     </a>
                 </li>

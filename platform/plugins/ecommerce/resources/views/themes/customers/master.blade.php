@@ -138,7 +138,6 @@
                                                 'active' => $item['active']
                                             ])
                                             title="{{ $item['name'] }}"
-                                            data-bs-dismiss="offcanvas"
                                         >
                                             <x-core::icon :name="$item['icon']" class="nav-icon flex-shrink-0" size="sm" />
                                             <span class="nav-text">{{ $item['name'] }}</span>

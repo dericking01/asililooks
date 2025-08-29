@@ -31,7 +31,8 @@
                 // Set a cookie to dismiss the suggestion for a week
                 const expiryDate = new Date();
                 expiryDate.setDate(expiryDate.getDate() + 7);
-                document.cookie = 'shortcode_cache_suggestion_dismissed=1; expires=' + expiryDate.toUTCString() + '; path=/';
+                const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+                document.cookie = 'shortcode_cache_suggestion_dismissed=1; expires=' + expiryDate.toUTCString() + '; path=/; SameSite=Lax' + secure;
 
                 // Hide the suggestion
                 document.getElementById('shortcode-cache-suggestion').style.display = 'none';

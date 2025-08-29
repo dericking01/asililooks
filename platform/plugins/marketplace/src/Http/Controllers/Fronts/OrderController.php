@@ -22,6 +22,7 @@ use Botble\Marketplace\Tables\OrderTable;
 use Botble\Payment\Models\Payment;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class OrderController extends BaseController
 {
@@ -211,6 +212,18 @@ class OrderController extends BaseController
         return $this
             ->httpResponse()
             ->setMessage(trans('plugins/ecommerce::order.customer.messages.cancel_success'));
+    }
+
+    public function downloadProof(Order $order)
+    {
+        abort_unless($order->store_id === auth('customer')->user()->store?->id, 403);
+        abort_unless($order->proof_file, 404);
+
+        $storage = Storage::disk('local');
+
+        abort_unless($storage->exists($order->proof_file), 404);
+
+        return $storage->download($order->proof_file);
     }
 
     protected function findOrFail(int|string $id): Order|Model|null

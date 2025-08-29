@@ -11,7 +11,7 @@
                             {{ $product->name }}
                         </div>
 
-                        @if (EcommerceHelper::isReviewEnabled())
+                        @if (EcommerceHelper::isReviewEnabled() && (!EcommerceHelper::hideRatingWhenNoReviews() || $product->reviews_count > 0))
                             <div class="bb-quick-search-item-rating">
                                 @include(EcommerceHelper::viewPath('includes.rating-star'), ['avg' => $product->reviews_avg])
                                 <span>({{ $product->reviews_count }})</span>

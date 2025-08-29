@@ -19,9 +19,9 @@
                                         </tbody>
                                     </table>
 
-                                    <h1 class="bb-text-center bb-m-0">New Subscriber</h1>
+                                    <h1 class="bb-text-center bb-m-0">{{ 'plugins/newsletter::newsletter.email_templates.admin_new_subscriber_title' | trans }}</h1>
 
-                                    <p class="bb-text-center bb-mt-sm bb-mb-0 bb-text-muted">New user has been subscribed your newsletter:
+                                    <p class="bb-text-center bb-mt-sm bb-mb-0 bb-text-muted">{{ 'plugins/newsletter::newsletter.email_templates.admin_new_subscriber_message' | trans }}
                                         <a href="mailto:{{ newsletter_email }}">{{ newsletter_email}}</a>
                                     </p>
                                 </td>

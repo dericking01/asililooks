@@ -229,14 +229,24 @@
         flex-direction: column;
     }
     .site-notice .site-notice__actions {
-        justify-content: stretch;
+        justify-content: center;
         margin-left: 0;
+        gap: 0.4rem;
+        flex-wrap: wrap;
     }
     [dir="rtl"] .site-notice .site-notice__actions {
         margin-right: 0;
     }
     .site-notice .site-notice__actions button {
-        flex: 1;
+        flex: none;
+        min-width: 70px;
+        max-width: 100px;
+        padding: 6px 10px;
+        font-size: 11px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        border-radius: 3px;
     }
 }
 </style>
@@ -421,10 +431,12 @@
 
             function rejectAllCookies() {
                 if (cookieExists(COOKIE_NAME)) {
+                    const secure = window.location.protocol === 'https:' ? '; Secure' : '';
                     document.cookie = COOKIE_NAME +
                         '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=' +
                         COOKIE_DOMAIN +
-                        '; path=/' +
+                        '; path=/; SameSite=Lax' +
+                        secure +
                         SESSION_SECURE;
                 }
 
@@ -462,6 +474,7 @@
             function setCookie(name, value, expirationInDays) {
                 const date = new Date();
                 date.setTime(date.getTime() + expirationInDays * 24 * 60 * 60 * 1000);
+                const secure = window.location.protocol === 'https:' ? ';Secure' : '';
                 document.cookie =
                     name +
                     '=' +
@@ -471,6 +484,8 @@
                     ';domain=' +
                     COOKIE_DOMAIN +
                     ';path=/' +
+                    ';SameSite=Lax' +
+                    secure +
                     SESSION_SECURE;
             }
 

@@ -17,12 +17,133 @@
     .card {
         .card-header {
             min-height: 4.5rem;
+
+            @media (max-width: 575.98px) {
+                min-height: auto;
+                padding: 1rem 0.75rem;
+
+                > div {
+                    flex-direction: column;
+                    align-items: stretch !important;
+                    gap: 0.75rem !important;
+
+                    > div:first-child {
+                        flex-wrap: wrap;
+                        gap: 0.5rem !important;
+
+                        > * {
+                            flex-shrink: 0;
+                        }
+                    }
+                }
+            }
         }
 
         &.has-filters,
         &.has-actions {
             .card-header {
                 min-height: 0;
+            }
+        }
+    }
+
+    .card-header .table-action-buttons.d-flex {
+        @media (max-width: 575.98px) {
+            width: 100% !important;
+            margin-top: 0.5rem;
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+
+            > .btn {
+                flex: 0 0 calc(50% - 0.25rem) !important;
+                width: calc(50% - 0.25rem) !important;
+                max-width: calc(50% - 0.25rem) !important;
+                min-width: 0 !important;
+                justify-content: center;
+                min-height: 2.5rem;
+                font-size: 0.875rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+
+                span {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    max-width: 100%;
+
+                    svg {
+                        flex-shrink: 0;
+                        width: 1rem;
+                        height: 1rem;
+                    }
+                }
+
+                svg {
+                    flex-shrink: 0;
+                    width: 1rem;
+                    height: 1rem;
+                    margin-right: 0.25rem;
+                }
+            }
+
+            .dropdown {
+                flex: 0 0 calc(50% - 0.25rem) !important;
+                width: calc(50% - 0.25rem) !important;
+                max-width: calc(50% - 0.25rem) !important;
+                min-width: 0 !important;
+
+                .dropdown-toggle {
+                    width: 100%;
+                    justify-content: center;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    padding-left: 0.5rem;
+                    padding-right: 0.5rem;
+
+                    span {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 0.25rem;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        max-width: 100%;
+
+                        svg {
+                            flex-shrink: 0;
+                            width: 1rem;
+                            height: 1rem;
+                        }
+                    }
+
+                    svg {
+                        flex-shrink: 0;
+                        width: 1rem;
+                        height: 1rem;
+                        margin-right: 0.25rem;
+                    }
+                }
+            }
+
+            > * {
+                margin-bottom: 0;
+            }
+        }
+
+    }
+
+    .card-header .table-action-buttons.d-flex {
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            .btn {
+                font-size: 0.875rem;
+                padding: 0.375rem 0.75rem;
             }
         }
     }
@@ -177,7 +298,18 @@ div.dt-buttons {
             margin-left: unset !important;
             margin-inline-start: 0.5em;
             padding-inline-end: 2rem;
+
+            @media (max-width: 575.98px) {
+                min-width: 100% !important;
+                margin-inline-start: 0;
+            }
         }
+    }
+
+    @media (max-width: 575.98px) {
+        margin-top: 0.5rem;
+        order: 3;
+        flex-basis: 100%;
     }
 }
 

@@ -31,6 +31,7 @@ use Botble\Marketplace\Models\Scopes\HideProductsByLockedVendorScope;
 use Botble\Marketplace\Models\Store;
 use Botble\Marketplace\Models\VendorInfo;
 use Botble\Marketplace\Models\Withdrawal;
+use Botble\Marketplace\Observers\ProductObserver;
 use Botble\Marketplace\Repositories\Eloquent\RevenueRepository;
 use Botble\Marketplace\Repositories\Eloquent\StoreRepository;
 use Botble\Marketplace\Repositories\Eloquent\VendorInfoRepository;
@@ -87,6 +88,7 @@ class MarketplaceServiceProvider extends ServiceProvider
         }
 
         add_filter(IS_IN_ADMIN_FILTER, [$this, 'setInAdmin'], 128);
+        add_filter('ecommerce_checkout_show_shipping_section', [$this, 'filterCheckoutShowShippingSection'], 10);
 
         $this
             ->setNamespace('plugins/marketplace')
@@ -124,7 +126,7 @@ class MarketplaceServiceProvider extends ServiceProvider
                     'priority' => 1,
                     'parent_id' => 'cms-plugins-marketplace',
                     'name' => 'plugins/marketplace::store.name',
-                    'icon' => null,
+                    'icon' => 'ti ti-building-store',
                     'url' => fn () => route('marketplace.store.index'),
                     'permissions' => ['marketplace.store.index'],
                 ])
@@ -133,7 +135,7 @@ class MarketplaceServiceProvider extends ServiceProvider
                     'priority' => 2,
                     'parent_id' => 'cms-plugins-marketplace',
                     'name' => 'plugins/marketplace::withdrawal.name',
-                    'icon' => null,
+                    'icon' => 'ti ti-cash-banknote',
                     'url' => fn () => route('marketplace.withdrawal.index'),
                     'permissions' => ['marketplace.withdrawal.index'],
                 ])
@@ -142,7 +144,7 @@ class MarketplaceServiceProvider extends ServiceProvider
                     'priority' => 4,
                     'parent_id' => 'cms-plugins-marketplace',
                     'name' => 'plugins/marketplace::marketplace.vendors',
-                    'icon' => null,
+                    'icon' => 'ti ti-users',
                     'url' => fn () => route('marketplace.vendors.index'),
                     'permissions' => ['marketplace.vendors.index'],
                 ])
@@ -155,7 +157,7 @@ class MarketplaceServiceProvider extends ServiceProvider
                                 'priority' => 5,
                                 'parent_id' => 'cms-plugins-marketplace',
                                 'name' => 'plugins/marketplace::unverified-vendor.name',
-                                'icon' => null,
+                                'icon' => 'ti ti-user-question',
                                 'url' => fn () => route('marketplace.unverified-vendors.index'),
                                 'permissions' => ['marketplace.unverified-vendors.index'],
                             ]);
@@ -166,19 +168,25 @@ class MarketplaceServiceProvider extends ServiceProvider
                     'priority' => 0,
                     'parent_id' => 'cms-plugins-marketplace',
                     'name' => 'plugins/marketplace::marketplace.reports.name',
-                    'icon' => null,
+                    'icon' => 'ti ti-chart-bar',
                     'url' => fn () => route('marketplace.reports.index'),
                     'permissions' => ['marketplace.reports'],
                 ])
-                ->registerItem([
-                    'id' => 'cms-plugins-marketplace-messages',
-                    'priority' => 10,
-                    'parent_id' => 'cms-plugins-marketplace',
-                    'name' => 'plugins/marketplace::message.name',
-                    'icon' => null,
-                    'url' => fn () => route('marketplace.messages.index'),
-                    'permissions' => ['marketplace.messages.index'],
-                ]);
+                ->when(
+                    MarketplaceHelper::isEnabledMessagingSystem(),
+                    function (DashboardMenuSupport $dashboardMenu): void {
+                        $dashboardMenu
+                            ->registerItem([
+                            'id' => 'cms-plugins-marketplace-messages',
+                            'priority' => 10,
+                            'parent_id' => 'cms-plugins-marketplace',
+                            'name' => 'plugins/marketplace::message.name',
+                            'icon' => 'ti ti-messages',
+                            'url' => fn () => route('marketplace.messages.index'),
+                            'permissions' => ['marketplace.messages.index'],
+                        ]);
+                    }
+                );
         });
 
         DashboardMenu::for('vendor')->beforeRetrieving(function (): void {
@@ -200,25 +208,35 @@ class MarketplaceServiceProvider extends ServiceProvider
                 ->when(EcommerceHelper::isProductSpecificationEnabled(), function (DashboardMenuSupport $dashboardMenu): void {
                     $dashboardMenu
                         ->registerItem([
-                            'id' => 'cms-plugins-product-specification-groups',
+                            'id' => 'cms-plugins-product-specification',
                             'priority' => 900,
+                            'name' => __('Product Specification'),
+                            'icon' => 'ti ti-table-options',
+                            'permissions' => ['ecommerce.product-specification.index'],
+                        ])
+                        ->registerItem([
+                            'id' => 'cms-plugins-product-specification-groups',
+                            'parent_id' => 'cms-plugins-product-specification',
+                            'priority' => 0,
                             'name' => __('Specification Groups'),
                             'url' => fn () => route('marketplace.vendor.specification-groups.index'),
-                            'icon' => 'ti ti-table-options',
+                            'icon' => 'ti ti-folder',
                         ])
                         ->registerItem([
                             'id' => 'cms-plugins-product-specification-attributes',
-                            'priority' => 910,
+                            'parent_id' => 'cms-plugins-product-specification',
+                            'priority' => 10,
                             'name' => __('Specification Attributes'),
                             'url' => fn () => route('marketplace.vendor.specification-attributes.index'),
-                            'icon' => 'ti ti-table-options',
+                            'icon' => 'ti ti-list-details',
                         ])
                         ->registerItem([
                             'id' => 'cms-plugins-product-specification-tables',
-                            'priority' => 920,
+                            'parent_id' => 'cms-plugins-product-specification',
+                            'priority' => 20,
                             'name' => __('Specification Tables'),
                             'url' => fn () => route('marketplace.vendor.specification-tables.index'),
-                            'icon' => 'ti ti-table-options',
+                            'icon' => 'ti ti-table',
                         ]);
                 })
                 ->registerItem([
@@ -413,6 +431,8 @@ class MarketplaceServiceProvider extends ServiceProvider
                 return $model->belongsTo(User::class, 'approved_by')->withDefault();
             });
 
+            Product::observe(ProductObserver::class);
+
             Customer::resolveRelationUsing('vendorInfo', function ($model) {
                 return $model->hasOne(VendorInfo::class, 'customer_id')->withDefault();
             });
@@ -533,5 +553,11 @@ class MarketplaceServiceProvider extends ServiceProvider
         }
 
         return $segment === config('plugins.marketplace.general.vendor_panel_dir', 'vendor') || $isInAdmin;
+    }
+
+    public function filterCheckoutShowShippingSection(bool $showShipping): bool
+    {
+        // If marketplace is active and charge_shipping_per_vendor is false, show standard shipping
+        return ! MarketplaceHelper::isChargeShippingPerVendor();
     }
 }

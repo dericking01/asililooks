@@ -154,6 +154,7 @@ class PublicCheckoutController extends BaseController
         $promotionDiscountAmount = $checkoutOrderData->promotionDiscountAmount;
         $couponDiscountAmount = $checkoutOrderData->couponDiscountAmount;
         $shippingAmount = $checkoutOrderData->shippingAmount;
+        $paymentFee = $checkoutOrderData->paymentFee;
 
         $data = compact(
             'token',
@@ -166,6 +167,7 @@ class PublicCheckoutController extends BaseController
             'sessionCheckoutData',
             'products',
             'isShowAddressForm',
+            'paymentFee',
         );
 
         if (auth('customer')->check()) {
@@ -198,9 +200,8 @@ class PublicCheckoutController extends BaseController
 
         $discounts = apply_filters('ecommerce_checkout_discounts_query', $discountsQuery, $products)->get();
 
-        $rawTotal = Cart::instance('cart')->rawTotal();
-        $orderAmount = max($rawTotal - $promotionDiscountAmount - $couponDiscountAmount, 0);
-        $orderAmount += (float) $shippingAmount;
+        $rawTotal = $checkoutOrderData->rawTotal;
+        $orderAmount = $checkoutOrderData->orderAmount;
 
         $data = [...$data, 'discounts' => $discounts, 'rawTotal' => $rawTotal, 'orderAmount' => $orderAmount];
 
@@ -215,8 +216,8 @@ class PublicCheckoutController extends BaseController
             return view($checkoutView, $data);
         }
 
-        add_filter('payment_order_total_amount', function () use ($orderAmount) {
-            return $orderAmount;
+        add_filter('payment_order_total_amount', function () use ($orderAmount, $paymentFee) {
+            return $orderAmount - $paymentFee;
         }, 120);
 
         return view(
@@ -366,6 +367,19 @@ class PublicCheckoutController extends BaseController
 
         $products = Cart::instance('cart')->products();
 
+        // Extract shipping values once to avoid repetition
+        $shippingMethod = $request->input('shipping_method');
+        $shippingOption = $request->input('shipping_option');
+
+        // Convert arrays to strings if needed
+        if (is_array($shippingMethod)) {
+            $shippingMethod = $shippingMethod[0] ?? ShippingMethodEnum::DEFAULT;
+        }
+
+        if (is_array($shippingOption)) {
+            $shippingOption = $shippingOption[0] ?? null;
+        }
+
         if (is_plugin_active('marketplace')) {
             $sessionData = apply_filters(
                 HANDLE_PROCESS_ORDER_DATA_ECOMMERCE,
@@ -389,8 +403,8 @@ class PublicCheckoutController extends BaseController
             $request->merge([
                 'amount' => Cart::instance('cart')->rawTotal(),
                 'user_id' => $currentUserId,
-                'shipping_method' => $request->input('shipping_method', ShippingMethodEnum::DEFAULT),
-                'shipping_option' => $request->input('shipping_option'),
+                'shipping_method' => $shippingMethod ?? ShippingMethodEnum::DEFAULT,
+                'shipping_option' => $shippingOption,
                 'shipping_amount' => 0,
                 'tax_amount' => Cart::instance('cart')->rawTax(),
                 'sub_total' => Cart::instance('cart')->rawSubTotal(),
@@ -445,7 +459,7 @@ class PublicCheckoutController extends BaseController
                     'qty' => $cartItem->qty,
                     'weight' => $weight,
                     'price' => $cartItem->price,
-                    'tax_amount' => $cartItem->tax,
+                    'tax_amount' => $cartItem->tax * $cartItem->qty,
                     'options' => $cartItem->options,
                     'product_type' => $product->product_type,
                 ];
@@ -690,6 +704,12 @@ class PublicCheckoutController extends BaseController
 
         $isAvailableShipping = EcommerceHelper::isAvailableShipping($products);
         $shippingMethodInput = $request->input('shipping_method', ShippingMethodEnum::DEFAULT);
+        $shippingOption = $request->input('shipping_option');
+
+        // Convert arrays to strings if needed
+        if (is_array($shippingOption)) {
+            $shippingOption = $shippingOption[0] ?? null;
+        }
 
         $shippingAmount = 0;
         $shippingData = [];
@@ -706,7 +726,7 @@ class PublicCheckoutController extends BaseController
             $shippingMethodData = $shippingFeeService->execute(
                 $shippingData,
                 $shippingMethodInput,
-                $request->input('shipping_option')
+                $shippingOption
             );
 
             $shippingMethod = Arr::first($shippingMethodData);
@@ -757,7 +777,7 @@ class PublicCheckoutController extends BaseController
             'currency' => $request->input('currency', strtoupper(get_application_currency()->title)),
             'user_id' => $currentUserId,
             'shipping_method' => $isAvailableShipping ? $shippingMethodInput : '',
-            'shipping_option' => $isAvailableShipping ? $request->input('shipping_option') : null,
+            'shipping_option' => $isAvailableShipping ? $shippingOption : null,
             'shipping_amount' => (float) $shippingAmount,
             'payment_fee' => (float) $paymentFee,
             'tax_amount' => Cart::instance('cart')->rawTax(),
@@ -827,7 +847,7 @@ class PublicCheckoutController extends BaseController
                 'qty' => $cartItem->qty,
                 'weight' => Arr::get($cartItem->options, 'weight', 0),
                 'price' => $cartItem->price,
-                'tax_amount' => $cartItem->tax,
+                'tax_amount' => $cartItem->tax * $cartItem->qty,
                 'options' => $cartItem->options,
                 'product_type' => $product->product_type,
             ];

@@ -41,8 +41,12 @@ class HookServiceProvider extends ServiceProvider
                                 ->wherePublished()
                                 ->pluck('name', 'key')
                                 ->all())
-                    );
+                    )
+                    ->withCaching(false);
             });
+
+            shortcode()->ignoreLazyLoading(['simple-slider']);
+            shortcode()->ignoreCaches(['simple-slider']);
         }
     }
 

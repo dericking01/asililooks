@@ -15,22 +15,22 @@
                         </tbody>
                     </table>
 
-                    <h1 class="bb-text-center bb-m-0 bb-mt-md">Customer has cancelled order {{ order_id }}</h1>
+                    <h1 class="bb-text-center bb-m-0 bb-mt-md">{{ 'plugins/ecommerce::email-templates.order_cancellation_to_admin_title' | trans({'order_id': order_id}) }}</h1>
                 </td>
             </tr>
             <tr>
                 <td class="bb-content">
-                    <p>Hello,</p>
-                    <p>Customer {{ customer_name }} has cancelled order <strong>{{ order_id }}</strong> due to reason {{ cancellation_reason }}.</p>
+                    <p>{{ 'plugins/ecommerce::email-templates.order_cancellation_to_admin_greeting' | trans }}</p>
+                    <p>{{ 'plugins/ecommerce::email-templates.order_cancellation_to_admin_message' | trans({'customer_name': customer_name, 'order_id': order_id, 'cancellation_reason': cancellation_reason}) | raw }}</p>
                 </td>
             </tr>
             <tr>
                 <td class="bb-content bb-pt-0">
-                    <h4>Here's what you ordered:</h4>
+                    <h4>{{ 'plugins/ecommerce::email-templates.order_cancellation_to_admin_order_summary' | trans }}</h4>
                     {{ product_list }}
 
                     {% if order_note %}
-                    <div>Note: {{ order_note }}</div>
+                    <div>{{ 'plugins/ecommerce::email-templates.order_cancellation_to_admin_note' | trans }}: {{ order_note }}</div>
                     {% endif %}
                 </td>
             </tr>

@@ -3,6 +3,8 @@
 use Botble\Base\Facades\AdminHelper;
 use Botble\Base\Http\Middleware\DisableInDemoModeMiddleware;
 use Botble\Ecommerce\Facades\EcommerceHelper;
+use Botble\Ecommerce\Http\Controllers\Customers\ExportCustomerController;
+use Botble\Ecommerce\Http\Controllers\Customers\ImportCustomerController;
 use Botble\Ecommerce\Http\Controllers\Customers\OrderController;
 use Botble\Ecommerce\Http\Controllers\Customers\UploadProofController;
 use Botble\Ecommerce\Http\Controllers\Fronts\AccountDeletionController;
@@ -14,6 +16,12 @@ AdminHelper::registerRoutes(
         Route::group(['namespace' => 'Botble\Ecommerce\Http\Controllers\Customers'], function (): void {
             Route::group(['prefix' => 'customers', 'as' => 'customers.'], function (): void {
                 Route::resource('', 'CustomerController')->parameters(['' => 'customer']);
+
+                Route::get('view/{id}', [
+                    'as' => 'view',
+                    'uses' => 'CustomerController@view',
+                    'permission' => 'customers.index',
+                ])->wherePrimaryKey();
 
                 Route::group(
                     ['prefix' => 'addresses', 'as' => 'addresses.', 'permission' => 'customers.edit'],
@@ -64,12 +72,30 @@ AdminHelper::registerRoutes(
                     'permission' => 'customers.index',
                 ])->wherePrimaryKey();
 
+                Route::post('resend-verification-email/{id}', [
+                    'as' => 'resend-verification-email',
+                    'uses' => 'CustomerController@resendVerificationEmail',
+                    'permission' => 'customers.edit',
+                ])->wherePrimaryKey();
+
                 Route::post('reviews/{id}', [
                     'as' => 'ajax.reviews',
                     'uses' => 'CustomerController@ajaxReviews',
                     'permission' => 'customers.edit',
                 ])->wherePrimaryKey();
             });
+        });
+
+        Route::group(['prefix' => 'tools/data-synchronize/import/customers', 'as' => 'ecommerce.customers.import.', 'permission' => 'ecommerce.customers.import'], function (): void {
+            Route::get('/', [ImportCustomerController::class, 'index'])->name('index');
+            Route::post('validate', [ImportCustomerController::class, 'validateData'])->name('validate');
+            Route::post('import', [ImportCustomerController::class, 'import'])->name('store');
+            Route::post('download-example', [ImportCustomerController::class, 'downloadExample'])->name('download-example');
+        });
+
+        Route::group(['prefix' => 'tools/data-synchronize/export/customers', 'as' => 'ecommerce.customers.export.', 'permission' => 'ecommerce.customers.export'], function (): void {
+            Route::get('/', [ExportCustomerController::class, 'index'])->name('index');
+            Route::post('/', [ExportCustomerController::class, 'store'])->name('store');
         });
     }
 );

@@ -3,6 +3,7 @@
 namespace Botble\ACL\Http\Requests;
 
 use Botble\ACL\Models\User;
+use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Rules\EmailRule;
 use Botble\Support\Http\Requests\Request;
 use Illuminate\Validation\Rule;
@@ -30,6 +31,7 @@ class CreateUserRequest extends Request
                 'max:120',
                 Rule::unique((new User())->getTable(), 'username'),
             ],
+            'phone' => ['nullable', ...BaseHelper::getPhoneValidationRule(true)],
         ];
     }
 }

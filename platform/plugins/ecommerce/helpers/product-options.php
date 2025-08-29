@@ -24,8 +24,10 @@ if (! function_exists('render_product_options')) {
         $script = 'vendor/core/plugins/ecommerce/js/change-product-options.js';
         $style = 'vendor/core/plugins/ecommerce/css/front-ecommerce.css';
 
-        Theme::asset()->add('front-ecommerce-css', $style, version: get_cms_version());
-        Theme::asset()->container('footer')->add('change-product-options', $script, ['jquery'], version: get_cms_version());
+        $version = EcommerceHelper::getAssetVersion();
+
+        Theme::asset()->add('front-ecommerce-css', $style, version: $version);
+        Theme::asset()->container('footer')->add('change-product-options', $script, ['jquery'], version: $version);
 
         foreach ($product->options as $option) {
             $typeClass = __NAMESPACE__ . '\\' . $option->option_type;

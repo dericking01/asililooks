@@ -36,5 +36,21 @@ return [
                 'contact_custom_fields' => 'plugins/contact::contact.settings.email.templates.contact_custom_fields',
             ],
         ],
+
+        'admin-reply' => [
+            'title' => 'plugins/contact::contact.settings.email.templates.admin_reply_title',
+            'description' => 'plugins/contact::contact.settings.email.templates.admin_reply_description',
+            'subject' => 'plugins/contact::contact.settings.email.templates.admin_reply_subject',
+            'can_off' => true,
+            'enabled' => true,
+            'variables' => [
+                'contact_name' => 'plugins/contact::contact.settings.email.templates.contact_name',
+                'contact_subject' => 'plugins/contact::contact.settings.email.templates.contact_subject',
+                'contact_email' => 'plugins/contact::contact.settings.email.templates.contact_email',
+                'contact_content' => 'plugins/contact::contact.settings.email.templates.contact_content',
+                'admin_reply_message' => 'plugins/contact::contact.settings.email.templates.admin_reply_message',
+                'site_title' => 'plugins/contact::contact.settings.email.templates.site_title',
+            ],
+        ],
     ],
 ];

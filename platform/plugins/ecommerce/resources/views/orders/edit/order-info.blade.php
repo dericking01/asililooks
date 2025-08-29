@@ -124,17 +124,13 @@
             </x-core::table.body.row>
         @endif
 
-        @if($isInAdmin)
+        @if(!empty($proofDownloadUrl))
             @if ($order->proof_file && Storage::disk('local')->exists($order->proof_file))
                 <x-core::table.body.row>
-                    <x-core::table.body.cell>
-                        {{ trans('plugins/ecommerce::order.payment_proof') }}
-                    </x-core::table.body.cell>
-                    <x-core::table.body.cell>
-                        <a href="{{ route('orders.download-proof', $order->id) }}" target="_blank">
-                            <span>{{ trans('plugins/ecommerce::order.download') }}</span>
-                            <x-core::icon name="ti ti-download" />
-                        </a>
+                    <x-core::table.body.cell colspan="2">
+                        <div style="margin-top: -1rem !important">
+                            @include('plugins/ecommerce::orders.partials.payment-proof-detail', ['downloadUrl' => $proofDownloadUrl])
+                        </div>
                     </x-core::table.body.cell>
                 </x-core::table.body.row>
             @endif

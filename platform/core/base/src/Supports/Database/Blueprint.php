@@ -41,7 +41,7 @@ class Blueprint extends IlluminateBlueprint
         };
     }
 
-    public function morphs($name, $indexName = null): void
+    public function morphs($name, $indexName = null, $after = null): void
     {
         match ($this->getModelTypeOfId()) {
             'UUID' => $this->uuidMorphs($name, $indexName),
@@ -50,7 +50,7 @@ class Blueprint extends IlluminateBlueprint
         };
     }
 
-    public function nullableMorphs($name, $indexName = null): void
+    public function nullableMorphs($name, $indexName = null, $after = null): void
     {
         match ($this->getModelTypeOfId()) {
             'UUID' => $this->nullableUuidMorphs($name, $indexName),

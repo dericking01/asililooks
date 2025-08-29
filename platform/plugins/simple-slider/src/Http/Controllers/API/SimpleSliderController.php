@@ -2,7 +2,7 @@
 
 namespace Botble\SimpleSlider\Http\Controllers\API;
 
-use Botble\Base\Http\Controllers\BaseController;
+use Botble\Api\Http\Controllers\BaseApiController;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Media\Facades\RvMedia;
 use Botble\SimpleSlider\Models\SimpleSlider;
@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 
-class SimpleSliderController extends BaseController
+class SimpleSliderController extends BaseApiController
 {
     /**
      * Get sliders

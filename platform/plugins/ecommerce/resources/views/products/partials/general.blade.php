@@ -19,6 +19,7 @@
             <x-core::form.checkbox
                 :label="trans('plugins/ecommerce::products.form.auto_generate_sku')"
                 name="auto_generate_sku"
+                :value="1"
             />
         @endif
     </div>
@@ -245,11 +246,145 @@
         || ($originalProduct && $originalProduct->isTypeDigital()) || ($product && $product->isTypeDigital())
     ))
 )
+    @if (EcommerceHelper::isEnabledLicenseCodesForDigitalProducts())
     <x-core::form.on-off.checkbox
         :label="trans('plugins/ecommerce::products.digital_attachments.generate_license_code_after_purchasing_product')"
         name="generate_license_code"
         :checked="old('generate_license_code', $product ? $product->generate_license_code : $originalProduct->generate_license_code ?? 0)"
+        data-bb-toggle="collapse"
+        data-bb-target="#license-code-options"
     />
+
+    <div class="collapse @if(old('generate_license_code', $product ? $product->generate_license_code : $originalProduct->generate_license_code ?? 0)) show @endif" id="license-code-options">
+        <x-core::form-group class="mt-3">
+            <x-core::form.label for="license_code_type" :value="trans('plugins/ecommerce::products.license_codes.type.title')" />
+            <x-core::form.select name="license_code_type" id="license_code_type">
+                <option value="auto_generate" @if(old('license_code_type', $product ? $product->license_code_type : 'auto_generate') === 'auto_generate') selected @endif>
+                    {{ trans('plugins/ecommerce::products.license_codes.type.auto_generate') }}
+                </option>
+                <option value="pick_from_list" @if(old('license_code_type', $product ? $product->license_code_type : 'auto_generate') === 'pick_from_list') selected @endif>
+                    {{ trans('plugins/ecommerce::products.license_codes.type.pick_from_list') }}
+                </option>
+            </x-core::form.select>
+            <x-core::form.helper-text>
+                {{ trans('plugins/ecommerce::products.license_codes.type.description') }}
+            </x-core::form.helper-text>
+        </x-core::form-group>
+    </div>
+
+    <x-core::form-group class="product-license-codes-management mb-5" id="license-codes-management" @style(['display: none' => !($product && $product->generate_license_code && $product->license_code_type === 'pick_from_list')])>
+        <x-core::form.label for="license_codes" class="mb-3">
+            {{ trans('plugins/ecommerce::products.license_codes.title') }}
+            @if($product && $product->is_variation)
+                <small class="text-muted d-block">
+                    {{ trans('plugins/ecommerce::products.license_codes.variation_specific_note') }}
+                </small>
+            @elseif($product && $product->variations()->count() > 0)
+                <small class="text-muted d-block">
+                    {{ trans('plugins/ecommerce::products.license_codes.main_product_note') }}
+                </small>
+            @endif
+
+            <x-slot:description>
+                <div class="btn-list mt-3 mb-3">
+                    @if($product && \Botble\Ecommerce\Http\Controllers\ProductLicenseCodeController::canAccessLicenseCodeManagement($product))
+                        <a href="{{ route('products.license-codes.index', $product->id) }}"
+                           class="btn btn-sm btn-primary"
+                           target="_blank">
+                            <x-core::icon name="ti ti-external-link" />
+                            {{ trans('plugins/ecommerce::products.license_codes.manage_codes') }}
+                        </a>
+                    @endif
+
+                    <x-core::button type="button" class="license-code-add-btn" size="sm" icon="ti ti-plus">
+                        {{ trans('plugins/ecommerce::products.license_codes.add') }}
+                    </x-core::button>
+
+                    <x-core::button type="button" class="license-code-generate-btn" size="sm" icon="ti ti-refresh">
+                        {{ trans('plugins/ecommerce::products.license_codes.generate') }}
+                    </x-core::button>
+                </div>
+
+                @if (get_ecommerce_setting('hide_used_license_codes_in_product_form', false) && $product && $product->licenseCodes->filter(fn($code) => $code->isUsed())->count() > 0)
+                    <div class="alert alert-info alert-sm mt-2">
+                        <x-core::icon name="ti ti-info-circle" />
+                        {{ trans('plugins/ecommerce::products.license_codes.used_codes_hidden', ['count' => $product->licenseCodes->filter(fn($code) => $code->isUsed())->count()]) }}
+                    </div>
+                @endif
+            </x-slot:description>
+        </x-core::form.label>
+
+        <div class="clearfix"></div>
+
+        <div class="table-responsive">
+            <x-core::table>
+                <x-core::table.header>
+                    <x-core::table.header.cell>
+                        {{ trans('plugins/ecommerce::products.license_codes.code') }}
+                    </x-core::table.header.cell>
+                    <x-core::table.header.cell>
+                        {{ trans('plugins/ecommerce::products.license_codes.status') }}
+                    </x-core::table.header.cell>
+                    <x-core::table.header.cell>
+                        {{ trans('plugins/ecommerce::products.license_codes.assigned_at') }}
+                    </x-core::table.header.cell>
+                    <x-core::table.header.cell />
+                </x-core::table.header>
+
+                <x-core::table.body id="license-codes-table-body">
+                @if($product)
+                    @php
+                        $hideUsedCodes = get_ecommerce_setting('hide_used_license_codes_in_product_form', false);
+                        $licenseCodes = $hideUsedCodes ? $product->licenseCodes->filter(fn($code) => $code->isAvailable()) : $product->licenseCodes;
+                    @endphp
+                    @foreach ($licenseCodes as $licenseCode)
+                        <x-core::table.body.row data-license-code-id="{{ $licenseCode->id }}">
+                            <x-core::table.body.cell>
+                                <input type="text"
+                                       name="license_codes[{{ $licenseCode->id }}][code]"
+                                       value="{{ $licenseCode->license_code }}"
+                                       class="form-control license-code-input"
+                                    {{ $licenseCode->isUsed() ? 'readonly' : '' }}>
+                            </x-core::table.body.cell>
+                            <x-core::table.body.cell>
+                                {!! $licenseCode->status->toHtml() !!}
+                            </x-core::table.body.cell>
+                            <x-core::table.body.cell>
+                                @if($licenseCode->assigned_at && $licenseCode->assignedOrderProduct && $licenseCode->assignedOrderProduct->order)
+                                    <div>
+                                        {{ BaseHelper::formatDate($licenseCode->assigned_at) }}
+                                        <br>
+                                        <a href="{{ route('orders.edit', $licenseCode->assignedOrderProduct->order->id) }}"
+                                           class="text-primary"
+                                           target="_blank">
+                                            <x-core::icon name="ti ti-external-link" />
+                                            {{ trans('plugins/ecommerce::order.view_order') }} #{{ $licenseCode->assignedOrderProduct->order->code }}
+                                        </a>
+                                    </div>
+                                @else
+                                    {{ $licenseCode->assigned_at ? BaseHelper::formatDate($licenseCode->assigned_at) : '-' }}
+                                @endif
+                            </x-core::table.body.cell>
+                            <x-core::table.body.cell>
+                                @if($licenseCode->isAvailable())
+                                    <x-core::button type="button"
+                                                    class="license-code-delete-btn"
+                                                    size="sm"
+                                                    color="danger"
+                                                    icon="ti ti-trash"
+                                                    data-license-code-id="{{ $licenseCode->id }}">
+                                        {{ trans('core/base::tables.delete') }}
+                                    </x-core::button>
+                                @endif
+                            </x-core::table.body.cell>
+                        </x-core::table.body.row>
+                    @endforeach
+                @endif
+            </x-core::table.body>
+        </x-core::table>
+        </div>
+    </x-core::form-group>
+    @endif
 
     <x-core::form-group class="product-type-digital-management">
         <x-core::form.label for="product_file" class="mb-3">
@@ -339,9 +474,15 @@
 
     @if (request()->ajax())
         @include('plugins/ecommerce::products.partials.digital-product-file-template')
+        @if (EcommerceHelper::isEnabledLicenseCodesForDigitalProducts())
+            @include('plugins/ecommerce::products.partials.license-code-template', ['isVariation' => $isVariation ?? false])
+        @endif
     @else
         @pushOnce('footer')
             @include('plugins/ecommerce::products.partials.digital-product-file-template')
+            @if (EcommerceHelper::isEnabledLicenseCodesForDigitalProducts())
+                @include('plugins/ecommerce::products.partials.license-code-template', ['isVariation' => $isVariation ?? false])
+            @endif
         @endpushOnce
     @endif
 @endif

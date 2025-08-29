@@ -2,8 +2,8 @@
 
 namespace Botble\Marketplace\Tables;
 
-use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Facades\Html;
+use Botble\Marketplace\Enums\StoreStatusEnum;
 use Botble\Marketplace\Models\Store;
 use Botble\Table\Abstracts\TableAbstract;
 use Botble\Table\Actions\Action;
@@ -42,6 +42,14 @@ class StoreTable extends TableAbstract
     {
         $data = $this->table
             ->eloquent($this->query())
+            ->editColumn('name', function ($item) {
+                $name = Html::link(route('marketplace.store.edit', $item->id), $item->name);
+                if ($item->is_verified) {
+                    $name .= ' ' . view('plugins/marketplace::partials.verified-badge', ['size' => 'sm'])->render();
+                }
+
+                return $name;
+            })
             ->editColumn('earnings', function ($item) {
                 return $item->customer->id ? format_price($item->customer->balance ?: 0) : '--';
             })
@@ -71,6 +79,7 @@ class StoreTable extends TableAbstract
                 'created_at',
                 'status',
                 'customer_id',
+                'is_verified',
             ])
             ->with(['customer', 'customer.vendorInfo'])
             ->withCount(['products']);
@@ -129,8 +138,17 @@ class StoreTable extends TableAbstract
             'status' => [
                 'title' => trans('core/base::tables.status'),
                 'type' => 'select',
-                'choices' => BaseStatusEnum::labels(),
-                'validate' => 'required|in:' . implode(',', BaseStatusEnum::values()),
+                'choices' => StoreStatusEnum::labels(),
+                'validate' => 'required|in:' . implode(',', StoreStatusEnum::values()),
+            ],
+            'is_verified' => [
+                'title' => trans('plugins/marketplace::store.forms.is_verified'),
+                'type' => 'select',
+                'choices' => [
+                    0 => trans('core/base::base.no'),
+                    1 => trans('core/base::base.yes'),
+                ],
+                'validate' => 'required|in:0,1',
             ],
             'created_at' => [
                 'title' => trans('core/base::tables.created_at'),

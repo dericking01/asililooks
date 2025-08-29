@@ -2,16 +2,19 @@
 
 namespace Botble\Shortcode\Forms;
 
+use Botble\Base\Forms\FieldOptions\AlertFieldOption;
 use Botble\Base\Forms\FieldOptions\ColorFieldOption;
 use Botble\Base\Forms\FieldOptions\MediaImageFieldOption;
 use Botble\Base\Forms\FieldOptions\SelectFieldOption;
 use Botble\Base\Forms\FieldOptions\TextareaFieldOption;
+use Botble\Base\Forms\Fields\AlertField;
 use Botble\Base\Forms\Fields\ColorField;
 use Botble\Base\Forms\Fields\MediaImageField;
 use Botble\Base\Forms\Fields\SelectField;
 use Botble\Base\Forms\Fields\TextareaField;
 use Botble\Base\Forms\FormAbstract;
 use Botble\Base\Models\BaseModel;
+use Botble\Shortcode\Compilers\ShortcodeCompiler;
 use Botble\Shortcode\Forms\Fields\ShortcodeTabsField;
 
 class ShortcodeForm extends FormAbstract
@@ -38,17 +41,94 @@ class ShortcodeForm extends FormAbstract
                 return $this;
             }
 
-            $form->add(
-                'enable_lazy_loading',
-                SelectField::class,
-                SelectFieldOption::make()
-                    ->label(__('Enable lazy loading'))
-                    ->choices([
-                        'no' => __('No'),
-                        'yes' => __('Yes'),
-                    ])
-                    ->helperText(__('When enabled, shortcode content will be loaded sequentially as the page loads, rather than all at once. This can help improve page load times.'))
-            );
+            $form
+                ->remove('enable_lazy_loading')
+                ->add(
+                    'enable_lazy_loading',
+                    SelectField::class,
+                    SelectFieldOption::make()
+                        ->label(__('Enable lazy loading'))
+                        ->choices([
+                            'no' => __('No'),
+                            'yes' => __('Yes'),
+                        ])
+                        ->helperText(__('When enabled, shortcode content will be loaded sequentially as the page loads, rather than all at once. This can help improve page load times.'))
+                );
+
+            return $this;
+        });
+
+        return $this;
+    }
+
+    public function withCaching(bool $caching = true): static
+    {
+        self::beforeRendering(function (self $form) use ($caching) {
+            if (! $caching) {
+                $form->remove('enable_caching');
+
+                return $this;
+            }
+
+            if (! setting('shortcode_cache_enabled', false)) {
+                return $this;
+            }
+
+            $form
+                ->remove('enable_caching')
+                ->add(
+                    'enable_caching',
+                    SelectField::class,
+                    SelectFieldOption::make()
+                        ->label(__('Enable caching'))
+                        ->choices([
+                            'yes' => __('Yes'),
+                            'no' => __('No'),
+                        ])
+                        ->helperText(__('When enabled, this shortcode content will be cached to improve performance. Disable for dynamic content that changes frequently.'))
+                );
+
+            return $this;
+        });
+
+        return $this;
+    }
+
+    public function withCacheWarning(string $shortcodeName): static
+    {
+        self::beforeRendering(function (self $form) use ($shortcodeName) {
+            if (in_array($shortcodeName, ShortcodeCompiler::getIgnoredCaches())) {
+                $form
+                    ->remove('enable_caching')
+                    ->add(
+                        'cache_warning',
+                        AlertField::class,
+                        AlertFieldOption::make()
+                        ->type('warning')
+                        ->content(__('Due to UI issues, cache for this UI block is disabled via code. This shortcode will not be cached even if caching is enabled.'))
+                    );
+            }
+
+            return $this;
+        });
+
+        return $this;
+    }
+
+    public function withLazyLoadingWarning(string $shortcodeName): static
+    {
+        self::beforeRendering(function (self $form) use ($shortcodeName) {
+            if (in_array($shortcodeName, ShortcodeCompiler::getIgnoredLazyLoading())) {
+                $form
+                    ->remove('enable_lazy_loading')
+                    ->add(
+                        'lazy_loading_warning',
+                        AlertField::class,
+                        AlertFieldOption::make()
+                        ->type('warning')
+                        ->content(__('Lazy loading for this UI block is disabled via code. This shortcode will not use lazy loading even if enabled.'))
+                    );
+            }
 
             return $this;
         });

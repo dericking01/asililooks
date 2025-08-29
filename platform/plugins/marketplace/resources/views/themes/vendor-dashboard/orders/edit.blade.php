@@ -21,6 +21,7 @@
                             <div class="col-md-6 offset-md-6">
                                 @include('plugins/ecommerce::orders.edit.order-info', [
                                     'isInAdmin' => false,
+                                    'proofDownloadUrl' => route('marketplace.vendor.orders.download-proof', $order->id),
                                 ])
 
                                 @if ($order->isInvoiceAvailable())

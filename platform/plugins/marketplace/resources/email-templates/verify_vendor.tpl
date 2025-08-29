@@ -14,13 +14,13 @@
                             </tr>
                         </tbody>
                     </table>
-                    <h1 class="bb-text-center bb-m-0 bb-mt-md">Verify Vendor</h1>
+                    <h1 class="bb-text-center bb-m-0 bb-mt-md">{{ 'plugins/marketplace::marketplace.email_templates.verify_vendor_title' | trans }}</h1>
                 </td>
             </tr>
             <tr>
                 <td class="bb-content bb-pb-0">
-                    <p>Dear Admin,</p>
-                    <p>You have a new vendor that needs to be verified on {{ site_title }}!</p>
+                    <p>{{ 'plugins/marketplace::marketplace.email_templates.dear_admin' | trans }}</p>
+                    <p>{{ 'plugins/marketplace::marketplace.email_templates.verify_vendor_message' | trans({'site_title': site_title}) }}</p>
                 </td>
             </tr>
             <tr>
@@ -29,16 +29,16 @@
                         <tbody>
                         <tr>
                             <td class="bb-bb-col">
-                                <h4>Vendor Information</h4>
-                                <div>Name: <strong>{{ customer_name }}</strong></div>
+                                <h4>{{ 'plugins/marketplace::marketplace.email_templates.vendor_information' | trans }}</h4>
+                                <div>{{ 'plugins/marketplace::marketplace.email_templates.field_name' | trans }}: <strong>{{ customer_name }}</strong></div>
                                 {% if customer_phone %}
-                                <div>Phone: <strong>{{ customer_phone }}</strong></div>
+                                <div>{{ 'plugins/marketplace::marketplace.email_templates.field_phone' | trans }}: <strong>{{ customer_phone }}</strong></div>
                                 {% endif %}
                                 {% if customer_email %}
-                                <div>Email: <strong>{{ customer_email }}</strong></div>
+                                <div>{{ 'plugins/marketplace::marketplace.email_templates.field_email' | trans }}: <strong>{{ customer_email }}</strong></div>
                                 {% endif %}
                                 {% if customer_address %}
-                                <div>Address: <strong>{{ customer_address }}</strong></div>
+                                <div>{{ 'plugins/marketplace::marketplace.email_templates.field_address' | trans }}: <strong>{{ customer_address }}</strong></div>
                                 {% endif %}
                             </td>
                         </tr>
@@ -52,9 +52,9 @@
                         <tbody>
                         <tr>
                             <td class="bb-bb-col">
-                                <h4>Shop information</h4>
-                                <div>Store Name: <strong>{{ store_name }}</strong></div>
-                                <div>Store Phone Number: <strong>{{ store_phone }}</strong></div>
+                                <h4>{{ 'plugins/marketplace::marketplace.email_templates.shop_information' | trans }}</h4>
+                                <div>{{ 'plugins/marketplace::marketplace.email_templates.field_store_name' | trans }}: <strong>{{ store_name }}</strong></div>
+                                <div>{{ 'plugins/marketplace::marketplace.email_templates.field_store_phone' | trans }}: <strong>{{ store_phone }}</strong></div>
                             </td>
                         </tr>
                         </tbody>
@@ -71,7 +71,7 @@
                                     <tr>
                                         <td align="center" valign="top" class="lh-1">
                                             <a href="{{ store_url }}" class="bb-btn bb-bg-blue bb-border-blue">
-                                                <span class="btn-span">Visit store</span>
+                                                <span class="btn-span">{{ 'plugins/marketplace::marketplace.email_templates.visit_store_button' | trans }}</span>
                                             </a>
                                         </td>
                                     </tr>

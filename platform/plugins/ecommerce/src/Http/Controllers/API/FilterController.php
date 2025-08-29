@@ -2,53 +2,46 @@
 
 namespace Botble\Ecommerce\Http\Controllers\API;
 
-use Botble\Base\Http\Controllers\BaseController;
+use Botble\Api\Http\Controllers\BaseApiController;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Http\Resources\API\FilterResource;
 use Botble\Ecommerce\Models\ProductCategory;
 use Botble\Ecommerce\Supports\RenderProductAttributeSetsOnSearchPageSupport;
-use Botble\Slug\Facades\SlugHelper;
 use Exception;
 use Illuminate\Http\Request;
 
-class FilterController extends BaseController
+class FilterController extends BaseApiController
 {
     /**
      * Get filter data for products
      *
      * @group Filters
      * @param Request $request
-     * @queryParam category string Category slug to get filter data for a specific category. No-example
+     * @queryParam category int Category ID to get filter data for a specific category. No-example
      *
      * @return mixed
      */
     public function getFilters(Request $request)
     {
         $category = null;
-        $categorySlug = $request->input('category');
+        $categoryId = $request->input('category');
 
-        if ($categorySlug) {
-            $slug = SlugHelper::getSlug($categorySlug, SlugHelper::getPrefix(ProductCategory::class));
-
-            if ($slug) {
-                $category = ProductCategory::query()
-                    ->wherePublished()
-                    ->where('id', $slug->reference_id)
-                    ->first();
-            }
+        if ($categoryId) {
+            $category = ProductCategory::query()
+                ->wherePublished()
+                ->where('id', $categoryId)
+                ->first();
         }
 
         try {
-            $filterData = EcommerceHelper::dataForFilter($category);
+            $filterData = EcommerceHelper::dataForFilter($category, true);
 
-            // Get attribute sets for filtering
             $attributeSetsSupport = new RenderProductAttributeSetsOnSearchPageSupport($request);
 
             if (EcommerceHelper::isEnabledFilterProductsByAttributes()) {
                 $attributeSets = $attributeSetsSupport->getAttributeSets();
                 $selectedAttrs = $attributeSetsSupport->getSelectedAttributes($attributeSets);
 
-                // Add attribute sets to filter data
                 $filterData[] = $attributeSets;
                 $filterData[] = $selectedAttrs;
             }

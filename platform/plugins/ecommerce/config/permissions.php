@@ -335,6 +335,16 @@ return [
         'flag' => 'customers.destroy',
         'parent_flag' => 'customers.index',
     ],
+    [
+        'name' => 'Import',
+        'flag' => 'ecommerce.customers.import',
+        'parent_flag' => 'customers.index',
+    ],
+    [
+        'name' => 'Export',
+        'flag' => 'ecommerce.customers.export',
+        'parent_flag' => 'customers.index',
+    ],
 
     [
         'name' => 'Flash sales',

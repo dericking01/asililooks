@@ -131,6 +131,9 @@ trait ProductActionsTrait
                     } else {
                         app(StoreProductService::class)->saveProductFiles(request(), $productRelatedToVariation);
                     }
+
+                    // Save license codes for digital products (including variations)
+                    app(StoreProductService::class)->saveLicenseCodes(request(), $productRelatedToVariation);
                 }
 
                 if (! $productRelatedToVariation->is_variation) {
@@ -519,6 +522,10 @@ trait ProductActionsTrait
             $data = $variation->toArray();
             if ((int) $variation->is_default === 1) {
                 $data['variation_default_id'] = $variation->id;
+            }
+
+            if ($product->sku) {
+                $data['auto_generate_sku'] = true;
             }
 
             $variationInfo[$variation->id] = $data;

@@ -7,6 +7,7 @@ use Botble\Base\Forms\FormAbstract;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Shortcode\Events\ShortcodeAdminConfigRendering;
 use Botble\Shortcode\Facades\Shortcode;
+use Botble\Shortcode\Forms\ShortcodeForm;
 use Botble\Shortcode\Http\Requests\GetShortcodeDataRequest;
 use Botble\Shortcode\Http\Requests\RenderBlockUiRequest;
 use Carbon\Carbon;
@@ -42,7 +43,13 @@ class ShortcodeController extends BaseController
                 $data = call_user_func($modifier, $data, $attributes, $content);
             }
 
-            $data = $data instanceof FormAbstract ? $data->renderForm() : $data;
+            // If it's a ShortcodeForm, add cache warning and caching options
+            if ($data instanceof ShortcodeForm) {
+                $data->withCacheWarning($key)->withCaching();
+                $data = $data->renderForm();
+            } elseif ($data instanceof FormAbstract) {
+                $data = $data->renderForm();
+            }
         }
 
         $data = apply_filters(SHORTCODE_REGISTER_CONTENT_IN_ADMIN, $data, $key, $attributes);
@@ -68,8 +75,9 @@ class ShortcodeController extends BaseController
 
         $attributes = $request->input('attributes', []);
 
-        // Create a cache key based on the shortcode name and attributes
-        $cacheKey = 'shortcode_' . md5($name . serialize($attributes));
+        // Create a cache key based on the shortcode name, attributes, and current locale
+        $locale = app()->getLocale();
+        $cacheKey = 'shortcode_' . md5($name . serialize($attributes) . $locale);
 
         if (! setting('shortcode_cache_enabled', false)) {
             $code = Shortcode::generateShortcode($name, $attributes);

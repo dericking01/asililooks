@@ -74,7 +74,9 @@ class Manager
             Arr::set($translations, $transKey, $transValue);
         }
 
-        $translations = array_merge($englishTranslations, $translations);
+        if (is_array($englishTranslations) && ! empty($englishTranslations)) {
+            $englishTranslations = array_merge($englishTranslations, $translations);
+        }
 
         $file = $locale . DIRECTORY_SEPARATOR . $group;
 

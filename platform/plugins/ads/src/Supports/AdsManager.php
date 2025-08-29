@@ -23,7 +23,7 @@ class AdsManager
         ];
     }
 
-    public function display(string $location, array $attributes = []): string
+    public function display(string $location, array $attributes = [], bool $single = true): string
     {
         $this->load();
 
@@ -32,7 +32,7 @@ class AdsManager
             ->where('location', $location)
             ->sortBy('order');
 
-        if ($data->isNotEmpty()) {
+        if ($data->isNotEmpty() && $single) {
             $data = $data->random(1);
         }
 

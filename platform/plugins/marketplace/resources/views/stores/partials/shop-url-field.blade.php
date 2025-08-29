@@ -18,9 +18,14 @@
             :value="old('slug', $store->slug)"
             :placeholder="__('Shop URL')"
             :required="true"
+            dir="ltr"
+            style="direction: ltr; text-align: left;"
         >
             <x-core::form.helper-text data-base-url="{{ route('public.store', old('slug', '/') ?: '/') }}">
                 {{ route('public.store', old('slug', $store->slug ?: '/') ?: '/') }}
+            </x-core::form.helper-text>
+            <x-core::form.helper-text>
+                {{ __('plugins/marketplace::store.forms.shop_url_helper') }}
             </x-core::form.helper-text>
         </x-core::form.text-input>
     </div>

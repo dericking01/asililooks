@@ -13,6 +13,7 @@ use Botble\Payment\Forms\PaymentMethodForm;
 class SslCommerzPaymentMethodForm extends PaymentMethodForm
 {
     use HasAvailableCountriesField;
+
     public function setup(): void
     {
         parent::setup();

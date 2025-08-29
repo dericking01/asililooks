@@ -5,8 +5,7 @@ namespace Botble\Ecommerce\Listeners;
 use Botble\Base\Facades\BaseHelper;
 use Botble\Ecommerce\Events\OrderPlacedEvent;
 use Exception;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\URL;
 
 class SendWebhookWhenOrderPlaced
@@ -59,16 +58,10 @@ class SendWebhookWhenOrderPlaced
 
             $data = apply_filters('ecommerce_order_placed_webhook_data', $data, $order);
 
-            $client = new Client(['verify' => false]);
-
-            $client->post($webhookURL, [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json',
-                ],
-                'json' => $data,
-            ]);
-        } catch (Exception|GuzzleException $exception) {
+            Http::withoutVerifying()
+                ->acceptJson()
+                ->post($webhookURL, $data);
+        } catch (Exception $exception) {
             info($exception->getMessage());
         }
     }

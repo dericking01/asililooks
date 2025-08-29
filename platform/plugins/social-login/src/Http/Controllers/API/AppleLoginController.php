@@ -2,7 +2,8 @@
 
 namespace Botble\SocialLogin\Http\Controllers\API;
 
-use Botble\Base\Http\Controllers\BaseController;
+use Botble\Api\Http\Controllers\BaseApiController;
+use Botble\Base\Facades\BaseHelper;
 use Botble\SocialLogin\Facades\SocialService;
 use Botble\SocialLogin\Services\AppleJwtService;
 use Botble\SocialLogin\Services\SocialLoginService;
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
-class AppleLoginController extends BaseController
+class AppleLoginController extends BaseApiController
 {
     public function __construct(
         protected SocialLoginService $socialLoginService,
@@ -23,12 +24,43 @@ class AppleLoginController extends BaseController
     ) {
     }
 
+    /**
+     * Apple login
+     *
+     * @group Social Login
+     *
+     * @bodyParam identityToken string required The Apple identity token received from Apple Sign-In.
+     * @bodyParam guard string optional The guard to use for authentication (default: web).
+     *
+     * @response 200 {
+     *   "error": false,
+     *   "data": {
+     *     "token": "1|abc123def456...",
+     *     "user": {
+     *       "id": 1,
+     *       "name": "John Doe",
+     *       "email": "john@example.com"
+     *     }
+     *   },
+     *   "message": "Login successful"
+     * }
+     *
+     * @response 400 {
+     *   "error": true,
+     *   "message": "Invalid Apple token"
+     * }
+     *
+     * @response 400 {
+     *   "error": true,
+     *   "message": "Cannot login, no email or Apple ID provided!"
+     * }
+     */
     public function login(Request $request): JsonResponse
     {
         try {
             $request->validate([
-                'identityToken' => 'required|string',
-                'guard' => 'string|nullable',
+                'identityToken' => ['required', 'string'],
+                'guard' => ['string', 'nullable'],
             ]);
 
             $identityToken = $request->input('identityToken');
@@ -100,11 +132,8 @@ class AppleLoginController extends BaseController
                 'avatar' => null,
             ]);
 
-            if ($this->socialLoginService->hasSocialLogin($account, 'apple')) {
-                $this->socialLoginService->updateSocialLogin($account, 'apple', $socialLoginData);
-            } else {
-                $this->socialLoginService->addSocialLogin($account, $socialLoginData);
-            }
+            // Use the new method that handles duplicates properly
+            $this->socialLoginService->createOrUpdateSocialLogin($account, $socialLoginData);
 
             $token = $account->createToken('apple-login')->plainTextToken;
 
@@ -127,9 +156,7 @@ class AppleLoginController extends BaseController
                 ->withInput()
                 ->toApiResponse();
         } catch (Exception $e) {
-            logger()->error('Apple login error: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
-            ]);
+            BaseHelper::logError($e);
 
             return $this->httpResponse()
                 ->setError()

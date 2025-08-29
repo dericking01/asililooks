@@ -14,13 +14,13 @@
                         </tr>
                     </tbody>
                 </table>
-                <h1 class="bb-text-center bb-m-0 bb-mt-md">Order is waiting for you to complete!</h1>
+                <h1 class="bb-text-center bb-m-0 bb-mt-md">{{ 'plugins/ecommerce::email-templates.order_recover_title' | trans }}</h1>
             </td>
         </tr>
         <tr>
             <td class="bb-content">
-                <p>Dear Admin,</p>
-                <div>We noticed you were intending to buy some products in our store, would you like to continue?</div>
+                <p>{{ 'plugins/ecommerce::email-templates.order_recover_greeting' | trans({'customer_name': customer_name}) }}</p>
+                <div>{{ 'plugins/ecommerce::email-templates.order_recover_message' | trans }}</div>
             </td>
         </tr>
         <tr>
@@ -34,7 +34,7 @@
                                     <tr>
                                         <td align="center" valign="top" class="lh-1">
                                             <a href="{{ site_url }}/checkout/{{ order_token }}/recover" class="bb-btn bb-bg-blue bb-border-blue">
-                                                <span class="btn-span">Complete order</span>
+                                                <span class="btn-span">{{ 'plugins/ecommerce::email-templates.order_recover_button' | trans }}</span>
                                             </a>
                                         </td>
                                     </tr>
@@ -48,11 +48,11 @@
         </tr>
         <tr>
             <td class="bb-content bb-pt-0">
-                <h4>Here's what you ordered:</h4>
+                <h4>{{ 'plugins/ecommerce::email-templates.order_recover_order_summary' | trans }}</h4>
                 {{ product_list }}
 
                 {% if order_note %}
-                <div>Note: {{ order_note }}</div>
+                <div>{{ 'plugins/ecommerce::email-templates.order_recover_note' | trans }}: {{ order_note }}</div>
                 {% endif %}
             </td>
         </tr>

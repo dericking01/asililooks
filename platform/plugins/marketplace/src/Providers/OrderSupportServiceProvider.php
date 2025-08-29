@@ -373,7 +373,14 @@ class OrderSupportServiceProvider extends ServiceProvider
         $couponCode = Arr::get($sessionStoreData, 'applied_coupon_code');
 
         $isAvailableShipping = EcommerceHelper::isAvailableShipping($products['products']);
-        $shippingMethodInput = $request->input("shipping_method.$storeId", ShippingMethodEnum::DEFAULT);
+
+        // Handle both array (per-vendor) and string (unified) shipping method inputs
+        if (MarketplaceHelper::isChargeShippingPerVendor()) {
+            $shippingMethodInput = $request->input("shipping_method.$storeId", ShippingMethodEnum::DEFAULT);
+        } else {
+            // For unified shipping, use the standard shipping_method input
+            $shippingMethodInput = $request->input('shipping_method', ShippingMethodEnum::DEFAULT);
+        }
 
         $promotionDiscountAmount = $promotionService
             ->execute($token, compact('cartItems', 'rawTotal', 'countCart'), "marketplace.$storeId.");
@@ -390,29 +397,83 @@ class OrderSupportServiceProvider extends ServiceProvider
         $shippingMethod = [];
         $shippingAmount = 0;
         if ($isAvailableShipping) {
-            $shippingData = $this->getShippingData($sessionStoreData, $orderAmount, $products, $paymentMethod);
+            if (MarketplaceHelper::isChargeShippingPerVendor()) {
+                // Per-vendor shipping: calculate shipping for each vendor separately
+                $shippingData = $this->getShippingData($sessionStoreData, $orderAmount, $products, $paymentMethod);
 
-            $shippingMethodData = $shippingFeeService
-                ->execute(
-                    $shippingData,
-                    $shippingMethodInput,
-                    $request->input("shipping_option.$storeId")
-                );
+                $shippingOptionInput = $request->input("shipping_option.$storeId");
 
-            $shippingMethod = Arr::first($shippingMethodData);
-            if (! $shippingMethod && ! (bool) get_ecommerce_setting('disable_shipping_options', false)) {
-                throw ValidationException::withMessages([
-                    'shipping_method.' . $storeId => trans(
-                        'validation.exists',
-                        ['attribute' => trans('plugins/ecommerce::shipping.shipping_method')]
-                    ),
-                ]);
-            }
+                $shippingMethodData = $shippingFeeService
+                    ->execute(
+                        $shippingData,
+                        $shippingMethodInput,
+                        $shippingOptionInput
+                    );
 
-            $shippingAmount = Arr::get($shippingMethod, 'price', 0);
+                $shippingMethod = Arr::first($shippingMethodData);
+                if (! $shippingMethod && ! (bool) get_ecommerce_setting('disable_shipping_options', false)) {
+                    throw ValidationException::withMessages([
+                        'shipping_method.' . $storeId => trans(
+                            'validation.exists',
+                            ['attribute' => trans('plugins/ecommerce::shipping.shipping_method')]
+                        ),
+                    ]);
+                }
 
-            if (get_shipping_setting('free_ship', $shippingMethodInput)) {
-                $shippingAmount = 0;
+                $shippingAmount = Arr::get($shippingMethod, 'price', 0);
+
+                if (get_shipping_setting('free_ship', $shippingMethodInput)) {
+                    $shippingAmount = 0;
+                }
+            } else {
+                // Unified shipping: calculate total shipping once and assign to first vendor only
+                [$stores, $groupedProducts] = $this->getStoresInCart(true);
+                $storeIds = array_keys($stores);
+                $firstStoreId = reset($storeIds);
+
+                if ($storeId == $firstStoreId) {
+                    // Only the first vendor gets the shipping fee in unified mode
+                    // Use all cart products to calculate unified shipping
+                    $allCartProducts = Cart::instance('cart')->products();
+                    $totalOrderAmount = Cart::instance('cart')->rawTotal();
+
+                    $shippingData = EcommerceHelper::getShippingData(
+                        $allCartProducts,
+                        $sessionStoreData,
+                        EcommerceHelper::getOriginAddress(),
+                        $totalOrderAmount,
+                        $paymentMethod
+                    );
+
+                    $shippingOptionInput = $request->input('shipping_option');
+
+                    $shippingMethodData = $shippingFeeService
+                        ->execute(
+                            $shippingData,
+                            $shippingMethodInput,
+                            $shippingOptionInput
+                        );
+
+                    $shippingMethod = Arr::first($shippingMethodData);
+                    if (! $shippingMethod && ! (bool) get_ecommerce_setting('disable_shipping_options', false)) {
+                        throw ValidationException::withMessages([
+                            'shipping_method' => trans(
+                                'validation.exists',
+                                ['attribute' => trans('plugins/ecommerce::shipping.shipping_method')]
+                            ),
+                        ]);
+                    }
+
+                    $shippingAmount = Arr::get($shippingMethod, 'price', 0);
+
+                    if (get_shipping_setting('free_ship', $shippingMethodInput)) {
+                        $shippingAmount = 0;
+                    }
+                } else {
+                    // Other vendors get 0 shipping in unified mode
+                    $shippingAmount = 0;
+                    $shippingMethod = [];
+                }
             }
         }
 
@@ -440,7 +501,7 @@ class OrderSupportServiceProvider extends ServiceProvider
             'currency' => $request->input('currency', strtoupper(get_application_currency()->title)),
             'user_id' => $currentUserId,
             'shipping_method' => $isAvailableShipping ? $shippingMethodInput : '',
-            'shipping_option' => $isAvailableShipping ? $request->input("shipping_option.$storeId") : null,
+            'shipping_option' => $isAvailableShipping ? (MarketplaceHelper::isChargeShippingPerVendor() ? $request->input("shipping_option.$storeId") : $request->input('shipping_option')) : null,
             'shipping_amount' => (float) $shippingAmount,
             'payment_fee' => (float) $paymentFee,
             'tax_amount' => Cart::instance('cart')->rawTaxByItems($cartItems),
@@ -762,7 +823,12 @@ class OrderSupportServiceProvider extends ServiceProvider
             $orderTotal = max($orderTotal, 0);
             $isAvailableShipping = EcommerceHelper::isAvailableShipping($productsByStore['products']);
 
-            $defaultShippingMethod = $request->input("shipping_method.$storeId") ?: Arr::get($sessionCheckoutData, 'shipping_method', ShippingMethodEnum::DEFAULT);
+            // Handle both array (per-vendor) and string (unified) shipping method inputs
+            if (MarketplaceHelper::isChargeShippingPerVendor()) {
+                $defaultShippingMethod = $request->input("shipping_method.$storeId") ?: Arr::get($sessionCheckoutData, 'shipping_method', ShippingMethodEnum::DEFAULT);
+            } else {
+                $defaultShippingMethod = $request->input('shipping_method') ?: Arr::get($sessionCheckoutData, 'shipping_method', ShippingMethodEnum::DEFAULT);
+            }
             $defaultShippingOption = null;
             if ($isAvailableShipping) {
                 $shippingData = $this->getShippingData(
@@ -798,10 +864,15 @@ class OrderSupportServiceProvider extends ServiceProvider
 
                     $defaultShippingMethod = (string) $defaultShippingMethod;
 
-                    if ($optionRequest = $request->input(
-                        "shipping_option.$storeId",
-                        old("shipping_option.$storeId")
-                    )) {
+                    // Handle both array (per-vendor) and string (unified) shipping option inputs
+                    $optionRequest = null;
+                    if (MarketplaceHelper::isChargeShippingPerVendor()) {
+                        $optionRequest = $request->input("shipping_option.$storeId", old("shipping_option.$storeId"));
+                    } else {
+                        $optionRequest = $request->input('shipping_option', old('shipping_option'));
+                    }
+
+                    if ($optionRequest) {
                         if (
                             (is_string($optionRequest) || is_int($optionRequest))
                             && array_key_exists($optionRequest, (array) Arr::get($shipping, $defaultShippingMethod, []))
@@ -867,7 +938,14 @@ class OrderSupportServiceProvider extends ServiceProvider
             ];
         }
 
-        $shippingAmount = $marketplaceData->pluck('shipping_amount')->sum();
+        // Handle shipping amount calculation based on mode
+        if (MarketplaceHelper::isChargeShippingPerVendor()) {
+            // Per-vendor shipping: sum all vendor shipping amounts
+            $shippingAmount = $marketplaceData->pluck('shipping_amount')->sum();
+        } else {
+            // Unified shipping: use the shipping amount from the first vendor only
+            $shippingAmount = $marketplaceData->first()['shipping_amount'] ?? 0;
+        }
         $promotionDiscountAmount = $marketplaceData->pluck('promotion_discount_amount')->sum();
         $couponDiscountAmount = $marketplaceData->pluck('coupon_discount_amount')->sum();
 
@@ -1152,15 +1230,16 @@ class OrderSupportServiceProvider extends ServiceProvider
     ): array {
         $cartItems = $products['products']->pluck('cartItem');
 
-        $shippingMethod = $request->input('shipping_method', ShippingMethodEnum::DEFAULT);
-
-        $shippingOption = $request->input('shipping_option');
-
         $store = $products['store'];
 
-        if ($store && $store->id) {
+        // Handle both array (per-vendor) and string (unified) shipping inputs
+        if (MarketplaceHelper::isChargeShippingPerVendor() && $store && $store->id) {
             $shippingMethod = $request->input('shipping_method.' . $store->id, ShippingMethodEnum::DEFAULT);
             $shippingOption = $request->input('shipping_option.' . $store->id);
+        } else {
+            // For unified shipping, use standard inputs
+            $shippingMethod = $request->input('shipping_method', ShippingMethodEnum::DEFAULT);
+            $shippingOption = $request->input('shipping_option');
         }
 
         $generalData = [
@@ -1196,15 +1275,19 @@ class OrderSupportServiceProvider extends ServiceProvider
 
     public function processCheckoutRulesRequest(array $rules): array
     {
-        unset($rules['shipping_method']);
-        [$stores, $groupedProducts] = $this->getStoresInCart(true);
-        foreach ($stores as $storeId => $storeName) {
-            $products = collect($groupedProducts[$storeId]);
-            if (EcommerceHelper::isAvailableShipping($products) && ! (bool) get_ecommerce_setting('disable_shipping_options', false)) {
-                $rules["shipping_method.$storeId"] = 'required|' . Rule::in(ShippingMethodEnum::values());
-                $rules["shipping_option.$storeId"] = 'required';
+        if (MarketplaceHelper::isChargeShippingPerVendor()) {
+            // Per-vendor shipping: use vendor-specific rules
+            unset($rules['shipping_method']);
+            [$stores, $groupedProducts] = $this->getStoresInCart(true);
+            foreach ($stores as $storeId => $storeName) {
+                $products = collect($groupedProducts[$storeId]);
+                if (EcommerceHelper::isAvailableShipping($products) && ! (bool) get_ecommerce_setting('disable_shipping_options', false)) {
+                    $rules["shipping_method.$storeId"] = 'required|' . Rule::in(ShippingMethodEnum::values());
+                    $rules["shipping_option.$storeId"] = 'required';
+                }
             }
         }
+        // For unified shipping, keep the standard ecommerce rules (shipping_method and shipping_option)
 
         return $rules;
     }

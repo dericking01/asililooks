@@ -26,6 +26,18 @@ AdminHelper::registerRoutes(function (): void {
                     'uses' => 'StoreRevenueController@view',
                 ])->wherePrimaryKey();
 
+                Route::post('verify/{id}', [
+                    'as' => 'verify',
+                    'uses' => 'StoreController@verify',
+                    'permission' => 'marketplace.store.edit',
+                ])->wherePrimaryKey();
+
+                Route::post('unverify/{id}', [
+                    'as' => 'unverify',
+                    'uses' => 'StoreController@unverify',
+                    'permission' => 'marketplace.store.edit',
+                ])->wherePrimaryKey();
+
                 Route::group(['prefix' => 'revenues', 'as' => 'revenue.'], function (): void {
                     Route::match(['GET', 'POST'], 'list/{id}', [
                         'as' => 'index',

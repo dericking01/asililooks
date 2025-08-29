@@ -4,6 +4,7 @@ namespace Botble\Blog\Http\Resources;
 
 use Botble\Blog\Models\Post;
 use Botble\Media\Facades\RvMedia;
+use Botble\Shortcode\Facades\Shortcode;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
@@ -18,7 +19,7 @@ class PostResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'description' => $this->description,
-            'content' => $this->content,
+            'content' => Shortcode::compile((string) $this->content, true)->toHtml(),
             'image' => $this->image ? RvMedia::url($this->image) : null,
             'categories' => CategoryResource::collection($this->categories),
             'tags' => TagResource::collection($this->tags),

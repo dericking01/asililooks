@@ -4,10 +4,13 @@ namespace Botble\Ecommerce\Tables;
 
 use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Facades\Html;
+use Botble\DataSynchronize\Table\HeaderActions\ExportHeaderAction;
+use Botble\DataSynchronize\Table\HeaderActions\ImportHeaderAction;
 use Botble\Ecommerce\Enums\CustomerStatusEnum;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Models\Customer;
 use Botble\Table\Abstracts\TableAbstract;
+use Botble\Table\Actions\Action;
 use Botble\Table\Actions\DeleteAction;
 use Botble\Table\Actions\EditAction;
 use Botble\Table\BulkActions\DeleteBulkAction;
@@ -15,9 +18,9 @@ use Botble\Table\BulkChanges\CreatedAtBulkChange;
 use Botble\Table\BulkChanges\EmailBulkChange;
 use Botble\Table\BulkChanges\NameBulkChange;
 use Botble\Table\BulkChanges\StatusBulkChange;
-use Botble\Table\Columns\Column;
 use Botble\Table\Columns\CreatedAtColumn;
 use Botble\Table\Columns\EmailColumn;
+use Botble\Table\Columns\FormattedColumn;
 use Botble\Table\Columns\IdColumn;
 use Botble\Table\Columns\NameColumn;
 use Botble\Table\Columns\PhoneColumn;
@@ -28,7 +31,6 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -38,56 +40,57 @@ class CustomerTable extends TableAbstract
     {
         $this
             ->model(Customer::class)
+            ->addHeaderActions([
+                ExportHeaderAction::make()
+                    ->route('ecommerce.customers.export.index')
+                    ->permission('ecommerce.customers.export'),
+                ImportHeaderAction::make()
+                    ->route('ecommerce.customers.import.index')
+                    ->permission('ecommerce.customers.import'),
+            ])
             ->addActions([
+                Action::make('view')
+                    ->route('customers.view')
+                    ->permission('customers.index')
+                    ->icon('ti ti-eye')
+                    ->label(trans('core/base::tables.view')),
                 EditAction::make()->route('customers.edit'),
                 DeleteAction::make()->route('customers.destroy'),
-            ]);
-    }
-
-    public function ajax(): JsonResponse
-    {
-        $data = $this->table
-            ->eloquent($this->query())
-            ->editColumn('avatar', function (Customer $item) {
-                if ($this->isExportingToCSV() || $this->isExportingToExcel()) {
-                    return $item->avatar_url;
-                }
-
-                return Html::tag(
-                    'img',
-                    '',
-                    ['src' => $item->avatar_url, 'alt' => BaseHelper::clean($item->name), 'width' => 50]
-                );
+            ])
+            ->queryUsing(function (Builder $query) {
+                return $query
+                    ->select([
+                        'id',
+                        'name',
+                        'email',
+                        'phone',
+                        'avatar',
+                        'created_at',
+                        'status',
+                        'confirmed_at',
+                    ]);
             });
-
-        return $this->toJson($data);
-    }
-
-    public function query(): Relation|Builder|QueryBuilder
-    {
-        $query = $this
-            ->getModel()
-            ->query()
-            ->select([
-                'id',
-                'name',
-                'email',
-                'phone',
-                'avatar',
-                'created_at',
-                'status',
-                'confirmed_at',
-            ]);
-
-        return $this->applyScopes($query);
     }
 
     public function columns(): array
     {
         $columns = [
             IdColumn::make(),
-            Column::make('avatar')
-                ->title(trans('plugins/ecommerce::customer.avatar')),
+            FormattedColumn::make('avatar')
+                ->title(trans('plugins/ecommerce::customer.avatar'))
+                ->renderUsing(function (FormattedColumn $column) {
+                    $item = $column->getItem();
+
+                    if ($this->isExportingToCSV() || $this->isExportingToExcel()) {
+                        return $item->avatar_url;
+                    }
+
+                    return Html::tag(
+                        'img',
+                        '',
+                        ['src' => $item->avatar_url, 'alt' => BaseHelper::clean($item->name), 'width' => 50]
+                    );
+                }),
             NameColumn::make()->route('customers.edit'),
         ];
 
@@ -157,11 +160,6 @@ class CustomerTable extends TableAbstract
         }
 
         return parent::renderTable($data, $mergeData);
-    }
-
-    public function getDefaultButtons(): array
-    {
-        return array_unique(array_merge(['export'], parent::getDefaultButtons()));
     }
 
     public function applyFilterCondition(

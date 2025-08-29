@@ -62,6 +62,7 @@ class AdsServiceProvider extends ServiceProvider
                     'parent_id' => 'cms-plugins-ads',
                     'priority' => 1,
                     'name' => 'plugins/ads::ads.name',
+                    'icon' => 'ti ti-list',
                     'url' => fn () => route('ads.index'),
                     'permissions' => ['ads.index'],
                 ])
@@ -70,6 +71,7 @@ class AdsServiceProvider extends ServiceProvider
                     'parent_id' => 'cms-plugins-ads',
                     'priority' => 2,
                     'name' => 'plugins/ads::ads.settings.title',
+                    'icon' => 'ti ti-settings',
                     'url' => fn () => route('ads.settings'),
                     'permissions' => ['ads.index'],
                 ]);
@@ -129,34 +131,28 @@ class AdsServiceProvider extends ServiceProvider
         if (defined('THEME_FRONT_HEADER')) {
             add_filter(THEME_FRONT_HEADER, function ($html) {
                 $autoAds = setting('ads_google_adsense_auto_ads');
-
-                if (! $autoAds) {
-                    return $html;
-                }
-
-                return $html . $autoAds;
-            }, 128);
-
-            add_filter(THEME_FRONT_HEADER, function ($html) {
                 $clientId = setting('ads_google_adsense_unit_client_id');
 
-                $autoAds = setting('ads_google_adsense_auto_ads');
-
-                if (! $clientId || $autoAds) {
-                    return $html;
+                if ($autoAds) {
+                    return $html . $autoAds;
                 }
 
-                return $html . view('plugins/ads::partials.google-adsense.unit-ads-header', compact('clientId'))->render();
+                if ($clientId) {
+                    return $html . view('plugins/ads::partials.google-adsense.unit-ads-header', compact('clientId'))->render();
+                }
+
+                return $html;
             }, 128);
 
             add_filter(THEME_FRONT_FOOTER, function ($html) {
                 $clientId = setting('ads_google_adsense_unit_client_id');
+                $autoAds = setting('ads_google_adsense_auto_ads');
 
-                if (! $clientId) {
-                    return $html;
+                if ($clientId && ! $autoAds) {
+                    return $html . view('plugins/ads::partials.google-adsense.unit-ads-footer')->render();
                 }
 
-                return $html . view('plugins/ads::partials.google-adsense.unit-ads-footer')->render();
+                return $html;
             }, 128);
         }
 

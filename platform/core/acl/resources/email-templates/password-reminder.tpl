@@ -15,12 +15,12 @@
                         </tbody>
                     </table>
 
-                    <h1 class="bb-text-center bb-m-0 bb-mt-md">Reset Password Instruction</h1>
+                    <h1 class="bb-text-center bb-m-0 bb-mt-md">{{ 'core/acl::auth.settings.email.templates.password_reminder.email_title' | trans }}</h1>
                 </td>
             </tr>
             <tr>
                 <td class="bb-content bb-text-center">
-                    <p>You are receiving this email because we received a password reset request for your account.</p>
+                    <p>{{ 'core/acl::auth.settings.email.templates.password_reminder.email_message' | trans }}</p>
                 </td>
             </tr>
             <tr>
@@ -34,7 +34,7 @@
                                         <tr>
                                             <td align="center" valign="top" class="lh-1">
                                                 <a href="{{ reset_link }}" class="bb-btn bb-bg-blue bb-border-blue">
-                                                    <span class="btn-span">Reset password</span>
+                                                    <span class="btn-span">{{ 'core/acl::auth.settings.email.templates.password_reminder.button_text' | trans }}</span>
                                                 </a>
                                             </td>
                                         </tr>
@@ -48,7 +48,7 @@
             </tr>
             <tr>
                 <td class="bb-content bb-text-muted bb-pt-0 bb-text-center">
-                    If you’re having trouble clicking the "Reset Password" button, copy and paste the URL below into your web browser: <a href="{{ reset_link }}">{{ reset_link }}</a> and paste it into your browser. If you didn't request a password reset, please ignore this message or contact us if you have any questions.
+                    {{ 'core/acl::auth.settings.email.templates.password_reminder.trouble_text' | trans({'reset_link': reset_link}) }}
                 </td>
             </tr>
         </tbody>

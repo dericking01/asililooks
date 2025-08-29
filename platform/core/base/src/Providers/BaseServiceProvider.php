@@ -266,7 +266,6 @@ class BaseServiceProvider extends ServiceProvider
                 ! $this->app->environment(['testing', 'production']),
             'debugbar.capture_ajax' => false,
             'debugbar.remote_sites_path' => '',
-            'core.base.general.google_fonts' => GoogleFonts::getFonts(),
             'scribe.type' => 'static',
             'scribe.assets_directory' => 'vendor/core/packages/api',
             'scribe.routes' => [
@@ -305,8 +304,17 @@ class BaseServiceProvider extends ServiceProvider
          * @var SettingStore $setting
          */
         $setting = $this->app[SettingStore::class];
-        $timezone = $setting->get('time_zone', $config->get('app.timezone'));
-        $locale = $setting->get('locale', Arr::get($baseConfig, 'locale', $config->get('app.locale')));
+
+        $cacheKey = 'core.base.boot_settings';
+        $bootSettings = cache()->remember($cacheKey, 3600, function () use ($setting, $config) {
+            return [
+                'timezone' => $setting->get('time_zone', $config->get('app.timezone')),
+                'locale' => $setting->get('locale', $config->get('app.locale')),
+            ];
+        });
+
+        $timezone = $bootSettings['timezone'];
+        $locale = $bootSettings['locale'];
 
         $this->app->setLocale($locale);
 
@@ -326,6 +334,9 @@ class BaseServiceProvider extends ServiceProvider
                 'view.officeapps.live.com/op/embed.aspx',
                 'onedrive.live.com/embed',
                 'open.spotify.com/embed',
+                'www.googletagmanager.com',
+                'www.facebook.com/plugins',
+                'tiktok.com/embed',
                 parse_url($config->get('app.url'), PHP_URL_HOST),
             ];
 

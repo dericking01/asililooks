@@ -2,8 +2,10 @@
 
 namespace Botble\Setting\Forms;
 
+use Botble\Base\Forms\FieldOptions\AlertFieldOption;
 use Botble\Base\Forms\FieldOptions\NumberFieldOption;
 use Botble\Base\Forms\FieldOptions\OnOffFieldOption;
+use Botble\Base\Forms\Fields\AlertField;
 use Botble\Base\Forms\Fields\NumberField;
 use Botble\Base\Forms\Fields\OnOffCheckboxField;
 use Botble\Setting\Http\Requests\CacheSettingRequest;
@@ -54,20 +56,19 @@ class CacheSettingForm extends SettingForm
             )
             ->addOpenCollapsible('shortcode_cache_enabled', '1', $targetValue)
             ->add(
-                'shortcode_cache_ttl_default',
-                NumberField::class,
-                NumberFieldOption::make()
-                    ->label(trans('core/setting::setting.cache.form.shortcode_cache_ttl_default'))
-                    ->helperText(trans('core/setting::setting.cache.form.shortcode_cache_ttl_default_helper'))
-                    ->value(setting('shortcode_cache_ttl_default', 5))
+                'shortcode_cache_alert',
+                AlertField::class,
+                AlertFieldOption::make()
+                    ->content(trans('core/setting::setting.cache.form.shortcode_cache_warning'))
+                    ->type('warning')
             )
             ->add(
-                'shortcode_cache_ttl_cacheable',
+                'shortcode_cache_ttl',
                 NumberField::class,
                 NumberFieldOption::make()
-                    ->label(trans('core/setting::setting.cache.form.shortcode_cache_ttl_cacheable'))
-                    ->helperText(trans('core/setting::setting.cache.form.shortcode_cache_ttl_cacheable_helper'))
-                    ->value(setting('shortcode_cache_ttl_cacheable', 1800))
+                    ->label(trans('core/setting::setting.cache.form.shortcode_cache_ttl'))
+                    ->helperText(trans('core/setting::setting.cache.form.shortcode_cache_ttl_helper'))
+                    ->value(setting('shortcode_cache_ttl', 1800))
             )
             ->addCloseCollapsible('shortcode_cache_enabled', '1')
             ->add(
@@ -81,20 +82,19 @@ class CacheSettingForm extends SettingForm
             )
             ->addOpenCollapsible('widget_cache_enabled', '1', $targetValue)
             ->add(
-                'widget_cache_ttl_default',
-                NumberField::class,
-                NumberFieldOption::make()
-                    ->label(trans('core/setting::setting.cache.form.widget_cache_ttl_default'))
-                    ->helperText(trans('core/setting::setting.cache.form.widget_cache_ttl_default_helper'))
-                    ->value(setting('widget_cache_ttl_default', 5))
+                'widget_cache_alert',
+                AlertField::class,
+                AlertFieldOption::make()
+                    ->content(trans('core/setting::setting.cache.form.widget_cache_warning'))
+                    ->type('warning')
             )
             ->add(
-                'widget_cache_ttl_cacheable',
+                'widget_cache_ttl',
                 NumberField::class,
                 NumberFieldOption::make()
-                    ->label(trans('core/setting::setting.cache.form.widget_cache_ttl_cacheable'))
-                    ->helperText(trans('core/setting::setting.cache.form.widget_cache_ttl_cacheable_helper'))
-                    ->value(setting('widget_cache_ttl_cacheable', 1800))
+                    ->label(trans('core/setting::setting.cache.form.widget_cache_ttl'))
+                    ->helperText(trans('core/setting::setting.cache.form.widget_cache_ttl_helper'))
+                    ->value(setting('widget_cache_ttl', 1800))
             )
             ->addCloseCollapsible('widget_cache_enabled', '1')
             ->add(

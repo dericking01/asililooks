@@ -26,7 +26,7 @@ class OrderTrackingForm extends FormFront
                     ->required()
                     ->placeholder(__('Enter the order ID'))
             )
-            ->when(EcommerceHelper::isLoginUsingPhone(), function (FormAbstract $form): void {
+            ->when(EcommerceHelper::isOrderTrackingUsingPhone(), function (FormAbstract $form): void {
                 $form->add(
                     'phone',
                     'tel',

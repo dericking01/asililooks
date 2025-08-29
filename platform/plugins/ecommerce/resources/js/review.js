@@ -150,24 +150,10 @@ $(() => {
                     $this.find('.alert-message').removeClass('alert-success').addClass('d-none alert-warning')
                 },
                 success: (res) => {
-                    if (!res.error) {
-                        $this.find('textarea').val('')
-
-                        const $item = $('.ecommerce-product-item[data-id=' + productId + ']')
-                        $item
-                            .find('.ecommerce-product-star')
-                            .removeClass()
-                            .addClass('text-success mt-2')
-                            .html(res.message)
-                        if ($('#product-review-modal').length) {
-                            $('#product-review-modal').modal('hide')
-                        } else {
-                            $this
-                                .find('.alert-message')
-                                .removeClass('alert-warning d-none')
-                                .addClass('alert-success')
-                                .html(res.message)
-                        }
+                    if (! res.error) {
+                        setTimeout(() => {
+                            window.location.reload()
+                        }, 1000)
                     } else {
                         $this.find('.alert-message').html(res.message).removeClass('d-none')
                     }

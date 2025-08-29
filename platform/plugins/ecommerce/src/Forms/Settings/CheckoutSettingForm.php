@@ -140,6 +140,14 @@ class CheckoutSettingForm extends SettingForm
                     ->value(get_ecommerce_setting('terms_and_policy_checkbox_checked_by_default', false))
             )
             ->addCloseCollapsible('show_terms_and_policy_checkbox', '1')
+            ->add(
+                'checkout_acceptance_message_enabled',
+                OnOffCheckboxField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('plugins/ecommerce::setting.checkout.form.checkout_acceptance_message_enabled'))
+                    ->helperText(trans('plugins/ecommerce::setting.checkout.form.checkout_acceptance_message_enabled_helper'))
+                    ->value(get_ecommerce_setting('checkout_acceptance_message_enabled', false))
+            )
             ->when(is_plugin_active('location'), function () use ($countries, $selectedCountries): void {
                 $this
                     ->add(
@@ -305,6 +313,14 @@ class CheckoutSettingForm extends SettingForm
                     ->label(trans('plugins/ecommerce::setting.checkout.form.checkout_product_quantity_editable'))
                     ->value(get_ecommerce_setting('checkout_product_quantity_editable', true))
                     ->helperText(trans('plugins/ecommerce::setting.checkout.form.checkout_product_quantity_editable_helper'))
+            )
+            ->add(
+                'hide_customer_info_at_checkout',
+                OnOffCheckboxField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('plugins/ecommerce::setting.checkout.form.hide_customer_info_at_checkout'))
+                    ->value(get_ecommerce_setting('hide_customer_info_at_checkout', false))
+                    ->helperText(trans('plugins/ecommerce::setting.checkout.form.hide_customer_info_at_checkout_helper'))
             )
             ->when(is_plugin_active('language'), function (FormAbstract $form): void {
                 $form->add('languageSwitcher', LanguageSwitcherField::class);

@@ -9,7 +9,7 @@
     }
 
     if (! empty($attributes['data-options'])) {
-        $attributes['data-options'] = json_encode($attributes['data-options']);
+        $attributes['data-options'] = is_string($attributes['data-options']) ? $attributes['data-options'] : json_encode($attributes['data-options']);
     }
 @endphp
 

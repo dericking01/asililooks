@@ -40,7 +40,14 @@ class ProductVariationItem extends BaseModel
             ->whereIn('ec_product_variation_items.variation_id', $versionIds)
             ->select([
                 'ec_product_variation_items.variation_id',
-                'ec_product_attributes.*',
+                'ec_product_attributes.id',
+                'ec_product_attributes.slug',
+                'ec_product_attributes.title',
+                'ec_product_attributes.color',
+                'ec_product_attributes.image',
+                'ec_product_attributes.attribute_set_id',
+                'ec_product_attributes.order',
+                'ec_product_attribute_sets.id as attribute_set_id',
                 'ec_product_attribute_sets.title as attribute_set_title',
                 'ec_product_attribute_sets.slug as attribute_set_slug',
             ])

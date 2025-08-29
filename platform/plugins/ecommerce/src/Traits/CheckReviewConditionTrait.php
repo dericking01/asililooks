@@ -29,6 +29,7 @@ trait CheckReviewConditionTrait
         if ($exists) {
             return [
                 'error' => true,
+                'type' => 'already_reviewed',
                 'message' => __('You have reviewed this product already!'),
             ];
         }
@@ -53,6 +54,7 @@ trait CheckReviewConditionTrait
             if (! $order) {
                 return [
                     'error' => true,
+                    'type' => 'purchase_required',
                     'message' => __('Please purchase the product for a review!'),
                 ];
             }
@@ -60,6 +62,7 @@ trait CheckReviewConditionTrait
 
         return [
             'error' => false,
+            'type' => null,
         ];
     }
 }

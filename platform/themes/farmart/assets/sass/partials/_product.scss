@@ -196,6 +196,9 @@
             width: 100%;
             padding-left: 7px;
             padding-right: 7px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     }
 
@@ -509,6 +512,9 @@
             width: auto;
             padding-right: 20px;
             padding-left: 20px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     }
 
@@ -646,7 +652,15 @@
             flex: 1 1 30%;
             margin-right: .5rem;
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             padding: .8rem .5rem;
+        }
+
+        .js-quick-shop-button {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .quantity .qty {
@@ -1938,5 +1952,154 @@ html:not([dir="rtl"]) .noUi-horizontal .noUi-handle {
                 max-width: 60px;
             }
         }
+    }
+}
+
+
+// Global button text truncation styles
+.add-to-cart-button,
+.js-quick-shop-button {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+// Quick Shop Modal Styles
+#product-quick-shop-modal {
+    .modal-dialog {
+        max-width: 500px;
+    }
+    
+    .modal-content {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .btn-close {
+    align-items: center;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
+    display: flex;
+    height: 30px;
+    justify-content: center;
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    width: 30px;
+    z-index: 10;
+}
+    
+    .modal-body {
+        padding: 2rem;
+    }
+    
+    .ps-product--quickshop {
+        .ps-product__header {
+            margin-bottom: 1.5rem;
+            
+            h3 {
+                font-size: 1.5rem;
+                font-weight: 600;
+                margin-bottom: 0.5rem;
+            }
+        }
+        
+        .ps-product__brand {
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            
+            a {
+                color: var(--color-primary);
+                text-decoration: none;
+                
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+        
+        .product-availability {
+            padding: 0.75rem;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            
+            .availability-status {
+                display: flex;
+                align-items: center;
+                font-size: 0.875rem;
+                
+                .status-label {
+                    font-weight: 600;
+                    margin-right: 0.5rem;
+                    color: #6c757d;
+                }
+                
+                .status-value {
+                    font-weight: 600;
+                }
+            }
+        }
+        
+        .product-button {
+            margin-top: 1.5rem;
+            
+            button {
+                width: 100%;
+            }
+        }
+        
+        .ps-product__link {
+            text-align: center;
+            margin-top: 1rem;
+            
+            a {
+                color: var(--color-primary);
+                font-size: 0.875rem;
+                
+                &:hover {
+                    color: var(--color-primary-hover);
+                }
+            }
+        }
+    }
+    
+    &.loading {
+        .modal-content {
+            &::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(255, 255, 255, 0.7);
+                z-index: 10;
+            }
+        }
+        
+        .modal-loading {
+            display: flex;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 11;
+            
+            &::after {
+                content: '';
+                display: block;
+                width: 40px;
+                height: 40px;
+                border: 3px solid #f3f3f3;
+                border-top: 3px solid var(--color-primary);
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+        }
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
 }

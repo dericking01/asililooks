@@ -30,6 +30,7 @@ use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Facades\FlashSale as FlashSaleFacade;
 use Botble\Ecommerce\Facades\InvoiceHelper;
 use Botble\Ecommerce\Facades\OrderHelper;
+use Botble\Ecommerce\Importers\CustomerImporter;
 use Botble\Ecommerce\Importers\ProductImporter;
 use Botble\Ecommerce\Models\Brand;
 use Botble\Ecommerce\Models\Customer;
@@ -120,11 +121,15 @@ class HookServiceProvider extends ServiceProvider
         });
 
         add_filter('data_synchronize_import_form_before', function (?string $html, Importer $importer): ?string {
-            if (! $importer instanceof ProductImporter) {
-                return $html;
+            if ($importer instanceof ProductImporter) {
+                return $html . view('plugins/ecommerce::products.partials.product-import-extra-fields')->render();
             }
 
-            return $html . view('plugins/ecommerce::products.partials.product-import-extra-fields')->render();
+            if ($importer instanceof CustomerImporter) {
+                return $html . view('plugins/ecommerce::customers.partials.customer-import-extra-fields')->render();
+            }
+
+            return $html;
         }, 999, 2);
 
         add_filter('core_request_rules', function (array $rules, Request $request): array {
@@ -188,6 +193,20 @@ class HookServiceProvider extends ServiceProvider
             add_filter(BASE_FILTER_TOP_HEADER_LAYOUT, [$this, 'registerTopHeaderNotification'], 121);
             add_filter(BASE_FILTER_APPEND_MENU_NAME, [$this, 'getPendingOrders'], 130, 2);
             add_filter(BASE_FILTER_MENU_ITEMS_COUNT, [$this, 'getMenuItemCount'], 120);
+
+            add_filter('ecommerce_customer_form_end', function (?string $html, $form): ?string {
+                if (! $form || ! $form->getModel() || ! $form->getModel()->id) {
+                    return $html;
+                }
+
+                $customer = $form->getModel();
+
+                if (! $customer->confirmed_at && EcommerceHelper::isEnableEmailVerification()) {
+                    $html .= view('plugins/ecommerce::customers.partials.resend-verification-email', compact('customer'))->render();
+                }
+
+                return $html;
+            }, 99, 2);
             add_filter(RENDER_PRODUCTS_IN_CHECKOUT_PAGE, [$this, 'renderProductsInCheckoutPage'], 1000);
 
             add_filter('cms_unauthenticated_redirect_to', function ($redirectCallback, $request) {
@@ -521,12 +540,25 @@ class HookServiceProvider extends ServiceProvider
                         ) ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
                     ];
 
-                    if ($privacyPolicyUrl = theme_option('merchant_return_policy_url')) {
-                        $offers['hasMerchantReturnPolicy'] = [
+                    if ($returnPolicyUrl = theme_option('merchant_return_policy_url')) {
+                        $returnPolicy = [
                             '@type' => 'MerchantReturnPolicy',
-                            'returnPolicyCategory' => $privacyPolicyUrl,
                             'merchantReturnDays' => theme_option('merchant_return_days', 30),
                         ];
+
+                        // Add merchantReturnLink if it's a full URL, otherwise construct it
+                        if (filter_var($returnPolicyUrl, FILTER_VALIDATE_URL)) {
+                            $returnPolicy['merchantReturnLink'] = $returnPolicyUrl;
+                        } else {
+                            $returnPolicy['merchantReturnLink'] = url($returnPolicyUrl);
+                        }
+
+                        // Add applicable country if configured
+                        if ($applicableCountry = theme_option('merchant_return_applicable_country')) {
+                            $returnPolicy['applicableCountry'] = $applicableCountry;
+                        }
+
+                        $offers['hasMerchantReturnPolicy'] = $returnPolicy;
                     }
 
                     $schema = [
@@ -784,6 +816,23 @@ class HookServiceProvider extends ServiceProvider
             return $data . $button;
         }, 3, 2);
 
+        if (defined('PAYMENT_FILTER_PAYMENT_INFO_DETAIL')) {
+            add_filter(PAYMENT_FILTER_PAYMENT_INFO_DETAIL, function ($data, $payment) {
+                // Find the order associated with this payment
+                $order = Order::query()->where('payment_id', $payment->id)->first();
+
+                if (! $order || ! $order->proof_file || ! \Storage::disk('local')->exists($order->proof_file)) {
+                    return $data;
+                }
+
+                // Add payment proof section to the detail
+                $downloadUrl = route('orders.download-proof', $order->id);
+                $proofHtml = view('plugins/ecommerce::orders.partials.payment-proof-detail', compact('order', 'downloadUrl'))->render();
+
+                return $data . $proofHtml;
+            }, 10, 2);
+        }
+
         if (defined('PAYMENT_FILTER_PAYMENT_DATA')) {
             add_filter(PAYMENT_FILTER_PAYMENT_DATA, function (array $data, Request $request) {
                 $orderIds = (array) $request->input('order_id', []);
@@ -818,6 +867,7 @@ class HookServiceProvider extends ServiceProvider
 
                 return [
                     'amount' => $this->convertOrderAmount((float) $orders->sum('amount')),
+                    'payment_fee' => $this->convertOrderAmount((float) $orders->sum('payment_fee')),
                     'shipping_amount' => $this->convertOrderAmount((float) $orders->sum('shipping_amount')),
                     'shipping_method' => $firstOrder->shipping_method->label(),
                     'tax_amount' => $this->convertOrderAmount((float) $orders->sum('tax_amount')),
@@ -989,7 +1039,10 @@ class HookServiceProvider extends ServiceProvider
         }, 123, 2);
 
         add_filter('ecommerce_checkout_form_before', function (?string $html, Collection $products) {
-            $messages = $this->getQuantityRestrictionMessages($products);
+            $messages = array_merge(
+                $this->getQuantityRestrictionMessages($products),
+                $this->getMinimumOrderAmountMessages()
+            );
 
             if (empty($messages)) {
                 return $html;
@@ -1036,6 +1089,22 @@ class HookServiceProvider extends ServiceProvider
                     'product' => BaseHelper::clean($product->original_product->name),
                 ]);
             }
+        }
+
+        return $messages;
+    }
+
+    protected function getMinimumOrderAmountMessages(): array
+    {
+        $messages = [];
+        $minimumOrderAmount = EcommerceHelper::getMinimumOrderAmount();
+        $cartSubTotal = Cart::instance('cart')->rawSubTotal();
+
+        if ($minimumOrderAmount > 0 && $cartSubTotal < $minimumOrderAmount) {
+            $messages[] = __('Minimum order amount is :amount, you need to buy more :more to place an order!', [
+                'amount' => format_price($minimumOrderAmount),
+                'more' => format_price($minimumOrderAmount - $cartSubTotal),
+            ]);
         }
 
         return $messages;
@@ -1245,6 +1314,20 @@ class HookServiceProvider extends ServiceProvider
                             ],
                         ],
                         'priority' => 1001,
+                    ],
+                    [
+                        'id' => 'merchant_return_applicable_country',
+                        'type' => 'text',
+                        'label' => trans('plugins/ecommerce::ecommerce.theme_options.merchant_return_applicable_country'),
+                        'attributes' => [
+                            'name' => 'merchant_return_applicable_country',
+                            'value' => null,
+                            'options' => [
+                                'class' => 'form-control',
+                                'placeholder' => trans('plugins/ecommerce::ecommerce.theme_options.merchant_return_applicable_country_placeholder'),
+                            ],
+                        ],
+                        'priority' => 1002,
                     ],
                 ],
                 'priority' => 600,

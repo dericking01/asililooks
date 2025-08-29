@@ -14,12 +14,12 @@
                     </tr>
                     </tbody>
                 </table>
-                <h1 class="bb-text-center bb-m-0 bb-mt-md">New order return request!</h1>
+                <h1 class="bb-text-center bb-m-0 bb-mt-md">{{ 'plugins/ecommerce::email-templates.order_return_request_title' | trans }}</h1>
             </td>
         </tr>
         <tr>
             <td class="bb-content">
-                <div>{{ customer_name }} has just requested return product(s) on your site.</div>
+                <div>{{ 'plugins/ecommerce::email-templates.order_return_request_message' | trans({'customer_name': customer_name}) }}</div>
             </td>
         </tr>
         <tr>
@@ -28,7 +28,7 @@
                     <tbody>
                         <tr>
                             <td class="bb-bb-col">
-                                <h4 class="bb-m-0">Return reason</h4>
+                                <h4 class="bb-m-0">{{ 'plugins/ecommerce::email-templates.order_return_request_return_reason' | trans }}</h4>
                                 <div><strong>{{ return_reason }}</strong></div>
                             </td>
                         </tr>
@@ -42,16 +42,16 @@
                     <tbody>
                         <tr>
                             <td class="bb-bb-col">
-                                <h4 class="bb-m-0">Customer Information</h4>
-                                <div>Name: <strong>{{ customer_name }}</strong></div>
+                                <h4 class="bb-m-0">{{ 'plugins/ecommerce::email-templates.order_return_request_customer_info' | trans }}</h4>
+                                <div>{{ 'plugins/ecommerce::email-templates.order_return_request_name' | trans }}: <strong>{{ customer_name }}</strong></div>
                                 {% if customer_phone %}
-                                <div>Phone: <strong>{{ customer_phone }}</strong></div>
+                                <div>{{ 'plugins/ecommerce::email-templates.order_return_request_phone' | trans }}: <strong>{{ customer_phone }}</strong></div>
                                 {% endif %}
                                 {% if customer_email %}
-                                <div>Email: <strong>{{ customer_email }}</strong></div>
+                                <div>{{ 'plugins/ecommerce::email-templates.order_return_request_email' | trans }}: <strong>{{ customer_email }}</strong></div>
                                 {% endif %}
                                 {% if customer_address %}
-                                <div>Address: <strong>{{ customer_address }}</strong></div>
+                                <div>{{ 'plugins/ecommerce::email-templates.order_return_request_address' | trans }}: <strong>{{ customer_address }}</strong></div>
                                 {% endif %}
                             </td>
                         </tr>
@@ -61,11 +61,11 @@
         </tr>
         <tr>
             <td class="bb-content bb-pt-0">
-                <h4>Here's what you ordered:</h4>
+                <h4>{{ 'plugins/ecommerce::email-templates.order_return_request_order_summary' | trans }}</h4>
                 {{ product_list }}
 
                 {% if order_note %}
-                <div>Note: {{ order_note }}</div>
+                <div>{{ 'plugins/ecommerce::email-templates.order_return_request_note' | trans }}: {{ order_note }}</div>
                 {% endif %}
             </td>
         </tr>

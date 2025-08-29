@@ -20,7 +20,7 @@
 
     @php
         $faviconUrl = AdminHelper::getAdminFaviconUrl();
-        $faviconType = rescue(fn () => RvMedia::getMimeType(AdminHelper::getAdminFavicon()), 'image/x-icon');
+        $faviconType = setting('admin_favicon_type', 'image/x-icon');
     @endphp
     <link
         href="{{ $faviconUrl }}"

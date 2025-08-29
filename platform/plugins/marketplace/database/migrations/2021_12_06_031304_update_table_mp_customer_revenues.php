@@ -2,12 +2,26 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class () extends Migration {
     public function up(): void
     {
-        if (Schema::hasColumn('mp_customer_revenues', 'sub_amount')) {
+        // Check if columns need to be updated by checking if they are still unsigned
+        $columns = DB::select('DESCRIBE mp_customer_revenues');
+        $needsUpdate = false;
+
+        foreach ($columns as $column) {
+            if (in_array($column->Field, ['sub_amount', 'amount', 'current_balance']) &&
+                str_contains($column->Type, 'unsigned')) {
+                $needsUpdate = true;
+
+                break;
+            }
+        }
+
+        if (! $needsUpdate) {
             return;
         }
 

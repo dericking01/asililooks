@@ -138,6 +138,11 @@
                             @endphp
                         </div>
                         <div class="col-md-7">
+                            <x-core::alert type="warning">
+                                <strong>{{ trans('plugins/language::language.default_language_warning') }}</strong><br><br>
+                                {{ trans('plugins/language::language.default_language_warning_details') }}<br><br>
+                                {{ trans('plugins/language::language.default_language_warning_action') }}
+                            </x-core::alert>
                             <div class="table-responsive">
                                 <x-core::table class="table-language">
                                     <x-core::table.header>

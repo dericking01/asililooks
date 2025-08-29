@@ -143,20 +143,16 @@ class SocialLoginController extends BaseController
 
         $model = new $providerData['model']();
 
-        // Find account by email
         $account = $this->socialLoginService->findUserByEmail($oAuth->getEmail(), $model::class);
 
-        // Find social login by provider and provider ID
         $socialLoginUser = $this->socialLoginService->findUserByProvider($provider, $oAuth->getId());
 
         if ($socialLoginUser && $account && $socialLoginUser->getKey() !== $account->getKey()) {
-            // If social login exists but belongs to a different account, update it
             $this->socialLoginService->updateSocialLogin($socialLoginUser, $provider, [
                 'user_id' => $account->getKey(),
                 'user_type' => $account::class,
             ]);
         } elseif (! $account) {
-            // Create new account if not exists
             $beforeProcessData = apply_filters('social_login_before_creating_account', null, $oAuth, $providerData);
 
             if ($beforeProcessData instanceof BaseHttpResponse) {
@@ -201,7 +197,6 @@ class SocialLoginController extends BaseController
             event(new Registered($account));
         }
 
-        // Create or update social login
         $socialLoginData = $this->socialLoginService->createSocialLoginData([
             'provider' => $provider,
             'id' => $oAuth->getId(),
@@ -213,20 +208,8 @@ class SocialLoginController extends BaseController
             'avatar' => $oAuth->getAvatar(),
         ]);
 
-        if ($this->socialLoginService->hasSocialLogin($account, $provider)) {
-            $this->socialLoginService->updateSocialLogin($account, $provider, $socialLoginData);
-        } else {
-            $this->socialLoginService->addSocialLogin($account, $socialLoginData);
-        }
+        $this->socialLoginService->createOrUpdateSocialLogin($account, $socialLoginData);
 
-        // Update user information if changed
-        if ($account->name !== $oAuth->getName() || $account->email !== $oAuth->getEmail()) {
-            $account->name = $oAuth->getName() ?: $account->name;
-            $account->email = $oAuth->getEmail();
-            $account->save();
-        }
-
-        // Update avatar if changed
         try {
             $url = $oAuth->getAvatar();
             if ($url && (! $account->avatar_id || $account->avatar_id !== $avatarId)) {

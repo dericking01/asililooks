@@ -71,7 +71,7 @@ class HookServiceProvider extends ServiceProvider
                 $paymentDetail = $paymentService->getPaymentDetails($payment->charge_id);
 
                 if ($paymentDetail) {
-                    $data = view('plugins/razorpay::detail', ['payment' => $paymentDetail, 'paymentModel' => $payment])->render();
+                    $data .= view('plugins/razorpay::detail', ['payment' => $paymentDetail, 'paymentModel' => $payment])->render();
                 }
             }
 
@@ -189,7 +189,7 @@ class HookServiceProvider extends ServiceProvider
                 'amount' => $amount,
                 'currency' => $data['currency'],
                 'notes' => [
-                    'order_id' => $paymentData['order_id'],
+                    'order_id' => is_array($paymentData['order_id']) ? implode(',', $paymentData['order_id']) : $paymentData['order_id'],
                     'order_token' => $paymentData['checkout_token'],
                     'customer_name' => $paymentData['address']['name'],
                     'customer_email' => $paymentData['address']['email'],
@@ -224,7 +224,7 @@ class HookServiceProvider extends ServiceProvider
                 'prefill[name]' => $paymentData['address']['name'],
                 'prefill[email]' => $paymentData['address']['email'],
                 'prefill[contact]' => $paymentData['address']['phone'],
-                'notes[order_id]' => json_encode($paymentData['order_id']),
+                'notes[order_id]' => is_array($paymentData['order_id']) ? implode(',', $paymentData['order_id']) : $paymentData['order_id'],
                 'notes[order_token]' => $paymentData['checkout_token'],
                 'notes[customer_name]' => $paymentData['address']['name'],
                 'notes[customer_email]' => $paymentData['address']['email'],

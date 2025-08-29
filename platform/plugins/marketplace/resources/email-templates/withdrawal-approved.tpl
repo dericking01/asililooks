@@ -14,18 +14,18 @@
                         </tr>
                         </tbody>
                     </table>
-                    <h1 class="bb-text-center bb-m-0 bb-mt-md">Withdrawal Approved</h1>
+                    <h1 class="bb-text-center bb-m-0 bb-mt-md">{{ 'plugins/marketplace::marketplace.email_templates.withdrawal_approved_title' | trans }}</h1>
                 </td>
             </tr>
             <tr>
                 <td class="bb-content bb-pb-0">
-                    <p>Dear {{ store_name }},</p>
-                    <div>Your payout request has been approved, we will sent <strong>{{ withdrawal_amount }}</strong> to your bank information shortly.</div>
+                    <p>{{ 'plugins/marketplace::marketplace.email_templates.dear_vendor' | trans({'vendor_name': store_name}) }}</p>
+                    <div>{{ 'plugins/marketplace::marketplace.email_templates.withdrawal_approved_message' | trans({'withdrawal_amount': withdrawal_amount}) | raw }}</div>
                 </td>
             </tr>
             <tr>
                 <td class="bb-content bb-text-center">
-                    <div>Happy selling!</div>
+                    <div>{{ 'plugins/marketplace::marketplace.email_templates.happy_selling' | trans }}</div>
                 </td>
             </tr>
         </tbody>

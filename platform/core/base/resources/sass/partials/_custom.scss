@@ -438,3 +438,13 @@ a.form-hint, .form-hint a {
     }
 }
 
+.btn-action {
+    border: none;
+}
+
+.table {
+    .btn-icon {
+        min-height: calc(var(--bb-btn-line-height) * var(--bb-btn-font-size) + var(--bb-btn-padding-y) * 2 + var(--bb-btn-border-width) * 2);
+        min-width: calc(var(--bb-btn-line-height) * var(--bb-btn-font-size) + var(--bb-btn-padding-y) * 2 + var(--bb-btn-border-width) * 2);
+    }
+}

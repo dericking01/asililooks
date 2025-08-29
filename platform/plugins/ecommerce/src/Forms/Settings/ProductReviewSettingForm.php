@@ -70,6 +70,14 @@ class ProductReviewSettingForm extends SettingForm
                     ->value(get_ecommerce_setting('show_customer_full_name', true))
                     ->helperText(trans('plugins/ecommerce::setting.product_review.form.show_customer_full_name_help'))
             )
+            ->add(
+                'hide_rating_when_no_reviews',
+                OnOffCheckboxField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('plugins/ecommerce::setting.product_review.form.hide_rating_when_no_reviews'))
+                    ->value(get_ecommerce_setting('hide_rating_when_no_reviews', false))
+                    ->helperText(trans('plugins/ecommerce::setting.product_review.form.hide_rating_when_no_reviews_help'))
+            )
             ->add('close_fieldset_review_settings', 'html', ['html' => '</fieldset>']);
     }
 }

@@ -33,6 +33,8 @@ abstract class AbstractWidget
 
     protected ?WidgetGroup $group = null;
 
+    protected static array $ignoredCaches = [];
+
     public function __construct(array $config = [])
     {
         foreach ($config as $key => $value) {
@@ -73,41 +75,9 @@ abstract class AbstractWidget
 
         $args = func_get_args();
 
-        $widgetClass = $this->getId();
-        $sidebar = $args[0] ?? 'default';
-        $position = $args[1] ?? 0;
-        $theme = Theme::getThemeName();
-        $locale = App::getLocale();
-
-        $cacheKey = 'widget_' . md5($widgetClass . $sidebar . $position . $theme . $locale . serialize($this->config));
-
-        // Check if caching is enabled from settings
-        if (setting('widget_cache_enabled', false) && ! request()->ajax()) {
-            // Check if this widget should be cached for longer
-            $cacheable = $this->isWidgetCacheable();
-
-            // Get cache durations from settings
-            $defaultTtl = (int) setting('widget_cache_ttl_default', 5);
-            $cacheableTtl = (int) setting('widget_cache_ttl_cacheable', 1800);
-
-            // Set cache duration based on whether the widget is cacheable
-            $cacheDuration = $cacheable
-                ? Carbon::now()->addSeconds($cacheableTtl)
-                : Carbon::now()->addSeconds($defaultTtl);
-
-            // Get from cache or render if not cached
-            return Cache::remember($cacheKey, $cacheDuration, function () use ($args) {
-                return $this->renderWidget($args);
-            });
-        }
-
-        // If caching is disabled, render directly
         return $this->renderWidget($args);
     }
 
-    /**
-     * Render the widget without caching
-     */
     protected function renderWidget(array $args): ?string
     {
         $widgetGroup = app('botble.widget-group-collection');
@@ -128,6 +98,37 @@ abstract class AbstractWidget
             $this->config = array_merge($this->config, $data->data);
         }
 
+        $widgetClass = $this->getId();
+        $sidebar = $args[0] ?? 'default';
+        $position = $args[1] ?? 0;
+        $theme = Theme::getThemeName();
+        $locale = App::getLocale();
+        $authorized = auth()->check();
+        $appUrl = url('/');
+
+        $renderedContent = $this->renderWidgetContent($args, $data);
+
+        $containsForms = $this->containsFormElements($renderedContent);
+
+        if (
+            setting('widget_cache_enabled', false)
+            && ! request()->ajax()
+            && ! $this->shouldIgnoreCache($widgetClass)
+            && (Arr::get($this->config, 'enable_caching', 'yes') !== 'no')
+            && ! $containsForms
+        ) {
+            $cacheKey = 'widget_' . md5($widgetClass . $sidebar . $appUrl . $position . $theme . $locale . $authorized . serialize($this->config));
+            $cacheTtl = (int) setting('widget_cache_ttl', 1800);
+            $cacheDuration = Carbon::now()->addSeconds($cacheTtl);
+
+            Cache::put($cacheKey, $renderedContent, $cacheDuration);
+        }
+
+        return $renderedContent;
+    }
+
+    protected function renderWidgetContent(array $args, $data): ?string
+    {
         $viewData = array_merge([
             'config' => $this->config,
             'sidebar' => $args[0],
@@ -151,25 +152,6 @@ abstract class AbstractWidget
         }
 
         return apply_filters('widget_rendered', $html, $this);
-    }
-
-    /**
-     * Determine if a widget should be cached for a longer period
-     *
-     * @return bool
-     */
-    protected function isWidgetCacheable(): bool
-    {
-        // List of widgets that should be cached for longer periods
-        // These are typically widgets that don't change frequently or don't contain dynamic content
-        $cacheableWidgets = [
-            'Botble\Widget\Widgets\Text',
-            'Botble\Widget\Widgets\Menu',
-            'Botble\Widget\Widgets\CustomMenu',
-            'Botble\Widget\Widgets\CustomHTML',
-        ];
-
-        return in_array($this->getId(), $cacheableWidgets);
     }
 
     public function getId(): string
@@ -203,7 +185,13 @@ abstract class AbstractWidget
 
         $settingForm = $this->settingForm();
 
-        return $settingForm instanceof WidgetForm ? $settingForm->renderForm() : $settingForm;
+        if ($settingForm instanceof WidgetForm) {
+            $settingForm->withCacheWarning($this->getId())->withCaching();
+
+            return $settingForm->renderForm();
+        }
+
+        return $settingForm;
     }
 
     protected function settingForm(): WidgetForm|string|null
@@ -278,5 +266,51 @@ abstract class AbstractWidget
             ...$this->config,
             ...$config,
         ];
+    }
+
+    public static function ignoreCaches(array $widgets): void
+    {
+        static::$ignoredCaches = array_merge(static::$ignoredCaches, $widgets);
+    }
+
+    public static function getIgnoredCaches(): array
+    {
+        return static::$ignoredCaches;
+    }
+
+    protected function shouldIgnoreCache(string $widgetClass): bool
+    {
+        return in_array($widgetClass, static::$ignoredCaches);
+    }
+
+    protected function containsFormElements(?string $content): bool
+    {
+        if (! $content) {
+            return false;
+        }
+
+        $patterns = [
+            '<form',
+            'csrf_token',
+            '_token',
+            'g-recaptcha',
+            'FormBuilder',
+            'renderForm()',
+            'NewsletterForm',
+            'ContactForm',
+            'CommentForm',
+            'SubscribeForm',
+            'type="submit"',
+            'method="post"',
+            'method="POST"',
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (stripos($content, $pattern) !== false) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

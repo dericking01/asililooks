@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\DB;
 
 class ProductReviewsSummaryCard extends Card
 {
+    public function getColumns(): int
+    {
+        return 6; // Half width for better layout
+    }
+
     public function getOptions(): array
     {
         $data = Review::query()

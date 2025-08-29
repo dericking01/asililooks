@@ -183,6 +183,19 @@ return [
         'width' => 'Width',
         'aspect_ratio' => 'Aspect ratio',
     ],
+
+    'validation' => [
+        'uploaded_file_required' => 'Please select a file to upload.',
+        'uploaded_file_invalid_type' => 'The file type is not allowed. Please upload a valid file format.',
+        'uploaded_file_too_large' => 'The file is too large. Please choose a smaller file.',
+        'uploaded_file_corrupted' => 'The file appears to be corrupted or invalid. Please try uploading a different file.',
+        'upload_network_error' => 'Upload failed due to network issues. Please check your connection and try again.',
+        'attributes' => [
+            'uploaded_file' => 'file',
+            'upload' => 'file',
+        ],
+    ],
+
     'unable_to_write' => 'Unable to write file. Please chmod folder ":folder" to make it writeable!',
     'unable_download_image_from' => 'Unable to download image from URL: :url',
     'rename_physical_folder' => 'Rename physical folder name on disk too',

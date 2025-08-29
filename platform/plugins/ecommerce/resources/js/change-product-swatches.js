@@ -1,6 +1,8 @@
 class ChangeProductSwatches {
     constructor() {
         this.xhr = null
+        this.cache = new Map() // Client-side cache for variation responses
+        this.cacheTimeout = 5 * 60 * 1000 // 5 minutes cache
 
         this.handleEvents()
     }
@@ -144,6 +146,18 @@ class ChangeProductSwatches {
         }
 
         let id = $productAttributes.prop('id')
+        
+        // Create cache key from attributes and language
+        const locale = document.documentElement.lang || 'en'
+        const cacheKey = JSON.stringify(attributes.sort()) + (referenceProduct || '') + '_v1_' + locale
+        
+        // Check cache first
+        const cached = _self.getFromCache(cacheKey)
+        if (cached) {
+            // Use cached response
+            _self.handleResponse(cached, $productAttributes, slugAttributes, id, updateUrl)
+            return
+        }
 
         _self.xhr = $.ajax({
             url: $productAttributes.data('target'),
@@ -155,44 +169,11 @@ class ChangeProductSwatches {
                 }
             },
             success: (res) => {
-                if (window.onChangeSwatchesSuccess && typeof window.onChangeSwatchesSuccess === 'function') {
-                    window.onChangeSwatchesSuccess(res, $productAttributes)
-                }
-
-                const { data, message } = res
-
-                if (!data.error_message) {
-                    if (data.selected_attributes) {
-                        slugAttributes = {}
-                        $.each(data.selected_attributes, (index, item) => {
-                            slugAttributes[item.set_slug] = item.slug
-                        })
-                    }
-
-                    const url = new URL(window.location)
-
-                    if (id) {
-                        _self.updateSelectingAttributes(slugAttributes, $('#' + id))
-                    }
-
-                    $.each(slugAttributes, (name, value) => {
-                        url.searchParams.set(name, value)
-                    })
-
-                    if (updateUrl && url != window.location.href) {
-                        window.history.pushState(
-                            { formData, data: res, product_attributes_id: id, slugAttributes },
-                            message,
-                            url
-                        )
-                    } else {
-                        window.history.replaceState(
-                            { formData, data: res, product_attributes_id: id, slugAttributes },
-                            message,
-                            url
-                        )
-                    }
-                }
+                // Store in cache
+                _self.setCache(cacheKey, res)
+                
+                // Handle response
+                _self.handleResponse(res, $productAttributes, slugAttributes, id, updateUrl)
             },
             complete: (res) => {
                 if (window.onChangeSwatchesComplete && typeof window.onChangeSwatchesComplete === 'function') {
@@ -243,6 +224,76 @@ class ChangeProductSwatches {
             } else params[k] = v
         }
         return params
+    }
+    
+    handleResponse = function(res, $productAttributes, slugAttributes, id, updateUrl) {
+        let _self = this
+        
+        if (window.onChangeSwatchesSuccess && typeof window.onChangeSwatchesSuccess === 'function') {
+            window.onChangeSwatchesSuccess(res, $productAttributes)
+        }
+
+        const { data, message } = res
+
+        if (!data.error_message) {
+            if (data.selected_attributes) {
+                slugAttributes = {}
+                $.each(data.selected_attributes, (index, item) => {
+                    slugAttributes[item.set_slug] = item.slug
+                })
+            }
+
+            const url = new URL(window.location)
+
+            if (id) {
+                _self.updateSelectingAttributes(slugAttributes, $('#' + id))
+            }
+
+            $.each(slugAttributes, (name, value) => {
+                url.searchParams.set(name, value)
+            })
+
+            if (updateUrl && url != window.location.href) {
+                window.history.pushState(
+                    { formData: { attributes: res.data.attributes }, data: res, product_attributes_id: id, slugAttributes },
+                    message,
+                    url
+                )
+            } else {
+                window.history.replaceState(
+                    { formData: { attributes: res.data.attributes }, data: res, product_attributes_id: id, slugAttributes },
+                    message,
+                    url
+                )
+            }
+        }
+    }
+    
+    getFromCache(key) {
+        const item = this.cache.get(key)
+        if (!item) return null
+        
+        // Check if cache is expired
+        if (Date.now() - item.timestamp > this.cacheTimeout) {
+            this.cache.delete(key)
+            return null
+        }
+        
+        return item.data
+    }
+    
+    setCache(key, data) {
+        this.cache.set(key, {
+            data: data,
+            timestamp: Date.now()
+        })
+        
+        // Limit cache size to prevent memory issues
+        if (this.cache.size > 100) {
+            // Remove oldest entries
+            const firstKey = this.cache.keys().next().value
+            this.cache.delete(firstKey)
+        }
     }
 }
 

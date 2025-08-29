@@ -14,18 +14,18 @@
                     </tr>
                     </tbody>
                 </table>
-                <h1 class="bb-text-center bb-m-0 bb-mt-md">Vendor Account Rejected</h1>
+                <h1 class="bb-text-center bb-m-0 bb-mt-md">{{ 'plugins/marketplace::marketplace.email_templates.vendor_account_rejected_title' | trans }}</h1>
             </td>
         </tr>
         <tr>
             <td class="bb-content bb-pb-0">
-                <p>Dear {{ store_name }},</p>
-                <div>We regret to inform you that your account has not been approved for selling on our site <a href="{{ site_url }}">{{ site_url }}</a>.</div>
+                <p>{{ 'plugins/marketplace::marketplace.email_templates.dear_vendor' | trans({'vendor_name': store_name}) }}</p>
+                <div>{{ 'plugins/marketplace::marketplace.email_templates.vendor_account_rejected_message' | trans({'site_url': site_url}) | raw }}</div>
             </td>
         </tr>
         <tr>
             <td class="bb-content bb-text-center">
-                <div>Thank you for your understanding.</div>
+                <div>{{ 'plugins/marketplace::marketplace.email_templates.thank_you_understanding' | trans }}</div>
             </td>
         </tr>
         </tbody>

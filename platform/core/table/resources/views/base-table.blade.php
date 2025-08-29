@@ -66,7 +66,7 @@
                         </label>
                     </div>
                 </div>
-                <div class="d-flex align-items-center gap-1">
+                <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-1 table-action-buttons">
                     @foreach($table->getButtons() as $button)
                         @if (Arr::get($button, 'extend') === 'collection')
                             <div class="dropdown d-inline-block">

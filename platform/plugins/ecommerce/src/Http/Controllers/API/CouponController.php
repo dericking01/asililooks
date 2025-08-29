@@ -2,17 +2,20 @@
 
 namespace Botble\Ecommerce\Http\Controllers\API;
 
-use Botble\Base\Http\Controllers\BaseController;
+use Botble\Api\Http\Controllers\BaseApiController;
+use Botble\Ecommerce\Enums\DiscountTypeEnum;
 use Botble\Ecommerce\Facades\Cart;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Facades\OrderHelper;
 use Botble\Ecommerce\Http\Requests\API\ApplyCouponRequest;
+use Botble\Ecommerce\Http\Resources\API\CouponResource;
+use Botble\Ecommerce\Models\Discount;
 use Botble\Ecommerce\Services\HandleApplyCouponService;
 use Botble\Ecommerce\Services\HandleRemoveCouponService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
-class CouponController extends BaseController
+class CouponController extends BaseApiController
 {
     public function __construct(
         protected HandleApplyCouponService $applyCouponService,
@@ -52,6 +55,10 @@ class CouponController extends BaseController
         }
 
         if ($result['error']) {
+            if ($cartId) {
+                Cart::instance('cart')->store($cartId);
+            }
+
             return $this
                 ->httpResponse()
                 ->setError()
@@ -137,6 +144,10 @@ class CouponController extends BaseController
         }
 
         if (! $couponCode) {
+            if ($cartId) {
+                Cart::instance('cart')->store($cartId);
+            }
+
             return $this
                 ->httpResponse()
                 ->setError()
@@ -179,6 +190,38 @@ class CouponController extends BaseController
             ->httpResponse()
             ->setData($cartData)
             ->setMessage(__('Removed coupon code successfully!'))
+            ->toApiResponse();
+    }
+
+    /**
+     * Get all available coupons
+     *
+     * @group Coupons
+     * @param Request $request
+     * @return mixed
+     *
+     * @queryParam coupon_ids string Optional comma-separated list of coupon IDs to filter by. Example: 1,2,3
+     */
+    public function index(Request $request)
+    {
+        $query = Discount::query()
+            ->where('type', DiscountTypeEnum::COUPON)
+            ->active()
+            ->available();
+
+        // If specific coupon IDs are provided, filter by them
+        if ($request->has('coupon_ids')) {
+            $couponIds = array_filter(explode(',', $request->input('coupon_ids')));
+            if (! empty($couponIds)) {
+                $query->whereIn('id', $couponIds);
+            }
+        }
+
+        $coupons = $query->get();
+
+        return $this
+            ->httpResponse()
+            ->setData(CouponResource::collection($coupons))
             ->toApiResponse();
     }
 

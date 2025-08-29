@@ -2,13 +2,13 @@
 
 namespace Botble\Ecommerce\Http\Controllers\API;
 
+use Botble\Api\Http\Controllers\BaseApiController;
 use Botble\Ecommerce\AdsTracking\FacebookPixel;
 use Botble\Ecommerce\AdsTracking\GoogleTagManager;
 use Botble\Ecommerce\Enums\DiscountTypeEnum;
 use Botble\Ecommerce\Facades\Cart;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Facades\OrderHelper;
-use Botble\Ecommerce\Http\Controllers\BaseController;
 use Botble\Ecommerce\Http\Requests\API\AddCartRequest;
 use Botble\Ecommerce\Http\Requests\API\CartRefreshRequest;
 use Botble\Ecommerce\Http\Requests\API\DeleteCartRequest;
@@ -25,7 +25,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Throwable;
 
-class CartController extends BaseController
+class CartController extends BaseApiController
 {
     public function __construct(
         protected HandleApplyPromotionsService $applyPromotionsService,
@@ -71,10 +71,6 @@ class CartController extends BaseController
     public function store(AddCartRequest $request, ?string $id = null)
     {
         $response = $this->httpResponse();
-        // Use provided cart ID or generate a new one
-        $identifier = $id ?: (string) Str::uuid();
-
-        Cart::instance('cart')->restore($identifier);
 
         /**
          * @var Product $product
@@ -110,6 +106,11 @@ class CartController extends BaseController
 
         $outOfQuantity = false;
 
+        // Use the provided cart ID or generate a new one
+        $identifier = $id ?: (string) Str::uuid();
+
+        Cart::instance('cart')->restore($identifier);
+
         foreach (Cart::instance('cart')->content() as $item) {
             if ($item->id == $product->id) {
                 $originalQuantity = $product->quantity;
@@ -136,6 +137,8 @@ class CartController extends BaseController
             $originalProduct->options()->where('required', true)->exists()
         ) {
             if (! $request->input('options')) {
+                Cart::instance('cart')->store($identifier);
+
                 return $response
                     ->setError()
                     ->setData(['next_url' => $originalProduct->url])
@@ -157,6 +160,8 @@ class CartController extends BaseController
             }
 
             if ($message) {
+                Cart::instance('cart')->store($identifier);
+
                 return $response
                     ->setError()
                     ->setMessage(__('Please select product options!'))
@@ -165,6 +170,8 @@ class CartController extends BaseController
         }
 
         if ($outOfQuantity) {
+            Cart::instance('cart')->store($identifier);
+
             return $response
                 ->setError()
                 ->setMessage(__(
@@ -218,10 +225,6 @@ class CartController extends BaseController
      */
     public function update(UpdateCartRequest $request, string $id)
     {
-        $identifier = $id;
-
-        Cart::instance('cart')->restore($identifier);
-
         $newQty = $request->input('qty', 1);
 
         $productId = $request->input('product_id');
@@ -232,6 +235,10 @@ class CartController extends BaseController
         $product = Product::query()->find($productId);
 
         $rowId = null;
+
+        $identifier = $id;
+
+        Cart::instance('cart')->restore($identifier);
 
         foreach (Cart::instance('cart')->content() as $item) {
             if ($item->id == $productId) {
@@ -277,6 +284,8 @@ class CartController extends BaseController
         $cartItem = Cart::instance('cart')->get($rowId);
 
         if (! $cartItem) {
+            Cart::instance('cart')->store($identifier);
+
             return response()->json(['error' => __('Cart item not found')], 404);
         }
 
@@ -294,6 +303,8 @@ class CartController extends BaseController
             }
 
             if ($product->isOutOfStock()) {
+                Cart::instance('cart')->store($identifier);
+
                 return response()->json(['error' => __('Product is out of stock')], 400);
             }
 
@@ -339,6 +350,8 @@ class CartController extends BaseController
         }
 
         if (! $rowId) {
+            Cart::instance('cart')->store($identifier);
+
             return response()->json(['error' => __('Cart item not found')], 404);
         }
 
@@ -353,6 +366,8 @@ class CartController extends BaseController
             return response()->json(__('Cart item removed successfully'));
 
         } catch (Throwable) {
+            Cart::instance('cart')->store($identifier);
+
             return response()->json(['error' => __('Cart item not found')], 404);
         }
     }
@@ -362,7 +377,7 @@ class CartController extends BaseController
      *
      * @group Cart
      * @param CartRefreshRequest $request
-     * @bodyParam products array required List of products. Example: [{"product_id": 1, "quantity": 1}]
+     * @bodyParam products array required List of products with product_id and quantity.
      * @bodyParam products.*.product_id integer required ID of the product. Example: 1
      * @bodyParam products.*.quantity integer required Quantity of the product. Example: 1
      *
@@ -489,9 +504,13 @@ class CartController extends BaseController
     {
         [$products, $promotionDiscountAmount, $couponDiscountAmount, $couponCode] = $this->getCartData();
 
-        $content = Cart::instance('cart')->content();
-        $rawTotal = Cart::instance('cart')->rawTotal();
-        $countCart = Cart::instance('cart')->count();
+        $cart = Cart::instance('cart');
+
+        $content = $cart->content();
+        $rawSubTotal = $cart->rawSubTotal();
+        $rawTotal = $cart->rawTotal();
+        $rawTaxTotal = $cart->rawTax();
+        $countCart = $cart->count();
 
         if (is_plugin_active('marketplace')) {
             foreach ($content as $item) {
@@ -523,6 +542,10 @@ class CartController extends BaseController
             'count' => $countCart,
             'raw_total' => $rawTotal,
             'raw_total_formatted' => format_price($rawTotal),
+            'sub_total' => $rawSubTotal,
+            'sub_total_formatted' => format_price($rawSubTotal),
+            'tax_amount' => $rawTaxTotal,
+            'tax_amount_formatted' => format_price($rawTaxTotal),
             'promotion_discount_amount' => $promotionDiscountAmount,
             'promotion_discount_amount_formatted' => format_price($promotionDiscountAmount),
             'coupon_discount_amount' => $couponDiscountAmount,

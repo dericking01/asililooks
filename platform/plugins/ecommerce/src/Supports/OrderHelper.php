@@ -56,6 +56,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -162,7 +163,15 @@ class OrderHelper
                 /**
                  * @var Order $order
                  */
-                $this->sendEmailForDigitalProducts($order);
+                if (EcommerceHelperFacade::isEnabledSupportDigitalProducts()) {
+                    $digitalProductsCount = EcommerceHelperFacade::countDigitalProducts($order->products);
+
+                    if ($digitalProductsCount === $order->products->count() && EcommerceHelperFacade::isAutoCompleteDigitalOrdersAfterPayment()) {
+                        $this->setOrderCompleted($order->getKey(), request(), Auth::id() ?? 0);
+                    } elseif ($digitalProductsCount > 0) {
+                        event(new OrderCompletedEvent($order));
+                    }
+                }
             }
         }
 
@@ -251,6 +260,7 @@ class OrderHelper
                     'product_attributes_text' => Arr::get($digitalProduct->options, 'attributes'),
                     'product_options_text' => $digitalProduct->product_options_implode,
                     'product_options_array' => $digitalProduct->product_options_array,
+                    'license_code' => $digitalProduct->license_code,
                 ];
             }
         }
@@ -267,10 +277,7 @@ class OrderHelper
             'customer_address' => $order->full_address,
             'product_list' => view('plugins/ecommerce::emails.partials.order-detail', compact('order'))
                 ->render(),
-            'digital_product_list' => EcommerceHelperFacade::isEnabledSupportDigitalProducts() ? view(
-                'plugins/ecommerce::emails.partials.digital-product-list',
-                compact('order')
-            )->render() : null,
+            'digital_product_list' => EcommerceHelperFacade::isEnabledSupportDigitalProducts() ? $this->getDigitalProductListView($order) : null,
             'shipping_method' => $order->shipping_method_name,
             'payment_method' => $paymentMethod,
             'order_delivery_notes' => view(
@@ -298,10 +305,37 @@ class OrderHelper
         ], $order);
     }
 
-    public function sendOrderConfirmationEmail(Order $order, bool $saveHistory = false): bool
+    protected function getDigitalProductListView(Order $order): ?string
+    {
+        // Check if any digital products have downloadable files
+        $hasDownloadableFiles = false;
+        $hasLicenseCodesOnly = false;
+
+        foreach ($order->products as $orderProduct) {
+            if ($orderProduct->isTypeDigital()) {
+                if ($orderProduct->hasFiles()) {
+                    $hasDownloadableFiles = true;
+                } elseif ($orderProduct->license_code && EcommerceHelperFacade::isEnabledLicenseCodesForDigitalProducts()) {
+                    $hasLicenseCodesOnly = true;
+                }
+            }
+        }
+
+        // Use appropriate partial view based on product type
+        if ($hasDownloadableFiles) {
+            return view('plugins/ecommerce::emails.partials.digital-product-list', compact('order'))->render();
+        } elseif ($hasLicenseCodesOnly) {
+            return view('plugins/ecommerce::emails.partials.digital-product-license-codes', compact('order'))->render();
+        }
+
+        return null;
+    }
+
+    public function sendOrderConfirmationEmail(Order $order, bool $saveHistory = false, bool $force = false): bool
     {
         try {
             if (
+                ! $force &&
                 OrderHistory::query()
                     ->where([
                         'action' => OrderHistoryActionEnum::SEND_ORDER_CONFIRMATION_EMAIL,
@@ -346,10 +380,28 @@ class OrderHelper
         if ($digitalProductsCount) {
             $mailer = EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME);
             $mailer = $this->setEmailVariables($order, $mailer);
-            $mailer->sendUsingTemplate('download_digital_products', $order->user->email ?: $order->address->email);
 
-            if ($digitalProductsCount === $order->products->count()) {
-                $this->setOrderCompleted($order->getKey(), request(), Auth::id() ?? 0);
+            // Check if any digital products have downloadable files
+            $hasDownloadableFiles = false;
+            $hasLicenseCodesOnly = false;
+
+            foreach ($order->products as $orderProduct) {
+                if ($orderProduct->isTypeDigital()) {
+                    if ($orderProduct->hasFiles()) {
+                        $hasDownloadableFiles = true;
+                    } elseif ($orderProduct->license_code && EcommerceHelperFacade::isEnabledLicenseCodesForDigitalProducts()) {
+                        $hasLicenseCodesOnly = true;
+                    }
+                }
+            }
+
+            // Send appropriate email template based on product type
+            if ($hasDownloadableFiles) {
+                // Send download email for products with files
+                $mailer->sendUsingTemplate('download_digital_products', $order->user->email ?: $order->address->email);
+            } elseif ($hasLicenseCodesOnly) {
+                // Send license codes email for products without files
+                $mailer->sendUsingTemplate('digital_product_license_codes', $order->user->email ?: $order->address->email);
             }
         }
     }
@@ -558,8 +610,9 @@ class OrderHelper
             $options = $this->getProductOptionData($requestOption);
         }
 
-        $taxClasses = $parentProduct
-            ->taxes()
+        $taxClasses = DB::table('ec_tax_products')
+            ->join('ec_taxes', 'ec_taxes.id', '=', 'ec_tax_products.tax_id')
+            ->where('ec_tax_products.product_id', $parentProduct->id)
             ->select(['ec_taxes.id', 'ec_taxes.title', 'ec_taxes.percentage'])
             ->get()
             ->mapWithKeys(function ($tax) {
@@ -570,7 +623,9 @@ class OrderHelper
         $taxRate = $parentProduct->total_taxes_percentage;
 
         if (! $taxClasses && $defaultTaxRate = get_ecommerce_setting('default_tax_rate')) {
-            $tax = Tax::query()->where('id', $defaultTaxRate)->first();
+            $tax = cache()->remember('default_tax_rate_' . $defaultTaxRate, 3600, function () use ($defaultTaxRate) {
+                return Tax::query()->where('id', $defaultTaxRate)->first();
+            });
 
             if ($tax) {
                 $taxClasses = [$tax->title => $tax->percentage];
@@ -890,7 +945,7 @@ class OrderHelper
                     'qty' => $cartItem->qty,
                     'weight' => $productByCartItem->weight * $cartItem->qty,
                     'price' => $cartItem->price,
-                    'tax_amount' => $cartItem->tax,
+                    'tax_amount' => $cartItem->tax * $cartItem->qty,
                     'options' => [],
                     'product_type' => $productByCartItem->product_type,
                 ];
@@ -1072,7 +1127,19 @@ class OrderHelper
             'user_id' => $user?->getKey(),
         ]);
 
-        $this->sendEmailForDigitalProducts($order);
+        if (EcommerceHelperFacade::isEnabledSupportDigitalProducts()) {
+            $digitalProductsCount = EcommerceHelperFacade::countDigitalProducts($order->products);
+
+            if (
+                $digitalProductsCount === $order->products->count()
+                && EcommerceHelperFacade::isAutoCompleteDigitalOrdersAfterPayment()
+            ) {
+                $this->setOrderCompleted($order->getKey(), request(), $user?->getKey() ?? 0);
+            } elseif ($digitalProductsCount > 0) {
+                // Fire OrderCompletedEvent for digital products even if order is not auto-completed
+                event(new OrderCompletedEvent($order));
+            }
+        }
 
         return true;
     }
@@ -1191,7 +1258,7 @@ class OrderHelper
 
             $bankInfo = view(
                 'plugins/ecommerce::orders.partials.bank-transfer-info',
-                compact('bankInfo', 'orderAmount', 'orderCode')
+                compact('bankInfo', 'orderAmount', 'orderCode', 'orders')
             )->render();
 
             return apply_filters('ecommerce_order_bank_info', $bankInfo, $orders);

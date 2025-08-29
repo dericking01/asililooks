@@ -1,3 +1,9 @@
+<!--
+tags: [process, download, upload, loader, loading]
+category: System
+version: "1.17"
+unicode: "eca3"
+-->
 <svg
   xmlns="http://www.w3.org/2000/svg"
   width="24"
@@ -8,8 +14,7 @@
   stroke-width="2"
   stroke-linecap="round"
   stroke-linejoin="round"
-  >
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+>
   <path d="M12 6l0 -3" />
   <path d="M16.25 7.75l2.15 -2.15" />
   <path d="M18 12l3 0" />

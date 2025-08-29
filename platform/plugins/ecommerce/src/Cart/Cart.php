@@ -293,7 +293,7 @@ class Cart
     {
         $content = $this->getContent();
 
-        return $content->reduce(function ($total, ?CartItem $cartItem) {
+        $total = $content->reduce(function ($total, ?CartItem $cartItem) {
             if (! $cartItem) {
                 return 0;
             }
@@ -304,6 +304,8 @@ class Cart
 
             return $total + ($cartItem->qty * ($cartItem->priceTax == 0 ? $cartItem->price : $cartItem->priceTax));
         }, 0);
+
+        return apply_filters('ecommerce_cart_raw_total', $total, $content);
     }
 
     public function rawTotalByItems($content): float
@@ -336,9 +338,11 @@ class Cart
     {
         $content = $this->getContent();
 
-        return $content->reduce(function ($subTotal, CartItem $cartItem) {
+        $subTotal = $content->reduce(function ($subTotal, CartItem $cartItem) {
             return $subTotal + ($cartItem->qty * $cartItem->price);
         }, 0);
+
+        return apply_filters('ecommerce_cart_raw_subtotal', $subTotal, $content);
     }
 
     public function rawSubTotalByItems($content): float
@@ -533,6 +537,8 @@ class Cart
             return $total + ($cartItem->qty * ($cartItem->priceTax == 0 ? $cartItem->price : $cartItem->priceTax));
         }, 0);
 
+        $total = apply_filters('ecommerce_cart_total', $total, $content);
+
         return format_price($total);
     }
 
@@ -565,6 +571,8 @@ class Cart
         $subTotal = $content->reduce(function ($subTotal, CartItem $cartItem) {
             return $subTotal + ($cartItem->qty * $cartItem->price);
         }, 0);
+
+        $subTotal = apply_filters('ecommerce_cart_subtotal', $subTotal, $content);
 
         return format_price($subTotal);
     }

@@ -21,6 +21,21 @@ $(() => {
     const $shortcodeListModal = $('#shortcode-list-modal')
     const $shortcodeFormModal = $('#shortcode-modal')
 
+    // Function to escape HTML entities
+    function escapeHtml(text) {
+        if (typeof text !== 'string') return text
+
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        }
+
+        return text.replace(/[&<>"']/g, function(m) { return map[m] })
+    }
+
     $('[data-bb-toggle="shortcode-item-radio"]').on('change', () => {
         $('[data-bb-toggle="shortcode-use"]').prop('disabled', false).removeClass('disabled')
     })
@@ -59,11 +74,13 @@ $(() => {
 
         const editorInstance = $('.add_shortcode_btn_trigger').data('result')
 
-        const shortcode = '[' + $shortCodeKey + attributes + ']' + content + '[/' + $shortCodeKey + ']'
+        let shortcode = '[' + $shortCodeKey + attributes + ']' + content + '[/' + $shortCodeKey + ']'
 
         if (window.EDITOR && window.EDITOR.CKEDITOR && $('.editor-ckeditor').length > 0) {
             window.EDITOR.CKEDITOR[editorInstance].commands.execute('shortcode', shortcode)
         } else if ($('.editor-tinymce').length > 0) {
+            shortcode = '[' + $shortCodeKey + attributes + ']' + escapeHtml(content) + '[/' + $shortCodeKey + ']'
+
             tinymce.get(editorInstance).execCommand('mceInsertContent', false, shortcode)
         } else {
             const coreInsertShortCodeEvent = new CustomEvent('core-insert-shortcode', {

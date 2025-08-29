@@ -15,7 +15,7 @@ return [
     'admin_order_cancellation_description' => 'Send to customer when admin cancels an order',
     'order_cancellation_to_admin_title' => 'Order cancellation (will be sent to admins)',
     'order_cancellation_to_admin_description' => 'Send to admin when customer cancels an order',
-    'order_cancellation_to_admin_subject' => 'Order :order_id has been cancelled by customer',
+    'order_cancellation_to_admin_subject' => 'Order {{ order_id }} has been cancelled by customer',
 
     'delivery_confirmation_title' => 'Delivering confirmation',
     'delivery_confirmation_description' => 'Send to customer when order is delivering',
@@ -73,6 +73,9 @@ return [
     'download_digital_products_title' => 'Download digital products',
     'download_digital_products_description' => 'Send email digital product downloads when guest makes a purchase',
     'download_digital_products_subject' => 'Download digital products which you have purchased',
+    'digital_product_license_codes_title' => 'Digital product license codes',
+    'digital_product_license_codes_description' => 'Send email with license codes for digital products without downloadable files',
+    'digital_product_license_codes_subject' => 'Your license codes for digital products',
     'digital_product_list' => 'Digital product list',
     'digital_products' => 'Digital products',
     'customer_deletion_request_confirmation_title' => 'Account deletion confirmation',

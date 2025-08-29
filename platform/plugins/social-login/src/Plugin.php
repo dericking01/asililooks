@@ -29,6 +29,9 @@ class Plugin extends PluginOperationAbstract
             'social_login_apple_enable',
             'social_login_apple_app_id',
             'social_login_apple_app_secret',
+            'social_login_x_enable',
+            'social_login_x_app_id',
+            'social_login_x_app_secret',
         ]);
     }
 }

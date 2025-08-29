@@ -48,6 +48,8 @@ class GeneralSettingController extends SettingController
             $data['locale'] = $locale;
         }
 
+        cache()->forget('core.base.boot_settings');
+
         return $this->performUpdate($data);
     }
 
@@ -195,7 +197,7 @@ class GeneralSettingController extends SettingController
     {
         if (config('core.base.general.license_storage_method') === 'database') {
             // For database storage, use the setting's updated_at timestamp or current time
-            $licenseContent = SettingModel::where('key', 'license_file_content')->first();
+            $licenseContent = SettingModel::query()->where('key', 'license_file_content')->first();
 
             return $licenseContent && $licenseContent->updated_at
                 ? Carbon::parse($licenseContent->updated_at)

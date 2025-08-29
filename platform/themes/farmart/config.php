@@ -53,7 +53,7 @@ return [
             });
 
             // You may use this event to set up your assets.
-            $version = get_cms_version() . '.1';
+            $version = get_cms_version() . '.2';
 
             $useCDN = theme_option('use_source_assets_from', 'cdn') == 'cdn';
 
@@ -224,7 +224,7 @@ return [
                 'main-js' => [
                     'local' => [
                         'source' => 'js/main.js',
-                        'dependencies' => ['jquery', 'front-ecommerce-js'],
+                        'dependencies' => ['jquery', 'bootstrap-js', 'front-ecommerce-js', 'scrollbar-js'],
                         'version' => $version,
                     ],
                     'container' => 'footer',

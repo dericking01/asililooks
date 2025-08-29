@@ -17,11 +17,63 @@ class GoogleTagManager
 
     public function isEnabled(): bool
     {
-        $type = setting('google_tag_manager_type', 'code');
+        $enabled = get_ecommerce_setting('google_tag_manager_enabled', false);
 
-        return get_ecommerce_setting('google_tag_manager_enabled', false)
-            && ($type === 'code' && setting('google_tag_manager_code'))
-            || ($type === 'id' && setting('google_tag_manager_id'));
+        if (is_string($enabled)) {
+            $enabled = $enabled === '1' || $enabled === 'true';
+        }
+
+        if (! $enabled) {
+            return false;
+        }
+
+        $type = setting('google_tag_manager_type');
+
+        if (! $type) {
+            if (setting('gtm_container_id')) {
+                $type = 'gtm';
+            } elseif (setting('google_tag_manager_code')) {
+                $type = 'code';
+            } elseif (setting('custom_tracking_header_js') || setting('custom_tracking_body_html')) {
+                $type = 'custom';
+            } elseif (setting('google_tag_manager_id') || setting('google_analytics')) {
+                $type = 'id';
+            } else {
+                return false;
+            }
+        }
+
+        switch ($type) {
+            case 'gtm':
+                return (bool) setting('gtm_container_id');
+
+            case 'id':
+                return (bool) (setting('google_tag_manager_id') || setting('google_analytics'));
+
+            case 'custom':
+                return (bool) (
+                    setting('custom_tracking_header_js') ||
+                    setting('custom_tracking_body_html') ||
+                    setting('google_tag_manager_code')
+                );
+
+            case 'code':
+                return (bool) (
+                    setting('google_tag_manager_code') ||
+                    setting('custom_tracking_header_js') ||
+                    setting('custom_tracking_body_html')
+                );
+
+            default:
+                return (bool) (
+                    setting('gtm_container_id') ||
+                    setting('google_tag_manager_id') ||
+                    setting('google_analytics') ||
+                    setting('google_tag_manager_code') ||
+                    setting('custom_tracking_header_js') ||
+                    setting('custom_tracking_body_html')
+                );
+        }
     }
 
     public function viewItemList(array $items, string $name, array $attributes = []): self
@@ -40,6 +92,50 @@ class GoogleTagManager
         $this->pushEvent('view_item', [$item], [
             'currency' => get_application_currency()->title,
             'value' => $item->price,
+            ...$attributes,
+        ]);
+
+        return $this;
+    }
+
+    public function selectItem(Product $item, string $listName = '', int $index = 0, array $attributes = []): self
+    {
+        $this->pushEvent('select_item', [$item], [
+            'item_list_id' => Str::snake($listName),
+            'item_list_name' => $listName,
+            'index' => $index,
+            ...$attributes,
+        ]);
+
+        return $this;
+    }
+
+    public function search(string $searchTerm, array $items = [], array $attributes = []): self
+    {
+        $this->pushEvent('search', $items, [
+            'search_term' => $searchTerm,
+            ...$attributes,
+        ]);
+
+        return $this;
+    }
+
+    public function viewPromotion(array $items, string $promotionId = '', string $promotionName = '', array $attributes = []): self
+    {
+        $this->pushEvent('view_promotion', $items, [
+            'promotion_id' => $promotionId,
+            'promotion_name' => $promotionName,
+            ...$attributes,
+        ]);
+
+        return $this;
+    }
+
+    public function selectPromotion(array $items, string $promotionId = '', string $promotionName = '', array $attributes = []): self
+    {
+        $this->pushEvent('select_promotion', $items, [
+            'promotion_id' => $promotionId,
+            'promotion_name' => $promotionName,
             ...$attributes,
         ]);
 

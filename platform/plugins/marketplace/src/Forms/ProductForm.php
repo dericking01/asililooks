@@ -4,9 +4,11 @@ namespace Botble\Marketplace\Forms;
 
 use Botble\Base\Forms\FieldOptions\ContentFieldOption;
 use Botble\Base\Forms\FieldOptions\EditorFieldOption;
+use Botble\Base\Forms\FieldOptions\MediaImageFieldOption;
 use Botble\Base\Forms\FieldOptions\NameFieldOption;
 use Botble\Base\Forms\FieldOptions\NumberFieldOption;
 use Botble\Base\Forms\FieldOptions\SelectFieldOption;
+use Botble\Base\Forms\Fields\MediaImageField;
 use Botble\Base\Forms\Fields\MultiCheckListField;
 use Botble\Base\Forms\Fields\NumberField;
 use Botble\Base\Forms\Fields\SelectField;
@@ -122,6 +124,12 @@ class ProductForm extends BaseProductForm
                             ->allowClear()
                     );
             })
+            ->add(
+                'image',
+                MediaImageField::class,
+                MediaImageFieldOption::make()
+                    ->label(trans('plugins/ecommerce::products.form.featured_image'))
+            )
             ->when($productCollections, function () use ($productCollections): void {
                 $selectedProductCollections = [];
 

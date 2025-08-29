@@ -30,6 +30,7 @@
             }
         }
     }
+
     .bb-customer-card-list {
         .bb-customer-card {
             .bb-customer-card-header {
@@ -125,6 +126,44 @@
                         transform: rotate(180deg);
                     }
                 }
+            }
+        }
+    }
+
+    .bb-product-gallery-horizontal {
+        .slick-arrow.slick-next, .slick-arrow.slick-prev {
+            transform: rotate(180deg) !important;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .bb-product-gallery-horizontal {
+            .slick-arrow.slick-next {
+                inset-inline-start: 91% !important;
+            }
+        }
+    }
+
+    .bb-product-gallery-thumbnails {
+        .video-thumbnail {
+            svg {
+                transform: translate(100%, -50%);
+            }
+        }
+
+        &.slick-vertical {
+            .slick-arrow {
+                inset-inline-start: calc(43% - 17px);
+            }
+        }
+    }
+
+    @media (max-width: 991px) {
+        .bb-filter-offcanvas-area {
+            transform: translateX(calc(100% + 80px));
+
+            &.offcanvas-opened {
+                transform: translateX(0);
             }
         }
     }

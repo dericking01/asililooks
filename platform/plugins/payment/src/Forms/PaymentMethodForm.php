@@ -85,7 +85,7 @@ class PaymentMethodForm extends FormAbstract
         $label = trans('plugins/payment::payment.processing_fee');
 
         if ($feeType === PaymentFeeTypeEnum::PERCENTAGE) {
-            $label = trans('plugins/payment::payment.fee') . ' (%)';
+            $label = trans('plugins/payment::payment.payment_fee') . ' (%)';
         }
 
         return $this

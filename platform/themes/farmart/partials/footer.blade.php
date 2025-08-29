@@ -259,7 +259,7 @@
             @endif
         </div>
     </div>
-    <div class="footer-mobile">
+    <div class="footer-mobile" @if(theme_option('bottom_bar_menu_show_text', 'yes') != 'yes')data-hide-text="true"@endif style="--bottom-bar-menu-text-font-size: {{ theme_option('bottom_bar_menu_text_font_size', 11) }}px;">
         <ul class="menu--footer">
             <li>
                 <a href="{{ BaseHelper::getHomepageUrl() }}">
@@ -309,6 +309,7 @@
     </div>
     @if (is_plugin_active('ecommerce'))
         {!! Theme::partial('ecommerce.quick-view-modal') !!}
+        {!! Theme::partial('ecommerce.quick-shop-modal') !!}
     @endif
     {!! Theme::partial('toast') !!}
 
@@ -324,7 +325,7 @@
         </span>
     </div>
 
-    <script>
+    <script data-pagespeed-no-defer data-pagespeed-no-transform>
         'use strict';
 
         window.trans = {
@@ -351,7 +352,5 @@
 
     {!! Theme::footer() !!}
 
-    @include('packages/theme::toast-notification')
     </body>
-
-    </html>
+</html>

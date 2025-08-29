@@ -2,7 +2,7 @@
 
 namespace Botble\Ecommerce\Http\Controllers\API;
 
-use Botble\Base\Http\Controllers\BaseController;
+use Botble\Api\Http\Controllers\BaseApiController;
 use Botble\Ecommerce\Facades\Cart;
 use Botble\Ecommerce\Http\Requests\API\AddCompareRequest;
 use Botble\Ecommerce\Http\Requests\API\DeleteCompareRequest;
@@ -11,7 +11,7 @@ use Botble\Ecommerce\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 
-class CompareController extends BaseController
+class CompareController extends BaseApiController
 {
     /**
      * Get compare items

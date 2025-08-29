@@ -2,7 +2,7 @@
 
 namespace Botble\Ecommerce\Http\Controllers\API;
 
-use Botble\Base\Http\Controllers\BaseController;
+use Botble\Api\Http\Controllers\BaseApiController;
 use Botble\Ecommerce\Enums\OrderHistoryActionEnum;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Facades\OrderReturnHelper;
@@ -15,7 +15,7 @@ use Botble\Ecommerce\Models\OrderReturn;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
-class OrderReturnController extends BaseController
+class OrderReturnController extends BaseApiController
 {
     /**
      * Get list of order return requests for the current user
@@ -85,7 +85,7 @@ class OrderReturnController extends BaseController
      *
      * @bodyParam order_id integer required The ID of the order to return. Example: 1
      * @bodyParam reason string required The reason for the return. Example: DAMAGED_PRODUCT
-     * @bodyParam return_items array required The items to return.
+     * @bodyParam return_items array required The items to return with order_item_id, is_return, and qty.
      * @bodyParam return_items.*.order_item_id integer required The ID of the order item. Example: 1
      * @bodyParam return_items.*.is_return boolean required Whether to return this item. Example: true
      * @bodyParam return_items.*.qty integer The quantity to return (required if partial return is enabled). Example: 1

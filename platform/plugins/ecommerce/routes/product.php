@@ -124,6 +124,39 @@ AdminHelper::registerRoutes(function (): void {
                 'uses' => 'ProductController@setDefaultProductVariation',
                 'permission' => 'products.edit',
             ])->wherePrimaryKey();
+
+            // License code management routes
+            Route::group(['prefix' => '{product}/license-codes', 'as' => 'license-codes.'], function (): void {
+                Route::get('/', [
+                    'as' => 'index',
+                    'uses' => 'ProductLicenseCodeController@index',
+                    'permission' => 'products.edit',
+                ]);
+
+                Route::post('/', [
+                    'as' => 'store',
+                    'uses' => 'ProductLicenseCodeController@store',
+                    'permission' => 'products.edit',
+                ]);
+
+                Route::put('{licenseCode}', [
+                    'as' => 'update',
+                    'uses' => 'ProductLicenseCodeController@update',
+                    'permission' => 'products.edit',
+                ]);
+
+                Route::delete('{licenseCode}', [
+                    'as' => 'destroy',
+                    'uses' => 'ProductLicenseCodeController@destroy',
+                    'permission' => 'products.edit',
+                ]);
+
+                Route::post('bulk-generate', [
+                    'as' => 'bulk-generate',
+                    'uses' => 'ProductLicenseCodeController@bulkGenerate',
+                    'permission' => 'products.edit',
+                ]);
+            });
         });
     });
 

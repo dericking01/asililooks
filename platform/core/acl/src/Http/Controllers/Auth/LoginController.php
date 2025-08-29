@@ -82,7 +82,7 @@ class LoginController extends BaseController
             });
     }
 
-    public function username()
+    public function username(): string
     {
         return filter_var(request()->input('username'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
     }

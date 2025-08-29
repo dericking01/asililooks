@@ -171,7 +171,7 @@ class MediaManagement {
 
                 return false
             })
-            .on('dblclick doubletap', '.js-up-one-level', (event) => {
+            .on('click', '.js-up-one-level', (event) => {
                 event.preventDefault()
                 let count = $('.rv-media-breadcrumb .breadcrumb li').length
                 $(`.rv-media-breadcrumb .breadcrumb li:nth-child(${count - 1}) a`).trigger('click')

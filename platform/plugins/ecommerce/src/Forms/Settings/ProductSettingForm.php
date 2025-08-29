@@ -75,8 +75,22 @@ class ProductSettingForm extends SettingForm
                 OnOffFieldOption::make()
                     ->label(trans('plugins/ecommerce::setting.product.form.is_enabled_related_products'))
                     ->helperText(trans('plugins/ecommerce::setting.product.form.is_enabled_related_products_helper'))
-                    ->value(EcommerceHelper::isEnabledRelatedProducts())
+                    ->value($relatedProductsEnabled = EcommerceHelper::isEnabledRelatedProducts())
             )
+            ->addOpenCollapsible('is_enabled_related_products', '1', $relatedProductsEnabled)
+            ->add(
+                'related_products_source',
+                RadioField::class,
+                RadioFieldOption::make()
+                    ->label(trans('plugins/ecommerce::setting.product.form.related_products_source'))
+                    ->helperText(trans('plugins/ecommerce::setting.product.form.related_products_source_helper'))
+                    ->choices([
+                        'category' => trans('plugins/ecommerce::setting.product.form.related_products_source_category'),
+                        'brand' => trans('plugins/ecommerce::setting.product.form.related_products_source_brand'),
+                    ])
+                    ->selected(get_ecommerce_setting('related_products_source', 'category'))
+            )
+            ->addCloseCollapsible('is_enabled_related_products', '1')
             ->add(
                 'enable_product_specification',
                 OnOffCheckboxField::class,

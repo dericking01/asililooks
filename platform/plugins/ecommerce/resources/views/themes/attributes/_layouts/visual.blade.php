@@ -1,4 +1,8 @@
-@if (($attributes = $attributes->where('attribute_set_id', $set->id)) && $attributes->isNotEmpty())
+@php
+    $displayAttributes = $attributes->where('attribute_set_id', $set->id);
+@endphp
+
+@if ($displayAttributes && $displayAttributes->isNotEmpty())
     <div
         class="bb-product-attribute-swatch visual-swatches-wrapper attribute-swatches-wrapper"
         data-type="visual"
@@ -6,14 +10,18 @@
     >
         <h4 class="bb-product-attribute-swatch-title">{{ $set->title }}:</h4>
         <ul class="bb-product-attribute-swatch-list visual-swatch color-swatch attribute-swatch">
-            @foreach ($attributes as $attribute)
+            @foreach ($displayAttributes as $attribute)
+                @php
+                    $isDisabled = $variationInfo->where('id', $attribute->id)->isEmpty();
+                    $style = $attribute->getAttributeStyle($set, $productVariations);
+                @endphp
                 <li
                     data-slug="{{ $attribute->slug }}"
                     data-id="{{ $attribute->id }}"
-                    data-bs-toggle="tooltip" data-bs-title="Disabled tooltip"
+                    @if($isDisabled) data-bs-toggle="tooltip" data-bs-title="Not available" @endif
                     @class([
                         'bb-product-attribute-swatch-item attribute-swatch-item',
-                        'disabled' => $variationInfo->where('id', $attribute->id)->isEmpty(),
+                        'disabled' => $isDisabled,
                     ])
                 >
                     <label>
@@ -25,8 +33,9 @@
                             value="{{ $attribute->id }}"
                             @checked($selected->where('id', $attribute->id)->isNotEmpty())
                             class="product-filter-item"
+                            @if($isDisabled) disabled @endif
                         >
-                        <span class="bb-product-attribute-swatch-display" style="{{ $attribute->getAttributeStyle($set, $productVariations) }}"></span>
+                        <span class="bb-product-attribute-swatch-display" @if($style) style="{{ $style }}" @endif></span>
                         <span class="bb-product-attribute-swatch-item-tooltip">{{ $attribute->title }}</span>
                     </label>
                 </li>

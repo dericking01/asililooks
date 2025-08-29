@@ -21,9 +21,6 @@
                                     <p class="text-muted small mb-0">{{ __('Share your experience with these products') }}</p>
                                 </div>
                             </div>
-                            <div class="bb-customer-card-status">
-                                <span class="badge bg-warning">{{ $products->count() }}</span>
-                            </div>
                         </div>
                     </div>
                     <div class="bb-customer-card-body">
@@ -57,7 +54,7 @@
                                                 <div class="bb-customer-card-actions mt-2">
                                                     <div class="d-flex align-items-center gap-2">
                                                         <span class="text-muted small">{{ __('Rate this product:') }}</span>
-                                                        <div class="d-flex ecommerce-product-star" data-id="{{ $product->id }}">
+                                                        <div class="d-flex ecommerce-product-star ecommerce-product-item" data-id="{{ $product->id }}">
                                                             @for ($i = 5; $i >= 1; $i--)
                                                                 <label class="order-{{ $i }} cursor-pointer">
                                                                     <x-core::icon name="ti ti-star-filled" class="ecommerce-icon text-warning" data-star="{{ $i }}" />
@@ -93,9 +90,6 @@
                                     <p class="text-muted small mb-0">{{ __('Products you have reviewed') }}</p>
                                 </div>
                             </div>
-                            <div class="bb-customer-card-status">
-                                <span class="badge bg-success">{{ $reviews->total() }}</span>
-                            </div>
                         </div>
                     </div>
                     <div class="bb-customer-card-body">
@@ -125,7 +119,7 @@
                             </div>
                             <h5 class="h6 mb-2">{{ __('All caught up!') }}</h5>
                             <p class="text-muted small mb-3">
-                                {{ __('You don\'t have any products waiting for review. Keep shopping to discover new products!') }}
+                                {{ __("You don't have any products waiting for review. Keep shopping to discover new products!") }}
                             </p>
                             <a href="{{ route('public.products') }}" class="btn btn-outline-primary btn-sm">
                                 <x-core::icon name="ti ti-shopping-bag" class="me-1" />

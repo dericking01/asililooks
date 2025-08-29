@@ -2,8 +2,8 @@
 
 namespace Botble\Blog\Http\Controllers\API;
 
+use Botble\Api\Http\Controllers\BaseApiController;
 use Botble\Base\Enums\BaseStatusEnum;
-use Botble\Base\Http\Controllers\BaseController;
 use Botble\Blog\Http\Resources\CategoryResource;
 use Botble\Blog\Http\Resources\ListCategoryResource;
 use Botble\Blog\Models\Category;
@@ -12,12 +12,29 @@ use Botble\Blog\Supports\FilterCategory;
 use Botble\Slug\Facades\SlugHelper;
 use Illuminate\Http\Request;
 
-class CategoryController extends BaseController
+class CategoryController extends BaseApiController
 {
     /**
      * List categories
      *
      * @group Blog
+     *
+     * @queryParam per_page integer The number of items to return per page (default: 10).
+     * @queryParam page integer The page number to retrieve (default: 1).
+     *
+     * @response 200 {
+     *   "error": false,
+     *   "data": [
+     *     {
+     *       "id": 1,
+     *       "name": "Technology",
+     *       "slug": "technology",
+     *       "description": "Latest tech news and updates",
+     *       "created_at": "2023-01-01T00:00:00.000000Z"
+     *     }
+     *   ],
+     *   "message": null
+     * }
      */
     public function index(Request $request)
     {
@@ -36,6 +53,25 @@ class CategoryController extends BaseController
      * Filters categories
      *
      * @group Blog
+     *
+     * @queryParam page integer Current page of the collection (default: 1).
+     * @queryParam per_page integer Maximum number of items to be returned (default: 10).
+     * @queryParam search string Limit results to those matching a string.
+     * @queryParam order string Order sort attribute ascending or descending (default: desc). One of: asc, desc.
+     * @queryParam order_by string Sort collection by object attribute (default: created_at). One of: created_at, updated_at, id, name.
+     *
+     * @response 200 {
+     *   "error": false,
+     *   "data": [
+     *     {
+     *       "id": 1,
+     *       "name": "Technology",
+     *       "slug": "technology",
+     *       "description": "Latest tech news and updates"
+     *     }
+     *   ],
+     *   "message": null
+     * }
      */
     public function getFilters(Request $request, CategoryInterface $categoryRepository)
     {

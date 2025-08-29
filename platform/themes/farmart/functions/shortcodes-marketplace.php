@@ -6,7 +6,10 @@ use Botble\Base\Facades\Html;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Marketplace\Models\Store;
 use Botble\Shortcode\Compilers\Shortcode;
+use Botble\Shortcode\Facades\Shortcode as ShortcodeFacade;
+use Botble\Shortcode\Forms\ShortcodeForm;
 use Botble\Theme\Facades\Theme;
+use Illuminate\Support\Arr;
 
 if (is_plugin_active('marketplace')) {
     Assets::addStylesDirectly('vendor/core/core/base/libraries/tagify/tagify.css');
@@ -51,14 +54,37 @@ if (is_plugin_active('marketplace')) {
         return Theme::partial('shortcodes.marketplace.stores', compact('shortcode', 'layout', 'stores'));
     });
 
-    shortcode()->setAdminConfig('marketplace-stores', function (array $attributes) {
+    ShortcodeFacade::setAdminConfig('marketplace-stores', function (array $attributes) {
         $stores = Store::query()
             ->wherePublished()
             ->orderBy('name')
             ->pluck('name', 'id');
 
-        return Html::script('vendor/core/core/base/libraries/tagify/tagify.js') .
-            Html::script('vendor/core/core/base/js/tags.js') .
-            Theme::partial('shortcodes.marketplace.stores-admin-config', compact('attributes', 'stores'));
+        $layouts = get_store_list_layouts();
+
+        return ShortcodeForm::createFromArray($attributes)
+            ->add('stores_scripts', 'html', [
+                'html' => Html::script('vendor/core/core/base/libraries/tagify/tagify.js')->toHtml() .
+                          Html::script('vendor/core/core/base/js/tags.js')->toHtml(),
+            ])
+            ->add('title', 'text', [
+                'label' => __('Title'),
+                'value' => Arr::get($attributes, 'title'),
+                'placeholder' => __('Title'),
+            ])
+            ->add('stores', 'tags', [
+                'label' => __('Stores'),
+                'value' => Arr::get($attributes, 'stores'),
+                'placeholder' => __('Select stores from the list'),
+                'attr' => [
+                    'class' => 'form-control list-tagify',
+                    'data-list' => json_encode($stores),
+                ],
+            ])
+            ->add('layout', 'customSelect', [
+                'label' => __('Layout'),
+                'choices' => $layouts,
+                'selected' => Arr::get($attributes, 'layout'),
+            ]);
     });
 }

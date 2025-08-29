@@ -21,19 +21,19 @@ class ProductCategoryDistributionChart extends Chart
     {
         $categories = ProductCategory::query()
             ->wherePublished()
-            ->with(['products' => function ($query) {
+            ->with(['products' => function ($query): void {
                 $query->wherePublished()
                     ->where('is_variation', false)
                     ->whereDate('created_at', '>=', $this->startDate)
                     ->whereDate('created_at', '<=', $this->endDate);
             }])
-            ->withCount(['products' => function ($query) {
+            ->withCount(['products' => function ($query): void {
                 $query->wherePublished()
                     ->where('is_variation', false)
                     ->whereDate('created_at', '>=', $this->startDate)
                     ->whereDate('created_at', '<=', $this->endDate);
             }])
-            ->orderByDesc('products_count')
+            ->latest('products_count')
             ->limit(6)
             ->get();
 

@@ -14,18 +14,18 @@
                             </tr>
                         </tbody>
                     </table>
-                    <h1 class="bb-text-center bb-m-0 bb-mt-md">Order completed!</h1>
+                    <h1 class="bb-text-center bb-m-0 bb-mt-md">{{ 'plugins/ecommerce::email-templates.review_products_title' | trans }}</h1>
                 </td>
             </tr>
             <tr>
                 <td class="bb-content">
-                    <p>Dear {{ customer_name }},</p>
-                    <div>Thank you for purchasing our products, you can review the product below!</div>
+                    <p>{{ 'plugins/ecommerce::email-templates.review_products_greeting' | trans({'customer_name': customer_name}) }}</p>
+                    <div>{{ 'plugins/ecommerce::email-templates.review_products_message' | trans }}</div>
                 </td>
             </tr>
             <tr>
                 <td class="bb-content bb-pt-0">
-                    <h4>Products</h4>
+                    <h4>{{ 'plugins/ecommerce::email-templates.review_products_products' | trans }}</h4>
                     {{ product_review_list }}
                 </td>
             </tr>

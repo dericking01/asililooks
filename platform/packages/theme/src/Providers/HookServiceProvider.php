@@ -264,6 +264,26 @@ class HookServiceProvider extends ServiceProvider
                                 ],
                             ],
                             [
+                                'id' => 'favicon_type',
+                                'type' => 'customSelect',
+                                'label' => trans('packages/theme::theme.theme_option_favicon_type'),
+                                'attributes' => [
+                                    'name' => 'favicon_type',
+                                    'list' => [
+                                        'image/x-icon' => 'ICO',
+                                        'image/png' => 'PNG',
+                                        'image/svg+xml' => 'SVG',
+                                        'image/gif' => 'GIF',
+                                        'image/jpeg' => 'JPEG',
+                                        'image/webp' => 'WebP',
+                                    ],
+                                    'value' => 'image/x-icon',
+                                    'options' => [
+                                        'class' => 'form-control',
+                                    ],
+                                ],
+                            ],
+                            [
                                 'id' => 'logo',
                                 'type' => 'mediaImage',
                                 'label' => trans('packages/theme::theme.theme_option_logo'),
@@ -451,6 +471,8 @@ class HookServiceProvider extends ServiceProvider
                 ]);
         });
 
+        shortcode()->ignoreLazyLoading(['media', 'audio']);
+
         add_filter(THEME_FRONT_HEADER, function (?string $html): ?string {
             $file = Theme::getStyleIntegrationPath();
             if ($this->app['files']->exists($file)) {
@@ -490,6 +512,8 @@ class HookServiceProvider extends ServiceProvider
                                 ->maxLength(100000)
                         );
                 });
+
+                shortcode()->ignoreLazyLoading(['custom-html']);
             }
 
             if (config('packages.theme.general.enable_custom_js')) {
@@ -511,6 +535,11 @@ class HookServiceProvider extends ServiceProvider
                     }, 15);
                 }
             }
+
+            // Add Google Tag Manager noscript to body
+            add_filter(THEME_FRONT_BODY, function (?string $html): string {
+                return ThemeSupport::renderGoogleTagManagerNoscript() . $html;
+            }, 10);
 
             if (config('packages.theme.general.enable_custom_html')) {
                 if (setting('custom_header_html')) {

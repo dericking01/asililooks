@@ -17,7 +17,46 @@
     @endguest
 
     @if (isset($checkReview) && $checkReview['error'])
-        <p class="text-warning">{{ $checkReview['message'] }}</p>
+        <div class="review-warning-alert">
+            <div class="warning-icon">
+                @if ($checkReview['type'] === 'already_reviewed')
+                    <x-core::icon name="ti ti-circle-check" />
+                @elseif ($checkReview['type'] === 'purchase_required')
+                    <x-core::icon name="ti ti-shopping-cart" />
+                @else
+                    <x-core::icon name="ti ti-alert-triangle" />
+                @endif
+            </div>
+            <div class="warning-content">
+                <div class="warning-title">
+                    @if ($checkReview['type'] === 'already_reviewed')
+                        {{ __('Review Already Submitted') }}
+                    @elseif ($checkReview['type'] === 'purchase_required')
+                        {{ __('Purchase Required') }}
+                    @else
+                        {{ __('Review Not Available') }}
+                    @endif
+                </div>
+                <div class="warning-message">
+                    {{ $checkReview['message'] }}
+                </div>
+                @if ($checkReview['type'] === 'purchase_required')
+                    <div class="warning-actions">
+                        <a href="{{ route('public.products') }}" class="btn btn-outline-warning btn-sm">
+                            <x-core::icon name="ti ti-shopping-bag" />
+                            {{ __('Browse Products') }}
+                        </a>
+                    </div>
+                @elseif ($checkReview['type'] === 'already_reviewed')
+                    <div class="warning-actions">
+                        <a href="{{ route('customer.product-reviews') }}" class="btn btn-outline-warning btn-sm">
+                            <x-core::icon name="ti ti-star" />
+                            {{ __('View Your Reviews') }}
+                        </a>
+                    </div>
+                @endif
+            </div>
+        </div>
     @else
         <x-core::form :url="route('public.reviews.create')" method="post" :files="true">
             <input type="hidden" name="product_id" value="{{ $product->id }}">

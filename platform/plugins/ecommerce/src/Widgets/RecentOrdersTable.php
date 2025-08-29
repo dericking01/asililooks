@@ -11,6 +11,8 @@ class RecentOrdersTable extends Table
 
     protected string $route = 'ecommerce.report.recent-orders';
 
+    protected int $columns = 6;
+
     public function getLabel(): string
     {
         return trans('plugins/ecommerce::reports.recent_orders');

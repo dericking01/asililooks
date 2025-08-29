@@ -15,7 +15,6 @@
         >
             <ul class="mt-3 mb-0 ps-2">
                 <li class="mb-2">Please back up your database and script files before upgrading.</li>
-                <li class="mb-2">You need to activate your license before doing upgrade.</li>
                 <li class="mb-2">If you don't need this 1-click update, you can disable it in <strong>.env</strong> by
                     adding
                     <strong>CMS_ENABLE_SYSTEM_UPDATER=false</strong>

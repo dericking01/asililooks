@@ -2,11 +2,11 @@
 
 namespace Botble\Language\Http\Controllers\API;
 
-use Botble\Base\Http\Controllers\BaseController;
+use Botble\Api\Http\Controllers\BaseApiController;
 use Botble\Language\Facades\Language;
 use Illuminate\Http\JsonResponse;
 
-class LanguageController extends BaseController
+class LanguageController extends BaseApiController
 {
     /**
      * Get list of available languages
@@ -21,7 +21,7 @@ class LanguageController extends BaseController
      *       "lang_name": "English",
      *       "lang_locale": "en",
      *       "lang_code": "en_US",
-     *       "lang_flag": "us",
+     *       "lang_flag": "<svg ...>",
      *       "lang_is_default": true,
      *       "lang_is_rtl": false,
      *       "lang_order": 0
@@ -31,7 +31,7 @@ class LanguageController extends BaseController
      *       "lang_name": "Vietnamese",
      *       "lang_locale": "vi",
      *       "lang_code": "vi",
-     *       "lang_flag": "vn",
+     *       "lang_flag": "<svg ...>",
      *       "lang_is_default": false,
      *       "lang_is_rtl": false,
      *       "lang_order": 1
@@ -43,6 +43,12 @@ class LanguageController extends BaseController
     public function index()
     {
         $languages = Language::getActiveLanguage();
+
+        $languages->transform(function ($item) {
+            $item->lang_flag = language_flag($item->lang_flag, $item->lang_name);
+
+            return $item;
+        });
 
         return response()
             ->json($languages);
@@ -73,6 +79,8 @@ class LanguageController extends BaseController
         $currentLocale = Language::getCurrentLocale();
         $languages = Language::getActiveLanguage();
         $currentLanguage = $languages->where('lang_locale', $currentLocale)->first();
+
+        $currentLanguage->lang_flag = language_flag($currentLanguage->lang_flag, $currentLanguage->lang_name);
 
         return response()
             ->json($currentLanguage);

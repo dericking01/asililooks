@@ -67,7 +67,7 @@ class PaymentServiceProvider extends ServiceProvider
                     'priority' => 0,
                     'parent_id' => 'cms-plugins-payments',
                     'name' => 'plugins/payment::payment.transactions',
-                    'icon' => null,
+                    'icon' => 'ti ti-list',
                     'url' => fn () => route('payment.index'),
                     'permissions' => ['payment.index'],
                 ])
@@ -76,7 +76,7 @@ class PaymentServiceProvider extends ServiceProvider
                     'priority' => 1,
                     'parent_id' => 'cms-plugins-payments',
                     'name' => 'plugins/payment::payment.payment_log.name',
-                    'icon' => null,
+                    'icon' => 'ti ti-file-text',
                     'url' => fn () => route('payments.logs.index'),
                     'permissions' => ['payments.logs'],
                 ])
@@ -85,7 +85,7 @@ class PaymentServiceProvider extends ServiceProvider
                     'priority' => 1,
                     'parent_id' => 'cms-plugins-payments',
                     'name' => 'plugins/payment::payment.payment_methods',
-                    'icon' => null,
+                    'icon' => 'ti ti-settings',
                     'url' => fn () => route('payments.methods'),
                     'permissions' => ['payments.settings'],
                 ]);

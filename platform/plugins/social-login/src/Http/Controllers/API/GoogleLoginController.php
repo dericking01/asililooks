@@ -2,7 +2,7 @@
 
 namespace Botble\SocialLogin\Http\Controllers\API;
 
-use Botble\Base\Http\Controllers\BaseController;
+use Botble\Api\Http\Controllers\BaseApiController;
 use Botble\SocialLogin\Facades\SocialService;
 use Botble\SocialLogin\Services\SocialLoginService;
 use Carbon\Carbon;
@@ -14,18 +14,49 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
-class GoogleLoginController extends BaseController
+class GoogleLoginController extends BaseApiController
 {
     public function __construct(protected SocialLoginService $socialLoginService)
     {
     }
 
+    /**
+     * Google login
+     *
+     * @group Social Login
+     *
+     * @bodyParam identityToken string required The Google identity token received from Google Sign-In.
+     * @bodyParam guard string optional The guard to use for authentication (default: web).
+     *
+     * @response 200 {
+     *   "error": false,
+     *   "data": {
+     *     "token": "1|abc123def456...",
+     *     "user": {
+     *       "id": 1,
+     *       "name": "John Doe",
+     *       "email": "john@example.com"
+     *     }
+     *   },
+     *   "message": "Login successful"
+     * }
+     *
+     * @response 400 {
+     *   "error": true,
+     *   "message": "Invalid Google token"
+     * }
+     *
+     * @response 400 {
+     *   "error": true,
+     *   "message": "Google authentication is not properly configured"
+     * }
+     */
     public function login(Request $request)
     {
         try {
             $request->validate([
-                'identityToken' => 'required|string',
-                'guard' => 'string|nullable',
+                'identityToken' => ['required', 'string'],
+                'guard' => ['string', 'nullable'],
             ]);
 
             $identityToken = $request->input('identityToken');
@@ -106,13 +137,8 @@ class GoogleLoginController extends BaseController
                 'avatar' => $googleUserData['picture'] ?? null,
             ]);
 
-            $hasSocialLogin = $this->socialLoginService->hasSocialLogin($account, 'google');
-
-            if ($hasSocialLogin) {
-                $this->socialLoginService->updateSocialLogin($account, 'google', $socialLoginData);
-            } else {
-                $this->socialLoginService->addSocialLogin($account, $socialLoginData);
-            }
+            // Use the new method that handles duplicates properly
+            $this->socialLoginService->createOrUpdateSocialLogin($account, $socialLoginData);
 
             $token = $account->createToken('google-login')->plainTextToken;
 

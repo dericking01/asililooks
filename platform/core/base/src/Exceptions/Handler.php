@@ -134,11 +134,15 @@ class Handler extends ExceptionHandler
 
         $key = 'send_error_exception';
 
-        if (Cache::has($key)) {
-            return;
-        }
+        try {
+            if (Cache::has($key)) {
+                return;
+            }
 
-        Cache::put($key, 1, Carbon::now()->addMinutes(5));
+            Cache::put($key, 1, Carbon::now()->addMinutes(5));
+        } catch (Throwable) {
+            // Do nothing
+        }
 
         if (! app()->isLocal() && ! app()->runningInConsole() && ! app()->isDownForMaintenance()) {
             if (
@@ -222,7 +226,7 @@ class Handler extends ExceptionHandler
 
     protected function unauthenticated($request, AuthenticationException $exception)
     {
-        if ($request->wantsJson() || $request->expectsJson()) {
+        if ($request->expectsJson()) {
             return $this
                 ->baseHttpResponse
                 ->setError()

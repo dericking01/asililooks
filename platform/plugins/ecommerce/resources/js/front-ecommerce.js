@@ -6,6 +6,8 @@ class Ecommerce {
     filterTimeout = null
 
     constructor() {
+        this.initClipboard()
+
         $(document)
             .on('click', '[data-bb-toggle="toggle-product-categories-tree"]', (e) => {
                 e.preventDefault()
@@ -40,6 +42,11 @@ class Ecommerce {
                 const paramsByName = {}
                 const attributeArrays = {}
 
+                // Get current URL parameters to check if search query has changed
+                const currentUrlParams = new URLSearchParams(window.location.search)
+                const currentSearchQuery = currentUrlParams.get('q') || ''
+                let newSearchQuery = ''
+
                 formData.forEach((item) => {
                     // Handle attribute arrays like attributes[color][]
                     if (item.name.includes('attributes[') && item.name.endsWith('[]')) {
@@ -49,8 +56,17 @@ class Ecommerce {
                         attributeArrays[item.name].push(item.value)
                     } else if (!paramsByName[item.name]) {
                         paramsByName[item.name] = item.value
+                        // Track the new search query
+                        if (item.name === 'q') {
+                            newSearchQuery = item.value
+                        }
                     }
                 })
+
+                // If search query has changed, remove the page parameter
+                if (newSearchQuery !== currentSearchQuery && paramsByName['page']) {
+                    delete paramsByName['page']
+                }
 
                 // Add regular parameters to URLSearchParams
                 Object.keys(paramsByName).forEach(name => {
@@ -147,6 +163,9 @@ class Ecommerce {
                 }
             })
             .on('click', '[data-bb-toggle="quick-shop"]', (e) => {
+                e.preventDefault()
+                e.stopPropagation()
+
                 const currentTarget = $(e.currentTarget)
                 const modal = $('#quick-shop-modal')
 
@@ -154,7 +173,15 @@ class Ecommerce {
                     url: currentTarget.data('url'),
                     type: 'GET',
                     beforeSend: () => {
-                        modal.find('.modal-body').html('')
+                        if (modal.find('.quick-shop-content').length) {
+                            modal.find('.quick-shop-content').html('')
+                            modal.find('.modal-body').addClass('modal-empty')
+                            modal.find('.loading-spinner').removeClass('d-none').show()
+                            modal.find('.quick-shop-content').hide()
+                        } else {
+                            modal.find('.modal-body').html('')
+                        }
+
                         modal.modal('show')
 
                         document.dispatchEvent(
@@ -167,7 +194,14 @@ class Ecommerce {
                         )
                     },
                     success: ({ data }) => {
-                        modal.find('.modal-body').html(data)
+                        if (modal.find('.quick-shop-content').length) {
+                            modal.find('.quick-shop-content').html(data)
+                            modal.find('.loading-spinner').addClass('d-none').hide()
+                            modal.find('.modal-body').removeClass('modal-empty')
+                            modal.find('.quick-shop-content').show()
+                        } else {
+                            modal.find('.modal-body').html(data)
+                        }
                     },
                     error: (error) => Theme.handleError(error),
                     complete: () => {
@@ -852,14 +886,21 @@ class Ecommerce {
             }
 
             if ($thumbnails.length) {
+                let isVertical = $thumbnails.data('vertical') === 1
+
+                if (window.innerWidth < 768) {
+                    isVertical = false
+                }
+
                 $thumbnails.slick({
                     slidesToShow: 6,
                     slidesToScroll: 1,
                     asNavFor: '.bb-product-gallery-images',
                     focusOnSelect: true,
                     infinite: false,
-                    rtl: this.isRtl(),
-                    vertical: $thumbnails.data('vertical') === 1,
+                    rtl: this.isRtl() && ! isVertical,
+                    vertical: isVertical,
+                    verticalSwiping: isVertical,
                     prevArrow:
                         '<button class="slick-prev slick-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 6l-6 6l6 6" /></svg></button>',
                     nextArrow:
@@ -869,7 +910,6 @@ class Ecommerce {
                             breakpoint: 768,
                             settings: {
                                 slidesToShow: 4,
-                                vertical: false,
                             },
                         },
                     ],
@@ -916,32 +956,51 @@ class Ecommerce {
             const $minPrice = $priceFilter.find('input[name="min_price"]')
             const $maxPrice = $priceFilter.find('input[name="max_price"]')
 
-            const minPriceValue = $minPrice.val() || $sliderRange.data('min')
+            // Get current values from form inputs (important for AJAX reinitialization)
+            const currentMinPrice = parseInt($minPrice.val()) || $sliderRange.data('min')
+            const currentMaxPrice = parseInt($maxPrice.val()) || $sliderRange.data('max')
+            const isRtl = this.isRtl()
 
-            const maxPriceValue = $maxPrice.val() || $sliderRange.data('max')
+            // For RTL: Initialize slider with inverted range to visually reverse it
+            const sliderMin = isRtl ? -$sliderRange.data('max') : $sliderRange.data('min')
+            const sliderMax = isRtl ? -$sliderRange.data('min') : $sliderRange.data('max')
+            const sliderValues = isRtl ? [-currentMaxPrice, -currentMinPrice] : [currentMinPrice, currentMaxPrice]
 
             $sliderRange.slider({
                 range: true,
-                min: $sliderRange.data('min'),
-                max: $sliderRange.data('max'),
-                values: [minPriceValue, maxPriceValue],
-                slide: function (event, ui) {
-                    $rangeLabel.find('.from').text(EcommerceApp.formatPrice(ui.values[0]))
-                    $rangeLabel.find('.to').text(EcommerceApp.formatPrice(ui.values[1]))
-                },
-                change: function (event, ui) {
-                    if (parseInt(minPriceValue) !== ui.values[0]) {
-                        $minPrice.val(ui.values[0]).trigger('change')
+                min: sliderMin,
+                max: sliderMax,
+                values: sliderValues,
+                slide: function (_, ui) {
+                    // Convert UI values back to real values for RTL
+                    const realMin = isRtl ? -ui.values[1] : ui.values[0]
+                    const realMax = isRtl ? -ui.values[0] : ui.values[1]
+
+                    $rangeLabel.find('.from').text(this.formatPrice(realMin))
+                    $rangeLabel.find('.to').text(this.formatPrice(realMax))
+                }.bind(this),
+                change: function (_, ui) {
+                    // Convert UI values back to real values for RTL
+                    const realMin = isRtl ? -ui.values[1] : ui.values[0]
+                    const realMax = isRtl ? -ui.values[0] : ui.values[1]
+
+                    if (parseInt(currentMinPrice) !== realMin) {
+                        $minPrice.val(realMin).trigger('change')
                     }
 
-                    if (parseInt(maxPriceValue) !== ui.values[1]) {
-                        $maxPrice.val(ui.values[1]).trigger('change')
+                    if (parseInt(currentMaxPrice) !== realMax) {
+                        $maxPrice.val(realMax).trigger('change')
                     }
-                },
+                }.bind(this),
             })
 
-            $rangeLabel.find('.from').text(this.formatPrice($sliderRange.slider('values', 0)))
-            $rangeLabel.find('.to').text(this.formatPrice($sliderRange.slider('values', 1)))
+            // Initialize display values correctly
+            const currentValues = $sliderRange.slider('values')
+            const displayMin = isRtl ? -currentValues[1] : currentValues[0]
+            const displayMax = isRtl ? -currentValues[0] : currentValues[1]
+
+            $rangeLabel.find('.from').text(this.formatPrice(displayMin))
+            $rangeLabel.find('.to').text(this.formatPrice(displayMax))
         }
     }
 
@@ -1120,6 +1179,11 @@ class Ecommerce {
             const paramsByName = {}
             const attributeArrays = {}
 
+            // Get current URL parameters to check if search query has changed
+            const currentUrlParams = new URLSearchParams(window.location.search)
+            const currentSearchQuery = currentUrlParams.get('q') || ''
+            let newSearchQuery = ''
+
             // Group by name to handle arrays and prevent duplicates
             data.forEach(item => {
                 if (item.name && item.value) {
@@ -1131,9 +1195,18 @@ class Ecommerce {
                         attributeArrays[item.name].push(item.value)
                     } else {
                         paramsByName[item.name] = item.value
+                        // Track the new search query
+                        if (item.name === 'q') {
+                            newSearchQuery = item.value
+                        }
                     }
                 }
             })
+
+            // If search query has changed, remove the page parameter
+            if (newSearchQuery !== currentSearchQuery && paramsByName['page']) {
+                delete paramsByName['page']
+            }
 
             // Add regular parameters to URLSearchParams
             Object.keys(paramsByName).forEach(name => {
@@ -1500,16 +1573,38 @@ class Ecommerce {
                 }
 
                 const $galleryImages = $product.find('.bb-product-gallery')
+                const $existingGalleryImages = $galleryImages.find('.bb-product-gallery-images')
+                const $existingThumbnails = $galleryImages.find('.bb-product-gallery-thumbnails')
 
-                $galleryImages.find('.bb-product-gallery-thumbnails').slick('unslick').html(thumbHtml)
+                // Preserve existing video elements
+                const existingVideoElements = $existingGalleryImages.find('.bb-product-video').clone()
+                const existingVideoThumbnails = $existingThumbnails.find('.video-thumbnail').clone()
+
+                let finalImageHtml = imageHtml
+                let finalThumbHtml = thumbHtml
+
+                // Add preserved videos back to the gallery
+                if (existingVideoElements.length > 0) {
+                    existingVideoElements.each(function() {
+                        finalImageHtml += $(this)[0].outerHTML
+                    })
+                }
+
+                if (existingVideoThumbnails.length > 0) {
+                    existingVideoThumbnails.each(function() {
+                        finalThumbHtml += `<div>${$(this)[0].outerHTML}</div>`
+                    })
+                }
+
+                $galleryImages.find('.bb-product-gallery-thumbnails').slick('unslick').html(finalThumbHtml)
 
                 const $quickViewGalleryImages = $(document).find('.bb-quick-view-gallery-images')
 
                 if ($quickViewGalleryImages.length) {
-                    $quickViewGalleryImages.slick('unslick').html(imageHtml)
+                    $quickViewGalleryImages.slick('unslick').html(finalImageHtml)
                 }
 
-                $galleryImages.find('.bb-product-gallery-images').slick('unslick').html(imageHtml)
+                $galleryImages.find('.bb-product-gallery-images').slick('unslick').html(finalImageHtml)
 
                 if (typeof EcommerceApp !== 'undefined') {
                     EcommerceApp.initProductGallery()
@@ -1566,6 +1661,73 @@ class Ecommerce {
             }
         }
     }
+
+    initClipboard() {
+        $(document).on('click', '[data-ecommerce-clipboard]', async (e) => {
+            e.preventDefault()
+
+            const target = $(e.currentTarget)
+            const copiedMessage = target.data('clipboard-message')
+            const text = target.data('clipboard-text')
+
+            if (!text) {
+                return
+            }
+
+            let copied = false
+
+            // Try modern clipboard API first
+            if (navigator.clipboard && window.isSecureContext) {
+                try {
+                    await navigator.clipboard.writeText(text)
+                    copied = true
+                } catch (err) {
+                    console.warn('Clipboard API failed, falling back to legacy method:', err)
+                }
+            }
+
+            // Fallback for older browsers or non-secure contexts
+            if (!copied) {
+                const textArea = document.createElement('textarea')
+                textArea.value = text
+                textArea.style.position = 'fixed'
+                textArea.style.left = '-999999px'
+                textArea.style.top = '-999999px'
+                document.body.appendChild(textArea)
+                textArea.focus()
+                textArea.select()
+
+                try {
+                    document.execCommand('copy')
+                    copied = true
+                } catch (err) {
+                    console.error('Failed to copy text: ', err)
+                }
+
+                document.body.removeChild(textArea)
+            }
+
+            if (copied) {
+                if (copiedMessage) {
+                    if (typeof Theme !== 'undefined' && Theme.showSuccess) {
+                        Theme.showSuccess(copiedMessage)
+                    }
+                }
+
+                // Update button text temporarily
+                const originalHtml = target.html()
+                target.html('<i class="ti ti-check"></i> ' + (copiedMessage || 'Copied!'))
+
+                setTimeout(() => {
+                    target.html(originalHtml)
+                }, 2000)
+            } else {
+                if (typeof Theme !== 'undefined' && Theme.showError) {
+                    Theme.showError('Failed to copy to clipboard')
+                }
+            }
+        })
+    }
 }
 
 $(() => {
@@ -1611,9 +1773,23 @@ $(() => {
         if (data.additional) {
             const $descriptionContainer = $('.bb-product-listing-page-description')
 
-            if (data.additional.product_listing_page_description_html) {
+            const descriptionHtml = data.additional.product_listing_page_description_html
+
+            if (descriptionHtml) {
                 if ($descriptionContainer.length) {
-                    $descriptionContainer.html(data.additional.product_listing_page_description_html)
+                    $descriptionContainer.html(descriptionHtml)
+
+                    document.dispatchEvent(new CustomEvent('shortcode.loaded', {
+                        detail: {
+                            name: null,
+                            attributes: [],
+                            html: descriptionHtml
+                        }
+                    }));
+
+                    if (typeof Theme.lazyLoadInstance !== 'undefined') {
+                        Theme.lazyLoadInstance.update()
+                    }
                 }
             } else {
                 $descriptionContainer.html('')

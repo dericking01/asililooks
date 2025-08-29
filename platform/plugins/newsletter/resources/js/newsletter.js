@@ -6,7 +6,8 @@ $(() => {
     const dontShowAgain = (time) => {
         const date = new Date()
         date.setTime(date.getTime() + time)
-        document.cookie = `newsletter_popup=1; expires=${date.toUTCString()}; path=/`
+        const secure = window.location.protocol === 'https:' ? '; Secure' : ''
+        document.cookie = `newsletter_popup=1; expires=${date.toUTCString()}; path=/; SameSite=Lax${secure}`
     }
 
     if ($newsletterPopup.length > 0) {

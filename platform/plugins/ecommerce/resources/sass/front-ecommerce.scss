@@ -348,6 +348,7 @@
             .#{$prefix}product-gallery-thumbnails {
                 max-width: 100%;
                 padding: 0 40px;
+                margin-top: 20px;
             }
         }
 
@@ -413,6 +414,7 @@
         &-thumbnails {
             max-width: 80px;
             min-width: 80px;
+            height: 100%;
             width: 100%;
 
             .video-thumbnail {
@@ -2975,4 +2977,15 @@ table {
 
 .bb-block__content {
     margin-bottom: 40px;
+}
+
+.shop-url-wrapper {
+    .input-group {
+        direction: ltr;
+
+        .input-group-text {
+            border-radius: 0 !important;
+            border-right: none !important;
+        }
+    }
 }

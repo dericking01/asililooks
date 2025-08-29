@@ -16,7 +16,6 @@
 
                     <div class="bb-customer-card-meta">
                         <div class="d-flex align-items-center mb-2">
-                            <span class="me-2">{{ $item->star }}</span>
                             @for ($i = 1; $i <= 5; $i++)
                                 <x-core::icon
                                     name="ti ti-star{{ $i <= $item->star ? '-filled' : '' }}"

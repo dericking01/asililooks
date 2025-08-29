@@ -1,12 +1,14 @@
 <div class="customer-address-payment-form">
     <input type="hidden" name="update-tax-url" id="update-checkout-tax-url" value="{{ route('public.ajax.checkout.update-tax') }}">
-    <div class="mb-3 form-group">
-        @if (auth('customer')->check())
-            <p>{{ __('Account') }}: <strong>{{ auth('customer')->user()->name }}</strong> - {!! Html::email(auth('customer')->user()->email) !!} (<a href="{{ route('customer.logout') }}">{{ __('Logout') }})</a></p>
-        @else
-            <p>{{ __('Already have an account?') }} <a href="{{ route('customer.login') }}">{{ __('Login') }}</a></p>
-        @endif
-    </div>
+    @if (!EcommerceHelper::isHideCustomerInfoAtCheckout())
+        <div class="mb-3 form-group">
+            @if (auth('customer')->check())
+                <p>{{ __('Account') }}: <strong>{{ auth('customer')->user()->name }}</strong> - {!! Html::email(auth('customer')->user()->email) !!} (<a href="{{ route('customer.logout') }}">{{ __('Logout') }})</a></p>
+            @else
+                <p>{{ __('Already have an account?') }} <a href="{{ route('customer.login') }}">{{ __('Login') }}</a></p>
+            @endif
+        </div>
+    @endif
 
     {!! apply_filters('ecommerce_checkout_address_form_before') !!}
 

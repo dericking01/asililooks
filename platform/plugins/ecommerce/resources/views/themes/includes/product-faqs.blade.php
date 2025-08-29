@@ -1,5 +1,5 @@
 @php
-    Theme::asset()->add('faqs-css', 'vendor/core/plugins/ecommerce/css/front-faq.css', version: get_cms_version());
+    Theme::asset()->add('faqs-css', 'vendor/core/plugins/ecommerce/css/front-faq.css', version: EcommerceHelper::getAssetVersion());
 @endphp
 
 <div class="product-faqs-accordion accordion" id="faqs-accordion">

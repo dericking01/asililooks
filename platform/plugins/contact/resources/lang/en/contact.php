@@ -75,6 +75,11 @@ return [
                 'sender_confirmation_title' => 'Send confirmation to sender',
                 'sender_confirmation_description' => 'Email template for confirming the sender that the message has been sent successfully',
                 'sender_confirmation_subject' => 'Thank You for Contacting Us!',
+                'admin_reply_title' => 'Admin reply to contact',
+                'admin_reply_description' => 'Email template for admin replies to contact messages',
+                'admin_reply_subject' => 'Re: {{ contact_subject }}',
+                'admin_reply_message' => 'Admin reply message',
+                'site_title' => 'Site title',
             ],
         ],
         'title' => 'Contact',
@@ -126,5 +131,40 @@ return [
                 'time' => 'Time',
             ],
         ],
+    ],
+    'email_templates' => [
+        // Admin reply email template
+        'admin_reply_title' => 'Reply to Your Contact Message',
+        'admin_reply_greeting' => 'Dear :contact_name,',
+        'admin_reply_thank_you' => 'Thank you for contacting us. We have reviewed your message and here is our response:',
+        'admin_reply_original_message' => 'Your Original Message:',
+        'admin_reply_our_response' => 'Our Response:',
+        'admin_reply_additional_questions' => 'If you have any additional questions, feel free to reply to this email or contact us again.',
+        'admin_reply_best_regards' => 'Best regards,',
+        'admin_reply_team' => '{{ site_title }} Team',
+
+        // Notice email template
+        'notice_title' => 'New Contact Message',
+        'notice_greeting' => 'Dear Admin,',
+        'notice_message_details' => 'Message details',
+        'notice_reply_instruction' => 'You can reply an email to :contact_email by clicking on below button.',
+        'notice_answer_button' => 'Answer',
+
+        // Sender confirmation email template
+        'sender_confirmation_title' => 'Thank You for Contacting Us!',
+        'sender_confirmation_greeting' => 'Dear :contact_name,',
+        'sender_confirmation_thank_you' => 'Thank you for reaching out to us! We have received your message and our team will review it shortly. One of our representatives will get back to you as soon as possible.',
+        'sender_confirmation_submission_details' => 'Here are the details of your submission:',
+        'sender_confirmation_additional_info' => 'If you have any additional information or questions, feel free to reply to this email.',
+        'sender_confirmation_appreciate' => 'We appreciate your interest and will be in touch soon!',
+
+        // Common field labels
+        'field_name' => 'Name:',
+        'field_subject' => 'Subject:',
+        'field_email' => 'Email:',
+        'field_address' => 'Address:',
+        'field_phone' => 'Phone:',
+        'field_content' => 'Content:',
+        'field_message' => 'Message:',
     ],
 ];

@@ -19,7 +19,7 @@ class AdsSettingController extends SettingController
 
     public function update(AdsSettingRequest $request)
     {
-        if ($request->has('google_adsense_ads_delete_txt')) {
+        if ($request->input('google_adsense_ads_delete_txt') === '1') {
             File::delete(public_path('ads.txt'));
 
             return $this
@@ -31,8 +31,25 @@ class AdsSettingController extends SettingController
             $request->file('ads_google_adsense_txt_file')->move(public_path(), 'ads.txt');
         }
 
-        return $this->performUpdate(
-            Arr::except($request->validated(), ['ads_google_adsense_txt_file'])
-        );
+        $data = Arr::except($request->validated(), ['ads_google_adsense_txt_file', 'ads_google_adsense_mode']);
+
+        if ($request->has('ads_google_adsense_mode')) {
+            $mode = $request->input('ads_google_adsense_mode');
+
+            if ($mode === 'none') {
+                $data['ads_google_adsense_auto_ads'] = null;
+                $data['ads_google_adsense_unit_client_id'] = null;
+            } elseif ($mode === 'auto') {
+                $data['ads_google_adsense_unit_client_id'] = null;
+            } elseif ($mode === 'unit') {
+                $data['ads_google_adsense_auto_ads'] = null;
+            }
+        } else {
+            if (! empty($data['ads_google_adsense_auto_ads']) && ! empty($data['ads_google_adsense_unit_client_id'])) {
+                $data['ads_google_adsense_unit_client_id'] = null;
+            }
+        }
+
+        return $this->performUpdate($data);
     }
 }

@@ -189,17 +189,30 @@ class GoogleFonts
         ];
     }
 
+    protected static ?array $fontsCache = null;
+
     public static function getFonts(): array
     {
+        // Lazy load fonts only when needed
+        if (static::$fontsCache !== null) {
+            return static::$fontsCache;
+        }
+
         $path = core_path('base/resources/data/google-fonts.json');
 
         try {
             if (! File::exists($path)) {
+                static::$fontsCache = [];
+
                 return [];
             }
 
-            return File::json($path);
+            static::$fontsCache = File::json($path);
+
+            return static::$fontsCache;
         } catch (Exception) {
+            static::$fontsCache = [];
+
             return [];
         }
     }
