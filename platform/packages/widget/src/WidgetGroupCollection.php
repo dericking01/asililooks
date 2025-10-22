@@ -8,10 +8,11 @@ use Botble\Widget\Models\Widget;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 
 class WidgetGroupCollection
 {
-    protected array $groups;
+    protected array $groups = [];
 
     protected Collection|array $data = [];
 
@@ -62,6 +63,8 @@ class WidgetGroupCollection
 
     public function render(string $sidebarId): string
     {
+        Event::dispatch('core.widget:rendering', $sidebarId);
+
         $this->load();
 
         foreach ($this->data as $widget) {

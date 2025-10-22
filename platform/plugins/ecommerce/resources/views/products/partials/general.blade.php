@@ -96,6 +96,17 @@
         />
     </div>
 
+    @if (Botble\Ecommerce\Facades\EcommerceHelper::isTaxEnabled())
+        <div class="col-md-12">
+            <x-core::form.on-off.checkbox
+                :label="trans('plugins/ecommerce::products.form.price_includes_tax')"
+                name="price_includes_tax"
+                :checked="old('price_includes_tax', $product ? $product->price_includes_tax : $originalProduct->price_includes_tax ?? false)"
+                :helper-text="trans('plugins/ecommerce::products.form.price_includes_tax_helper')"
+            />
+        </div>
+    @endif
+
     <div class="col-md-6">
         <x-core::form.text-input
             :label="trans('plugins/ecommerce::products.form.cost_per_item')"
@@ -279,7 +290,7 @@
                 <small class="text-muted d-block">
                     {{ trans('plugins/ecommerce::products.license_codes.variation_specific_note') }}
                 </small>
-            @elseif($product && $product->variations()->count() > 0)
+            @elseif($product && $product->has_variation)
                 <small class="text-muted d-block">
                     {{ trans('plugins/ecommerce::products.license_codes.main_product_note') }}
                 </small>

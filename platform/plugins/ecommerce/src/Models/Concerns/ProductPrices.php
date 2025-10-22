@@ -89,6 +89,10 @@ trait ProductPrices
     protected function frontSalePriceWithTaxes(): Attribute
     {
         return Attribute::get(function (): ?float {
+            if ($this->price_includes_tax) {
+                return $this->front_sale_price;
+            }
+
             if (! EcommerceHelper::isDisplayProductIncludingTaxes()) {
                 return $this->front_sale_price;
             }
@@ -100,6 +104,10 @@ trait ProductPrices
     protected function priceWithTaxes(): Attribute
     {
         return Attribute::get(function (): ?float {
+            if ($this->price_includes_tax) {
+                return $this->price;
+            }
+
             if (! EcommerceHelper::isDisplayProductIncludingTaxes()) {
                 return $this->price;
             }

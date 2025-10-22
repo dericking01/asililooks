@@ -73,17 +73,21 @@ Route::group([
         Route::get('downloads/{id}', [DownloadController::class, 'download'])->wherePrimaryKey();
     });
 
-    Route::post('cart', [CartController::class, 'store']);
-    Route::post('cart/{id}', [CartController::class, 'store']);
-    Route::put('cart/{id}', [CartController::class, 'update']);
-    Route::delete('cart/{id}', [CartController::class, 'destroy']);
-    Route::get('cart/{id}', [CartController::class, 'index']);
-
-    Route::post('cart/refresh', [CartController::class, 'refresh']);
+    Route::group(['middleware' => ['api.optional.auth']], function (): void {
+        Route::post('cart', [CartController::class, 'store']);
+        Route::post('cart/{id}', [CartController::class, 'store']);
+        Route::put('cart/{id}', [CartController::class, 'update']);
+        Route::delete('cart/{id}', [CartController::class, 'destroy']);
+        Route::get('cart/{id}', [CartController::class, 'index']);
+        Route::post('cart/refresh', [CartController::class, 'refresh']);
+    });
 
     Route::get('coupons', [CouponController::class, 'index']);
-    Route::post('coupon/apply', [CouponController::class, 'apply']);
-    Route::post('coupon/remove', [CouponController::class, 'remove']);
+    
+    Route::group(['middleware' => ['api.optional.auth']], function (): void {
+        Route::post('coupon/apply', [CouponController::class, 'apply']);
+        Route::post('coupon/remove', [CouponController::class, 'remove']);
+    });
     Route::get('countries', [CountryController::class, 'index']);
     Route::get('currencies', [CurrencyController::class, 'index']);
     Route::get('currencies/current', [CurrencyController::class, 'getCurrentCurrency']);

@@ -99,7 +99,8 @@ class BaseServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this
-            ->loadAndPublishConfigurations(['permissions', 'assets'])
+            ->loadAndPublishConfigurations(['assets'])
+            ->loadAndPublishConfigurations(['permissions'])
             ->loadAndPublishViews()
             ->loadAnonymousComponents()
             ->loadAndPublishTranslations()
@@ -115,9 +116,10 @@ class BaseServiceProvider extends ServiceProvider
             do_action(BASE_ACTION_INIT);
         });
 
-        $this->registerDashboardMenus();
-
-        $this->registerPanelSections();
+        if (BaseHelper::isAdminRequest()) {
+            $this->registerDashboardMenus();
+            $this->registerPanelSections();
+        }
 
         Paginator::useBootstrap();
 

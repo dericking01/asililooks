@@ -5,6 +5,7 @@ namespace Botble\Ecommerce\Models;
 use Botble\ACL\Models\User;
 use Botble\Base\Casts\SafeContent;
 use Botble\Base\Enums\BaseStatusEnum;
+use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Models\BaseModel;
 use Botble\Ecommerce\Enums\DiscountTargetEnum;
 use Botble\Ecommerce\Enums\DiscountTypeEnum;
@@ -13,9 +14,11 @@ use Botble\Ecommerce\Enums\ProductTypeEnum;
 use Botble\Ecommerce\Enums\StockStatusEnum;
 use Botble\Ecommerce\Events\ProductQuantityUpdatedEvent;
 use Botble\Ecommerce\Facades\EcommerceHelper;
+use Botble\Ecommerce\Services\ProductCacheService;
 use Botble\Ecommerce\Services\Products\UpdateDefaultProductService;
 use Botble\Faq\Models\Faq;
 use Botble\Media\Facades\RvMedia;
+use Botble\Slug\Facades\SlugHelper;
 use Botble\Theme\Supports\Vimeo;
 use Botble\Theme\Supports\Youtube;
 use Carbon\Carbon;
@@ -73,12 +76,14 @@ class Product extends BaseModel
         'stock_status',
         'barcode',
         'cost_per_item',
+        'price_includes_tax',
         'generate_license_code',
         'license_code_type',
         'minimum_order_quantity',
         'maximum_order_quantity',
         'notify_attachment_updated',
         'specification_table_id',
+        'slug',
     ];
 
     protected $appends = [
@@ -103,6 +108,7 @@ class Product extends BaseModel
         'is_featured' => 'bool',
         'allow_checkout_when_out_of_stock' => 'bool',
         'with_storehouse_management' => 'bool',
+        'price_includes_tax' => 'bool',
         'generate_license_code' => 'bool',
         'notify_attachment_updated' => 'bool',
         'video_media' => 'json',
@@ -115,13 +121,42 @@ class Product extends BaseModel
         'order' => 'int',
         'cost_per_item' => 'float',
         'is_variation' => 'bool',
+        'variations_count' => 'int',
+        'reviews_count' => 'int',
+        'reviews_avg' => 'float',
     ];
+
+    protected function url(): Attribute
+    {
+        return Attribute::get(function (): string {
+            if (! $this->slug && $this->slugable) {
+                $this->slug = $this->slugable->key;
+            }
+
+            if (! $this->slug) {
+                return BaseHelper::getHomepageUrl();
+            }
+
+            $prefix = SlugHelper::getPrefix(Product::class);
+
+            $prefix = apply_filters(FILTER_SLUG_PREFIX, $prefix);
+
+            return apply_filters(
+                'slug_filter_url',
+                url(ltrim($prefix . '/' . $this->slug, '/')) . SlugHelper::getPublicSingleEndingURL()
+            );
+        });
+    }
 
     protected static function booted(): void
     {
         static::creating(function (Product $product): void {
             $product->created_by_id = Auth::check() ? Auth::id() : 0;
             $product->created_by_type = User::class;
+        });
+
+        static::deleting(function (Product $product): void {
+            app(ProductCacheService::class)->clearProductCache($product);
         });
 
         static::deleted(function (Product $product): void {
@@ -143,6 +178,10 @@ class Product extends BaseModel
             $product->tags()->detach();
             $product->specificationAttributes()->detach();
             $product->licenseCodes()->delete();
+        });
+
+        static::saved(function (Product $product): void {
+            app(ProductCacheService::class)->clearProductCache($product);
         });
 
         static::updated(function (Product $product): void {
@@ -338,6 +377,18 @@ class Product extends BaseModel
             ->withPivot('value', 'hidden', 'order');
     }
 
+    public function getVisibleSpecificationAttributes()
+    {
+        return $this->specificationAttributes
+            ->where('pivot.hidden', false)
+            ->sortBy('pivot.order');
+    }
+
+    public function getSpecificationAttributePivot(SpecificationAttribute $attribute)
+    {
+        return $this->specificationAttributes->where('id', $attribute->id)->first();
+    }
+
     protected function crossSaleProducts(): Attribute
     {
         return Attribute::get(function () {
@@ -436,7 +487,7 @@ class Product extends BaseModel
     {
         return Attribute::make(
             get: function () {
-                return $this->variations()->count() > 1;
+                return $this->variations_count > 1;
             }
         );
     }
@@ -445,8 +496,15 @@ class Product extends BaseModel
     {
         return Attribute::make(
             get: function () {
-                return (bool) $this->defaultVariation->id;
+                return $this->variations_count > 0;
             }
+        );
+    }
+
+    protected function averageRating(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->reviews_avg
         );
     }
 
@@ -607,18 +665,18 @@ class Product extends BaseModel
                         $selectedFaqs = Faq::query()
                             ->wherePublished()
                             ->whereIn('id', $selectedExistingFaqs)
-                            ->pluck('answer', 'question')
-                            ->all();
+                            ->select(['id', 'question', 'answer'])
+                            ->get();
 
-                        foreach ($selectedFaqs as $question => $answer) {
+                        foreach ($selectedFaqs as $selectedFaq) {
                             $faqs[] = [
                                 [
                                     'key' => 'question',
-                                    'value' => $question,
+                                    'value' => $selectedFaq->question,
                                 ],
                                 [
                                     'key' => 'answer',
-                                    'value' => $answer,
+                                    'value' => $selectedFaq->answer,
                                 ],
                             ];
                         }
@@ -633,7 +691,9 @@ class Product extends BaseModel
             }
 
             foreach ($faqs as $key => $item) {
-                if (! $item[0]['value'] && ! $item[1]['value']) {
+                if (! is_array($item) || ! isset($item[0], $item[1]) ||
+                    ! isset($item[0]['value'], $item[1]['value']) ||
+                    (! $item[0]['value'] && ! $item[1]['value'])) {
                     Arr::forget($faqs, $key);
                 }
             }
@@ -820,8 +880,8 @@ class Product extends BaseModel
             ->leftJoinSub($variationsCountSubquery, 'vc', function (JoinClause $join): void {
                 $join->on('ec_products.id', '=', 'vc.configurable_product_id');
             })
-            ->orderBy('ec_products.name')
-            ->orderBy('parent_product_id');
+            ->oldest('ec_products.name')
+            ->oldest('parent_product_id');
     }
 
     public static function getDigitalProductFilesDirectory(): string
@@ -937,11 +997,35 @@ class Product extends BaseModel
 
             $taxNames = $taxes->map(fn ($tax) => $tax->title . ' ' . $tax->percentage . '%')->implode(' + ');
 
-            if (EcommerceHelper::isDisplayProductIncludingTaxes()) {
-                return '(' . __('Including :tax', ['tax' => $taxNames]) . ')';
+            if ($this->price_includes_tax || EcommerceHelper::isDisplayProductIncludingTaxes()) {
+                $description =  __('Including :tax', ['tax' => $taxNames]);
+            } else {
+                $description =__('Excluding :tax', ['tax' => $taxNames]);
             }
 
-            return '(' . __('Excluding :tax', ['tax' => $taxNames]) . ')';
+            $description = str_replace('{{ tax_percentage }}', $this->total_taxes_percentage, $description);
+
+            return BaseHelper::clean('(' . $description . ')');
         });
+    }
+
+    public function updateReviewsCache(): void
+    {
+        $stats = $this->reviews()
+            ->selectRaw('COUNT(*) as count, AVG(star) as avg')
+            ->first();
+
+        $count = $stats->count ?? 0;
+        $avg = round($stats->avg ?? 0, 2);
+
+        DB::table('ec_products')
+            ->where('id', $this->id)
+            ->update([
+                'reviews_count' => $count,
+                'reviews_avg' => $avg,
+            ]);
+
+        $this->setAttribute('reviews_count', $count);
+        $this->setAttribute('reviews_avg', $avg);
     }
 }

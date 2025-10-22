@@ -3,7 +3,6 @@
 namespace Botble\Payment\Http\Controllers;
 
 use Botble\Base\Facades\Assets;
-use Botble\Base\Facades\PageTitle;
 use Botble\Base\Http\Actions\DeleteResourceAction;
 use Botble\Payment\Enums\PaymentStatusEnum;
 use Botble\Payment\Forms\BankTransferPaymentMethodForm;
@@ -23,7 +22,7 @@ class PaymentController extends SettingController
 {
     public function index(PaymentTable $table)
     {
-        PageTitle::setTitle(trans('plugins/payment::payment.name'));
+        $this->pageTitle(trans('plugins/payment::payment.name'));
 
         return $table->renderTable();
     }
@@ -35,7 +34,7 @@ class PaymentController extends SettingController
 
     public function show(Payment $payment)
     {
-        PageTitle::setTitle(trans('plugins/payment::payment.view_transaction', ['charge_id' => $payment->charge_id]));
+        $this->pageTitle(trans('plugins/payment::payment.view_transaction', ['charge_id' => $payment->charge_id]));
 
         $detail = apply_filters(PAYMENT_FILTER_PAYMENT_INFO_DETAIL, null, $payment);
 
@@ -52,7 +51,7 @@ class PaymentController extends SettingController
 
     public function methods()
     {
-        PageTitle::setTitle(trans('plugins/payment::payment.payment_methods'));
+        $this->pageTitle(trans('plugins/payment::payment.payment_methods'));
 
         Assets::addScriptsDirectly('vendor/core/plugins/payment/js/payment-methods.js');
 

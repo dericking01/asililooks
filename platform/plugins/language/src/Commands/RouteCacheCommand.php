@@ -39,8 +39,6 @@ class RouteCacheCommand extends BaseRouteCacheCommand
 
     protected function cacheRoutesPerLocale(): int
     {
-        // Store the default routes cache,
-        // this way the Application will detect that routes are cached.
         $allLocales = $this->getSupportedLocales();
 
         $allLocales[] = null;
@@ -62,6 +60,10 @@ class RouteCacheCommand extends BaseRouteCacheCommand
                 $newRoutes = new RouteCollection();
 
                 foreach ($defaultRoutesWithPrefix as $defaultRoutesWithPrefixItem) {
+                    if ($defaultRoutesWithPrefixItem->getName()) {
+                        $defaultRoutesWithPrefixItem->name($defaultLocale . '.' . $defaultRoutesWithPrefixItem->getName());
+                    }
+
                     $newRoutes->add($defaultRoutesWithPrefixItem);
                 }
 
@@ -125,7 +127,7 @@ class RouteCacheCommand extends BaseRouteCacheCommand
                 '{{translatedRoutes}}',
             ],
             [
-                base64_encode(serialize($routes)),
+                var_export($routes->compile(), true),
                 $this->getLocalization()->getSerializedTranslatedRoutes(),
             ],
             $stub

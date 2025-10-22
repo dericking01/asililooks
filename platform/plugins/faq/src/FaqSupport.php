@@ -105,7 +105,13 @@ class FaqSupport implements FaqContract
 
         $value = json_encode($value);
 
-        $faqs = Faq::query()->wherePublished()->pluck('question', 'id')->all();
+        $faqs = Faq::query()
+            ->select(['id', 'question'])
+            ->wherePublished()
+            ->latest()
+            ->get()
+            ->mapWithKeys(fn ($item) => [$item->id => $item->question])
+            ->all();
 
         return view('plugins/faq::schema-config-box', compact('value', 'hasValue', 'faqs', 'selectedFaqs'))->render();
     }

@@ -76,7 +76,7 @@ trait HasBlogSeeder
         }
     }
 
-    protected function createBlogPosts(array $posts, bool $truncate = true): void
+    protected function createBlogPosts(array $data, bool $truncate = true): array
     {
         if ($truncate) {
             Post::query()->truncate();
@@ -90,7 +90,9 @@ trait HasBlogSeeder
         $tagIds = Tag::query()->pluck('id');
         $userIds = $this->getUserIds();
 
-        foreach ($posts as $item) {
+        $posts = [];
+
+        foreach ($data as $item) {
             $item['views'] ??= $faker->numberBetween(100, 2500);
             $item['description'] ??= $faker->realText();
             $item['is_featured'] ??= $faker->boolean();
@@ -123,7 +125,11 @@ trait HasBlogSeeder
             SlugHelper::createSlug($post);
 
             $this->createMetadata($post, $item);
+
+            $posts[] = $post;
         }
+
+        return $posts;
     }
 
     protected function getCategoryId(string $name): int|string

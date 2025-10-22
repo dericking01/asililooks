@@ -81,10 +81,20 @@ Route::group(['namespace' => 'Botble\Base\Http\Controllers'], function (): void 
             'uses' => 'CronjobSettingController@index',
         ]);
 
+        Route::get('system/security', [
+            'as' => 'system.security',
+            'uses' => 'SecuritySettingController@index',
+        ]);
+
         Route::group(['permission' => false], function (): void {
             Route::post('membership/authorize', [
                 'as' => 'membership.authorize',
                 'uses' => 'SystemController@postAuthorize',
+            ]);
+
+            Route::get('license/check', [
+                'as' => 'license.check',
+                'uses' => 'SystemController@checkLicense',
             ]);
 
             Route::get('menu-items-count', [

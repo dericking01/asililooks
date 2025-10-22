@@ -77,7 +77,7 @@ class ReviewController extends BaseApiController
         }
 
         $results = [];
-        if ($request->hasFile('images')) {
+        if (EcommerceHelper::isCustomerReviewImageUploadEnabled() && $request->hasFile('images')) {
             $images = (array) $request->file('images', []);
             foreach ($images as $image) {
                 $result = RvMedia::handleUpload($image, 0, 'reviews');

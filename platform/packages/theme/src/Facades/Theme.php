@@ -52,7 +52,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string header()
  * @method static string footer()
  * @method static void routes()
- * @method static \Illuminate\Routing\Router registerRoutes(\Closure|callable $closure)
+ * @method static \Illuminate\Routing\Router registerRoutes(\Closure|callable $closure, array $middlewares = ['web', 'core'])
  * @method static string loadView(string $view)
  * @method static string getStyleIntegrationPath()
  * @method static \Botble\Theme\Theme fireEventGlobalAssets()

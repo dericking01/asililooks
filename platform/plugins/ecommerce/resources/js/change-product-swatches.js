@@ -228,14 +228,14 @@ class ChangeProductSwatches {
     
     handleResponse = function(res, $productAttributes, slugAttributes, id, updateUrl) {
         let _self = this
-        
+
         if (window.onChangeSwatchesSuccess && typeof window.onChangeSwatchesSuccess === 'function') {
             window.onChangeSwatchesSuccess(res, $productAttributes)
         }
 
         const { data, message } = res
 
-        if (!data.error_message) {
+        if (data && !data.error_message) {
             if (data.selected_attributes) {
                 slugAttributes = {}
                 $.each(data.selected_attributes, (index, item) => {
@@ -298,5 +298,26 @@ class ChangeProductSwatches {
 }
 
 $(() => {
-    new ChangeProductSwatches()
+    const swatchInstance = new ChangeProductSwatches()
+    
+    // Check initial selection on page load
+    $('.product-attribute-swatches').each(function() {
+        const $container = $(this)
+        const hasCheckedVariation = $container.find('input[type=radio]:checked:not(:disabled)').length > 0
+        
+        // If no valid variation is selected, select the first available one
+        if (!hasCheckedVariation) {
+            $container.find('.attribute-swatches-wrapper').each(function() {
+                const $wrapper = $(this)
+                const $firstAvailable = $wrapper.find('input[type=radio]:not(:disabled)').first()
+                
+                if ($firstAvailable.length) {
+                    $firstAvailable.prop('checked', true)
+                }
+            })
+            
+            // Trigger change to update product info
+            swatchInstance.getProductVariation($container)
+        }
+    })
 })

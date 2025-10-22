@@ -19,7 +19,7 @@ class AdsSettingRequest extends Request
 
     public function withValidator(Validator $validator): void
     {
-        $validator->after(function (Validator $validator) {
+        $validator->after(function (Validator $validator): void {
             $mode = $this->input('ads_google_adsense_mode');
 
             $autoAds = $this->input('ads_google_adsense_auto_ads');

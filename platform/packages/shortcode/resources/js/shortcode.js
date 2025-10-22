@@ -55,6 +55,7 @@ $(() => {
                 if (value && typeof value === 'string') {
                     value = value.replace(/"([^"]*)"/g, '“$1”')
                     value = value.replace(/"/g, '“')
+                    value = value.replace(/\r\n/g, '{{NEWLINE}}').replace(/\n/g, '{{NEWLINE}}').replace(/\r/g, '{{NEWLINE}}')
                 }
 
                 if (element.data('shortcode-attribute') !== 'content') {
@@ -163,7 +164,15 @@ $(() => {
                 Botble.initMediaIntegrate()
                 Botble.initFieldCollapse()
 
-                document.dispatchEvent(new CustomEvent('core-shortcode-config-loaded'))
+                const eventDetail = {
+                    shortcode: key,
+                    name: name,
+                    description: description,
+                    update: update,
+                    element: data.data,
+                }
+
+                document.dispatchEvent(new CustomEvent('core-shortcode-config-loaded', { detail: eventDetail }))
             })
     }
 

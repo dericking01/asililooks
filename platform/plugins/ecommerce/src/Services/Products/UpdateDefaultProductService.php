@@ -55,6 +55,17 @@ class UpdateDefaultProductService
                 continue;
             }
 
+            if ($item === 'quantity' && $parent->variations()->exists()) {
+                $totalQuantity = $parent->variations()
+                    ->join('ec_products', 'ec_products.id', '=', 'ec_product_variations.product_id')
+                    ->where('ec_products.with_storehouse_management', 1)
+                    ->sum('ec_products.quantity');
+
+                $parent->quantity = $totalQuantity ?: 0;
+
+                continue;
+            }
+
             $parent->{$item} = $product->{$item};
         }
 

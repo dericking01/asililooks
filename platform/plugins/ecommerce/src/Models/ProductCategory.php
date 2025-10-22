@@ -10,6 +10,7 @@ use Botble\Base\Models\BaseModel;
 use Botble\Base\Traits\HasTreeCategory;
 use Botble\Ecommerce\Tables\ProductTable;
 use Botble\Media\Facades\RvMedia;
+use Botble\Slug\Facades\SlugHelper;
 use Botble\Support\Services\Cache\Cache;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -39,6 +40,7 @@ class ProductCategory extends BaseModel implements HasTreeCategoryContract
         'is_featured',
         'icon',
         'icon_image',
+        'slug',
     ];
 
     protected $casts = [
@@ -46,6 +48,28 @@ class ProductCategory extends BaseModel implements HasTreeCategoryContract
         'is_featured' => 'bool',
         'order' => 'int',
     ];
+
+    protected function url(): Attribute
+    {
+        return Attribute::get(function (): string {
+            if (! $this->slug && $this->slugable) {
+                $this->slug = $this->slugable->key;
+            }
+
+            if (! $this->slug) {
+                return BaseHelper::getHomepageUrl();
+            }
+
+            $prefix = SlugHelper::getPrefix(ProductCategory::class);
+
+            $prefix = apply_filters(FILTER_SLUG_PREFIX, $prefix);
+
+            return apply_filters(
+                'slug_filter_url',
+                url(ltrim($prefix . '/' . $this->slug, '/')) . SlugHelper::getPublicSingleEndingURL()
+            );
+        });
+    }
 
     protected static function booted(): void
     {
@@ -58,12 +82,16 @@ class ProductCategory extends BaseModel implements HasTreeCategoryContract
             $category->productAttributeSets()->detach();
         });
 
-        static::saved(function (): void {
+        static::saved(function (ProductCategory $category): void {
             Cache::make(static::class)->flush();
+
+            $category->clearParentCache();
         });
 
-        static::deleted(function (): void {
+        static::deleted(function (ProductCategory $category): void {
             Cache::make(static::class)->flush();
+
+            $category->clearParentCache();
         });
     }
 
@@ -118,15 +146,105 @@ class ProductCategory extends BaseModel implements HasTreeCategoryContract
         return Attribute::get(function (): Collection {
             $parents = collect();
 
-            $parent = $this->parent;
-
-            while ($parent->id) {
-                $parents->push($parent);
-                $parent = $parent->parent;
+            if (! $this->parent_id) {
+                return $parents;
             }
 
-            return $parents;
+            $cacheKey = 'product_category_parents_' . $this->id;
+
+            return cache()->remember($cacheKey, 3600, function () {
+                return $this->loadParentsRecursively();
+            });
         });
+    }
+
+    protected function loadParentsRecursively(): Collection
+    {
+        $parents = collect();
+        $parentIds = [];
+        $currentParentId = $this->parent_id;
+
+        $maxDepth = 10;
+        while ($currentParentId && $maxDepth > 0) {
+            if (in_array($currentParentId, $parentIds)) {
+                break;
+            }
+            $parentIds[] = $currentParentId;
+            $maxDepth--;
+
+            $nextParent = DB::table('ec_product_categories')
+                ->where('id', $currentParentId)
+                ->select('parent_id')
+                ->first();
+
+            $currentParentId = $nextParent?->parent_id;
+        }
+
+        if (! empty($parentIds)) {
+            $allParents = ProductCategory::query()
+                ->whereIn('id', $parentIds)
+                ->get()
+                ->keyBy('id');
+
+            foreach ($parentIds as $parentId) {
+                if ($allParents->has($parentId)) {
+                    $parents->push($allParents->get($parentId));
+                }
+            }
+        }
+
+        return $parents;
+    }
+
+    public function clearParentCache(): void
+    {
+        cache()->forget('product_category_parents_' . $this->id);
+
+        $childIds = $this->children()->pluck('id')->all();
+        foreach ($childIds as $childId) {
+            cache()->forget('product_category_parents_' . $childId);
+        }
+    }
+
+    public static function withAllParents($categories): void
+    {
+        if ($categories->isEmpty()) {
+            return;
+        }
+
+        $allParentIds = [];
+        foreach ($categories as $category) {
+            if ($category->parent_id) {
+                $allParentIds[] = $category->parent_id;
+            }
+        }
+
+        if (empty($allParentIds)) {
+            return;
+        }
+
+        $loadedIds = [];
+        $maxDepth = 10;
+
+        while (! empty($allParentIds) && $maxDepth > 0) {
+            $allParentIds = array_unique(array_diff($allParentIds, $loadedIds));
+
+            if (empty($allParentIds)) {
+                break;
+            }
+
+            $parents = static::query()
+                ->whereIn('id', $allParentIds)
+                ->get();
+
+            foreach ($parents as $parent) {
+                cache()->put('product_category_' . $parent->id, $parent, 3600);
+                $loadedIds[] = $parent->id;
+            }
+
+            $allParentIds = $parents->pluck('parent_id')->filter()->toArray();
+            $maxDepth--;
+        }
     }
 
     protected function badgeWithCount(): Attribute

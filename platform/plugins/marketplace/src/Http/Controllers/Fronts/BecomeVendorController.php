@@ -4,6 +4,7 @@ namespace Botble\Marketplace\Http\Controllers\Fronts;
 
 use Botble\Base\Forms\FieldOptions\HtmlFieldOption;
 use Botble\Base\Forms\Fields\HtmlField;
+use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Marketplace\Facades\MarketplaceHelper;
 use Botble\Marketplace\Forms\Fronts\BecomeVendorForm;
 use Botble\Marketplace\Http\Controllers\BaseController;
@@ -171,7 +172,13 @@ class BecomeVendorController extends BaseController
 
         $storage = Storage::disk('local');
 
-        abort_unless($storage->exists($certificate = $customer->store->certificate_file), 404);
+        $certificate = $customer->store->certificate_file;
+
+        if (! $storage->exists($certificate)) {
+            return BaseHttpResponse::make()
+                ->setError()
+                ->setMessage(__('File not found!'));
+        }
 
         return response()->file($storage->path($certificate));
     }
@@ -184,7 +191,13 @@ class BecomeVendorController extends BaseController
 
         $storage = Storage::disk('local');
 
-        abort_unless($storage->exists($governmentId = $customer->store->government_id_file), 404);
+        $governmentId = $customer->store->government_id_file;
+
+        if (! $storage->exists($governmentId)) {
+            return BaseHttpResponse::make()
+                ->setError()
+                ->setMessage(__('File not found!'));
+        }
 
         return response()->file($storage->path($governmentId));
     }

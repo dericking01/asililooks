@@ -10,4 +10,6 @@ return [
     'allow_index' => 'Allow search engines to index this page',
     'index' => 'Index',
     'noindex' => 'No index',
+    'homepage_seo_description' => 'To configure SEO meta tags for the homepage, please go to Appearance → Theme Options where you can set the site title, description, and other SEO-related settings.',
+    'go_to_theme_options' => 'Go to Theme Options',
 ];

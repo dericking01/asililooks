@@ -223,6 +223,7 @@
                                         {{ format_price($invoice->sub_total) }}
                                     </x-core::table.body.cell>
                                 </x-core::table.body.row>
+                                {!! apply_filters('ecommerce_admin_invoice_after_subtotal', null, $invoice) !!}
                                 @if ($invoice->tax_amount > 0)
                                     <x-core::table.body.row>
                                         <x-core::table.body.cell colspan="4"></x-core::table.body.cell>

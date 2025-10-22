@@ -6,6 +6,7 @@ use Botble\Theme\Facades\Theme;
 use Botble\Widget\Facades\WidgetGroup as WidgetGroupFacade;
 use Botble\Widget\Forms\WidgetForm;
 use Carbon\Carbon;
+use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
@@ -117,7 +118,8 @@ abstract class AbstractWidget
             && (Arr::get($this->config, 'enable_caching', 'yes') !== 'no')
             && ! $containsForms
         ) {
-            $cacheKey = 'widget_' . md5($widgetClass . $sidebar . $appUrl . $position . $theme . $locale . $authorized . serialize($this->config));
+            $serializableConfig = $this->getSerializableConfig();
+            $cacheKey = 'widget_' . md5($widgetClass . $sidebar . $appUrl . $position . $theme . $locale . $authorized . serialize($serializableConfig));
             $cacheTtl = (int) setting('widget_cache_ttl', 1800);
             $cacheDuration = Carbon::now()->addSeconds($cacheTtl);
 
@@ -313,4 +315,34 @@ abstract class AbstractWidget
 
         return false;
     }
+
+    public function getName(): ?string
+    {
+        $name = $this->getConfig()['name'] ?? '';
+
+        if ($name instanceof Closure) {
+            return $name();
+        }
+
+        return $name;
+    }
+
+    public function getDescription(): ?string
+    {
+        $description = $this->getConfig()['description'] ?? '';
+
+        if ($description instanceof Closure) {
+            return $description();
+        }
+
+        return $description;
+    }
+
+    protected function getSerializableConfig(): array
+    {
+        return array_filter($this->config, function ($value) {
+            return ! $value instanceof Closure;
+        });
+    }
+
 }

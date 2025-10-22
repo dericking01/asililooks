@@ -26,4 +26,5 @@ return [
     'manage_as_table' => 'manage categories as a table',
     'parent' => 'Parent Category',
     'image' => 'Image',
+    'product_category_translations' => 'Product Category Translations',
 ];

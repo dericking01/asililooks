@@ -226,17 +226,6 @@ AdminHelper::registerRoutes(function (): void {
                     'permission' => 'ecommerce.settings.webhook',
                 ]);
 
-                Route::get('tracking', [
-                    'as' => 'ecommerce.settings.tracking',
-                    'uses' => 'TrackingSettingController@edit',
-                ]);
-
-                Route::put('tracking', [
-                    'as' => 'ecommerce.settings.tracking.update',
-                    'uses' => 'TrackingSettingController@update',
-                    'permission' => 'ecommerce.settings.tracking',
-                ]);
-
                 Route::get('standard-and-format', [
                     'as' => 'ecommerce.settings.standard-and-format',
                     'uses' => 'StandardAndFormatSettingController@edit',

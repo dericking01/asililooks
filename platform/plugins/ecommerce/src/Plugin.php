@@ -105,6 +105,7 @@ class Plugin extends PluginOperationAbstract
         Schema::dropIfExists('ec_product_files');
         Schema::dropIfExists('ec_tax_rules');
         Schema::dropIfExists('ec_product_specification_attribute');
+        Schema::dropIfExists('ec_product_specification_attribute_translations');
         Schema::dropIfExists('ec_specification_table_group');
         Schema::dropIfExists('ec_specification_tables');
         Schema::dropIfExists('ec_specification_tables_translations');

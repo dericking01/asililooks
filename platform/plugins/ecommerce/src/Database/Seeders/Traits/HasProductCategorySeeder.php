@@ -5,9 +5,26 @@ namespace Botble\Ecommerce\Database\Seeders\Traits;
 use Botble\Ecommerce\Models\ProductCategory;
 use Botble\Slug\Facades\SlugHelper;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 
 trait HasProductCategorySeeder
 {
+    protected function truncateDate(): void
+    {
+        ProductCategory::query()->truncate();
+        DB::table('ec_product_category_product')->truncate();
+        DB::table('ec_product_categorizables')->truncate();
+    }
+
+    protected function createProductCategories(array $data): void
+    {
+        $this->truncateDate();
+
+        foreach ($data as $index => $item) {
+            $this->createCategoryItem($index, $item);
+        }
+    }
+
     protected function createCategoryItem(int $index, array $category, int|string|null $parentId = 0): void
     {
         $category['parent_id'] = $parentId;
@@ -22,7 +39,9 @@ trait HasProductCategorySeeder
 
         $createdCategory = ProductCategory::query()->create($category);
 
-        SlugHelper::createSlug($createdCategory);
+        $slug = SlugHelper::createSlug($createdCategory);
+
+        $createdCategory->update(['slug' => $slug->key]);
 
         if ($children) {
             foreach ($children as $childIndex => $child) {

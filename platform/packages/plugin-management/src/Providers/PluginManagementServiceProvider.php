@@ -17,7 +17,8 @@ class PluginManagementServiceProvider extends ServiceProvider
     {
         $this
             ->setNamespace('packages/plugin-management')
-            ->loadAndPublishConfigurations(['permissions', 'general'])
+            ->loadAndPublishConfigurations(['general'])
+            ->loadAndPublishConfigurations(['permissions'])
             ->loadAndPublishViews()
             ->loadAndPublishTranslations()
             ->loadRoutes()

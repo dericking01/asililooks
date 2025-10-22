@@ -1,7 +1,3 @@
-@php
-    $sitemapUrl = url('sitemap.xml');
-@endphp
-
 <div class="card border-info mb-3">
     <div class="card-body">
         <div class="d-flex align-items-start">
@@ -23,7 +19,7 @@
                             <div class="flex-fill">
                                 <div class="fw-medium small">{{ trans('packages/sitemap::sitemap.settings.sitemap_url') }}</div>
                                 <div class="mt-1">
-                                    <a href="{{ $sitemapUrl }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <a href="{{ url('sitemap.xml') }}" target="_blank" class="btn btn-sm btn-outline-primary">
                                         <x-core::icon name="ti ti-external-link" class="me-1" />
                                         {{ trans('packages/sitemap::sitemap.settings.view_sitemap') }}
                                     </a>

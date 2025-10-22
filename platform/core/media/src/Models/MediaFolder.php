@@ -101,7 +101,7 @@ class MediaFolder extends BaseModel
             return $folder->slug;
         }
 
-        return rtrim($parent, '/') . '/' . $folder->slug;
+        return rtrim($parent, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $folder->slug;
     }
 
     public static function createSlug(string $name, int|string|null $parentId): string

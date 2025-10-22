@@ -80,6 +80,13 @@
                         </div>
                     </div>
                 @endif
+            @else
+                <div class="col ms-auto ms-md-0 col-12">
+                    <div class="text-muted">
+                        <x-core::icon name="ti ti-info-circle" class="me-1" />
+                        {{ trans('plugins/ecommerce::product-option.no_global_options') }}
+                    </div>
+                </div>
             @endif
         </div>
     </div>

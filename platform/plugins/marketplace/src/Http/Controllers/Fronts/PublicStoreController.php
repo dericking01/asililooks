@@ -25,10 +25,12 @@ class PublicStoreController extends BaseController
 {
     public function getStores(Request $request)
     {
+        $title = __('Stores');
         Theme::breadcrumb()
-            ->add(__('Stores'), route('public.stores'));
+            ->add($title, route('public.stores'));
 
-        SeoHelper::setTitle(__('Stores'))->setDescription(__('Stores'));
+        SeoHelper::setTitle(theme_option('marketplace_stores_seo_title') ?: $title)
+            ->setDescription(theme_option('marketplace_stores_seo_description') ?: $title);
 
         $condition = [];
 

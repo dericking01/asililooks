@@ -23,6 +23,12 @@ class SaveProductFaqListener
             (new FaqSupport())->saveConfigs($model, $request->input('faq_schema_config'));
         }
 
-        MetaBox::saveMetaBoxData($model, 'faq_ids', $request->input('selected_existing_faqs', []));
+        $faqIds = $request->input('selected_existing_faqs', []);
+
+        if (! empty($faqIds) && is_array($faqIds) && count(array_filter($faqIds)) > 0) {
+            MetaBox::saveMetaBoxData($model, 'faq_ids', $faqIds);
+        } else {
+            MetaBox::deleteMetaData($model, 'faq_ids');
+        }
     }
 }

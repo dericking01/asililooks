@@ -53,6 +53,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string cleanToastMessage(string $message)
  * @method static mixed getHomepageUrl()
  * @method static array getFonts()
+ * @method static bool isAdminRequest()
  *
  * @see \Botble\Base\Helpers\BaseHelper
  */

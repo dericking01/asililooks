@@ -25,7 +25,7 @@
                 <form class="single-variation-wrap" data-bb-toggle="product-form" action="{{ route('public.cart.add-to-cart') }}" method="post">
                     @csrf
                     <div class="row product-filters">
-                        @if ($product->variations()->count() > 0)
+                        @if ($product->has_variation)
                             {!! render_product_swatches($product, [
                                 'selected' => $selectedAttrs,
                             ]) !!}

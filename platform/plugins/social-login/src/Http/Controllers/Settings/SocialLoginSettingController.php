@@ -3,6 +3,7 @@
 namespace Botble\SocialLogin\Http\Controllers\Settings;
 
 use Botble\Base\Http\Responses\BaseHttpResponse;
+use Botble\Base\Supports\Breadcrumb;
 use Botble\Setting\Http\Controllers\SettingController;
 use Botble\SocialLogin\Facades\SocialService;
 use Botble\SocialLogin\Forms\SocialLoginSettingForm;
@@ -11,6 +12,12 @@ use Illuminate\Support\Arr;
 
 class SocialLoginSettingController extends SettingController
 {
+    protected function breadcrumb(): Breadcrumb
+    {
+        return parent::breadcrumb()
+            ->add(trans('core/base::base.panel.others'));
+    }
+
     public function edit()
     {
         $this->pageTitle(trans('plugins/social-login::social-login.settings.title'));

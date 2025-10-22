@@ -4,12 +4,13 @@ namespace Botble\Ecommerce\Forms;
 
 use Botble\Base\Forms\FieldOptions\NameFieldOption;
 use Botble\Base\Forms\FieldOptions\SelectFieldOption;
+use Botble\Base\Forms\FieldOptions\TextareaFieldOption;
 use Botble\Base\Forms\Fields\SelectField;
+use Botble\Base\Forms\Fields\TextareaField;
 use Botble\Base\Forms\Fields\TextField;
 use Botble\Base\Forms\FormAbstract;
 use Botble\Base\Forms\MetaBox;
 use Botble\Ecommerce\Enums\SpecificationAttributeFieldType;
-use Botble\Ecommerce\Forms\Fronts\Auth\FieldOptions\TextFieldOption;
 use Botble\Ecommerce\Http\Requests\SpecificationAttributeRequest;
 use Botble\Ecommerce\Models\SpecificationAttribute;
 use Botble\Ecommerce\Models\SpecificationGroup;
@@ -39,7 +40,8 @@ class SpecificationAttributeForm extends FormAbstract
                 'name',
                 TextField::class,
                 NameFieldOption::make()
-                    ->required(),
+                    ->required()
+                    ->placeholder(trans('plugins/ecommerce::product-specification.specification_attributes.name_placeholder')),
             )
             ->add(
                 'type',
@@ -47,13 +49,15 @@ class SpecificationAttributeForm extends FormAbstract
                 SelectFieldOption::make()
                     ->required()
                     ->label(trans('plugins/ecommerce::product-specification.specification_attributes.type'))
+                    ->placeholder(trans('plugins/ecommerce::product-specification.specification_attributes.type_placeholder'))
                     ->choices(SpecificationAttributeFieldType::labels())
             )
             ->add(
                 'default_value',
-                TextField::class,
-                TextFieldOption::make()
+                TextareaField::class,
+                TextareaFieldOption::make()
                     ->label(trans('plugins/ecommerce::product-specification.specification_attributes.default_value'))
+                    ->placeholder(trans('plugins/ecommerce::product-specification.specification_attributes.default_value_placeholder'))
             )
             ->addMetaBox(
                 MetaBox::make('specification-attribute-options')

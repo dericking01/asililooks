@@ -12,13 +12,17 @@ class WidgetFactory extends AbstractWidgetFactory
 
     public function registerWidget(string $widget): WidgetFactory
     {
-        $this->widgets[] = new $widget();
+        $this->widgets[] = $widget;
 
         return $this;
     }
 
     public function getWidgets(): array
     {
+        foreach ($this->widgets as $key => $widget) {
+            $this->widgets[$key] = new $widget();
+        }
+
         return $this->widgets;
     }
 

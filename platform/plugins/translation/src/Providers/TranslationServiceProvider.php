@@ -26,7 +26,8 @@ class TranslationServiceProvider extends ServiceProvider
     {
         $this
             ->setNamespace('plugins/translation')
-            ->loadAndPublishConfigurations(['general', 'permissions'])
+            ->loadAndPublishConfigurations(['general'])
+            ->loadAndPublishConfigurations(['permissions'])
             ->loadMigrations()
             ->loadRoutes()
             ->loadAndPublishViews()

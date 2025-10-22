@@ -9,8 +9,8 @@ class RecentPosts extends Posts
         parent::__construct();
 
         $this->setConfigs([
-            'name' => __('Recent Posts'),
-            'description' => __('Display recent blog posts'),
+            'name' => trans('plugins/blog::posts.widget_posts_recent'),
+            'description' => trans('plugins/blog::posts.widget_posts_recent_description'),
             'type' => 'recent',
         ]);
     }

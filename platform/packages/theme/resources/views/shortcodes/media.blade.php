@@ -8,7 +8,6 @@
     $marginStart = $data['margin_start'] ?? 0;
     $marginEnd = $data['margin_end'] ?? 0;
 
-    // Prepare margin styles
     $marginStyle = "margin-top: {$marginTop}px; margin-bottom: {$marginBottom}px; margin-inline-start: {$marginStart}px; margin-inline-end: {$marginEnd}px;";
 @endphp
 
@@ -16,6 +15,7 @@
     @case('youtube')
     @case('vimeo')
         <div
+            class="{{ $type }}-iframe"
             @if(! $width && ! $height)
                 style="position: relative; display: block; height: 0; padding-bottom: 56.25%; overflow: hidden; {{ $marginStyle }}{{ $centered ? ' margin-left: auto; margin-right: auto;' : '' }}"
             @else
@@ -24,25 +24,20 @@
         >
             <iframe
                 src="{{ $url }}"
-                @if(! $width && ! $height)
-                    style="position: absolute; top: 0; bottom: 0; left: 0; width: 100%; height: 100%; border: 0;"
-                @endif
                 allowfullscreen
                 frameborder="0"
-                @if ($height)
-                    height="{{ $height }}"
-                @endif
-
-                @if ($width)
-                    width="{{ $width }}"
-                @endif
-
+                @style([
+                    'position: absolute; top: 0; bottom: 0; left: 0; width: 100%; height: 100%; border: 0;' => ! $width && ! $height,
+                    "height: {$height}px !important;" => $height,
+                    "width: {$width}px !important;" => $width,
+                    'max-width: 100%',
+                ])
                 title="Video"
             ></iframe>
         </div>
         @break
     @case('tiktok')
-        <div style="{{ $marginStyle }}{{ $centered ? ' display: flex; justify-content: center;' : '' }}">
+        <div class="{{ $type }}-iframe" style="{{ $marginStyle }}{{ $centered ? ' display: flex; justify-content: center;' : '' }}">
             <blockquote
                 class="tiktok-embed"
                 cite="{{ $data['url'] }}"
@@ -53,13 +48,13 @@
         </div>
         @break
     @case('twitter')
-        <div style="{{ $marginStyle }} display: flex; justify-content: center">
+        <div class="{{ $type }}-iframe" style="{{ $marginStyle }} display: flex; justify-content: center">
             <blockquote class="twitter-tweet" style="border: none !important;"><a href="{{ $data['url'] }}"></a></blockquote>
         </div>
         @break
     @case('video')
-        <div style="{{ $marginStyle }}{{ $centered ? ' display: flex; justify-content: center;' : '' }}">
-            <video @if ($width) width="{{ $width }}" @endif @if ($height) height="{{ $height }}" @endif controls>
+        <div class="{{ $type }}-iframe" style="{{ $marginStyle }}{{ $centered ? ' display: flex; justify-content: center;' : '' }}">
+            <video @style(["height: {$height}px !important;" => $height, "width: {$width}px !important;" => $width, 'max-width: 100%',]) controls>
                 <source src="{{ $data['url'] }}" type="video/{{ $data['extension'] }}">
             </video>
         </div>

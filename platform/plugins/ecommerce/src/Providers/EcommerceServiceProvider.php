@@ -30,6 +30,7 @@ use Botble\Ecommerce\Http\Middleware\ApiCurrencyMiddleware;
 use Botble\Ecommerce\Http\Middleware\ApiLanguageMiddleware;
 use Botble\Ecommerce\Http\Middleware\CaptureCouponMiddleware;
 use Botble\Ecommerce\Http\Middleware\CaptureFootprintsMiddleware;
+use Botble\Ecommerce\Http\Middleware\OptionalApiAuthentication;
 use Botble\Ecommerce\Http\Middleware\RedirectIfCustomer;
 use Botble\Ecommerce\Http\Middleware\RedirectIfNotCustomer;
 use Botble\Ecommerce\Http\Middleware\TrackAbandonedCart;
@@ -61,6 +62,7 @@ use Botble\Ecommerce\Models\ProductAttributeSet;
 use Botble\Ecommerce\Models\ProductCategory;
 use Botble\Ecommerce\Models\ProductCollection;
 use Botble\Ecommerce\Models\ProductLabel;
+use Botble\Ecommerce\Models\ProductSpecificationAttributeTranslation;
 use Botble\Ecommerce\Models\ProductTag;
 use Botble\Ecommerce\Models\ProductVariation;
 use Botble\Ecommerce\Models\ProductVariationItem;
@@ -370,6 +372,8 @@ class EcommerceServiceProvider extends ServiceProvider
         $loader->alias('ProductCategoryHelper', ProductCategoryHelper::class);
         $loader->alias('CurrencyHelper', CurrencyFacade::class);
         $loader->alias('InvoiceHelper', InvoiceHelper::class);
+
+        $this->loadJsonTranslationsFrom($this->getPath() . '/resources/lang');
     }
 
     public function boot(): void
@@ -408,8 +412,7 @@ class EcommerceServiceProvider extends ServiceProvider
             ->loadAndPublishViews()
             ->loadMigrations()
             ->loadAnonymousComponents()
-            ->publishAssets()
-            ->loadJsonTranslationsFrom($this->getPath() . '/resources/lang');
+            ->publishAssets();
 
         Discount::observe(DiscountObserver::class);
 
@@ -427,10 +430,12 @@ class EcommerceServiceProvider extends ServiceProvider
             SlugHelper::registerModule(Brand::class, fn () => trans('plugins/ecommerce::brands.brands'));
             SlugHelper::registerModule(ProductCategory::class, fn () => trans('plugins/ecommerce::product-categories.product_categories'));
             SlugHelper::registerModule(ProductTag::class, fn () => trans('plugins/ecommerce::product-tag.product_tags'));
+            SlugHelper::registerModule(ProductCollection::class, fn () => trans('plugins/ecommerce::product-collections.product_collections'));
             SlugHelper::setPrefix(Product::class, 'products', true);
             SlugHelper::setPrefix(Brand::class, 'brands', true);
             SlugHelper::setPrefix(ProductTag::class, 'product-tags', true);
             SlugHelper::setPrefix(ProductCategory::class, 'product-categories', true);
+            SlugHelper::setPrefix(ProductCollection::class, 'collections', true);
         });
 
         if (File::exists(storage_path('app/invoices/template.blade.php'))) {
@@ -556,6 +561,7 @@ class EcommerceServiceProvider extends ServiceProvider
             ]);
 
             LanguageAdvancedManager::addTranslatableMetaBox('product_options_box');
+            LanguageAdvancedManager::addTranslatableMetaBox('product-specification-table');
 
             add_action(LANGUAGE_ADVANCED_ACTION_SAVED, function ($data, $request): void {
                 switch ($data::class) {
@@ -568,6 +574,31 @@ class EcommerceServiceProvider extends ServiceProvider
                             }
 
                             LanguageAdvancedManager::save($variation->product, $request);
+                        }
+
+                        $specificationAttributes = $request->input('specification_attributes', []);
+
+                        $langCode = $request->input('language');
+
+                        if ($specificationAttributes && $langCode) {
+                            foreach ($specificationAttributes as $attributeId => $attributeData) {
+                                if (isset($attributeData['value'])) {
+                                    $attribute = SpecificationAttribute::query()->find($attributeId);
+
+                                    if ($attribute) {
+                                        ProductSpecificationAttributeTranslation::query()->updateOrCreate(
+                                            [
+                                                'product_id' => $data->getKey(),
+                                                'attribute_id' => $attributeId,
+                                                'lang_code' => $langCode,
+                                            ],
+                                            [
+                                                'value' => $attributeData['value'],
+                                            ]
+                                        );
+                                    }
+                                }
+                            }
                         }
 
                         $options = $request->input('options', []) ?: [];
@@ -695,6 +726,7 @@ class EcommerceServiceProvider extends ServiceProvider
             $router->aliasMiddleware('customer.guest', RedirectIfCustomer::class);
             $router->aliasMiddleware('api.currency', ApiCurrencyMiddleware::class);
             $router->aliasMiddleware('api.language.ecommerce', ApiLanguageMiddleware::class);
+            $router->aliasMiddleware('api.optional.auth', OptionalApiAuthentication::class);
             $router->pushMiddlewareToGroup('web', CaptureFootprintsMiddleware::class);
             $router->pushMiddlewareToGroup('web', CaptureCouponMiddleware::class);
             $router->pushMiddlewareToGroup('web', TrackAbandonedCart::class);

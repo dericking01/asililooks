@@ -519,4 +519,17 @@ class ProductController extends BaseController
 
         return $videoMedias;
     }
+
+    public function view(Product $product)
+    {
+        $store = auth('customer')->user()?->store;
+
+        abort_if(! $store || $product->store_id !== $store->id, 404);
+
+        abort_if($product->is_variation, 404);
+
+        $this->pageTitle(trans('plugins/ecommerce::products.view', ['name' => $product->name]));
+
+        return view('plugins/marketplace::themes.vendor-dashboard.products.view', $this->getProductViewData($product));
+    }
 }

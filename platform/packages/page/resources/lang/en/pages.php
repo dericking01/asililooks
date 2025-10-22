@@ -24,4 +24,5 @@ return [
         'title' => 'Page',
         'your_home_page_display' => 'Your homepage displays',
     ],
+    'default_template' => 'Default',
 ];

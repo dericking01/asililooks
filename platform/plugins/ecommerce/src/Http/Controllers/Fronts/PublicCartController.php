@@ -5,6 +5,7 @@ namespace Botble\Ecommerce\Http\Controllers\Fronts;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Ecommerce\AdsTracking\FacebookPixel;
 use Botble\Ecommerce\AdsTracking\GoogleTagManager;
+use Botble\Ecommerce\Cart\Cart as CartInstance;
 use Botble\Ecommerce\Enums\DiscountTypeEnum;
 use Botble\Ecommerce\Facades\Cart;
 use Botble\Ecommerce\Facades\EcommerceHelper;
@@ -36,7 +37,7 @@ class PublicCartController extends BaseController
     ) {
     }
 
-    protected function getCartInstance()
+    protected function getCartInstance(): CartInstance
     {
         if ($this->cachedCartInstance === null) {
             $this->cachedCartInstance = Cart::instance('cart');
@@ -202,7 +203,13 @@ class PublicCartController extends BaseController
                 ));
         }
 
-        $cartItems = OrderHelper::handleAddCart($product, $request);
+        try {
+            $cartItems = OrderHelper::handleAddCart($product, $request);
+        } catch (Exception $e) {
+            return $response
+                ->setError()
+                ->setMessage($e->getMessage());
+        }
 
         $cartItem = Arr::first(array_filter($cartItems, fn ($item) => $item['id'] == $product->id));
 
@@ -214,6 +221,7 @@ class PublicCartController extends BaseController
         $responseData = [
             'status' => true,
             'content' => $cartItems,
+            'extra_data' => app(GoogleTagManager::class)->formatProductTrackingData($originalProduct, $cartItem['qty']),
         ];
 
         app(GoogleTagManager::class)->addToCart(
@@ -319,13 +327,25 @@ class PublicCartController extends BaseController
     {
         try {
             $cartItem = Cart::instance('cart')->get($id);
-            app(GoogleTagManager::class)->removeFromCart($cartItem);
+            $product = Product::query()->find($cartItem->id);
+
+            $googleTagManager = app(GoogleTagManager::class);
+
+            if ($product) {
+                $trackingData = $googleTagManager->formatProductTrackingData($product->original_product, $cartItem->qty);
+            }
+
+            $googleTagManager->removeFromCart($cartItem);
 
             Cart::instance('cart')->remove($id);
 
             $responseData = [
                 ...$this->getDataForResponse(),
             ];
+
+            if (isset($trackingData)) {
+                $responseData['extra_data'] = $trackingData;
+            }
 
             return $this
                 ->httpResponse()

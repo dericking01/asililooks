@@ -88,8 +88,6 @@ AdminHelper::registerRoutes(function (): void {
             ]);
         });
 
-        require core_path('table/routes/web-actions.php');
-
         Route::group(['prefix' => 'product-tags', 'as' => 'product-tag.'], function (): void {
             Route::resource('', 'ProductTagController')
                 ->parameters(['' => 'product-tag']);

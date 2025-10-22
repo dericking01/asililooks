@@ -4,6 +4,7 @@ namespace Botble\Ecommerce\Models;
 
 use Botble\Base\Models\BaseModel;
 use Botble\Ecommerce\Enums\ShippingCodStatusEnum;
+use Botble\Ecommerce\Enums\ShippingMethodEnum;
 use Botble\Ecommerce\Enums\ShippingStatusEnum;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -88,7 +89,7 @@ class Shipment extends BaseModel
     {
         return apply_filters(
             'ecommerce_shipment_can_print_shipping_label',
-            $this->order->shipping_method == 'default',
+            $this->order->shipping_method == ShippingMethodEnum::DEFAULT,
             $this
         );
     }

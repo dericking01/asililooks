@@ -302,6 +302,12 @@ class Cart
                 return $total + $cartItem->qty * $cartItem->price;
             }
 
+            $priceIncludesTax = $cartItem->options->get('price_includes_tax', false);
+
+            if ($priceIncludesTax) {
+                return $total + $cartItem->qty * $cartItem->price;
+            }
+
             return $total + ($cartItem->qty * ($cartItem->priceTax == 0 ? $cartItem->price : $cartItem->priceTax));
         }, 0);
 
@@ -319,6 +325,12 @@ class Cart
                 return $total + $cartItem->qty * $cartItem->price;
             }
 
+            $priceIncludesTax = $cartItem->options->get('price_includes_tax', false);
+
+            if ($priceIncludesTax) {
+                return $total + $cartItem->qty * $cartItem->price;
+            }
+
             return $total + ($cartItem->qty * ($cartItem->priceTax == 0 ? $cartItem->price : $cartItem->priceTax));
         }, 0);
     }
@@ -329,9 +341,21 @@ class Cart
             return 0;
         }
 
-        return $content->reduce(function ($tax, CartItem $cartItem) {
-            return $tax + ($cartItem->qty * $cartItem->tax);
-        }, 0);
+        $totalTax = 0;
+        foreach ($content as $cartItem) {
+            $taxRate = $cartItem->taxRate;
+            if ($taxRate > 0) {
+                $priceIncludesTax = $cartItem->options->get('price_includes_tax', false);
+
+                if ($priceIncludesTax) {
+                    $totalTax += EcommerceHelper::roundPrice($cartItem->qty * ($cartItem->price - ($cartItem->price / (1 + $taxRate / 100))));
+                } else {
+                    $totalTax += EcommerceHelper::roundPrice($cartItem->price * $cartItem->qty * ($taxRate / 100));
+                }
+            }
+        }
+
+        return $totalTax;
     }
 
     public function rawSubTotal(): float
@@ -339,7 +363,15 @@ class Cart
         $content = $this->getContent();
 
         $subTotal = $content->reduce(function ($subTotal, CartItem $cartItem) {
-            return $subTotal + ($cartItem->qty * $cartItem->price);
+            $priceIncludesTax = $cartItem->options->get('price_includes_tax', false);
+
+            if ($priceIncludesTax && $cartItem->taxRate > 0) {
+                $basePrice = $cartItem->price / (1 + $cartItem->taxRate / 100);
+
+                return $subTotal + EcommerceHelper::roundPrice($cartItem->qty * $basePrice);
+            }
+
+            return $subTotal + EcommerceHelper::roundPrice($cartItem->qty * $cartItem->price);
         }, 0);
 
         return apply_filters('ecommerce_cart_raw_subtotal', $subTotal, $content);
@@ -348,7 +380,15 @@ class Cart
     public function rawSubTotalByItems($content): float
     {
         return $content->reduce(function ($subTotal, CartItem $cartItem) {
-            return $subTotal + ($cartItem->qty * $cartItem->price);
+            $priceIncludesTax = $cartItem->options->get('price_includes_tax', false);
+
+            if ($priceIncludesTax && $cartItem->taxRate > 0) {
+                $basePrice = $cartItem->price / (1 + $cartItem->taxRate / 100);
+
+                return $subTotal + EcommerceHelper::roundPrice($cartItem->qty * $basePrice);
+            }
+
+            return $subTotal + EcommerceHelper::roundPrice($cartItem->qty * $cartItem->price);
         }, 0);
     }
 
@@ -559,9 +599,21 @@ class Cart
 
         $content = $this->getContent();
 
-        return $content->reduce(function ($tax, CartItem $cartItem) {
-            return $tax + ($cartItem->qty * $cartItem->tax);
-        }, 0);
+        $totalTax = 0;
+        foreach ($content as $cartItem) {
+            $taxRate = $cartItem->taxRate;
+            if ($taxRate > 0) {
+                $priceIncludesTax = $cartItem->options->get('price_includes_tax', false);
+
+                if ($priceIncludesTax) {
+                    $totalTax += EcommerceHelper::roundPrice($cartItem->qty * ($cartItem->price - ($cartItem->price / (1 + $taxRate / 100))));
+                } else {
+                    $totalTax += EcommerceHelper::roundPrice($cartItem->price * $cartItem->qty * ($taxRate / 100));
+                }
+            }
+        }
+
+        return $totalTax;
     }
 
     public function subtotal(): string

@@ -12,12 +12,10 @@ class UpdateProductStockStatus
     {
         $product = $event->product;
 
-        // If this is a variation, update the parent product
         if ($product->is_variation) {
             $this->updateParentProduct($product);
         }
 
-        // If this is a parent product with variations, update it based on variations
         if (! $product->is_variation && $product->variations()->exists()) {
             $this->updateParentProductFromVariations($product);
         }
@@ -42,8 +40,11 @@ class UpdateProductStockStatus
             return;
         }
 
-        $quantity = 0;
-        $withStorehouseManagement = false;
+        $totalQuantity = 0;
+        $variationsWithStorehouse = 0;
+        $variationsWithoutStorehouse = 0;
+        $hasAnyInStock = false;
+        $hasBackorder = false;
         $stockStatus = StockStatusEnum::OUT_OF_STOCK;
         $allowCheckoutWhenOutOfStock = false;
 
@@ -55,34 +56,43 @@ class UpdateProductStockStatus
             }
 
             if ($variationProduct->with_storehouse_management) {
-                $quantity += $variationProduct->quantity;
-                $withStorehouseManagement = true;
+                $variationsWithStorehouse++;
+                $totalQuantity += $variationProduct->quantity ?: 0;
+            } else {
+                $variationsWithoutStorehouse++;
             }
 
             if ($variationProduct->allow_checkout_when_out_of_stock) {
                 $allowCheckoutWhenOutOfStock = true;
             }
 
-            if (! $variationProduct->isOutOfStock()) {
-                $stockStatus = $variationProduct->stock_status == StockStatusEnum::ON_BACKORDER
-                    ? StockStatusEnum::ON_BACKORDER
-                    : StockStatusEnum::IN_STOCK;
+            if ($variationProduct->stock_status == StockStatusEnum::ON_BACKORDER) {
+                $hasBackorder = true;
+            } elseif (! $variationProduct->isOutOfStock()) {
+                $hasAnyInStock = true;
             }
         }
 
-        // Only update if there are actual changes to prevent infinite loops
-        $hasChanges = $parentProduct->quantity != $quantity ||
+        if ($hasBackorder) {
+            $stockStatus = StockStatusEnum::ON_BACKORDER;
+        } elseif ($hasAnyInStock || $allowCheckoutWhenOutOfStock) {
+            $stockStatus = StockStatusEnum::IN_STOCK;
+        }
+
+        $withStorehouseManagement = $variationsWithStorehouse > $variationsWithoutStorehouse;
+
+        $hasChanges = $parentProduct->quantity != $totalQuantity ||
                      $parentProduct->with_storehouse_management != $withStorehouseManagement ||
                      $parentProduct->stock_status != $stockStatus ||
                      $parentProduct->allow_checkout_when_out_of_stock != $allowCheckoutWhenOutOfStock;
 
         if ($hasChanges) {
-            $parentProduct->quantity = $quantity;
+            $parentProduct->quantity = $totalQuantity;
             $parentProduct->with_storehouse_management = $withStorehouseManagement;
             $parentProduct->stock_status = $stockStatus;
             $parentProduct->allow_checkout_when_out_of_stock = $allowCheckoutWhenOutOfStock;
 
-            $parentProduct->saveQuietly(); // Use saveQuietly to prevent triggering events again
+            $parentProduct->saveQuietly();
         }
     }
 }

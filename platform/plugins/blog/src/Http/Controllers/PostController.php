@@ -100,7 +100,8 @@ class PostController extends BaseController
         $limit = $limit > 0 ? $limit : 10;
 
         $posts = Post::query()
-            ->with(['slugable'])->latest()
+            ->with(['slugable'])
+            ->latest()
             ->limit($limit)
             ->get();
 

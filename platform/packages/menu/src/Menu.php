@@ -23,10 +23,10 @@ use Botble\Support\Http\Requests\Request as BaseRequest;
 use Botble\Support\Services\Cache\Cache;
 use Botble\Theme\Facades\Theme;
 use Exception;
-use Illuminate\Config\Repository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Event;
 use Throwable;
 
 class Menu
@@ -39,11 +39,11 @@ class Menu
 
     protected bool $loaded = false;
 
-    public function __construct(protected Repository $config)
+    protected static array $locations = [];
+
+    public function __construct()
     {
         $this->cache = Cache::make(MenuModel::class);
-
-        $this->addMenuLocation('main-menu', trans('packages/menu::menu.main_navigation'));
     }
 
     public function hasMenu(string $slug): bool
@@ -142,25 +142,28 @@ class Menu
 
     public function addMenuLocation(string $location, string $description): self
     {
-        $locations = $this->getMenuLocations();
-        $locations[$location] = $description;
-
-        $this->config->set('packages.menu.general.locations', $locations);
+        static::$locations[$location] = $description;
 
         return $this;
     }
 
     public function getMenuLocations(): array
     {
-        return $this->config->get('packages.menu.general.locations', []);
+        Event::dispatch('cms.menu::registering-locations');
+
+        return static::$locations;
     }
 
     public function removeMenuLocation(string $location): self
     {
-        $locations = $this->getMenuLocations();
-        Arr::forget($locations, $location);
+        Arr::forget(static::$locations, $location);
 
-        $this->config->set('packages.menu.general.locations', $locations);
+        return $this;
+    }
+
+    public function clearMenuLocations(): self
+    {
+        static::$locations = [];
 
         return $this;
     }
@@ -206,9 +209,24 @@ class Menu
 
     protected function read(): Collection
     {
+        $cacheEnabled = setting('cache_front_menu_enabled', true);
+        $cacheKey = 'menu_all_menus_' . md5(serialize(BaseHelper::getHomepageUrl()));
+
+        if ($cacheEnabled && $this->cache->has($cacheKey)) {
+            $cached = $this->cache->get($cacheKey);
+
+            if ($cached instanceof Collection) {
+                return $cached;
+            }
+        }
+
         $with = apply_filters('cms_menu_load_with_relations', [
             'menuNodes',
             'menuNodes.child',
+            'menuNodes.metadata',
+            'menuNodes.child.metadata',
+            'menuNodes.reference',
+            'menuNodes.child.reference',
             'locations',
         ]);
 
@@ -216,7 +234,13 @@ class Menu
             ->wherePublished()
             ->with($with);
 
-        return RepositoryHelper::applyBeforeExecuteQuery($items, new MenuModel())->get();
+        $result = RepositoryHelper::applyBeforeExecuteQuery($items, new MenuModel())->get();
+
+        if ($cacheEnabled) {
+            $this->cache->put($cacheKey, $result);
+        }
+
+        return $result;
     }
 
     public function generateMenu(array $args = []): ?string
@@ -231,9 +255,13 @@ class Menu
 
         $cacheEnabled = setting('cache_front_menu_enabled', true);
 
-        if ($cacheEnabled && $this->cache->has($cacheKey) && ($cachedData = $this->cache->get($cacheKey))) {
-            $data = $cachedData;
-        } else {
+        $data = [];
+
+        if ($cacheEnabled && $this->cache->has($cacheKey)) {
+            $data = $this->cache->get($cacheKey);
+        }
+
+        if (! $data) {
             $menu = Arr::get($args, 'menu');
 
             $slug = Arr::get($args, 'slug');
@@ -280,7 +308,13 @@ class Menu
             ];
 
             $data['options'] = Html::attributes(Arr::get($args, 'options', []));
+
+            if ($cacheEnabled) {
+                $this->cache->put($cacheKey, $data);
+            }
         }
+
+        $data = (array) $data;
 
         if ($theme && $view) {
             return Theme::partial($view, $data);

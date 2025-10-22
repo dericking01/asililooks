@@ -2,7 +2,10 @@
 
 namespace Botble\Base\Services;
 
+use Botble\Base\Events\CacheCleared;
 use Botble\Media\Facades\RvMedia;
+use Closure;
+use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Cache;
@@ -28,6 +31,7 @@ class ClearCacheService
         Cache::flush();
 
         Event::dispatch('cache:cleared');
+        Event::dispatch(new CacheCleared('framework'));
     }
 
     public function clearGoogleFontsCache(): void
@@ -124,5 +128,135 @@ class ClearCacheService
         $this->clearDebugbar();
 
         RvMedia::refreshCache();
+
+        Event::dispatch(new CacheCleared('all'));
+    }
+
+    public function cacheConfig(): void
+    {
+        $configPath = $this->app->getCachedConfigPath();
+
+        $this->files->delete($configPath);
+
+        $config = $this->app['config']->all();
+
+        $config = $this->removeSensitiveConfigData($config);
+
+        $this->files->put(
+            $configPath,
+            '<?php return ' . var_export($config, true) . ';' . PHP_EOL
+        );
+    }
+
+    protected function removeSensitiveConfigData(array $config): array
+    {
+        array_walk_recursive($config, function (&$value): void {
+            if ($value instanceof Closure) {
+                $value = null;
+            }
+        });
+
+        return $config;
+    }
+
+    public function cacheRoutes(): void
+    {
+        $this->clearRoutesCache();
+    }
+
+    public function cacheEvents(): void
+    {
+        $eventsPath = $this->app->bootstrapPath('cache/events.php');
+
+        $this->files->delete($eventsPath);
+    }
+
+    public function cacheViews(): void
+    {
+        $this->clearCompiledViews();
+
+        $viewPaths = config('view.paths');
+
+        foreach ($viewPaths as $path) {
+            if ($this->files->isDirectory($path)) {
+                $this->compileViewsIn($path);
+            }
+        }
+    }
+
+    protected function compileViewsIn(string $path): void
+    {
+        $compiler = $this->app['blade.compiler'];
+
+        foreach ($this->files->allFiles($path) as $file) {
+            if (Str::endsWith($file->getFilename(), '.blade.php')) {
+                $compiler->compile($file->getRealPath());
+            }
+        }
+    }
+
+    public function runOptimization(): array
+    {
+        $results = [];
+        $optimized = [];
+
+        try {
+            $this->clearConfig();
+            $this->clearRoutesCache();
+            $this->clearCompiledViews();
+
+            try {
+                $this->cacheConfig();
+                $optimized[] = trans('core/base::cache.optimization.messages.config_cached');
+                $results['config_cached'] = true;
+            } catch (Exception $e) {
+                $results['config_error'] = $e->getMessage();
+            }
+
+            $optimized[] = trans('core/base::cache.optimization.messages.routes_cleared');
+
+            try {
+                $this->cacheViews();
+                $optimized[] = trans('core/base::cache.optimization.messages.views_compiled');
+                $results['views_cached'] = true;
+            } catch (Exception $e) {
+                $results['views_error'] = $e->getMessage();
+            }
+
+            $this->clearFrameworkCache();
+            $optimized[] = trans('core/base::cache.optimization.messages.framework_cache_cleared');
+
+            $results['success'] = true;
+            $results['message'] = trans('core/base::cache.optimization.messages.optimization_completed', ['details' => implode(', ', $optimized)]);
+        } catch (Exception $e) {
+            $results['success'] = false;
+            $results['message'] = trans('core/base::cache.optimization.messages.optimization_failed', ['error' => $e->getMessage()]);
+        }
+
+        return $results;
+    }
+
+    public function clearOptimization(): array
+    {
+        $results = [];
+
+        try {
+            $this->clearConfig();
+            $results['config_cleared'] = true;
+
+            $this->clearRoutesCache();
+            $results['routes_cleared'] = true;
+
+            $this->clearCompiledViews();
+            $results['views_cleared'] = true;
+
+            $results['success'] = true;
+            $results['message'] = trans('core/base::cache.optimization.clear.success_msg');
+        } catch (Exception $e) {
+            $results['success'] = false;
+            $results['message'] = trans('core/base::cache.optimization.messages.clear_failed', ['error' => $e->getMessage()]);
+        }
+
+        return $results;
     }
 }

@@ -3,9 +3,9 @@
 namespace Botble\Setting\Http\Requests;
 
 use Botble\Base\Facades\AdminAppearance;
+use Botble\Base\Facades\AdminHelper;
 use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Rules\GoogleFontsRule;
-use Botble\Base\Supports\Language;
 use Botble\Support\Http\Requests\Request;
 use Illuminate\Validation\Rule;
 
@@ -21,7 +21,7 @@ class AdminAppearanceRequest extends Request
             'login_screen_backgrounds' => ['nullable', 'array'],
             'login_screen_backgrounds*' => ['string', 'required'],
             'admin_title' => ['nullable', 'string', 'max:255'],
-            'admin_appearance_locale' => ['sometimes', 'required', Rule::in(array_keys(Language::getAvailableLocales()))],
+            'admin_appearance_locale' => ['sometimes', 'required', Rule::in(array_keys(AdminHelper::getAdminLocales()))],
             'admin_appearance_locale_direction' => ['required', 'in:ltr,rtl'],
             'rich_editor' => ['required', Rule::in(array_keys(BaseHelper::availableRichEditors()))],
             'admin_appearance_layout' => ['required', 'string', Rule::in(array_keys(AdminAppearance::getLayouts()))],

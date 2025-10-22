@@ -85,12 +85,8 @@ class Sitemap
         $this->addItem($params);
     }
 
-    /**
-     * Add new sitemap one or multiple items to $items array.
-     */
     public function addItem(array $params = []): void
     {
-        // if is multidimensional
         if (array_key_exists(1, $params)) {
             foreach ($params as $param) {
                 $this->addItem($param);
@@ -110,7 +106,6 @@ class Sitemap
         $googleNews = Arr::get($params, 'googlenews', []);
         $alternates = Arr::get($params, 'alternates', []);
 
-        // escaping
         if ($this->model->isEscaping()) {
             $loc = htmlentities($loc, ENT_XML1);
 
@@ -178,9 +173,6 @@ class Sitemap
         ]);
     }
 
-    /**
-     * Add new sitemap to $sitemaps array.
-     */
     public function resetSitemaps(array $sitemaps = []): void
     {
         $this->model->resetSitemaps($sitemaps);
@@ -244,19 +236,15 @@ class Sitemap
             'link' => $this->model->getLink(),
         ];
 
-        // check if styles are enabled
         if ($this->model->isUseStyles()) {
             if (null != $this->model->getSloc() && file_exists(
                 public_path($this->model->getSloc() . $format . '.xsl')
             )) {
-                // use style from your custom location
                 $style = $this->model->getSloc() . $format . '.xsl';
             } else {
-                // don't use style
                 $style = null;
             }
         } else {
-            // don't use style
             $style = null;
         }
 
@@ -325,37 +313,27 @@ class Sitemap
         ?string $path = null,
         ?string $style = null
     ): void {
-        // turn off caching for this method
         $this->model->setUseCache(false);
 
-        // use correct file extension
         in_array($format, ['txt', 'html'], true) ? $fe = $format : $fe = 'xml';
 
         if ($this->model->getUseGzip()) {
             $fe = $fe . '.gz';
         }
 
-        // use custom size limit for sitemaps
         if ($this->model->getMaxSize() > 0 && count($this->model->getItems()) > $this->model->getMaxSize()) {
             if ($this->model->isUseLimitSize()) {
-                // limit size
                 $this->model->limitSize($this->model->getMaxSize());
                 $data = $this->generate($format);
             } else {
-                // use sitemapindex and generate partial sitemaps
                 foreach (array_chunk($this->model->getItems(), $this->model->getMaxSize()) as $key => $item) {
-                    // reset current items
                     $this->model->resetItems($item);
 
-                    // generate new partial sitemap
                     $this->store($format, $filename . '-' . $key, $path);
 
-                    // add sitemap to sitemapindex
                     if ($path != null) {
-                        // if using custom path generate relative urls for sitemaps in the sitemapindex
                         $this->addSitemap($filename . '-' . $key . '.' . $fe);
                     } else {
-                        // else generate full urls based on app's domain
                         $this->addSitemap(url($filename . '-' . $key . '.' . $fe));
                     }
                 }
@@ -367,29 +345,21 @@ class Sitemap
         ) > 50000) || ($format == 'google-news' && count($this->model->getItems()) > 1000)) {
             ('google-news' != $format) ? $max = 50000 : $max = 1000;
 
-            // check if limiting size of items array is enabled
             if (! $this->model->isUseLimitSize()) {
-                // use sitemapindex and generate partial sitemaps
                 foreach (array_chunk($this->model->getItems(), $max) as $key => $item) {
-                    // reset current items
                     $this->model->resetItems($item);
 
-                    // generate new partial sitemap
                     $this->store($format, $filename . '-' . $key, $path, $style);
 
-                    // add sitemap to sitemapindex
                     if (null != $path) {
-                        // if using custom path generate relative urls for sitemaps in the sitemapindex
                         $this->addSitemap($filename . '-' . $key . '.' . $fe);
                     } else {
-                        // else generate full urls based on app's domain
                         $this->addSitemap(url($filename . '-' . $key . '.' . $fe));
                     }
                 }
 
                 $data = $this->generate('sitemapindex');
             } else {
-                // reset items and use only most recent $max items
                 $this->model->limitSize($max);
                 $data = $this->generate($format);
             }
@@ -397,32 +367,25 @@ class Sitemap
             $data = $this->generate($format);
         }
 
-        // clear memory
         if ('sitemapindex' == $format) {
             $this->model->resetSitemaps();
         }
 
         $this->model->resetItems();
 
-        // if custom path
         if (null == $path) {
             $file = public_path() . DIRECTORY_SEPARATOR . $filename . '.' . $fe;
         } else {
             $file = $path . DIRECTORY_SEPARATOR . $filename . '.' . $fe;
         }
 
-        if ($this->model->getUseGzip()) {
-            // write file (gzip compressed)
+        if ($this->model->getUseGzip() && extension_loaded('zlib')) {
             $this->file->put($file, gzencode($data['content'], 9));
         } else {
-            // write file
             $this->file->put($file, $data['content']);
         }
     }
 
-    /**
-     * Add new sitemap to $sitemaps array.
-     */
     public function addSitemap(string $loc, ?string $lastMod = null): void
     {
         $this->model->setSitemaps([

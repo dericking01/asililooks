@@ -22,24 +22,46 @@
         width: 100%;
         position: relative;
 
-        li {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
+        li.currency-item {
             position: relative;
-
-            + li {
-                margin-top: 1px;
-            }
+            margin-bottom: 1px;
 
             &:nth-child(odd) {
-                background-color: var(--bb-body-bg);
+                .currency-row {
+                    background-color: var(--bb-body-bg);
+                }
             }
 
-            > * {
-                float: left;
-                padding: 10px;
-                text-align: center;
+            .currency-row {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+
+                > * {
+                    float: left;
+                    padding: 10px;
+                    text-align: center;
+                }
+            }
+
+            .currency-advanced-settings {
+                background-color: var(--bb-tertiary-bg);
+                border-left: 3px solid var(--bb-primary);
+                padding: 15px 20px;
+                margin: 0;
+
+                .advanced-settings-content {
+                    .form-label {
+                        font-size: 13px;
+                        font-weight: 600;
+                        margin-bottom: 5px;
+                    }
+
+                    .form-control,
+                    .form-select {
+                        font-size: 14px;
+                    }
+                }
             }
 
             .image-box-container {
@@ -80,23 +102,69 @@
         }
     }
 
+    .header,
+    .currency-row {
+        width: 100%;
+    }
+
     .swatch-item {
-        flex: 1;
-        max-width: 90px;
+        flex: 0 0 auto;
+
+        &:first-child {
+            // Code column
+            width: 12%;
+            min-width: 100px;
+        }
+
+        &:nth-child(2) {
+            // Symbol column
+            width: 10%;
+            min-width: 80px;
+        }
+    }
+
+    .swatch-exchange-rate {
+        flex: 1 1 auto;
+        min-width: 150px;
     }
 
     .swatch-is-default {
-        width: 120px;
+        flex: 0 0 auto;
+        width: 12%;
+        min-width: 100px;
+    }
+
+    .swatch-advanced {
+        flex: 0 0 auto;
+        width: 10%;
+        min-width: 90px;
+
+        .toggle-advanced {
+            padding: 5px 12px;
+            transition: all 0.3s ease;
+
+            svg {
+                margin: 0;
+            }
+
+            &:hover {
+                background-color: var(--bb-primary);
+                border-color: var(--bb-primary);
+                color: white;
+            }
+
+            &.active {
+                background-color: var(--bb-primary);
+                border-color: var(--bb-primary);
+                color: white;
+            }
+        }
     }
 
     .remove-item {
-        width: 80px;
-    }
-
-    .swatch-exchange-rate,
-    .swatch-is-prefix-symbol,
-    .swatch-decimals {
-        max-width: 180px;
+        flex: 0 0 auto;
+        width: 10%;
+        min-width: 90px;
     }
 }
 
@@ -108,59 +176,75 @@
         }
 
         .swatches-list {
-            li {
-                display: block;
+            li.currency-item {
                 background-color: var(--bb-body-bg) !important;
                 border: var(--bb-border-width) var(--bb-border-style) var(--bb-border-color);
                 border-radius: 8px;
                 margin-bottom: 15px;
-                padding: 15px;
 
                 + li {
                     margin-top: 15px;
                 }
 
-                > * {
-                    float: none;
-                    padding: 8px 0;
-                    text-align: left;
-                    width: 100% !important;
-                    max-width: none !important;
+                .currency-row {
                     display: block;
-                }
+                    padding: 15px;
 
-                .swatch-item,
-                .swatch-is-default,
-                .remove-item {
-                    position: relative;
-                    margin-bottom: 12px;
-
-                    &::before {
-                        content: attr(data-label);
+                    > * {
+                        float: none;
+                        padding: 8px 0;
+                        text-align: left;
+                        width: 100% !important;
+                        max-width: none !important;
                         display: block;
-                        font-weight: 600;
-                        margin-bottom: 5px;
-                        color: var(--bb-body-color);
-                        font-size: 14px;
                     }
 
-                    .form-control,
-                    .form-select {
-                        width: 100%;
+                    .swatch-item,
+                    .swatch-is-default,
+                    .swatch-advanced {
+                        position: relative;
+                        margin-bottom: 12px;
+
+                        &::before {
+                            content: attr(data-label);
+                            display: block;
+                            font-weight: 600;
+                            margin-bottom: 5px;
+                            color: var(--bb-body-color);
+                            font-size: 14px;
+                        }
+
+                        .form-control,
+                        .form-select {
+                            width: 100%;
+                        }
+                    }
+
+                    .swatch-advanced {
+                        &::before {
+                            content: 'Advanced Settings';
+                        }
+
+                        .toggle-advanced {
+                            width: 100%;
+                        }
+                    }
+
+                    .remove-item {
+                        text-align: center;
+                        margin-top: 15px;
+                        padding-top: 15px;
+                        border-top: var(--bb-border-width) var(--bb-border-style) var(--bb-border-color);
+
+                        &::before {
+                            display: none;
+                        }
                     }
                 }
 
-
-
-                .remove-item {
-                    text-align: center;
-                    margin-top: 15px;
-                    padding-top: 15px;
-                    border-top: var(--bb-border-width) var(--bb-border-style) var(--bb-border-color);
-
-                    &::before {
-                        display: none;
-                    }
+                .currency-advanced-settings {
+                    border-left: 0;
+                    border-top: 3px solid var(--bb-primary);
                 }
             }
         }

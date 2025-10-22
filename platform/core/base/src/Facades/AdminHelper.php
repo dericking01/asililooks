@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static ?string getAdminFavicon()
  * @method static ?string getAdminFaviconUrl()
  * @method static bool isPreviewing()
+ * @method static array getAdminLocales()
  *
  * @see \Botble\Base\Helpers\AdminHelper
  */

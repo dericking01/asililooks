@@ -17,8 +17,8 @@
 >
     <div class="dd-handle dd3-handle"></div>
     <div class="dd3-content d-flex justify-content-between">
-        <div data-update="title" class="fw-medium">{{ $row->title }}</div>
-        <div class="text-end me-5">{{ Arr::last(explode('\\', (string) $row->reference_type)) ?: trans('packages/menu::menu.custom_link') }}</div>
+        <div data-update="title" class="fw-medium text-truncate pe-4" title="{{ $row->title }}">{{ $row->title }}</div>
+        <div class="text-end me-5 text-nowrap">{{ Arr::last(explode('\\', (string) $row->reference_type)) ?: trans('packages/menu::menu.custom_link') }}</div>
         <a class="show-item-details" href="#">
             <x-core::icon name="ti ti-chevron-down" />
         </a>

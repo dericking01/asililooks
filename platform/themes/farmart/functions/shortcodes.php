@@ -13,37 +13,19 @@ use Botble\Ecommerce\Models\ProductCategory;
 use Botble\Ecommerce\Models\ProductCollection;
 use Botble\Ecommerce\Repositories\Interfaces\ProductInterface;
 use Botble\Faq\Models\FaqCategory;
-use Botble\Media\Facades\RvMedia;
 use Botble\Shortcode\Compilers\Shortcode;
 use Botble\Shortcode\Facades\Shortcode as ShortcodeFacade;
 use Botble\Shortcode\Forms\ShortcodeForm;
 use Botble\Theme\Facades\Theme;
 use Botble\Theme\Supports\ThemeSupport;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Theme\Farmart\Supports\Wishlist;
 
-app()->booted(function (): void {
+app('events')->listen(RouteMatched::class, function (): void {
     ThemeSupport::registerGoogleMapsShortcode();
     ThemeSupport::registerYoutubeShortcode();
-
-    function image_placeholder(?string $default = null, ?string $size = null): string
-    {
-        if (theme_option('lazy_load_image_enabled', 'yes') != 'yes' && $default) {
-            if (Str::contains($default, ['https://', 'http://'])) {
-                return $default;
-            }
-
-            return RvMedia::getImageUrl($default, $size);
-        }
-
-        if ($placeholder = theme_option('image-placeholder')) {
-            return RvMedia::getImageUrl($placeholder);
-        }
-
-        return Theme::asset()->url('images/placeholder.png');
-    }
 
     if (is_plugin_active('simple-slider')) {
         add_filter(SIMPLE_SLIDER_VIEW_TEMPLATE, function () {
@@ -55,6 +37,7 @@ app()->booted(function (): void {
                 $ads = AdsManager::getData(true, true);
 
                 $form = ShortcodeForm::createFromArray($attributes)
+                    ->withLazyLoading()
                     ->add('is_autoplay', 'customSelect', [
                         'label' => __('Is autoplay?'),
                         'choices' => [
@@ -124,7 +107,8 @@ app()->booted(function (): void {
         ShortcodeFacade::setAdminConfig('theme-ads', function (array $attributes) {
             $ads = AdsManager::getData(true, true);
 
-            $form = ShortcodeForm::createFromArray($attributes);
+            $form = ShortcodeForm::createFromArray($attributes)
+                ->withLazyLoading();
 
             for ($i = 1; $i < 5; $i++) {
                 $form->add('key_' . $i, 'customSelect', [
@@ -163,6 +147,7 @@ app()->booted(function (): void {
 
         ShortcodeFacade::setAdminConfig('featured-product-categories', function (array $attributes) {
             return ShortcodeForm::createFromArray($attributes)
+                ->withLazyLoading()
                 ->add('title', 'text', [
                     'label' => __('Title'),
                     'value' => Arr::get($attributes, 'title'),
@@ -201,6 +186,8 @@ app()->booted(function (): void {
                 ]);
         });
 
+        ShortcodeFacade::registerLoadingState('featured-product-categories', Theme::getThemeNamespace('partials.shortcodes.ecommerce.featured-product-categories-skeleton'));
+
         add_shortcode('featured-brands', __('Featured Brands'), __('Featured Brands'), function (Shortcode $shortcode) {
             $limit = (int) $shortcode->limit ?: 8;
 
@@ -220,6 +207,7 @@ app()->booted(function (): void {
 
         ShortcodeFacade::setAdminConfig('featured-brands', function (array $attributes) {
             return ShortcodeForm::createFromArray($attributes)
+                ->withLazyLoading()
                 ->add('title', 'text', [
                     'label' => __('Title'),
                     'value' => Arr::get($attributes, 'title'),
@@ -262,6 +250,8 @@ app()->booted(function (): void {
                     'selected' => Arr::get($attributes, 'slides_to_show', 4),
                 ]);
         });
+
+        ShortcodeFacade::registerLoadingState('featured-brands', Theme::getThemeNamespace('partials.shortcodes.ecommerce.featured-brands-skeleton'));
 
         if (FlashSaleFacade::isEnabled()) {
             add_shortcode('flash-sale', __('Flash sale'), __('Flash sale'), function (Shortcode $shortcode) {
@@ -309,6 +299,7 @@ app()->booted(function (): void {
                     ->toArray();
 
                 return ShortcodeForm::createFromArray($attributes)
+                    ->withLazyLoading()
                     ->add('title', 'text', [
                         'label' => __('Title'),
                         'value' => Arr::get($attributes, 'title'),
@@ -346,6 +337,8 @@ app()->booted(function (): void {
                         'selected' => Arr::get($attributes, 'autoplay_speed', 3000),
                     ]);
             });
+
+            ShortcodeFacade::registerLoadingState('flash-sale', Theme::getThemeNamespace('partials.shortcodes.ecommerce.flash-sale-skeleton'));
         }
 
         add_shortcode(
@@ -398,6 +391,7 @@ app()->booted(function (): void {
             }
 
             return ShortcodeForm::createFromArray($attributes)
+                ->withLazyLoading()
                 ->add('title', 'text', [
                     'label' => __('Title'),
                     'value' => Arr::get($attributes, 'title'),
@@ -435,6 +429,8 @@ app()->booted(function (): void {
                     'selected' => Arr::get($attributes, 'autoplay_speed', 3000),
                 ]);
         });
+
+        ShortcodeFacade::registerLoadingState('product-collections', Theme::getThemeNamespace('partials.shortcodes.ecommerce.product-collections-skeleton'));
 
         add_shortcode(
             'product-category-products',
@@ -483,6 +479,7 @@ app()->booted(function (): void {
                 ->toArray();
 
             return ShortcodeForm::createFromArray($attributes)
+                ->withLazyLoading()
                 ->add('category_id', 'customSelect', [
                     'label' => __('Select category'),
                     'choices' => $categoryOptions,
@@ -521,6 +518,8 @@ app()->booted(function (): void {
                 ]);
         });
 
+        ShortcodeFacade::registerLoadingState('product-category-products', Theme::getThemeNamespace('partials.shortcodes.ecommerce.product-category-products-skeleton'));
+
         add_shortcode('featured-products', __('Featured products'), __('Featured products'), function (Shortcode $shortcode) {
             $limit = (int) $shortcode->limit ?: 10;
 
@@ -546,6 +545,7 @@ app()->booted(function (): void {
 
         ShortcodeFacade::setAdminConfig('featured-products', function (array $attributes) {
             return ShortcodeForm::createFromArray($attributes)
+                ->withLazyLoading()
                 ->add('title', 'text', [
                     'label' => __('Title'),
                     'value' => Arr::get($attributes, 'title'),
@@ -583,6 +583,8 @@ app()->booted(function (): void {
                     'selected' => Arr::get($attributes, 'autoplay_speed', 3000),
                 ]);
         });
+
+        ShortcodeFacade::registerLoadingState('featured-products', Theme::getThemeNamespace('partials.shortcodes.ecommerce.featured-products-skeleton'));
     }
 
     if (is_plugin_active('blog')) {
@@ -594,6 +596,7 @@ app()->booted(function (): void {
             $appEnabled = Arr::get($attributes, 'app_enabled', '0');
 
             return ShortcodeForm::createFromArray($attributes)
+                ->withLazyLoading()
                 ->add('title', 'text', [
                     'label' => __('Title'),
                     'value' => Arr::get($attributes, 'title'),
@@ -656,6 +659,7 @@ app()->booted(function (): void {
 
     ShortcodeFacade::setAdminConfig('contact-info-boxes', function (array $attributes) {
         $form = ShortcodeForm::createFromArray($attributes)
+            ->withLazyLoading()
             ->add('title', 'text', [
                 'label' => __('Title'),
                 'value' => Arr::get($attributes, 'title'),
@@ -763,6 +767,7 @@ app()->booted(function (): void {
                 ->toArray();
 
             return ShortcodeForm::createFromArray($attributes)
+                ->withLazyLoading()
                 ->add('title', 'text', [
                     'label' => __('Title'),
                     'value' => Arr::get($attributes, 'title'),
@@ -790,6 +795,7 @@ app()->booted(function (): void {
 
     ShortcodeFacade::setAdminConfig('coming-soon', function (array $attributes) {
         return ShortcodeForm::createFromArray($attributes)
+            ->withLazyLoading()
             ->add('title', 'text', [
                 'label' => __('Title'),
                 'value' => Arr::get($attributes, 'title'),
@@ -838,6 +844,7 @@ app()->booted(function (): void {
         ];
 
         return ShortcodeForm::createFromArray($attributes)
+            ->withLazyLoading()
             ->add('title', 'text', [
                 'label' => __('Title'),
             ])

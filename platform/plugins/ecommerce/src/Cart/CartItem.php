@@ -160,11 +160,11 @@ class CartItem implements Arrayable, Jsonable
         }
 
         if ($attribute === 'subtotal') {
-            return $this->qty * $this->price;
+            return EcommerceHelper::roundPrice($this->qty * $this->price);
         }
 
         if ($attribute === 'total') {
-            return $this->qty * $this->price + $this->tax;
+            return $this->qty * $this->price + $this->taxTotal;
         }
 
         if ($attribute === 'tax') {
@@ -180,7 +180,7 @@ class CartItem implements Arrayable, Jsonable
                 return 0;
             }
 
-            return $this->tax * $this->qty;
+            return EcommerceHelper::roundPrice($this->price * $this->qty * ($this->taxRate / 100));
         }
 
         if ($attribute === 'model') {

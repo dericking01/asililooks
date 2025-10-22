@@ -19,6 +19,7 @@ use Botble\Base\Http\Middleware\AdminLocaleMiddleware;
 use Botble\Base\Http\Middleware\CoreMiddleware;
 use Botble\Base\Http\Middleware\DisableInDemoModeMiddleware;
 use Botble\Base\Http\Middleware\EnsureLicenseHasBeenActivated;
+use Botble\Base\Http\Middleware\HttpSecurityHeaders;
 use Botble\Base\Http\Middleware\HttpsProtocolMiddleware;
 use Botble\Base\Http\Middleware\LocaleMiddleware;
 use Botble\Base\Listeners\AdminNotificationListener;
@@ -95,6 +96,7 @@ class EventServiceProvider extends ServiceProvider
             $router->pushMiddlewareToGroup('web', LocaleMiddleware::class);
             $router->pushMiddlewareToGroup('web', AdminLocaleMiddleware::class);
             $router->pushMiddlewareToGroup('web', HttpsProtocolMiddleware::class);
+            $router->pushMiddlewareToGroup('web', HttpSecurityHeaders::class);
             $router->aliasMiddleware('preventDemo', DisableInDemoModeMiddleware::class);
             $router->middlewareGroup('core', [CoreMiddleware::class]);
 

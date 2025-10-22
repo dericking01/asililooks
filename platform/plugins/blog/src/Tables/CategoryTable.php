@@ -19,6 +19,7 @@ use Botble\Table\Columns\FormattedColumn;
 use Botble\Table\Columns\IdColumn;
 use Botble\Table\Columns\StatusColumn;
 use Botble\Table\Columns\YesNoColumn;
+use Botble\Table\HeaderActions\CreateHeaderAction;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
@@ -36,7 +37,8 @@ class CategoryTable extends TableAbstract
             ->addActions([
                 EditAction::make()->route('categories.edit'),
                 DeleteAction::make()->route('categories.destroy'),
-            ]);
+            ])
+            ->addHeaderAction(CreateHeaderAction::make()->route('categories.create'));
     }
 
     public function query(): Relation|Builder|QueryBuilder
@@ -100,6 +102,9 @@ class CategoryTable extends TableAbstract
                 ->title(trans('core/base::tables.name'))
                 ->alignStart()
                 ->renderUsing(function (FormattedColumn $column) {
+                    /**
+                     * @var Category $category
+                     */
                     $category = $column->getItem();
                     $depth = $this->getCategoryDepth($category);
                     $indent = str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', $depth);
@@ -111,7 +116,12 @@ class CategoryTable extends TableAbstract
                 ->title(trans('plugins/blog::categories.parent'))
                 ->alignStart()
                 ->renderUsing(function (FormattedColumn $column) {
-                    return $this->buildParentTree($column->getItem());
+                    /**
+                     * @var Category $category
+                     */
+                    $category = $column->getItem();
+
+                    return $this->buildParentTree($category);
                 }),
             Column::make('order')
                 ->title(trans('plugins/blog::categories.order'))
@@ -125,11 +135,6 @@ class CategoryTable extends TableAbstract
             CreatedAtColumn::make(),
             StatusColumn::make(),
         ];
-    }
-
-    public function buttons(): array
-    {
-        return $this->addCreateButton(route('categories.create'), 'categories.create');
     }
 
     public function bulkActions(): array
@@ -215,7 +220,7 @@ class CategoryTable extends TableAbstract
         $categoriesById = $categories->keyBy('id');
         $sorted = collect();
 
-        $addCategoryAndChildren = function ($parentId = null) use (&$addCategoryAndChildren, $categoriesById, $sorted) {
+        $addCategoryAndChildren = function ($parentId = null) use (&$addCategoryAndChildren, $categoriesById, $sorted): void {
             $children = $categoriesById->filter(function ($category) use ($parentId) {
                 return $category->parent_id == $parentId;
             })->sortBy('order');

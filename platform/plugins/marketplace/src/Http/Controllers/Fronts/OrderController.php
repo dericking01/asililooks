@@ -217,11 +217,15 @@ class OrderController extends BaseController
     public function downloadProof(Order $order)
     {
         abort_unless($order->store_id === auth('customer')->user()->store?->id, 403);
-        abort_unless($order->proof_file, 404);
 
         $storage = Storage::disk('local');
 
-        abort_unless($storage->exists($order->proof_file), 404);
+        if (! $storage->exists($order->proof_file)) {
+            return $this
+                ->httpResponse()
+                ->setError()
+                ->setMessage(__('File not found!'));
+        }
 
         return $storage->download($order->proof_file);
     }

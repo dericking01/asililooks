@@ -3,6 +3,7 @@
 namespace Botble\Ecommerce\Http\Controllers\Fronts;
 
 use Botble\Base\Http\Controllers\BaseController;
+use Botble\Ecommerce\AdsTracking\GoogleTagManager;
 use Botble\Ecommerce\Facades\Cart;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Models\Product;
@@ -36,10 +37,10 @@ class CompareController extends BaseController
             $productIds = $itemIds->all();
 
             $products = $this->productRepository
-                ->getProductsByIds($productIds, array_merge([
+                ->getProductsByIds($productIds, [
                     'take' => 10,
                     'with' => EcommerceHelper::withProductEagerLoadingRelations(),
-                ], EcommerceHelper::withReviewsParams()));
+                ]);
 
             $attributeSets = collect();
 
@@ -82,7 +83,10 @@ class CompareController extends BaseController
         return $this
             ->httpResponse()
             ->setMessage(__('Added product :product to compare list successfully!', ['product' => $product->name]))
-            ->setData(['count' => Cart::instance('compare')->count()]);
+            ->setData([
+                'count' => Cart::instance('compare')->count(),
+                'extra_data' => app(GoogleTagManager::class)->formatProductTrackingData($product->original_product),
+            ]);
     }
 
     public function destroy(int|string $productId)
@@ -102,6 +106,9 @@ class CompareController extends BaseController
         return $this
             ->httpResponse()
             ->setMessage(__('Removed product :product from compare list successfully!', ['product' => $product->name]))
-            ->setData(['count' => Cart::instance('compare')->count()]);
+            ->setData([
+                'count' => Cart::instance('compare')->count(),
+                'extra_data' => app(GoogleTagManager::class)->formatProductTrackingData($product->original_product),
+            ]);
     }
 }

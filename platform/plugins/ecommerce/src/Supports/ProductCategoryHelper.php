@@ -5,6 +5,7 @@ namespace Botble\Ecommerce\Supports;
 use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Ecommerce\Models\ProductCategory;
 use Botble\Language\Facades\Language;
+use Botble\Slug\Facades\SlugHelper;
 use Botble\Support\Services\Cache\Cache;
 use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
@@ -143,7 +144,8 @@ class ProductCategoryHelper
     {
         $cache = Cache::make(ProductCategory::class);
 
-        $cacheKey = 'ecommerce_categories_for_rendering_select' . md5($cache->generateCacheKeyFromInput() . serialize(func_get_args()));
+        $locale = app()->getLocale();
+        $cacheKey = 'ecommerce_categories_for_rendering_select_' . $locale . '_' . md5($cache->generateCacheKeyFromInput() . serialize(func_get_args()));
 
         if ($cache->has($cacheKey)) {
             $categories = $cache->get($cacheKey);
@@ -175,52 +177,26 @@ class ProductCategoryHelper
     {
         $cache = Cache::make(ProductCategory::class);
 
-        $cacheKey = 'ecommerce_categories_for_widgets_' . md5($cache->generateCacheKeyFromInput() . serialize(func_get_args()));
+        $locale = app()->getLocale();
+        $cacheKey = 'ecommerce_categories_for_widgets_' . $locale . '_' . md5($cache->generateCacheKeyFromInput() . serialize(func_get_args()));
 
         if ($cache->has($cacheKey)) {
             return $cache->get($cacheKey);
         }
 
-        $tablePrefix = Schema::getConnection()->getTablePrefix();
         $query = ProductCategory::query()
             ->toBase()
             ->where('status', BaseStatusEnum::PUBLISHED)
             ->select([
                 'ec_product_categories.id',
                 'ec_product_categories.name',
+                'ec_product_categories.slug',
                 'ec_product_categories.order',
                 'parent_id',
-                DB::raw("
-                    CONCAT({$tablePrefix}slugs.prefix,
-                    IF({$tablePrefix}slugs.prefix IS NOT NULL AND {$tablePrefix}slugs.prefix != '', '/', ''),
-                    {$tablePrefix}slugs.key) as url
-                "),
                 'icon',
                 'image',
                 'icon_image',
             ])
-            ->leftJoin('slugs', function (JoinClause $join): void {
-                $join
-                    ->on('slugs.reference_id', 'ec_product_categories.id')
-                    ->where('slugs.reference_type', ProductCategory::class);
-            })
-            ->when($this->isEnabledMultiLanguages(), function (Builder $query): void {
-                $query
-                    ->leftJoin('slugs_translations as st', function (JoinClause $join): void {
-                        $join
-                            ->on('st.slugs_id', 'slugs.id')
-                            ->where('st.lang_code', Language::getCurrentLocaleCode());
-                    })
-                    ->addSelect(
-                        DB::raw("
-                            IF(
-                                st.key IS NOT NULL,
-                                CONCAT(st.prefix, IF(st.prefix IS NOT NULL AND st.prefix != '', '/', ''), st.key),
-                                CONCAT(slugs.prefix, IF(slugs.prefix IS NOT NULL AND slugs.prefix != '', '/', ''), slugs.key)
-                            ) as url
-                        ")
-                    );
-            })
             ->oldest('ec_product_categories.order')
             ->when(
                 ! empty($categoryIds),
@@ -232,6 +208,28 @@ class ProductCategoryHelper
         $query = $this->applyQuery($query);
 
         $categories = $query->get()->unique('id');
+
+        $prefix = SlugHelper::getPrefix(ProductCategory::class);
+
+        $categories = $categories->map(function ($category) use ($prefix) {
+            if ($this->isEnabledMultiLanguages() && Schema::hasTable('ec_product_categories_translations')) {
+                $translation = DB::table('ec_product_categories_translations')
+                    ->where('ec_product_categories_id', $category->id)
+                    ->where('lang_code', Language::getCurrentLocaleCode())
+                    ->select('slug')
+                    ->first();
+
+                if ($translation && $translation->slug) {
+                    $category->slug = $translation->slug;
+                }
+            }
+
+            $category->url = $prefix
+                ? $prefix . '/' . $category->slug
+                : $category->slug;
+
+            return $category;
+        });
 
         $cache->put($cacheKey, $categories, Carbon::now()->addHours(2));
 

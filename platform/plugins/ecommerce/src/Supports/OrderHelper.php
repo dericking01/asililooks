@@ -42,6 +42,7 @@ use Botble\Ecommerce\Models\ShipmentHistory;
 use Botble\Ecommerce\Models\ShippingRule;
 use Botble\Ecommerce\Models\Tax;
 use Botble\Ecommerce\Services\Footprints\FootprinterInterface;
+use Botble\Media\Facades\RvMedia;
 use Botble\Payment\Enums\PaymentMethodEnum;
 use Botble\Payment\Enums\PaymentStatusEnum;
 use Botble\Payment\Facades\PaymentMethods;
@@ -68,6 +69,10 @@ class OrderHelper
 {
     public function processOrder(string|array|null $orderIds, ?string $chargeId = null): bool|Collection|array|Model
     {
+        if (! empty($data['is_refund_update'])) {
+            return false;
+        }
+
         $orderIds = (array) $orderIds;
 
         $orders = Order::query()->whereIn('id', $orderIds)->get();
@@ -129,14 +134,18 @@ class OrderHelper
         if (is_plugin_active('marketplace')) {
             apply_filters(SEND_MAIL_AFTER_PROCESS_ORDER_MULTI_DATA, $orders);
         } else {
-            $mailer = EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME);
-            if ($mailer->templateEnabled('admin_new_order')) {
-                $mailer = $this->setEmailVariables($firstOrder, $mailer);
-                $mailer->sendUsingTemplate('admin_new_order');
-            }
+            if (
+                ! is_plugin_active('payment')
+                || in_array($order->payment->status, [PaymentStatusEnum::PENDING, PaymentStatusEnum::COMPLETED])
+            ) {
+                $mailer = EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME);
+                if ($mailer->templateEnabled('admin_new_order')) {
+                    $mailer = $this->setEmailVariables($firstOrder, $mailer);
+                    $mailer->sendUsingTemplate('admin_new_order');
+                }
 
-            // Temporarily only send emails with the first order
-            $this->sendOrderConfirmationEmail($firstOrder, true);
+                $this->sendOrderConfirmationEmail($firstOrder, true);
+            }
         }
 
         session(['order_id' => $firstOrder->getKey()]);
@@ -202,27 +211,30 @@ class OrderHelper
 
     public function decreaseProductQuantity(Order $order): bool
     {
-        foreach ($order->products as $orderProduct) {
-            /**
-             * @var Product $product
-             */
-            $product = Product::query()->find($orderProduct->product_id);
+        return DB::transaction(function () use ($order) {
+            foreach ($order->products as $orderProduct) {
+                /**
+                 * @var Product $product
+                 */
+                $product = Product::query()
+                    ->where('id', $orderProduct->product_id)
+                    ->lockForUpdate()
+                    ->first();
 
-            if (! $product) {
-                continue;
+                if (! $product) {
+                    continue;
+                }
+
+                if ($product->with_storehouse_management && $product->quantity >= $orderProduct->qty) {
+                    $product->quantity = $product->quantity - $orderProduct->qty;
+                    $product->save();
+
+                    event(new ProductQuantityUpdatedEvent($product));
+                }
             }
 
-            // Only decrease quantity if storehouse management is enabled
-            if ($product->with_storehouse_management && $product->quantity >= $orderProduct->qty) {
-                $product->quantity = $product->quantity - $orderProduct->qty;
-                $product->save();
-
-                // Trigger event to update parent product if this is a variation
-                event(new ProductQuantityUpdatedEvent($product));
-            }
-        }
-
-        return true;
+            return true;
+        });
     }
 
     public function setEmailVariables(Order $order, ?EmailHandlerSupport $emailHandler = null): EmailHandlerSupport
@@ -342,6 +354,13 @@ class OrderHelper
                         'order_id' => $order->getKey(),
                     ])
                     ->exists()
+            ) {
+                return false;
+            }
+
+            if (
+                is_plugin_active('payment')
+                && ! in_array($order->payment->status, [PaymentStatusEnum::PENDING, PaymentStatusEnum::COMPLETED])
             ) {
                 return false;
             }
@@ -635,14 +654,17 @@ class OrderHelper
 
         $image = $product->image ?: $parentProduct->image;
 
-        /**
-         * Add cart to session
-         */
+        if (! $relativePath) {
+            $image = RvMedia::getImageUrl($image);
+        }
+
+        $price = $product->price()->getPrice(false);
+
         Cart::instance('cart')->add(
             $product->getKey(),
             BaseHelper::clean($parentProduct->name ?: $product->name),
             $request->input('qty', 1),
-            $product->price()->getPrice(false),
+            $price,
             [
                 'image' => $image,
                 'attributes' => $product->is_variation ? $product->variation_attributes : '',
@@ -652,6 +674,7 @@ class OrderHelper
                 'extras' => $request->input('extras', []),
                 'sku' => $product->sku,
                 'weight' => $product->weight,
+                'price_includes_tax' => $parentProduct->price_includes_tax,
             ]
         );
 
@@ -934,6 +957,7 @@ class OrderHelper
                 ->where('order_id', $sessionData['created_order_id'])
                 ->get();
             $productIds = [];
+
             foreach ($cartItems as $cartItem) {
                 $productByCartItem = $products['products']->firstWhere('id', $cartItem->id);
 
@@ -944,8 +968,8 @@ class OrderHelper
                     'product_image' => $cartItem->options['image'],
                     'qty' => $cartItem->qty,
                     'weight' => $productByCartItem->weight * $cartItem->qty,
-                    'price' => $cartItem->price,
-                    'tax_amount' => $cartItem->tax * $cartItem->qty,
+                    'price' => EcommerceHelper::roundPrice($cartItem->price),
+                    'tax_amount' => $cartItem->taxTotal,
                     'options' => [],
                     'product_type' => $productByCartItem->product_type,
                 ];
@@ -1169,22 +1193,7 @@ class OrderHelper
 
         event(new OrderCancelledEvent($order, $reason, $reasonDescription));
 
-        foreach ($order->products as $orderProduct) {
-            $product = $orderProduct->product;
-
-            if (! $product) {
-                continue;
-            }
-
-            // Only restore quantity if storehouse management is enabled
-            if ($product->with_storehouse_management) {
-                $product->quantity += $orderProduct->qty;
-                $product->save();
-
-                // Trigger event to update parent product if this is a variation
-                event(new ProductQuantityUpdatedEvent($product));
-            }
-        }
+        $order->restockProductQuantities(updateRestockQuantity: true);
 
         if ($order->coupon_code && $order->user_id) {
             Discount::getFacadeRoot()->afterOrderCancelled($order->coupon_code, $order->user_id);

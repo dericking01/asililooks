@@ -234,6 +234,7 @@ class MediaSettingForm extends SettingForm
                 OnOffCheckboxField::class,
                 CheckboxFieldOption::make()
                     ->label(trans('core/setting::setting.media.do_spaces_cdn_enabled'))
+                    ->helperText(trans('core/setting::setting.media.do_spaces_cdn_enabled_helper'))
                     ->checked((bool) setting('media_do_spaces_cdn_enabled'))
             )
             ->add(
@@ -397,6 +398,7 @@ class MediaSettingForm extends SettingForm
                 OnOffCheckboxField::class,
                 CheckboxFieldOption::make()
                     ->label(trans('core/setting::setting.media.backblaze_cdn_enabled'))
+                    ->helperText(trans('core/setting::setting.media.backblaze_cdn_enabled_helper'))
                     ->value($backBlazeCdnEnabled = (bool) setting('media_backblaze_cdn_enabled'))
             )
             ->addOpenCollapsible('media_backblaze_cdn_enabled', '1', $backBlazeCdnEnabled)
@@ -421,6 +423,7 @@ class MediaSettingForm extends SettingForm
                 OnOffCheckboxField::class,
                 OnOffFieldOption::make()
                     ->label(trans('core/setting::setting.media.use_original_name_for_file_path'))
+                    ->helperText(trans('core/setting::setting.media.use_original_name_for_file_path_helper'))
                     ->value(setting('media_use_original_name_for_file_path'))
                     ->colspan(6)
             )
@@ -438,6 +441,7 @@ class MediaSettingForm extends SettingForm
                 OnOffCheckboxField::class,
                 OnOffFieldOption::make()
                     ->label(trans('core/setting::setting.media.keep_original_file_size_and_quality'))
+                    ->helperText(trans('core/setting::setting.media.keep_original_file_size_and_quality_helper'))
                     ->value(setting('media_keep_original_file_size_and_quality'))
                     ->colspan(6)
             )
@@ -446,6 +450,7 @@ class MediaSettingForm extends SettingForm
                 OnOffCheckboxField::class,
                 OnOffFieldOption::make()
                     ->label(trans('core/setting::setting.media.turn_off_automatic_url_translation_into_latin'))
+                    ->helperText(trans('core/setting::setting.media.turn_off_automatic_url_translation_into_latin_helper'))
                     ->value(RvMedia::turnOffAutomaticUrlTranslationIntoLatin())
                     ->colspan(6)
             )
@@ -617,6 +622,7 @@ class MediaSettingForm extends SettingForm
                 OnOffCheckboxField::class,
                 CheckboxFieldOption::make()
                     ->label(trans('core/setting::setting.media.enable_watermark'))
+                    ->helperText(trans('core/setting::setting.media.enable_watermark_helper'))
                     ->value($mediaWatermarkEnabledValue = setting('media_watermark_enabled'))
                     ->colspan(6)
             )

@@ -60,7 +60,7 @@ class AbandonedCartService
 
         $abandonedCart = AbandonedCart::query()
             ->where('is_recovered', false)
-            ->where(function ($query) use ($customer, $sessionId) {
+            ->where(function ($query) use ($customer, $sessionId): void {
                 if ($customer) {
                     $query->where('customer_id', $customer->id);
                 } else {
@@ -80,7 +80,7 @@ class AbandonedCartService
         return AbandonedCart::query()
             ->abandoned()
             ->where('abandoned_at', '<=', now()->subHours($hoursThreshold))
-            ->where(function ($query) {
+            ->where(function ($query): void {
                 $query->whereNull('reminder_sent_at')
                     ->orWhere('reminder_sent_at', '<=', now()->subHours(24));
             })

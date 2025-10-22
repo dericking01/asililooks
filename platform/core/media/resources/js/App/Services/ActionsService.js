@@ -310,18 +310,24 @@ export class ActionsService {
         let results = []
 
         Helpers.each(Helpers.getSelectedItems(), (value) => {
+            // Convert absolute URL to relative URL for HTML and markdown
+            let imageUrl = value.full_url
+            if ((shareType === 'html' || shareType === 'markdown') && imageUrl && imageUrl.startsWith(window.location.origin)) {
+                imageUrl = imageUrl.replace(window.location.origin, '')
+            }
+
             switch (shareType) {
                 case 'html':
                     results.push(
                         value.type === 'image'
-                            ? `<img src="${value.full_url}" alt="${value.alt}" />`
-                            : `<a href="${value.full_url}" target="_blank">${value.alt}</a>`
+                            ? `<img src="${imageUrl}" alt="${value.alt}" />`
+                            : `<a href="${imageUrl}" target="_blank">${value.alt}</a>`
                     )
                     break;
                 case 'markdown':
                     results.push(
                         (value.type === 'image' ? '!' : '') +
-                        `[${value.alt}](${value.full_url})`
+                        `[${value.alt}](${imageUrl})`
                     )
                     break;
                 case 'indirect_url':

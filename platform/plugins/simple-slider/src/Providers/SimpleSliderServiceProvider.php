@@ -16,8 +16,9 @@ use Botble\SimpleSlider\Repositories\Eloquent\SimpleSliderItemRepository;
 use Botble\SimpleSlider\Repositories\Eloquent\SimpleSliderRepository;
 use Botble\SimpleSlider\Repositories\Interfaces\SimpleSliderInterface;
 use Botble\SimpleSlider\Repositories\Interfaces\SimpleSliderItemInterface;
+use Illuminate\Contracts\Support\DeferrableProvider;
 
-class SimpleSliderServiceProvider extends ServiceProvider
+class SimpleSliderServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     use LoadAndPublishDataTrait;
 
@@ -75,5 +76,13 @@ class SimpleSliderServiceProvider extends ServiceProvider
         $this->app->booted(function (): void {
             $this->app->register(HookServiceProvider::class);
         });
+    }
+
+    public function provides(): array
+    {
+        return [
+            SimpleSliderInterface::class,
+            SimpleSliderItemInterface::class,
+        ];
     }
 }

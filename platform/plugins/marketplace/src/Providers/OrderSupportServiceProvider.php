@@ -684,11 +684,14 @@ class OrderSupportServiceProvider extends ServiceProvider
         try {
             $mailer = EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME);
 
-            if ($mailer->templateEnabled('admin_new_order')) {
-                $this->setEmailVariables($orders->first());
+            /**
+             * @var Order $order
+             */
+            $order = $orders->first();
 
-                $mailer->sendUsingTemplate('admin_new_order');
-            }
+            $this->setEmailVariables($order);
+
+            $mailer->sendUsingTemplate('admin_new_order');
 
             $this->sendOrderConfirmationEmail($orders, true);
         } catch (Throwable $exception) {
@@ -729,7 +732,7 @@ class OrderSupportServiceProvider extends ServiceProvider
         try {
             $mailer = EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME);
 
-            if ($mailer->templateEnabled('customer_new_order')) {
+            if (! $mailer->templateEnabled('customer_new_order')) {
                 return false;
             }
 

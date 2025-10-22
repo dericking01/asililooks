@@ -6,11 +6,13 @@ class Action extends ActionHookEvent
 {
     public function fire(string $action, array $args): void
     {
-        if (! $this->getListeners()) {
+        $actions = $this->getListeners();
+
+        if (! $actions) {
             return;
         }
 
-        foreach ($this->getListeners() as $hook => $listeners) {
+        foreach ($actions as $hook => $listeners) {
             if ($hook !== $action) {
                 continue;
             }

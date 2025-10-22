@@ -9,10 +9,59 @@ use Botble\DataSynchronize\Exporter\ExportColumn;
 use Botble\DataSynchronize\Exporter\ExportCounter;
 use Botble\DataSynchronize\Exporter\Exporter;
 use Botble\Media\Facades\RvMedia;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 class PostExporter extends Exporter
 {
+    protected ?int $limit = null;
+
+    protected ?string $status = null;
+
+    protected ?bool $isFeatured = null;
+
+    protected ?string $startDate = null;
+
+    protected ?string $endDate = null;
+
+    protected ?int $categoryId = null;
+
+    public function setLimit(?int $limit): static
+    {
+        $this->limit = $limit;
+
+        return $this;
+    }
+
+    public function setStatus(?string $status): static
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function setIsFeatured(?bool $isFeatured): static
+    {
+        $this->isFeatured = $isFeatured;
+
+        return $this;
+    }
+
+    public function setDateRange(?string $startDate, ?string $endDate): static
+    {
+        $this->startDate = $startDate;
+        $this->endDate = $endDate;
+
+        return $this;
+    }
+
+    public function setCategoryId(?int $categoryId): static
+    {
+        $this->categoryId = $categoryId;
+
+        return $this;
+    }
     public function getLabel(): string
     {
         return trans('plugins/blog::posts.posts');
@@ -40,12 +89,47 @@ class PostExporter extends Exporter
         ];
     }
 
+    protected function applyFilters(Builder $query): void
+    {
+        if ($this->status) {
+            $query->where('status', $this->status);
+        }
+
+        if ($this->isFeatured !== null) {
+            $query->where('is_featured', $this->isFeatured);
+        }
+
+        if ($this->startDate) {
+            $query->whereDate('created_at', '>=', Carbon::parse($this->startDate));
+        }
+
+        if ($this->endDate) {
+            $query->whereDate('created_at', '<=', Carbon::parse($this->endDate));
+        }
+
+        if ($this->categoryId) {
+            $query->whereHas('categories', function ($q): void {
+                $q->where('categories.id', $this->categoryId);
+            });
+        }
+
+        if ($this->limit) {
+            $query->latest()->limit($this->limit);
+        } else {
+            $query->oldest();
+        }
+    }
+
     public function counters(): array
     {
+        $query = Post::query();
+
+        $this->applyFilters($query);
+
         return [
             ExportCounter::make()
                 ->label(trans('plugins/blog::posts.export.total'))
-                ->value(Post::query()->count()),
+                ->value($query->count()),
         ];
     }
 
@@ -56,10 +140,13 @@ class PostExporter extends Exporter
 
     public function collection(): Collection
     {
-        return Post::query()
-            ->with(['categories', 'tags', 'slugable'])
-            ->get()
-            ->transform(fn (Post $post) => [ // @phpstan-ignore-line
+        $query = Post::query()
+            ->with(['categories', 'tags', 'slugable']);
+
+        $this->applyFilters($query);
+
+        return $query->get()
+            ->transform(fn (Post $post) => [
                 ...$post->toArray(),
                 'slug' => $post->slugable->key,
                 'url' => $post->url,
@@ -67,5 +154,10 @@ class PostExporter extends Exporter
                 'categories' => $post->categories->pluck('name')->implode(', '),
                 'tags' => $post->tags->pluck('name')->implode(', '),
             ]);
+    }
+
+    protected function getView(): string
+    {
+        return 'plugins/blog::posts.export';
     }
 }

@@ -95,6 +95,7 @@ class ProductRequest extends Request
                 'max:150',
             ],
             'cost_per_item' => ['nullable', 'numeric', 'min:0'],
+            'price_includes_tax' => ['nullable', 'boolean'],
             'general_license_code' => ['nullable', 'in:0,1'],
             'categories' => ['nullable', 'array'],
             'categories.*' => ['nullable', Rule::exists((new ProductCategory())->getTable(), 'id')],

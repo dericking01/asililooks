@@ -53,6 +53,14 @@ class AdsManager
 
     protected function read(array $with): Collection
     {
+        $defaultWith = ['metadata'];
+
+        if (! empty($with)) {
+            $with = array_merge($defaultWith, $with);
+        } else {
+            $with = $defaultWith;
+        }
+
         return Ads::query()->with($with)->get();
     }
 

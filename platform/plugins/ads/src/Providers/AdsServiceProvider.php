@@ -18,13 +18,14 @@ use Botble\LanguageAdvanced\Supports\LanguageAdvancedManager;
 use Botble\Setting\PanelSections\SettingOthersPanelSection;
 use Botble\Shortcode\Facades\Shortcode;
 use Botble\Shortcode\Forms\ShortcodeForm;
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Throwable;
 
-class AdsServiceProvider extends ServiceProvider
+class AdsServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     use LoadAndPublishDataTrait;
 
@@ -180,5 +181,13 @@ class AdsServiceProvider extends ServiceProvider
                 return true;
             }, 45, 2);
         });
+    }
+
+    public function provides(): array
+    {
+        return [
+            AdsInterface::class,
+            'AdsManager',
+        ];
     }
 }

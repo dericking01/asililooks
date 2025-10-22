@@ -2,6 +2,10 @@
 
 @section('title', __('Order successfully. Order number :id', ['id' => $order->code]))
 
+@push('header')
+    @include('plugins/ecommerce::orders.partials.google-ads-conversion', ['orders' => [$order]])
+@endpush
+
 @section('content')
     <div class="row">
         <div class="col-lg-7 col-md-6 col-12">
@@ -33,7 +37,6 @@
         </div>
     </div>
 
-    {{-- Continue shopping button for mobile, positioned at the bottom --}}
     <div class="d-md-none mt-4 mb-4">
         <a class="btn payment-checkout-btn w-100 mb-5" href="{{ BaseHelper::getHomepageUrl() }}">
             {{ __('Continue shopping') }}

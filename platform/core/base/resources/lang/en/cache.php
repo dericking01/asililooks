@@ -9,6 +9,9 @@ return [
     'refresh_button' => 'Refresh',
     'cache_size_warning' => 'Your CMS cache size is quite large (>50MB). Clearing it may improve system performance.',
     'footer_note' => 'Clear cache after making changes to your site to ensure they appear correctly.',
+    'type' => 'Type',
+    'description' => 'Description',
+    'action' => 'Action',
     'commands' => [
         'clear_cms_cache' => [
             'title' => 'Clear all CMS cache',
@@ -34,6 +37,30 @@ return [
             'title' => 'Clear log',
             'description' => 'Clear system log files',
             'success_msg' => 'The system log has been cleaned',
+        ],
+    ],
+    'optimization' => [
+        'title' => 'Performance Optimization',
+        'optimize' => [
+            'title' => 'Optimize site performance',
+            'description' => 'Cache configuration, routes, and views for faster loading speed.',
+            'button' => 'Optimize',
+            'success_msg' => 'Optimization completed successfully',
+        ],
+        'clear' => [
+            'title' => 'Clear optimization cache',
+            'description' => 'Remove optimization caches to allow configuration changes.',
+            'button' => 'Clear',
+            'success_msg' => 'Optimization cache cleared successfully',
+        ],
+        'messages' => [
+            'config_cached' => 'Configuration cached',
+            'routes_cleared' => 'Routes cleared (command line required for caching)',
+            'views_compiled' => 'Views compiled',
+            'framework_cache_cleared' => 'Framework cache cleared',
+            'optimization_completed' => 'Optimization completed: :details',
+            'optimization_failed' => 'Optimization failed: :error',
+            'clear_failed' => 'Clear optimization failed: :error',
         ],
     ],
 ];

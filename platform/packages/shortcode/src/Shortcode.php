@@ -3,6 +3,7 @@
 namespace Botble\Shortcode;
 
 use Botble\Shortcode\Compilers\ShortcodeCompiler;
+use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
 
@@ -66,12 +67,12 @@ class Shortcode
         return Arr::sort($this->compiler->getRegistered());
     }
 
-    public function setAdminConfig(string $key, string|null|callable|array $html): void
+    public function setAdminConfig(string $key, string|null|callable|Closure|array $html): void
     {
         $this->compiler->setAdminConfig($key, $html);
     }
 
-    public function modifyAdminConfig(string $key, callable $callback): void
+    public function modifyAdminConfig(string $key, callable|Closure $callback): void
     {
         $this->compiler->modifyAdminConfig($key, $callback);
     }
@@ -100,6 +101,7 @@ class Shortcode
         }
 
         foreach ($attributes as $key => $attribute) {
+            $attribute = str_replace(["\r\n", "\n", "\r"], '{{NEWLINE}}', $attribute);
             $parsedAttributes .= ' ' . $key . '="' . $attribute . '"';
         }
 

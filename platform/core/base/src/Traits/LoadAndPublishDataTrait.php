@@ -34,7 +34,9 @@ trait LoadAndPublishDataTrait
             $modulePath = base_path('platform/' . $this->getDashedNamespace());
         }
 
-        return $modulePath . ($path ? '/' . ltrim($path, '/') : '');
+        $modulePath = str_replace('/', DIRECTORY_SEPARATOR, $modulePath);
+
+        return $modulePath . ($path ? DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR) : '');
     }
 
     protected function loadAndPublishConfigurations(array|string $fileNames): static
@@ -145,6 +147,8 @@ trait LoadAndPublishDataTrait
             $path = 'vendor/core/' . $this->getDashedNamespace();
         }
 
+        $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
+
         $this->publishes([$this->getAssetsPath() => public_path($path)], 'cms-public');
 
         return $this;
@@ -168,6 +172,13 @@ trait LoadAndPublishDataTrait
             $this->getViewsPath() . '/components',
             str_replace('/', '-', (string) $this->namespace)
         );
+
+        return $this;
+    }
+
+    protected function loadPermissionsRegistration(): static
+    {
+        $this->loadAndPublishConfigurations(['permissions']);
 
         return $this;
     }

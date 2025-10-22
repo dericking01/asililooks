@@ -10,6 +10,15 @@
         name="csrf-token"
         content="{{ csrf_token() }}"
     >
+    @php
+        $description = trim((string) View::yieldContent('description')) ?: theme_option('ecommerce_checkout_seo_description');
+    @endphp
+    @if($description)
+        <meta
+            name="description"
+            content="{{ $description }}"
+        >
+    @endif
     <title> @yield('title', __('Checkout')) </title>
 
     @if ($favicon = Theme::getFavicon())

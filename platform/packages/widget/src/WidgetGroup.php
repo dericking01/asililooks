@@ -3,6 +3,7 @@
 namespace Botble\Widget;
 
 use Botble\Widget\Misc\ViewExpressionTrait;
+use Closure;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Arr;
 use stdClass;
@@ -13,9 +14,9 @@ class WidgetGroup
 
     protected string $id;
 
-    protected string $name;
+    protected string|Closure $name;
 
-    protected ?string $description = null;
+    protected string|null|Closure $description = null;
 
     protected array $widgets = [];
 
@@ -161,10 +162,12 @@ class WidgetGroup
 
     public function getName(): string
     {
-        return $this->name;
+        $name = $this->name;
+
+        return $name instanceof Closure ? $name() : $name;
     }
 
-    public function setName(string $name): self
+    public function setName(string|Closure $name): self
     {
         $this->name = $name;
 
@@ -173,10 +176,12 @@ class WidgetGroup
 
     public function getDescription(): ?string
     {
-        return $this->description;
+        $description = $this->description;
+
+        return $description instanceof Closure ? $description() : $description;
     }
 
-    public function setDescription(?string $description): self
+    public function setDescription(string|null|Closure $description): self
     {
         $this->description = $description;
 

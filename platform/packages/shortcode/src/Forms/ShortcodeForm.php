@@ -96,6 +96,14 @@ class ShortcodeForm extends FormAbstract
 
     public function withCacheWarning(string $shortcodeName): static
     {
+        if (! setting('shortcode_cache_enabled', false)) {
+            return $this;
+        }
+
+        if (! app()->hasDebugModeEnabled()) {
+            return $this;
+        }
+
         self::beforeRendering(function (self $form) use ($shortcodeName) {
             if (in_array($shortcodeName, ShortcodeCompiler::getIgnoredCaches())) {
                 $form

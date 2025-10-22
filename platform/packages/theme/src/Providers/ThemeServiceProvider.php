@@ -13,11 +13,13 @@ use Botble\Setting\PanelSections\SettingCommonPanelSection;
 use Botble\Theme\Commands\ThemeActivateCommand;
 use Botble\Theme\Commands\ThemeAssetsPublishCommand;
 use Botble\Theme\Commands\ThemeAssetsRemoveCommand;
+use Botble\Theme\Commands\ThemeClearCacheCommand;
 use Botble\Theme\Commands\ThemeOptionCheckMissingCommand;
 use Botble\Theme\Commands\ThemeRemoveCommand;
 use Botble\Theme\Commands\ThemeRenameCommand;
 use Botble\Theme\Contracts\Theme as ThemeContract;
 use Botble\Theme\Events\RenderingAdminBar;
+use Botble\Theme\Manager;
 use Botble\Theme\Theme;
 
 class ThemeServiceProvider extends ServiceProvider
@@ -27,13 +29,15 @@ class ThemeServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(ThemeContract::class, Theme::class);
+        $this->app->singleton(Manager::class);
     }
 
     public function boot(): void
     {
         $this
             ->setNamespace('packages/theme')
-            ->loadAndPublishConfigurations(['general', 'permissions'])
+            ->loadAndPublishConfigurations(['general'])
+            ->loadAndPublishConfigurations(['permissions'])
             ->loadAndPublishViews()
             ->loadAndPublishTranslations()
             ->loadHelpers()
@@ -168,6 +172,7 @@ class ThemeServiceProvider extends ServiceProvider
                 ThemeActivateCommand::class,
                 ThemeRemoveCommand::class,
                 ThemeAssetsPublishCommand::class,
+                ThemeClearCacheCommand::class,
                 ThemeOptionCheckMissingCommand::class,
                 ThemeAssetsRemoveCommand::class,
                 ThemeRenameCommand::class,

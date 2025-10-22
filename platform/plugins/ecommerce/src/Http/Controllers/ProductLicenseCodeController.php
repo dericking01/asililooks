@@ -89,8 +89,7 @@ class ProductLicenseCodeController extends BaseController
         $this->pageTitle(trans('plugins/ecommerce::products.license_codes.title') . ' - ' . $product->name, false);
 
         $licenseCodes = $product->licenseCodes()
-            ->with(['assignedOrderProduct.order'])
-            ->orderBy('created_at', 'desc')
+            ->with(['assignedOrderProduct.order'])->latest()
             ->paginate(20);
 
         // Check for low stock warning
@@ -120,7 +119,7 @@ class ProductLicenseCodeController extends BaseController
         }
 
         $request->validate([
-            'license_code' => 'required|string|max:255|unique:ec_product_license_codes,license_code',
+            'license_code' => ['required', 'string', 'max:255', 'unique:ec_product_license_codes,license_code'],
         ]);
 
         $product->licenseCodes()->create([
@@ -137,9 +136,7 @@ class ProductLicenseCodeController extends BaseController
     {
         $this->validateProductLicenseCodeAccess($product);
 
-        if ($licenseCode->product_id !== $product->id) {
-            abort(404);
-        }
+        abort_if($licenseCode->product_id !== $product->id, 404);
 
         if ($licenseCode->isUsed()) {
             return $this
@@ -165,9 +162,7 @@ class ProductLicenseCodeController extends BaseController
     {
         $this->validateProductLicenseCodeAccess($product);
 
-        if ($licenseCode->product_id !== $product->id) {
-            abort(404);
-        }
+        abort_if($licenseCode->product_id !== $product->id, 404);
 
         if ($licenseCode->isUsed()) {
             return $this
@@ -196,9 +191,9 @@ class ProductLicenseCodeController extends BaseController
         }
 
         $request->validate([
-            'quantity' => 'required|integer|min:1|max:100',
-            'format' => 'required|string|in:uuid,alphanumeric,numeric,custom',
-            'pattern' => 'required_if:format,custom|string|max:50',
+            'quantity' => ['required', 'integer', 'min:1', 'max:100'],
+            'format' => ['required', 'string', 'in:uuid,alphanumeric,numeric,custom'],
+            'pattern' => ['required_if:format,custom', 'string', 'max:50'],
         ]);
 
         $quantity = $request->input('quantity');
@@ -355,29 +350,19 @@ class ProductLicenseCodeController extends BaseController
     private function validateProductLicenseCodeAccess(Product $product): void
     {
         // Check if license codes feature is globally enabled
-        if (! EcommerceHelper::isEnabledLicenseCodesForDigitalProducts()) {
-            abort(404, trans('plugins/ecommerce::products.license_codes.errors.feature_not_enabled'));
-        }
+        abort_unless(EcommerceHelper::isEnabledLicenseCodesForDigitalProducts(), 404, trans('plugins/ecommerce::products.license_codes.errors.feature_not_enabled'));
 
         // Check if digital products are supported
-        if (! EcommerceHelper::isEnabledSupportDigitalProducts()) {
-            abort(404, trans('plugins/ecommerce::products.license_codes.errors.digital_products_not_enabled'));
-        }
+        abort_unless(EcommerceHelper::isEnabledSupportDigitalProducts(), 404, trans('plugins/ecommerce::products.license_codes.errors.digital_products_not_enabled'));
 
         // Check if the product exists
-        if (! $product) {
-            abort(404, trans('plugins/ecommerce::products.license_codes.errors.product_not_found'));
-        }
+        abort_unless($product, 404, trans('plugins/ecommerce::products.license_codes.errors.product_not_found'));
 
         // Check if the product is a digital product
-        if (! $product->isTypeDigital()) {
-            abort(404, trans('plugins/ecommerce::products.license_codes.errors.not_digital_product'));
-        }
+        abort_unless($product->isTypeDigital(), 404, trans('plugins/ecommerce::products.license_codes.errors.not_digital_product'));
 
         // Check if the product has license code generation enabled
-        if (! $product->generate_license_code) {
-            abort(404, trans('plugins/ecommerce::products.license_codes.errors.license_codes_not_enabled_for_product'));
-        }
+        abort_unless($product->generate_license_code, 404, trans('plugins/ecommerce::products.license_codes.errors.license_codes_not_enabled_for_product'));
     }
 
     /**

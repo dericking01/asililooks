@@ -21,9 +21,9 @@ class CustomerStatusEnum extends Enum
     public function toHtml(): HtmlString|string
     {
         $color = match ($this->value) {
-            self::ACTIVATED => 'info',
-            self::LOCKED => 'warning',
-            default => 'primary',
+            self::ACTIVATED => 'green',
+            self::LOCKED => 'orange',
+            default => 'cyan',
         };
 
         return BaseHelper::renderBadge($this->label(), $color);

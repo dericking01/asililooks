@@ -9,7 +9,13 @@ export class EditorService {
         if (window.opener && is_ckeditor) {
             let firstItem = Helpers.arrayFirst(selectedFiles)
 
-            window.opener.CKEDITOR.tools.callFunction(Helpers.getUrlParam('CKEditorFuncNum'), firstItem.full_url)
+            // Convert absolute URL to relative URL
+            let imageUrl = firstItem.full_url
+            if (imageUrl && imageUrl.startsWith(window.location.origin)) {
+                imageUrl = imageUrl.replace(window.location.origin, '')
+            }
+
+            window.opener.CKEDITOR.tools.callFunction(Helpers.getUrlParam('CKEditorFuncNum'), imageUrl)
 
             if (window.opener) {
                 window.close()

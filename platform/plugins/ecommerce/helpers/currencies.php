@@ -49,7 +49,7 @@ if (! function_exists('format_price')) {
         }
 
         if ($useSymbol && $currency->is_prefix_symbol) {
-            $space = (int) get_ecommerce_setting('add_space_between_price_and_currency', 0) == 1 ? ' ' : null;
+            $space = $currency->space_between_price_and_currency ? ' ' : null;
 
             return $currency->symbol . $space . human_price_text($price, $currency);
         }
@@ -91,16 +91,57 @@ if (! function_exists('human_price_text')) {
             $thousandSeparator = ' ';
         }
 
-        $price = number_format(
-            (float) $price,
-            (int) $numberAfterDot,
-            $decimalSeparator,
-            $thousandSeparator
-        );
+        $numberFormatStyle = ($currency instanceof Currency) ? ($currency->number_format_style ?? 'western') : 'western';
 
-        $space = (int) get_ecommerce_setting('add_space_between_price_and_currency', 0) == 1 || $convertNumberToText ? ' ' : null;
+        if ($numberFormatStyle === 'indian') {
+            $price = format_indian_number((float) $price, (int) $numberAfterDot, $decimalSeparator, $thousandSeparator);
+        } else {
+            $price = number_format(
+                (float) $price,
+                (int) $numberAfterDot,
+                $decimalSeparator,
+                $thousandSeparator
+            );
+        }
+
+        $space = ($currency instanceof Currency && $currency->space_between_price_and_currency) || $convertNumberToText ? ' ' : null;
 
         return $price . $space . ($priceUnit ?: '');
+    }
+}
+
+if (! function_exists('format_indian_number')) {
+    function format_indian_number(float $number, int $decimals = 2, string $decimalSeparator = '.', string $thousandSeparator = ','): string
+    {
+        $parts = explode('.', number_format($number, $decimals, '.', ''));
+        $integerPart = $parts[0];
+        $decimalPart = $parts[1] ?? '';
+
+        if (strlen($integerPart) <= 3) {
+            $formatted = $integerPart;
+        } else {
+            $lastThree = substr($integerPart, -3);
+            $remaining = substr($integerPart, 0, -3);
+
+            $formatted = '';
+            while (strlen($remaining) > 0) {
+                if (strlen($remaining) <= 2) {
+                    $formatted = $remaining . $thousandSeparator . $formatted;
+                    $remaining = '';
+                } else {
+                    $formatted = substr($remaining, -2) . $thousandSeparator . $formatted;
+                    $remaining = substr($remaining, 0, -2);
+                }
+            }
+
+            $formatted = $formatted . $lastThree;
+        }
+
+        if ($decimals > 0 && $decimalPart !== '') {
+            $formatted = $formatted . $decimalSeparator . $decimalPart;
+        }
+
+        return $formatted;
     }
 }
 

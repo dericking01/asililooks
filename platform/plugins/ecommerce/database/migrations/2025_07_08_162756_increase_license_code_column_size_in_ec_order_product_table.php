@@ -7,14 +7,14 @@ use Illuminate\Support\Facades\Schema;
 return new class () extends Migration {
     public function up(): void
     {
-        Schema::table('ec_order_product', function (Blueprint $table) {
+        Schema::table('ec_order_product', function (Blueprint $table): void {
             $table->text('license_code')->nullable()->change();
         });
     }
 
     public function down(): void
     {
-        Schema::table('ec_order_product', function (Blueprint $table) {
+        Schema::table('ec_order_product', function (Blueprint $table): void {
             $table->string('license_code')->nullable()->change();
         });
     }

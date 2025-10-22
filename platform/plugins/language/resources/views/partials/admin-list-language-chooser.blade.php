@@ -2,7 +2,7 @@
     $languages ??= Language::getActiveLanguage();
 @endphp
 
-<div class="text-end d-flex gap-2 justify-content-start justify-content-lg-end align-items-center">
+<div class="text-end d-flex gap-2 justify-content-start justify-content-lg-end align-items-center list-languages-chooser">
     <h4 class="mb-0">{{ trans('plugins/language::language.translations') }}:</h4>
     @if (count($languages) <= 3)
         <div class="d-flex gap-3 align-items-center">

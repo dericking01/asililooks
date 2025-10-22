@@ -81,7 +81,7 @@
                             {{ BaseHelper::formatDateTime($vendor->created_at) }}
                         </x-core::datagrid.item>
 
-                        @if($vendor->store->certificate_file)
+                        @if($vendor->store->certificate_file && Storage::disk('local')->exists($vendor->store->certificate_file))
                             <x-core::datagrid.item>
                                 <x-slot:title>
                                     {{ trans('plugins/marketplace::unverified-vendor.forms.certificate') }}
@@ -92,7 +92,7 @@
                             </x-core::datagrid.item>
                         @endif
 
-                        @if($vendor->store->government_id_file)
+                        @if($vendor->store->government_id_file && Storage::disk('local')->exists($vendor->store->government_id_file))
                             <x-core::datagrid.item>
                                 <x-slot:title>
                                     {{ trans('plugins/marketplace::unverified-vendor.forms.government_id') }}

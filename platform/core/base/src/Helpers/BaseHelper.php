@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Throwable;
@@ -602,5 +603,16 @@ class BaseHelper
         } catch (Throwable $e) {
             $this->logError($e);
         }
+    }
+
+    public function isAdminRequest(): bool
+    {
+        $adminPrefix = config('core.base.general.admin_dir', 'admin');
+
+        if (empty($adminPrefix)) {
+            return true;
+        }
+
+        return Request::is($adminPrefix . '/*') || Request::is($adminPrefix);
     }
 }

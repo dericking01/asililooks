@@ -52,6 +52,7 @@ class ProductController extends BaseApiController
      * @queryParam max_price int Maximum price. No-example
      * @queryParam price_ranges string Price ranges as JSON string. Example: [{"from":10,"to":20},{"from":30,"to":40}]
      * @queryParam attributes string Attributes as JSON string. Example: [{"id":1,"value":1},{"id":2,"value":2}]
+     * @queryParam thumbnail_size string Size of product thumbnail images. Value: thumb, small, medium, large. Default: thumb
      *
      * @return JsonResponse
      */
@@ -72,6 +73,7 @@ class ProductController extends BaseApiController
      *
      * @group Products
      * @param string $slug Product slug
+     * @queryParam thumbnail_size string Size of product thumbnail images. Value: thumb, small, medium, large. Default: thumb
      * @return JsonResponse
      *
      * @throws \Illuminate\Http\Exceptions\HttpResponseException
@@ -101,7 +103,6 @@ class ProductController extends BaseApiController
                         $query->where('ec_product_cross_sale_relations.is_variant', false);
                     },
                 ],
-                ...EcommerceHelper::withReviewsParams(),
             ]
         );
 
@@ -185,10 +186,9 @@ class ProductController extends BaseApiController
                         RvMedia::getDefaultImage()
                     ),
                 ],
-                'attribute_sets' => array_map(function ($set, $key) use ($productVariationsInfo, $attributeSets, $productAttributes) {
+                'attribute_sets' => array_map(function ($set, $key) use ($productVariationsInfo, $attributeSets, $productAttributes, $productVariations) {
                     $variationNextIds = [];
 
-                    // Process previous attribute sets to get variationNextIds
                     if ($key > 0) {
                         for ($i = 0; $i < $key; $i++) {
                             $previousSet = $attributeSets[$i];
@@ -196,14 +196,13 @@ class ProductController extends BaseApiController
                                 $productAttributes->where('attribute_set_id', $previousSet->id),
                                 $productVariationsInfo,
                                 $previousSet->id,
-                                [], // No selected attributes for API response
+                                [],
                                 $i,
                                 $variationNextIds
                             );
                         }
                     }
 
-                    // Get all attributes for this set
                     $setAttributes = $productAttributes->where('attribute_set_id', $set->id)->sortBy('order');
 
                     return [
@@ -212,33 +211,36 @@ class ProductController extends BaseApiController
                         'slug' => $set->slug,
                         'order' => $set->order,
                         'display_layout' => $set->display_layout,
-                        'attributes' => array_values(array_map(function ($attr) {
+                        'use_image_from_product_variation' => $set->use_image_from_product_variation,
+                        'attributes' => array_values(array_map(function ($attr) use ($set, $productVariations) {
                             return [
                                 'id' => $attr->id,
                                 'title' => $attr->title,
                                 'slug' => $attr->slug,
                                 'color' => $attr->color,
-                                'image' => $attr->image,
+                                'image' => $attr->getAttributeImageUrl($set, $productVariations),
                                 'order' => $attr->order,
                             ];
                         }, $setAttributes->all())),
                     ];
                 }, $attributeSets->all(), array_keys($attributeSets->all())),
                 'unavailable_attribute_ids' => $this->getUnavailableAttributeIds($productVariationsInfo, $attributeSets, $productAttributes, $selectedAttrs instanceof Collection ? $selectedAttrs->pluck('id')->toArray() : []),
-                'selected_attributes' => array_map(function ($attr) {
+                'selected_attributes' => array_map(function ($attr) use ($productVariations) {
+                    $attributeSet = $attr->productAttributeSet;
+
                     return [
                         'id' => $attr->id,
                         'attribute_set' => [
                             'id' => $attr->attribute_set_id,
-                            'title' => $attr->productAttributeSet->title,
-                            'slug' => $attr->productAttributeSet->slug,
-                            'order' => $attr->productAttributeSet->order,
-                            'display_layout' => $attr->productAttributeSet->display_layout,
+                            'title' => $attributeSet->title,
+                            'slug' => $attributeSet->slug,
+                            'order' => $attributeSet->order,
+                            'display_layout' => $attributeSet->display_layout,
                         ],
                         'title' => $attr->title,
                         'slug' => $attr->slug,
                         'color' => $attr->color,
-                        'image' => $attr->image,
+                        'image' => $attr->getAttributeImageUrl($attributeSet, $productVariations),
                         'order' => $attr->order,
                     ];
                 }, $selectedAttrs instanceof Collection ? $selectedAttrs->all() : $selectedAttrs),
@@ -636,11 +638,9 @@ class ProductController extends BaseApiController
             ->httpResponse()
             ->setData(new ProductVariationResource($product))
             ->setAdditional([
-                'attribute_sets' => array_map(function ($set, $key) use ($productVariationsInfo, $attributeSets, $productAttributes) {
-                    // Initialize variation info for this attribute set
+                'attribute_sets' => array_map(function ($set, $key) use ($productVariationsInfo, $attributeSets, $productAttributes, $productVariations) {
                     $variationNextIds = [];
 
-                    // Process previous attribute sets to get variationNextIds
                     if ($key > 0) {
                         for ($i = 0; $i < $key; $i++) {
                             $previousSet = $attributeSets[$i];
@@ -648,14 +648,13 @@ class ProductController extends BaseApiController
                                 $productAttributes->where('attribute_set_id', $previousSet->id),
                                 $productVariationsInfo,
                                 $previousSet->id,
-                                [], // No selected attributes for API response
+                                [],
                                 $i,
                                 $variationNextIds
                             );
                         }
                     }
 
-                    // Get all attributes for this set
                     $setAttributes = $productAttributes->where('attribute_set_id', $set->id)->sortBy('order');
 
                     return [
@@ -664,13 +663,16 @@ class ProductController extends BaseApiController
                         'slug' => $set->slug,
                         'order' => $set->order,
                         'display_layout' => $set->display_layout,
-                        'attributes' => array_values(array_map(function ($attr) {
+                        'use_image_from_product_variation' => $set->use_image_from_product_variation,
+                        'attributes' => array_values(array_map(function ($attr) use ($set, $productVariations) {
                             return [
                                 'id' => $attr->id,
                                 'title' => $attr->title,
                                 'slug' => $attr->slug,
                                 'color' => $attr->color,
-                                'image' => $attr->image,
+                                'image' => method_exists($attr, 'getAttributeImageUrl')
+                                    ? $attr->getAttributeImageUrl($set, $productVariations)
+                                    : ($attr->image ?? null),
                                 'order' => $attr->order,
                             ];
                         }, $setAttributes->all())),
@@ -678,7 +680,7 @@ class ProductController extends BaseApiController
                 }, $attributeSets->all(), array_keys($attributeSets->all())),
                 'unavailable_attribute_ids' => $unavailableAttributeIds,
                 'selected_attributes' => is_object($selectedAttributes) && method_exists($selectedAttributes, 'map')
-                    ? $selectedAttributes->map(function ($attr) {
+                    ? $selectedAttributes->map(function ($attr) use ($productVariations) {
                         if (! is_object($attr)) {
                             return null;
                         }
@@ -697,7 +699,9 @@ class ProductController extends BaseApiController
                             'title' => $attr->title ?? null,
                             'slug' => $attr->slug ?? null,
                             'color' => $attr->color ?? null,
-                            'image' => $attr->image ?? null,
+                            'image' => method_exists($attr, 'getAttributeImageUrl')
+                                ? $attr->getAttributeImageUrl($attributeSet, $productVariations)
+                                : ($attr->image ?? null),
                             'order' => $attr->order ?? 0,
                         ];
                     })->filter()->values()->all()

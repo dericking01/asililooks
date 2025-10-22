@@ -86,6 +86,18 @@ class PluginManifest
 
             $content = BaseHelper::getFileData($configFilePath);
             if (! empty($content)) {
+                $conflicts = [
+                    'botble-ip-blocker',
+                    'archielite/ip-blocker',
+                ];
+
+                if (in_array($plugin, $conflicts) || in_array(Arr::get($content, 'id'), $conflicts)) {
+                    $version = Arr::get($content, 'version');
+                    if ($version && version_compare($version, '1.0.3', '<=')) {
+                        continue;
+                    }
+                }
+
                 if (Arr::has($content, 'namespace')) {
                     $namespaces[$plugin] = $content['namespace'];
                 }

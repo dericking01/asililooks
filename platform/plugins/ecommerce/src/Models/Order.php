@@ -8,6 +8,7 @@ use Botble\Ecommerce\Enums\OrderCancellationReasonEnum;
 use Botble\Ecommerce\Enums\OrderStatusEnum;
 use Botble\Ecommerce\Enums\ShippingMethodEnum;
 use Botble\Ecommerce\Enums\ShippingStatusEnum;
+use Botble\Ecommerce\Events\ProductQuantityUpdatedEvent;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Facades\OrderHelper;
 use Botble\Payment\Enums\PaymentStatusEnum;
@@ -59,6 +60,9 @@ class Order extends BaseModel
     protected static function booted(): void
     {
         self::deleted(function (Order $order): void {
+            // Restore stock quantities before deleting order products
+            $order->restockProductQuantities();
+
             $order->shipment()->each(fn (Shipment $item) => $item->delete());
             $order->histories()->delete();
             $order->products()->delete();
@@ -264,6 +268,31 @@ class Order extends BaseModel
         return ! $this->returnRequest()->exists();
     }
 
+    public function restockProductQuantities(bool $updateRestockQuantity = false): void
+    {
+        foreach ($this->products as $orderProduct) {
+            $product = $orderProduct->product;
+
+            if (! $product || ! $product->id) {
+                continue;
+            }
+
+            $quantityToRestore = $orderProduct->qty - ($orderProduct->restock_quantity ?? 0);
+
+            if ($product->with_storehouse_management && $quantityToRestore > 0) {
+                $product->quantity += $quantityToRestore;
+                $product->save();
+
+                if ($updateRestockQuantity) {
+                    $orderProduct->restock_quantity = $orderProduct->qty;
+                    $orderProduct->save();
+                }
+
+                event(new ProductQuantityUpdatedEvent($product));
+            }
+        }
+    }
+
     public static function generateUniqueCode(): string
     {
         $nextInsertId = BaseModel::determineIfUsingUuidsForId() ? static::query()->count() + 1 : static::query()->max(
@@ -362,5 +391,61 @@ class Order extends BaseModel
                 'variationProductAttributes',
             ],
         ]);
+    }
+
+    public function toWebhookData(): array
+    {
+        $shippingAddress = $this->shippingAddress;
+
+        $customerData = [
+            'name' => $shippingAddress->name,
+            'email' => $shippingAddress->email,
+            'phone' => $shippingAddress->phone,
+            'address' => [
+                'address' => $shippingAddress->address,
+                'city' => $shippingAddress->city,
+                'state' => $shippingAddress->state,
+                'country' => $shippingAddress->country,
+                'zip_code' => $shippingAddress->zip_code,
+            ],
+        ];
+
+        if ($this->user_id) {
+            $customerData['id'] = $this->user_id;
+        }
+
+        $data = [
+            'id' => $this->id,
+            'status' => [
+                'value' => $this->status->getValue(),
+                'text' => $this->status->label(),
+            ],
+            'shipping_status' => $this->shipment->id ? [
+                'value' => $this->shipment->status->getValue(),
+                'text' => $this->shipment->status->label(),
+            ] : [],
+            'payment_method' => is_plugin_active('payment') && $this->payment->id ? [
+                'value' => $this->payment->payment_channel->getValue(),
+                'text' => $this->payment->payment_channel->label(),
+            ] : [],
+            'payment_status' => is_plugin_active('payment') && $this->payment->id ? [
+                'value' => $this->payment->status->getValue(),
+                'text' => $this->payment->status->label(),
+            ] : [],
+            'customer' => $customerData,
+            'sub_total' => $this->sub_total,
+            'tax_amount' => $this->tax_amount,
+            'shipping_method' => $this->shipping_method->getValue(),
+            'shipping_option' => $this->shipping_option,
+            'shipping_amount' => $this->shipping_amount,
+            'amount' => $this->amount,
+            'coupon_code' => $this->coupon_code,
+            'discount_amount' => $this->discount_amount,
+            'discount_description' => $this->discount_description,
+            'note' => $this->description,
+            'is_confirmed' => $this->is_confirmed,
+        ];
+
+        return apply_filters('ecommerce_order_webhook_data', $data, $this);
     }
 }

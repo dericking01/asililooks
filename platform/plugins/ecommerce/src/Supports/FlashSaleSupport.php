@@ -49,7 +49,7 @@ class FlashSaleSupport
         }
 
         if ($this->flashSales->isEmpty()) {
-            $this->flashSales = app(FlashSaleInterface::class)->getAvailableFlashSales(['products']);
+            $this->flashSales = app(FlashSaleInterface::class)->getAvailableFlashSales(['products', 'metadata']);
         }
 
         return $this->flashSales;

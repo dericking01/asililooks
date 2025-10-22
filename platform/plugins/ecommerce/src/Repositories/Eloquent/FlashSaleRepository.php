@@ -23,7 +23,7 @@ class FlashSaleRepository extends RepositoriesAbstract implements FlashSaleInter
             // If products are included, filter out sold-out products
             if (in_array('products', $with)) {
                 $with = [
-                    'products' => function ($query) {
+                    'products' => function ($query): void {
                         $query->wherePivot('quantity', '>', DB::raw('sold'));
                     },
                 ];

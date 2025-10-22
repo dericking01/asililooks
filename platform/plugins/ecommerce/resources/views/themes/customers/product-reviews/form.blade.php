@@ -50,51 +50,53 @@
                 {{ __('Share your experience with this product to help other customers.') }}
             </x-core::form.helper-text>
         </div>
-        <div class="col-12 mb-3">
-            <x-core::form.label class="mb-2">
-                {{ __('Photos') }} <span class="text-muted">({{ __('Optional') }})</span>
-            </x-core::form.label>
+        @if (EcommerceHelper::isCustomerReviewImageUploadEnabled())
+            <div class="col-12 mb-3">
+                <x-core::form.label class="mb-2">
+                    {{ __('Photos') }} <span class="text-muted">({{ __('Optional') }})</span>
+                </x-core::form.label>
 
-            <x-core::custom-template id="ecommerce-review-image-template">
-                <span class="ecommerce-image-viewer__item" data-id="__id__">
-                    <img src="{{ RvMedia::getDefaultImage() }}" alt="{{ __('Preview') }}" class="img-responsive d-block">
-                    <span class="ecommerce-image-viewer__icon-remove image-viewer__icon-remove" title="{{ __('Remove image') }}">
-                        <x-core::icon name="ti ti-x" class="ecommerce-icon" />
+                <x-core::custom-template id="ecommerce-review-image-template">
+                    <span class="ecommerce-image-viewer__item" data-id="__id__">
+                        <img src="{{ RvMedia::getDefaultImage() }}" alt="{{ __('Preview') }}" class="img-responsive d-block">
+                        <span class="ecommerce-image-viewer__icon-remove image-viewer__icon-remove" title="{{ __('Remove image') }}">
+                            <x-core::icon name="ti ti-x" class="ecommerce-icon" />
+                        </span>
                     </span>
-                </span>
-            </x-core::custom-template>
+                </x-core::custom-template>
 
-            <div class="ecommerce-image-upload__viewer d-flex">
-                <div class="ecommerce-image-viewer__list position-relative">
-                    <div class="ecommerce-image-upload__uploader-container">
-                        <div class="d-table">
-                            <div class="ecommerce-image-upload__uploader border border-2 border-dashed rounded p-4 text-center">
-                                <x-core::icon name="ti ti-photo-plus" class="ecommerce-icon ecommerce-image-upload__icon mb-2 text-muted" style="font-size: 2rem;" />
-                                <div class="ecommerce-image-upload__text fw-medium mb-1">{{ __('Upload photos') }}</div>
-                                <input
-                                    class="ecommerce-image-upload__file-input"
-                                    name="images[]"
-                                    data-max-files="{{ EcommerceHelper::reviewMaxFileNumber() }}"
-                                    data-max-size="{{ EcommerceHelper::reviewMaxFileSize(true) }}"
-                                    data-max-size-message="{{ trans('validation.max.file', ['attribute' => '__attribute__', 'max' => '__max__']) }}"
-                                    type="file"
-                                    accept="image/png,image/jpeg,image/jpg"
-                                    multiple="multiple"
-                                    aria-label="{{ __('Upload review photos') }}"
-                                >
+                <div class="ecommerce-image-upload__viewer d-flex">
+                    <div class="ecommerce-image-viewer__list position-relative">
+                        <div class="ecommerce-image-upload__uploader-container">
+                            <div class="d-table">
+                                <div class="ecommerce-image-upload__uploader border border-2 border-dashed rounded p-4 text-center">
+                                    <x-core::icon name="ti ti-photo-plus" class="ecommerce-icon ecommerce-image-upload__icon mb-2 text-muted" style="font-size: 2rem;" />
+                                    <div class="ecommerce-image-upload__text fw-medium mb-1">{{ __('Upload photos') }}</div>
+                                    <input
+                                        class="ecommerce-image-upload__file-input"
+                                        name="images[]"
+                                        data-max-files="{{ EcommerceHelper::reviewMaxFileNumber() }}"
+                                        data-max-size="{{ EcommerceHelper::reviewMaxFileSize(true) }}"
+                                        data-max-size-message="{{ trans('validation.max.file', ['attribute' => '__attribute__', 'max' => '__max__']) }}"
+                                        type="file"
+                                        accept="image/png,image/jpeg,image/jpg"
+                                        multiple="multiple"
+                                        aria-label="{{ __('Upload review photos') }}"
+                                    >
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <x-core::form.helper-text class="mt-2">
-                {{ __('You can upload up to :total photos, each photo maximum size is :max kilobytes', [
-                    'total' => EcommerceHelper::reviewMaxFileNumber(),
-                    'max' => EcommerceHelper::reviewMaxFileSize(true),
-                ]) }}
-            </x-core::form.helper-text>
-        </div>
+                <x-core::form.helper-text class="mt-2">
+                    {{ __('You can upload up to :total photos, each photo maximum size is :max kilobytes', [
+                        'total' => EcommerceHelper::reviewMaxFileNumber(),
+                        'max' => EcommerceHelper::reviewMaxFileSize(true),
+                    ]) }}
+                </x-core::form.helper-text>
+            </div>
+        @endif
         <div class="col-12 mb-3">
             <div class="alert alert-warning alert-message d-none" role="alert"></div>
         </div>

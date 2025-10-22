@@ -22,13 +22,12 @@ use Botble\Setting\Repositories\Interfaces\SettingInterface;
 use Botble\Setting\Supports\DatabaseSettingStore;
 use Botble\Setting\Supports\SettingStore;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Foundation\AliasLoader;
 
-class SettingServiceProvider extends ServiceProvider
+class SettingServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     use LoadAndPublishDataTrait;
-
-    protected bool $defer = true;
 
     public function register(): void
     {
@@ -58,7 +57,8 @@ class SettingServiceProvider extends ServiceProvider
             ->loadAndPublishViews()
             ->loadAnonymousComponents()
             ->loadAndPublishTranslations()
-            ->loadAndPublishConfigurations(['permissions', 'email'])
+            ->loadAndPublishConfigurations(['email'])
+            ->loadAndPublishConfigurations(['permissions'])
             ->loadMigrations()
             ->publishAssets();
 
@@ -99,6 +99,16 @@ class SettingServiceProvider extends ServiceProvider
                     ->withDescription(trans('core/setting::setting.cronjob.description'))
                     ->withPriority(50)
                     ->withRoute('system.cronjob')
+            );
+
+            PanelSectionManager::registerItem(
+                SystemPanelSection::class,
+                fn () => PanelSectionItem::make('security')
+                    ->setTitle(trans('core/setting::setting.security.title'))
+                    ->withIcon('ti ti-shield-check')
+                    ->withDescription(trans('core/setting::setting.security.menu_description'))
+                    ->withPriority(55)
+                    ->withRoute('system.security')
             );
         });
 

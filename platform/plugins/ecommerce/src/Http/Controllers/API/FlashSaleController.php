@@ -19,6 +19,7 @@ class FlashSaleController extends BaseApiController
      * @group Flash Sale
      *
      * @queryParam keys string[] Array of flash sale keys to filter by. Example: winter-sale,summer-sale
+     * @queryParam thumbnail_size string Size of product thumbnail images. Value: thumb, small, medium, large. Default: thumb
      * @bodyParam keys string[] Array of flash sale keys to filter by. Example: winter-sale,summer-sale
      *
      * @return BaseHttpResponse
@@ -50,14 +51,6 @@ class FlashSaleController extends BaseApiController
                         ->with(EcommerceHelper::withProductEagerLoadingRelations())
                         ->wherePublished()
                         ->wherePivot('quantity', '>', DB::raw('sold'));
-
-                    if (EcommerceHelper::isReviewEnabled()) {
-                        $reviewParams = EcommerceHelper::withReviewsParams();
-
-                        $query
-                            ->withCount($reviewParams['withCount'])
-                            ->withAvg($reviewParams['withAvg'][0], $reviewParams['withAvg'][1]);
-                    }
                 },
             ]);
 

@@ -16,15 +16,11 @@ class GuestPaymentProofController extends BaseController
     protected function validateOrderToken(string $token): ?Order
     {
         // Validate token format (should be a valid UUID or similar)
-        if (! $token || strlen($token) < 20) {
-            abort(404);
-        }
+        abort_if(! $token || strlen($token) < 20, 404);
 
         // Rate limiting by IP to prevent brute force attempts
         $key = 'payment-proof-access:' . request()->ip();
-        if (RateLimiter::tooManyAttempts($key, 10)) {
-            abort(Response::HTTP_TOO_MANY_REQUESTS, 'Too many attempts. Please try again later.');
-        }
+        abort_if(RateLimiter::tooManyAttempts($key, 10), Response::HTTP_TOO_MANY_REQUESTS, 'Too many attempts. Please try again later.');
 
         RateLimiter::hit($key, 60); // 10 attempts per minute
 
@@ -33,9 +29,7 @@ class GuestPaymentProofController extends BaseController
             ->where('token', $token)
             ->first();
 
-        if (! $order) {
-            abort(404);
-        }
+        abort_unless($order, 404);
 
         return $order;
     }

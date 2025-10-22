@@ -8,6 +8,7 @@ use Botble\Base\Forms\FieldOptions\NumberFieldOption;
 use Botble\Base\Forms\FieldOptions\SelectFieldOption;
 use Botble\Base\Forms\FieldOptions\TextFieldOption;
 use Botble\Base\Forms\Fields\NumberField;
+use Botble\Base\Forms\Fields\PasswordField;
 use Botble\Base\Forms\Fields\SelectField;
 use Botble\Base\Forms\Fields\TextField;
 use Botble\Setting\Http\Requests\EmailSettingRequest;
@@ -80,7 +81,7 @@ class EmailSettingForm extends SettingForm
             )
             ->add(
                 'email_password',
-                TextField::class,
+                PasswordField::class,
                 TextFieldOption::make()
                     ->label(trans('core/setting::setting.email.password'))
                     ->value(old('email_password', setting('email_password', config('mail.mailers.smtp.password'))))
@@ -100,6 +101,20 @@ class EmailSettingForm extends SettingForm
                     ->placeholder(trans('core/setting::setting.email.local_domain_placeholder'))
                     ->helperText(trans('core/setting::setting.email.local_domain_helper'))
                     ->maxLength(120)
+            )
+            ->add(
+                'email_encryption',
+                SelectField::class,
+                SelectFieldOption::make()
+                    ->label(trans('core/setting::setting.email.encryption'))
+                    ->choices([
+                        '' => trans('core/setting::setting.email.encryption_none'),
+                        'tls' => trans('core/setting::setting.email.encryption_tls'),
+                        'ssl' => trans('core/setting::setting.email.encryption_ssl'),
+                    ])
+                    ->selected(old('email_encryption', setting('email_encryption', config('mail.mailers.smtp.encryption'))))
+                    ->placeholder(trans('core/setting::setting.email.encryption_placeholder'))
+                    ->helperText(trans('core/setting::setting.email.encryption_helper'))
             )
             ->addCloseCollapsible('email_driver', 'smtp')
             ->addOpenCollapsible('email_driver', 'mailgun', $mailer === 'mailgun', ['class' => 'email-fields'])

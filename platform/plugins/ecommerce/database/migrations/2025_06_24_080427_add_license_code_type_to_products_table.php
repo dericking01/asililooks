@@ -8,7 +8,7 @@ return new class () extends Migration {
     public function up(): void
     {
         if (! Schema::hasColumn('ec_products', 'license_code_type')) {
-            Schema::table('ec_products', function (Blueprint $table) {
+            Schema::table('ec_products', function (Blueprint $table): void {
                 $table->enum('license_code_type', ['auto_generate', 'pick_from_list'])->default('auto_generate')->after('generate_license_code');
             });
         }
@@ -17,7 +17,7 @@ return new class () extends Migration {
     public function down(): void
     {
         if (Schema::hasColumn('ec_products', 'license_code_type')) {
-            Schema::table('ec_products', function (Blueprint $table) {
+            Schema::table('ec_products', function (Blueprint $table): void {
                 $table->dropColumn('license_code_type');
             });
         }

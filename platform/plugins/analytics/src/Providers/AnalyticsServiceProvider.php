@@ -11,9 +11,10 @@ use Botble\Base\PanelSections\PanelSectionItem;
 use Botble\Base\Supports\ServiceProvider;
 use Botble\Base\Traits\LoadAndPublishDataTrait;
 use Botble\Setting\PanelSections\SettingOthersPanelSection;
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Foundation\AliasLoader;
 
-class AnalyticsServiceProvider extends ServiceProvider
+class AnalyticsServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     use LoadAndPublishDataTrait;
 
@@ -38,7 +39,8 @@ class AnalyticsServiceProvider extends ServiceProvider
     {
         $this
             ->setNamespace('plugins/analytics')
-            ->loadAndPublishConfigurations(['general', 'permissions'])
+            ->loadAndPublishConfigurations(['general'])
+            ->loadAndPublishConfigurations(['permissions'])
             ->loadRoutes()
             ->loadAndPublishViews()
             ->loadAndPublishTranslations()
@@ -64,5 +66,13 @@ class AnalyticsServiceProvider extends ServiceProvider
         $this->app->booted(function (): void {
             $this->app->register(HookServiceProvider::class);
         });
+    }
+
+    public function provides(): array
+    {
+        return [
+            AnalyticsAbstract::class,
+            'Analytics',
+        ];
     }
 }

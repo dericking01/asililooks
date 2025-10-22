@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class () extends Migration {
     public function up(): void
     {
-        Schema::table('ec_product_categories', function (Blueprint $table) {
+        Schema::table('ec_product_categories', function (Blueprint $table): void {
             $table->index(['status', 'order'], 'idx_categories_status_order');
             $table->index('order', 'idx_categories_order');
         });
@@ -15,7 +15,7 @@ return new class () extends Migration {
 
     public function down(): void
     {
-        Schema::table('ec_product_categories', function (Blueprint $table) {
+        Schema::table('ec_product_categories', function (Blueprint $table): void {
             $table->dropIndex('idx_categories_status_order');
             $table->dropIndex('idx_categories_order');
         });

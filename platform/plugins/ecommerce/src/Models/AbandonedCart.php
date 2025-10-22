@@ -45,7 +45,7 @@ class AbandonedCart extends BaseModel
     {
         parent::boot();
 
-        static::saving(function ($model) {
+        static::saving(function ($model): void {
             if ($model->customer_id && ! Customer::query()->where('id', $model->customer_id)->exists()) {
                 $model->customer_id = null;
             }

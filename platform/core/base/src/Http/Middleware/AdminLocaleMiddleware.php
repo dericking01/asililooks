@@ -4,7 +4,6 @@ namespace Botble\Base\Http\Middleware;
 
 use Botble\Base\Facades\AdminAppearance;
 use Botble\Base\Facades\AdminHelper;
-use Botble\Base\Supports\Language;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,7 +24,7 @@ class AdminLocaleMiddleware
             $userLocale = AdminAppearance::getLocale() ?: $sessionLocale;
         }
 
-        if (array_key_exists($userLocale, Language::getAvailableLocales())) {
+        if (array_key_exists($userLocale, AdminHelper::getAdminLocales())) {
             app()->setLocale($userLocale);
             $request->setLocale($userLocale);
         }

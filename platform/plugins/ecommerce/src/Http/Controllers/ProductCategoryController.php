@@ -35,6 +35,7 @@ class ProductCategoryController extends BaseController
                 'parent_id',
                 'status',
                 'order',
+                'slug',
             ])
             ->oldest('order')
             ->latest()

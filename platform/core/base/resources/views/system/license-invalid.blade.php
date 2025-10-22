@@ -10,7 +10,7 @@
     @class(['alert-license alert-sticky small bg-warning text-white', 'vertical-wrapper' => AdminAppearance::isVerticalLayout()])
     icon=""
     @style(['display: none' => $hidden ?? true])
-    data-bb-toggle="authorized-reminder"
+    data-bb-toggle="license-reminder"
 >
     <div class="{{ AdminAppearance::getContainerWidth() }}">
         <div class="d-flex justify-content-between align-items-center">

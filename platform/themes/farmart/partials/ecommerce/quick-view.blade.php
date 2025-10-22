@@ -51,6 +51,9 @@
                     {!! BaseHelper::clean($product->description) !!}
                     {!! apply_filters('ecommerce_after_product_description', null, $product) !!}
                 </div>
+                @php
+                    $wishlistIds = \Theme\Farmart\Supports\Wishlist::getWishlistIds([$product->id]);
+                @endphp
                 {!! Theme::partial(
                     'ecommerce.product-cart-form',
                     compact('product', 'wishlistIds', 'selectedAttrs') + [

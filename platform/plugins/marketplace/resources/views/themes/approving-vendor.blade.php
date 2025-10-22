@@ -14,13 +14,13 @@
             <li class="list-group-item"><strong>{{ __('Owner') }}:</strong> {{ $store->customer->name }}</li>
             <li class="list-group-item"><strong>{{ __('Phone') }}:</strong> {{ $store->phone }}</li>
             @if (MarketplaceHelper::getSetting('requires_vendor_documentations_verification', true))
-                @if ($store->certificate_file)
+                @if ($store->certificate_file && Storage::disk('local')->exists($store->certificate_file))
                     <li class="list-group-item">
                         <strong>{{ __('Uploaded Certificate') }}: </strong>
                         <a href="{{ route('marketplace.vendor.become-vendor.download-certificate') }}" target="_blank" class="text-primary">{{ __('View Certificate') }}</a>
                     </li>
                 @endif
-                @if ($store->government_id_file)
+                @if ($store->government_id_file && Storage::disk('local')->exists($store->government_id_file))
                     <li class="list-group-item">
                         <strong>{{ __('Uploaded Government ID') }}: </strong>
                         <a href="{{ route('marketplace.vendor.become-vendor.download-government-id') }}" target="_blank" class="text-primary">{{ __('View Government ID') }}</a>

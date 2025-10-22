@@ -4,21 +4,15 @@ namespace Botble\Page\Supports;
 
 use Botble\Base\Facades\BaseHelper;
 use Botble\Theme\Facades\Theme;
+use Illuminate\Support\Facades\Event;
 
 class Template
 {
+    protected static array $templates = [];
+
     public static function registerPageTemplate(array $templates = []): void
     {
-        $validTemplates = array_filter($templates, function ($key) {
-            return in_array($key, self::getExistsTemplate());
-        }, ARRAY_FILTER_USE_KEY);
-
-        config([
-            'packages.page.general.templates' => array_merge(
-                config('packages.page.general.templates', []),
-                $validTemplates
-            ),
-        ]);
+        static::$templates = array_merge(static::$templates, $templates);
     }
 
     protected static function getExistsTemplate(): array
@@ -31,11 +25,13 @@ class Template
             $themes[] = Theme::getInheritTheme();
         }
 
-        foreach ($themes as $theme) {
-            $files = BaseHelper::scanFolder(theme_path($theme . DIRECTORY_SEPARATOR . config('packages.theme.general.containerDir.layout')));
+        $files = [];
 
-            foreach ($files as $key => $file) {
-                $files[$key] = str_replace('.blade.php', '', $file);
+        foreach ($themes as $theme) {
+            $scannedFiles = BaseHelper::scanFolder(theme_path($theme . DIRECTORY_SEPARATOR . 'layouts'));
+
+            foreach ($scannedFiles as $file) {
+                $files[] = str_replace('.blade.php', '', $file);
             }
         }
 
@@ -44,6 +40,14 @@ class Template
 
     public static function getPageTemplates(): array
     {
-        return (array) config('packages.page.general.templates', []);
+        static::$templates['default'] = trans('packages/page::pages.default_template');
+
+        Event::dispatch('core.page::registering-templates');
+
+        $existingTemplates = self::getExistsTemplate();
+
+        return array_filter(static::$templates, function ($key) use ($existingTemplates) {
+            return in_array($key, $existingTemplates);
+        }, ARRAY_FILTER_USE_KEY);
     }
 }

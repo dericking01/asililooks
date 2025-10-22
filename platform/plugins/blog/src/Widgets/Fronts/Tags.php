@@ -15,8 +15,8 @@ class Tags extends AbstractWidget
     public function __construct()
     {
         parent::__construct([
-            'name' => __('Tags'),
-            'description' => __('Popular tags'),
+            'name' => trans('plugins/blog::posts.widget_tags'),
+            'description' => trans('plugins/blog::posts.widget_tags_description'),
             'number_display' => 5,
         ]);
     }

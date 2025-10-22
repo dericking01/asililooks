@@ -1,3 +1,7 @@
+@php
+    use Botble\Ecommerce\Models\ProductSpecificationAttributeTranslation;
+@endphp
+
 <p class="text-secondary mb-0 p-3">
     {{ trans('plugins/ecommerce::product-specification.product.specification_table.description') }}
 </p>
@@ -7,7 +11,7 @@
 <script>
     $(() => {
         $(document)
-            .on('change', '#specification_table_id', function(e) {
+            .on('change', '#specification_table_id', function() {
                 const $this = $(this);
                 const $form = $this.closest('form');
                 const $table = $this.val();
@@ -18,7 +22,8 @@
                         data: {
                             table: $table,
                             @if($model)
-                            product: '{{ $model->getKey() }}',
+                                product: '{{ $model->getKey() }}',
+                                ref_lang: '{{ request()->input('ref_lang') }}',
                             @endif
                         },
                         success: function(response) {
@@ -26,13 +31,15 @@
                                 $form.find('.specification-table').html(response.data);
                                 $('.product-specification-table p').hide();
 
-                                $form.find('.specification-table table tbody').sortable({
-                                    update: function(event, ui) {
-                                        $(this).find('tr').each(function(index) {
-                                            $(this).find('input[name$="[order]"]').val(index);
-                                        });
-                                    },
-                                });
+                                @if (ProductSpecificationAttributeTranslation::isEditingDefaultLanguage())
+                                    $form.find('.specification-table table tbody').sortable({
+                                        update: function() {
+                                            $(this).find('tr').each(function(index) {
+                                                $(this).find('input[name$="[order]"]').val(index);
+                                            });
+                                        },
+                                    });
+                                @endif
                             }
                         },
                     });

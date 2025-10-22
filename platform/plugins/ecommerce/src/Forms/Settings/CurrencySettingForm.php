@@ -40,13 +40,16 @@ class CurrencySettingForm extends SettingForm
                 'value' => get_ecommerce_setting('enable_auto_detect_visitor_currency', false),
                 'help_block' => [
                     'text' => trans(
-                        'plugins/ecommerce::setting.currency.form.auto_detect_visitor_currency_description'
+                        'plugins/ecommerce::setting.currency.form.enable_auto_detect_visitor_currency_helper'
                     ),
                 ],
             ])
             ->add('add_space_between_price_and_currency', OnOffCheckboxField::class, [
                 'label' => trans('plugins/ecommerce::setting.currency.form.add_space_between_price_and_currency'),
                 'value' => get_ecommerce_setting('add_space_between_price_and_currency', false),
+                'help_block' => [
+                    'text' => trans('plugins/ecommerce::setting.currency.form.add_space_between_price_and_currency_helper'),
+                ],
             ])
             ->add('thousands_separator', SelectField::class, [
                 'label' => trans('plugins/ecommerce::setting.currency.form.thousands_separator'),
@@ -55,6 +58,9 @@ class CurrencySettingForm extends SettingForm
                     ',' => trans('plugins/ecommerce::setting.currency.form.separator_comma'),
                     '.' => trans('plugins/ecommerce::setting.currency.form.separator_period'),
                     'space' => trans('plugins/ecommerce::setting.currency.form.separator_space'),
+                ],
+                'help_block' => [
+                    'text' => trans('plugins/ecommerce::setting.currency.form.thousands_separator_helper'),
                 ],
             ])
             ->add('decimal_separator', SelectField::class, [
@@ -65,6 +71,9 @@ class CurrencySettingForm extends SettingForm
                     '.' => trans('plugins/ecommerce::setting.currency.form.separator_period'),
                     'space' => trans('plugins/ecommerce::setting.currency.form.separator_space'),
                 ],
+                'help_block' => [
+                    'text' => trans('plugins/ecommerce::setting.currency.form.decimal_separator_helper'),
+                ],
             ])
             ->add('api_provider_field', HtmlField::class, [
                 'html' => view('plugins/ecommerce::settings.partials.currencies.api-provider-fields'),
@@ -72,6 +81,9 @@ class CurrencySettingForm extends SettingForm
             ->add('use_exchange_rate_from_api', 'onOffCheckbox', [
                 'label' => trans('plugins/ecommerce::setting.currency.form.use_exchange_rate_from_api'),
                 'value' => get_ecommerce_setting('use_exchange_rate_from_api', false),
+                'help_block' => [
+                    'text' => trans('plugins/ecommerce::setting.currency.form.use_exchange_rate_from_api_helper'),
+                ],
             ])
             ->add('data_currencies', HtmlField::class, [
                 'html' => view(

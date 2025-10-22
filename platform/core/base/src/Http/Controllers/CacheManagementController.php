@@ -17,7 +17,6 @@ class CacheManagementController extends BaseSystemController
 
         Assets::addScriptsDirectly('vendor/core/core/base/js/cache.js');
 
-        // Calculate CMS cache size
         $cacheSize = 0;
         $cachePath = storage_path('framework/cache');
 
@@ -56,6 +55,33 @@ class CacheManagementController extends BaseSystemController
                 $clearCacheService->clearLogs();
 
                 break;
+            case 'optimize':
+                $results = $clearCacheService->runOptimization();
+
+                if ($results['success']) {
+                    return $this
+                        ->httpResponse()
+                        ->setMessage($results['message']);
+                }
+
+                return $this
+                    ->httpResponse()
+                    ->setError()
+                    ->setMessage($results['message']);
+
+            case 'clear_optimize':
+                $results = $clearCacheService->clearOptimization();
+
+                if ($results['success']) {
+                    return $this
+                        ->httpResponse()
+                        ->setMessage($results['message']);
+                }
+
+                return $this
+                    ->httpResponse()
+                    ->setError()
+                    ->setMessage($results['message']);
         }
 
         return $this

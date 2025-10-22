@@ -54,7 +54,8 @@ class LocationServiceProvider extends ServiceProvider
         $this
             ->setNamespace('plugins/location')
             ->loadHelpers()
-            ->loadAndPublishConfigurations(['permissions', 'general'])
+            ->loadAndPublishConfigurations(['general'])
+            ->loadAndPublishConfigurations(['permissions'])
             ->loadAndPublishViews()
             ->loadMigrations()
             ->loadAndPublishTranslations()

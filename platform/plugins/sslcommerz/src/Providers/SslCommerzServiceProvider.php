@@ -3,9 +3,10 @@
 namespace Botble\SslCommerz\Providers;
 
 use Botble\Base\Traits\LoadAndPublishDataTrait;
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 
-class SslCommerzServiceProvider extends ServiceProvider
+class SslCommerzServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     use LoadAndPublishDataTrait;
 

@@ -28,6 +28,7 @@ use Botble\Theme\Events\RenderingAdminBar;
 use Botble\Theme\Events\RenderingThemeOptionSettings;
 use Botble\Theme\Facades\AdminBar;
 use Botble\Theme\Facades\Theme;
+use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -37,16 +38,18 @@ class HookServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        if (is_plugin_active('language') && is_plugin_active('language-advanced')) {
-            LanguageAdvancedManager::registerTranslationImportExport(
-                Post::class,
-                trans('plugins/blog::posts.post_translations'),
-                [
-                    'import' => 'post-translations.import',
-                    'export' => 'post-translations.export',
-                ]
-            );
-        }
+        $this->app['events']->listen(RouteMatched::class, function (): void {
+            if (is_plugin_active('language') && is_plugin_active('language-advanced')) {
+                LanguageAdvancedManager::registerTranslationImportExport(
+                    Post::class,
+                    fn () => trans('plugins/blog::posts.post_translations'),
+                    [
+                        'import' => 'post-translations.import',
+                        'export' => 'post-translations.export',
+                    ]
+                );
+            }
+        });
 
         Menu::addMenuOptionModel(Category::class);
         Menu::addMenuOptionModel(Tag::class);

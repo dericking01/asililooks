@@ -3,9 +3,10 @@
 namespace Botble\Razorpay\Providers;
 
 use Botble\Base\Traits\LoadAndPublishDataTrait;
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 
-class RazorpayServiceProvider extends ServiceProvider
+class RazorpayServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     use LoadAndPublishDataTrait;
 

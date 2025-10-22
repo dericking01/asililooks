@@ -14,6 +14,7 @@ use Botble\Marketplace\Tables\Traits\ForVendor;
 use Botble\Table\Abstracts\TableAbstract;
 use Botble\Table\Actions\DeleteAction;
 use Botble\Table\Actions\EditAction;
+use Botble\Table\Actions\ViewAction;
 use Botble\Table\BulkActions\DeleteBulkAction;
 use Botble\Table\BulkChanges\CreatedAtBulkChange;
 use Botble\Table\BulkChanges\NameBulkChange;
@@ -45,6 +46,7 @@ class ProductTable extends TableAbstract
                 ImportHeaderAction::make()->route('marketplace.vendor.import.products.index'),
             ])
             ->addActions([
+                ViewAction::make()->route('marketplace.vendor.products.view'),
                 EditAction::make()->route('marketplace.vendor.products.edit'),
                 DeleteAction::make()->route('marketplace.vendor.products.destroy'),
             ]);

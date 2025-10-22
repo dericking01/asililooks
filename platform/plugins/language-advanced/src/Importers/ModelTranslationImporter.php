@@ -51,7 +51,7 @@ class ModelTranslationImporter extends Importer implements WithMapping
 
         foreach ($supportedLocales as $properties) {
             if ($properties['lang_code'] != $defaultLanguage) {
-                $langCode = $properties['lang_code'];
+                $langCode = strtolower($properties['lang_code']);
 
                 foreach ($translatableColumns as $column) {
                     if (! Schema::hasColumn($this->modelClass::query()->getModel()->getTable() . '_translations', $column)) {
@@ -60,7 +60,7 @@ class ModelTranslationImporter extends Importer implements WithMapping
 
                     $maxLength = $column === 'content' ? 300000 : ($column === 'description' ? 400 : 300000);
 
-                    $columns[] = ImportColumn::make($column . '_(' . $langCode . ')')
+                    $columns[] = ImportColumn::make("{$column}_({$langCode})")
                         ->label(Str::title($column) . ' (' . $langCode . ')')
                         ->rules(
                             ['nullable', 'string', 'max:' . $maxLength],
@@ -200,7 +200,7 @@ class ModelTranslationImporter extends Importer implements WithMapping
                     ];
 
                     foreach ($translatableColumns as $column) {
-                        $columnKey = $column . '_(' . $langCode . ')';
+                        $columnKey = $column . '_(' . strtolower($langCode) . ')';
                         if (isset($row[$columnKey])) {
                             $translationData[$column] = $row[$columnKey];
                         }

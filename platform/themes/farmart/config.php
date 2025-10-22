@@ -53,7 +53,7 @@ return [
             });
 
             // You may use this event to set up your assets.
-            $version = get_cms_version() . '.2';
+            $version = get_cms_version() . '.1';
 
             $useCDN = theme_option('use_source_assets_from', 'cdn') == 'cdn';
 
@@ -277,6 +277,8 @@ return [
                     'ecommerce.brand',
                     'ecommerce.search',
                     'ecommerce.cart',
+                    'marketplace.stores',
+                    'marketplace.store',
                 ], function (View $view): void {
                     $view->withShortcodes();
                 });

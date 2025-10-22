@@ -6,9 +6,9 @@ use Botble\Base\Facades\Html;
 use Botble\Marketplace\Enums\StoreStatusEnum;
 use Botble\Marketplace\Models\Store;
 use Botble\Table\Abstracts\TableAbstract;
-use Botble\Table\Actions\Action;
 use Botble\Table\Actions\DeleteAction;
 use Botble\Table\Actions\EditAction;
+use Botble\Table\Actions\ViewAction;
 use Botble\Table\BulkActions\DeleteBulkAction;
 use Botble\Table\Columns\Column;
 use Botble\Table\Columns\CreatedAtColumn;
@@ -28,11 +28,9 @@ class StoreTable extends TableAbstract
         $this
             ->model(Store::class)
             ->addActions([
-                Action::make('view')
+                ViewAction::make()
                     ->route('marketplace.store.view')
-                    ->permission('marketplace.store.view')
-                    ->label(trans('plugins/marketplace::store.view'))
-                    ->icon('ti ti-eye'),
+                    ->permission('marketplace.store.view'),
                 EditAction::make()->route('marketplace.store.edit'),
                 DeleteAction::make()->route('marketplace.store.destroy'),
             ]);

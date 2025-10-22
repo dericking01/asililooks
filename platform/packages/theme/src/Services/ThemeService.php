@@ -8,6 +8,7 @@ use Botble\PluginManagement\Services\PluginService;
 use Botble\Setting\Models\Setting;
 use Botble\Setting\Supports\SettingStore;
 use Botble\Theme\Events\ThemeRemoveEvent;
+use Botble\Theme\Facades\Manager as ThemeManager;
 use Botble\Theme\Facades\Theme;
 use Botble\Theme\Facades\ThemeOption;
 use Botble\Widget\Models\Widget;
@@ -87,6 +88,8 @@ class ThemeService
             ->save();
 
         Helper::clearCache();
+
+        ThemeManager::clearCache();
 
         return [
             'error' => false,
@@ -232,6 +235,8 @@ class ThemeService
             ];
         }
 
+        ThemeManager::clearCache();
+
         return [
             'error' => false,
             'message' => trans('packages/theme::theme.published_assets_success', ['themes' => implode(', ', $themes)]),
@@ -272,6 +277,8 @@ class ThemeService
             ->delete();
 
         event(new ThemeRemoveEvent($theme));
+
+        ThemeManager::clearCache();
 
         return [
             'error' => false,

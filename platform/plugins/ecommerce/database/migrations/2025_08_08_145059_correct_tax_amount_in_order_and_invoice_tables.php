@@ -9,8 +9,8 @@ return new class () extends Migration {
         DB::table('ec_order_product')
             ->whereNotNull('options')
             ->where('options', '!=', '')
-            ->orderBy('id')
-            ->chunk(100, function ($products) {
+            ->oldest('id')
+            ->chunk(100, function ($products): void {
                 foreach ($products as $product) {
                     $options = json_decode($product->options, true);
 
@@ -27,8 +27,8 @@ return new class () extends Migration {
         DB::table('ec_invoice_items')
             ->whereNotNull('options')
             ->where('options', '!=', '')
-            ->orderBy('id')
-            ->chunk(100, function ($items) {
+            ->oldest('id')
+            ->chunk(100, function ($items): void {
                 foreach ($items as $item) {
                     $options = json_decode($item->options, true);
 

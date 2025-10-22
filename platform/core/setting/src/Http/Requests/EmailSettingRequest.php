@@ -21,6 +21,7 @@ class EmailSettingRequest extends Request
             'email_username' => ['nullable', 'string', 'max:255'],
             'email_password' => ['nullable', 'string', 'max:255'],
             'email_local_domain' => ['nullable', 'string', 'max:150'],
+            'email_encryption' => ['nullable', 'string', 'in:,tls,ssl'],
             'email_mail_gun_domain' => ['nullable', 'string', 'max:150', $mailgunRules = new RequiredIf($mailDriver == 'mailgun')],
             'email_mail_gun_secret' => ['nullable', 'string', $mailgunRules],
             'email_mail_gun_endpoint' => ['nullable', 'string', $mailgunRules],

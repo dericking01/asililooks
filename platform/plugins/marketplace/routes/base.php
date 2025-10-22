@@ -118,6 +118,24 @@ AdminHelper::registerRoutes(function (): void {
                     'uses' => 'VendorController@index',
                 ]);
 
+                Route::get('view/{id}', [
+                    'as' => 'view',
+                    'uses' => 'VendorController@view',
+                    'permission' => 'marketplace.vendors.index',
+                ])->wherePrimaryKey();
+
+                Route::get('download-certificate/{id}', [
+                    'as' => 'download-certificate',
+                    'uses' => 'VendorController@downloadCertificate',
+                    'permission' => 'marketplace.vendors.index',
+                ])->wherePrimaryKey();
+
+                Route::get('download-government-id/{id}', [
+                    'as' => 'download-government-id',
+                    'uses' => 'VendorController@downloadGovernmentId',
+                    'permission' => 'marketplace.vendors.index',
+                ])->wherePrimaryKey();
+
                 Route::group(['permission' => 'marketplace.vendors.control'], function (): void {
                     Route::post('block/{id}', [VendorBlockedController::class, 'store'])->name('block');
                     Route::post('unblock/{id}', [VendorBlockedController::class, 'destroy'])->name('unblock');

@@ -598,17 +598,14 @@ class PluginService
 
         $this->clearCache();
 
-        // Fire updating event
         UpdatingPluginEvent::dispatch($name);
 
-        // Load plugin class if not already loaded
         if (! class_exists($content['provider'])) {
             $loader = new ClassLoader();
             $loader->setPsr4($content['namespace'], plugin_path($name . '/src'));
             $loader->register(true);
         }
 
-        // Call updating method if exists
         if (class_exists($content['namespace'] . 'Plugin')) {
             try {
                 call_user_func([$content['namespace'] . 'Plugin', 'updating']);
@@ -617,10 +614,8 @@ class PluginService
             }
         }
 
-        // Execute the update callback
         $result = $updateCallback();
 
-        // Call updated method if exists
         if (class_exists($content['namespace'] . 'Plugin')) {
             try {
                 call_user_func([$content['namespace'] . 'Plugin', 'updated']);
@@ -633,7 +628,6 @@ class PluginService
 
         $this->pluginManifest->generateManifest();
 
-        // Fire updated event
         UpdatedPluginEvent::dispatch($name);
 
         return $result;
@@ -650,7 +644,6 @@ class PluginService
         $pluginClass = $content['namespace'] . 'Plugin';
 
         if (! class_exists($pluginClass)) {
-            // Try to load the plugin class
             if (! class_exists($content['provider'])) {
                 $loader = new ClassLoader();
                 $loader->setPsr4($content['namespace'], plugin_path($name . '/src'));

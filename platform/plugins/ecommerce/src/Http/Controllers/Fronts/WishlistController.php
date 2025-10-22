@@ -3,6 +3,7 @@
 namespace Botble\Ecommerce\Http\Controllers\Fronts;
 
 use Botble\Base\Http\Controllers\BaseController;
+use Botble\Ecommerce\AdsTracking\GoogleTagManager;
 use Botble\Ecommerce\Facades\Cart;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Models\Product;
@@ -33,7 +34,6 @@ class WishlistController extends BaseController
                 'current_paged' => $request->integer('page', 1) ?: 1,
             ],
             'with' => ['slugable'],
-            ...EcommerceHelper::withReviewsParams(),
         ];
 
         if ($code && EcommerceHelper::isWishlistSharingEnabled()) {
@@ -94,6 +94,7 @@ class WishlistController extends BaseController
             ->setData([
                 'count' => $this->wishlistCount(),
                 'added' => $isAdded,
+                'extra_data' => app(GoogleTagManager::class)->formatProductTrackingData($product->original_product),
             ]);
     }
 
@@ -109,7 +110,10 @@ class WishlistController extends BaseController
         return $this
             ->httpResponse()
             ->setMessage(__('Removed product :product from wishlist successfully!', ['product' => $product->name]))
-            ->setData(['count' => $this->wishlistCount()]);
+            ->setData([
+                'count' => $this->wishlistCount(),
+                'extra_data' => app(GoogleTagManager::class)->formatProductTrackingData($product->original_product),
+            ]);
     }
 
     protected function wishlistCount(): int

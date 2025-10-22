@@ -30,11 +30,15 @@ class LoginController extends BaseController
 
     public function showLoginForm()
     {
-        SeoHelper::setTitle(__('Login'));
+        $title = __('Login');
+        SeoHelper::setTitle(theme_option('ecommerce_login_seo_title') ?: $title)
+            ->setDescription(theme_option('ecommerce_login_seo_description'));
 
-        Theme::breadcrumb()->add(__('Login'), route('customer.login'));
+        Theme::breadcrumb()->add($title, route('customer.login'));
 
-        if (! in_array(url()->previous(), [route('customer.login'), route('customer.register')])) {
+        if (request()->has('redirect') && request()->get('redirect')) {
+            session(['url.intended' => request()->get('redirect')]);
+        } elseif (! session()->has('url.intended') && ! in_array(url()->previous(), [route('customer.login'), route('customer.register')])) {
             session(['url.intended' => url()->previous()]);
         }
 

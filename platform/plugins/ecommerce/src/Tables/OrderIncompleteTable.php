@@ -5,8 +5,8 @@ namespace Botble\Ecommerce\Tables;
 use Botble\Base\Facades\BaseHelper;
 use Botble\Ecommerce\Models\Order;
 use Botble\Ecommerce\Tables\Formatters\PriceFormatter;
-use Botble\Table\Actions\Action;
 use Botble\Table\Actions\DeleteAction;
+use Botble\Table\Actions\ViewAction;
 use Botble\Table\BulkActions\DeleteBulkAction;
 use Botble\Table\Columns\Column;
 use Botble\Table\Columns\CreatedAtColumn;
@@ -27,11 +27,8 @@ class OrderIncompleteTable extends OrderTable
         $this
             ->model(Order::class)
             ->addActions([
-                Action::make('view')
-                    ->icon('ti ti-eye')
-                    ->label(trans('core/base::tables.view'))
+                ViewAction::make()
                     ->route('orders.view-incomplete-order')
-                    ->color('info')
                     ->permission('orders.edit'),
                 DeleteAction::make()->route('orders.destroy'),
             ]);

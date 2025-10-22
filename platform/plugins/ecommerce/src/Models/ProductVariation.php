@@ -26,6 +26,18 @@ class ProductVariation extends BaseModel
 
     protected static function booted(): void
     {
+        self::created(function (ProductVariation $variation): void {
+            if ($variation->configurable_product_id) {
+                Product::query()
+                    ->where('id', $variation->configurable_product_id)
+                    ->update([
+                        'variations_count' => ProductVariation::query()
+                            ->where('configurable_product_id', $variation->configurable_product_id)
+                            ->count(),
+                    ]);
+            }
+        });
+
         self::deleted(function (ProductVariation $variation): void {
             $variation->productAttributes()->detach();
             $variation->variationItems()->delete();
@@ -33,6 +45,16 @@ class ProductVariation extends BaseModel
             if ($variation->product && $variation->product->is_variation) {
                 $variation->product->delete();
                 event(new DeletedContentEvent(PRODUCT_MODULE_SCREEN_NAME, request(), $variation->product));
+            }
+
+            if ($variation->configurable_product_id) {
+                Product::query()
+                    ->where('id', $variation->configurable_product_id)
+                    ->update([
+                        'variations_count' => ProductVariation::query()
+                            ->where('configurable_product_id', $variation->configurable_product_id)
+                            ->count(),
+                    ]);
             }
         });
 

@@ -30,6 +30,15 @@ class MolliePaymentMethodForm extends PaymentMethodForm
                 TextFieldOption::make()
                     ->label(__('API Key'))
                     ->value(BaseHelper::hasDemoModeEnabled() ? '*******************************' : get_payment_setting('api_key', MOLLIE_PAYMENT_METHOD_NAME))
+                    ->helperText(__('Get your API key from your Mollie Dashboard'))
+            )
+            ->add(
+                sprintf('payment_%s_webhook_secret', MOLLIE_PAYMENT_METHOD_NAME),
+                TextField::class,
+                TextFieldOption::make()
+                    ->label(__('Webhook Secret (Optional)'))
+                    ->value(BaseHelper::hasDemoModeEnabled() ? '*******************************' : get_payment_setting('webhook_secret', MOLLIE_PAYMENT_METHOD_NAME))
+                    ->helperText(__('Optional: Add a webhook secret for enhanced security. Configure this in your Mollie Dashboard under Developers > Webhooks'))
             )
             ->addAvailableCountriesField(MOLLIE_PAYMENT_METHOD_NAME);
     }

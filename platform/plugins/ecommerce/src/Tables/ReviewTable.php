@@ -8,8 +8,8 @@ use Botble\Base\Facades\Html;
 use Botble\Ecommerce\Models\Review;
 use Botble\Ecommerce\Tables\Formatters\ReviewImagesFormatter;
 use Botble\Table\Abstracts\TableAbstract;
-use Botble\Table\Actions\Action;
 use Botble\Table\Actions\DeleteAction;
+use Botble\Table\Actions\ViewAction;
 use Botble\Table\BulkActions\DeleteBulkAction;
 use Botble\Table\Columns\Column;
 use Botble\Table\Columns\CreatedAtColumn;
@@ -33,11 +33,9 @@ class ReviewTable extends TableAbstract
             ->model(Review::class)
             ->addHeaderAction(CreateHeaderAction::make()->route('reviews.create'))
             ->addActions([
-                Action::make('view')
+                ViewAction::make()
                     ->route('reviews.show')
-                    ->permission('reviews.index')
-                    ->label(__('View'))
-                    ->icon('ti ti-eye'),
+                    ->permission('reviews.index'),
                 DeleteAction::make()->route('reviews.destroy'),
             ]);
     }
@@ -63,7 +61,13 @@ class ReviewTable extends TableAbstract
                         return null;
                     }
 
-                    return sprintf('%s (%s)', BaseHelper::clean($item->customer_name), $item->customer_email);
+                    $name = BaseHelper::clean($item->customer_name);
+
+                    if (! $item->customer_email) {
+                        return $name;
+                    }
+
+                    return sprintf('%s (%s)', $name, $item->customer_email);
                 }
 
                 return Html::link(

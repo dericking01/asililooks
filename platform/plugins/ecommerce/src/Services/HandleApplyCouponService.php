@@ -41,6 +41,7 @@ class HandleApplyCouponService
         if (! $discount) {
             return [
                 'error' => true,
+                'error_code' => 'INVALID_COUPON',
                 'message' => trans('plugins/ecommerce::discount.invalid_coupon'),
             ];
         }
@@ -169,6 +170,7 @@ class HandleApplyCouponService
         if (! $discount) {
             return [
                 'error' => true,
+                'error_code' => 'INVALID_COUPON',
                 'message' => trans('plugins/ecommerce::discount.invalid_coupon'),
             ];
         }
@@ -222,6 +224,7 @@ class HandleApplyCouponService
             if (! empty($productsInFlashSales)) {
                 return [
                     'error' => true,
+                    'error_code' => 'CANNOT_USE_WITH_FLASH_SALE',
                     'message' => trans('plugins/ecommerce::discount.cannot_use_same_time_with_flash_sale', [
                         'product_name' => '<strong>' . implode(', ', $productsInFlashSales) . '</strong>',
                     ]),
@@ -234,10 +237,19 @@ class HandleApplyCouponService
          */
         if ($discount->target == DiscountTargetEnum::CUSTOMER) {
             $discountCustomers = $discount->customers->pluck('id')->all();
-            if (! $customerId || ! in_array($customerId, $discountCustomers)) {
+            if (! $customerId) {
                 return [
                     'error' => true,
-                    'message' => trans('plugins/ecommerce::discount.invalid_coupon'),
+                    'error_code' => 'LOGIN_REQUIRED',
+                    'message' => trans('plugins/ecommerce::discount.you_need_login_to_use_coupon_code'),
+                ];
+            } elseif (! in_array($customerId, $discountCustomers)) {
+                return [
+                    'error' => true,
+                    'error_code' => 'NOT_AVAILABLE_FOR_CUSTOMER',
+                    'message' => trans('plugins/ecommerce::discount.coupon_not_available_for_your_account', [
+                        'code' => $discount->code,
+                    ]),
                 ];
             }
         }
@@ -246,11 +258,13 @@ class HandleApplyCouponService
             if (! $customerId) {
                 return [
                     'error' => true,
+                    'error_code' => 'LOGIN_REQUIRED',
                     'message' => trans('plugins/ecommerce::discount.you_need_login_to_use_coupon_code'),
                 ];
             } elseif ($discount->usedByCustomers()->where('customer_id', auth('customer')->id())->exists()) {
                 return [
                     'error' => true,
+                    'error_code' => 'ALREADY_USED',
                     'message' => trans('plugins/ecommerce::discount.you_used_coupon_code'),
                 ];
             }
@@ -259,6 +273,7 @@ class HandleApplyCouponService
         if (! $discount->can_use_with_promotion && (float) Arr::get($sessionData, 'promotion_discount_amount')) {
             return [
                 'error' => true,
+                'error_code' => 'CANNOT_USE_WITH_PROMOTION',
                 'message' => trans('plugins/ecommerce::discount.cannot_use_same_time_with_other_discount_program'),
             ];
         }
@@ -271,6 +286,7 @@ class HandleApplyCouponService
         ) {
             return [
                 'error' => true,
+                'error_code' => 'MINIMUM_ORDER_AMOUNT_NOT_MET',
                 'message' => trans('plugins/ecommerce::discount.minimum_order_amount_error', [
                     'minimum_amount' => format_price($discount->min_order_price),
                     'add_more' => format_price($rawTotal - $discount->min_order_price),

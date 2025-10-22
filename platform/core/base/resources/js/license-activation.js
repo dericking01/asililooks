@@ -15,6 +15,8 @@ $(() => {
             .then(({ data }) => {
                 Botble.showSuccess(data.message)
 
+                localStorage.removeItem('license_check_time')
+
                 if ($form.data('reload')) {
                     setTimeout(() => {
                         window.location.reload()

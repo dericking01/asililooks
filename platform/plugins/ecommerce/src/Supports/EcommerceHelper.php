@@ -132,6 +132,11 @@ class EcommerceHelper
         return $number;
     }
 
+    public function isCustomerReviewImageUploadEnabled(): bool
+    {
+        return (bool) get_ecommerce_setting('allow_customer_upload_image_in_review', true);
+    }
+
     public function getReviewsGroupedByProductId(int|string $productId, int $reviewsCount = 0): Collection
     {
         if ($reviewsCount) {
@@ -157,10 +162,16 @@ class EcommerceHelper
                 $starCount = 0;
             }
 
+            $percentage = ((int) ($starCount * 100)) / 100;
+
+            if ($percentage > 100) {
+                $percentage = 100;
+            }
+
             $results[] = [
                 'star' => $i,
                 'count' => $starCount,
-                'percent' => ((int) ($starCount * 100)) / 100,
+                'percent' => $percentage,
             ];
         }
 
@@ -199,6 +210,17 @@ class EcommerceHelper
     public function isTaxEnabled(): bool
     {
         return (bool) get_ecommerce_setting('ecommerce_tax_enabled', 1);
+    }
+
+    public function roundPrice(float $price, $currency = null): float
+    {
+        if (! $currency) {
+            $currency = get_application_currency();
+        }
+
+        $decimals = $currency ? (int) $currency->decimals : 2;
+
+        return round($price, $decimals);
     }
 
     public function getAvailableCountries(): array
@@ -502,7 +524,6 @@ class EcommerceHelper
             $reviews->where('ec_reviews.product_id', $product->getKey());
         }
 
-        // Check if customer is logged in to prioritize their review
         $currentCustomerId = auth('customer')->id();
 
         return $reviews
@@ -558,31 +579,17 @@ class EcommerceHelper
      */
     public function withReviewsCount(): array
     {
-        $withCount = [];
-        if ($this->isReviewEnabled()) {
-            $withCount = [
-                'reviews',
-                'reviews as reviews_avg' => function ($query): void {
-                    $query->select(DB::raw('avg(star)'));
-                },
-            ];
-        }
-
-        return $withCount;
+        return [];
     }
 
+    /**
+     * @deprecated since 09/2025
+     */
     public function withReviewsParams(): array
     {
-        if (! $this->isReviewEnabled()) {
-            return [
-                'withCount' => [],
-                'withAvg' => [null, null],
-            ];
-        }
-
         return [
-            'withCount' => ['reviews'],
-            'withAvg' => ['reviews as reviews_avg', 'star'],
+            'withCount' => [],
+            'withAvg' => [null, null],
         ];
     }
 
@@ -838,7 +845,22 @@ class EcommerceHelper
                     $productImages = $product->images;
                 }
             } else {
-                $selectedAttrs = $product->defaultVariation->productAttributes;
+                $defaultVariation = $product->defaultVariation;
+                $selectedAttrs = $defaultVariation->productAttributes;
+
+                if ($defaultVariation && $defaultVariation->product && $defaultVariation->product->isOutOfStock()) {
+                    $product->loadMissing(['variations.product']);
+
+                    $availableVariation = $product->variations
+                        ->filter(function ($variation) {
+                            return $variation->product && ! $variation->product->isOutOfStock();
+                        })
+                        ->first();
+
+                    if ($availableVariation) {
+                        $selectedAttrs = $availableVariation->productAttributes;
+                    }
+                }
             }
 
             if ($params) {
@@ -1003,12 +1025,10 @@ class EcommerceHelper
     {
         $param = $request->input($paramName);
 
-        // If it's already an array, return it
         if (is_array($param)) {
             return $param;
         }
 
-        // If it's a comma-separated string, split it
         if (is_string($param) && $param !== '') {
             return array_filter(explode(',', $param));
         }
@@ -1018,27 +1038,22 @@ class EcommerceHelper
 
     public function productFilterParamsValidated(Request $request): bool
     {
-        // First, try to parse JSON parameters to avoid validation errors
         $input = $request->input();
 
-        // Parse price_ranges if it's a JSON string
         if (isset($input['price_ranges']) && is_string($input['price_ranges'])) {
             $parsed = $this->parseJsonParam($input['price_ranges']);
             if (! empty($parsed)) {
                 $input['price_ranges'] = $parsed;
             } else {
-                // If parsing failed, remove the parameter to avoid validation errors
                 unset($input['price_ranges']);
             }
         }
 
-        // Parse attributes if it's a JSON string
         if (isset($input['attributes']) && is_string($input['attributes'])) {
             $parsed = $this->parseJsonParam($input['attributes']);
             if (! empty($parsed)) {
                 $input['attributes'] = $parsed;
             } else {
-                // If parsing failed, remove the parameter to avoid validation errors
                 unset($input['attributes']);
             }
         }
@@ -1060,12 +1075,10 @@ class EcommerceHelper
             'discounted_only' => ['nullable', 'boolean'],
         ]);
 
-        // Also validate comma-separated string format
         if ($validator->passes()) {
             return true;
         }
 
-        // Try validating with comma-separated strings
         $validator = Validator::make($request->input(), [
             'q' => ['nullable', 'string', 'max:255'],
             'max_price' => ['nullable', 'numeric'],
@@ -1183,23 +1196,19 @@ class EcommerceHelper
 
     public function isValidToProcessCheckout(): bool
     {
-        // Check minimum order amount
         if (Cart::instance('cart')->rawSubTotal() < $this->getMinimumOrderAmount()) {
             return false;
         }
 
-        // Check quantity restrictions for each product
         $products = Cart::instance('cart')->products();
 
         foreach ($products as $product) {
             $quantityOfProduct = Cart::instance('cart')->rawQuantityByItemId($product->getKey());
 
-            // Check minimum order quantity
             if ($product->minimum_order_quantity > 0 && $quantityOfProduct < $product->minimum_order_quantity) {
                 return false;
             }
 
-            // Check maximum order quantity
             if ($product->maximum_order_quantity > 0 && $quantityOfProduct > $product->maximum_order_quantity) {
                 return false;
             }
@@ -1665,43 +1674,46 @@ class EcommerceHelper
         return $this->jsAttributes($action, $product, $additional);
     }
 
-    public function jsAttributes(string $action, Product $product, array $additional = []): string
+    public function jsAttributes(string $action, Product $product, array $additional = [], bool $includeTrackingAttributes = false): string
     {
         $attributes = [
             'data-bb-toggle' => $action,
-            'data-product-id' => $product->getKey(),
-            'data-product-name' => $product->name,
-            'data-product-price' => $product->price,
-            'data-product-sku' => $product->sku,
         ];
 
-        $category = $product->categories->sortByDesc('id')->first();
+        if ($includeTrackingAttributes) {
+            $attributes['data-product-id'] = $product->getKey();
+            $attributes['data-product-name'] = $product->name;
+            $attributes['data-product-price'] = $product->price;
+            $attributes['data-product-sku'] = $product->sku;
 
-        if ($category) {
-            $gpd = '';
+            $category = $product->categories->sortByDesc('id')->first();
 
-            if ($category->parents->count()) {
-                foreach ($category->parents->reverse() as $parentCategory) {
-                    $gpd .= $parentCategory->name . ' > ';
+            if ($category) {
+                $gpd = '';
+
+                if ($category->parents->count()) {
+                    foreach ($category->parents->reverse() as $parentCategory) {
+                        $gpd .= $parentCategory->name . ' > ';
+                    }
                 }
+
+                $gpd .= $category->name;
+
+                $attributes['data-product-category'] = $gpd;
             }
 
-            $gpd .= $category->name;
+            if ($product->brand) {
+                $attributes['data-product-brand'] = $product->brand->name;
+            }
 
-            $attributes['data-product-category'] = $gpd;
-        }
+            /**
+             * @var Collection $categories
+             */
+            $categories = $product->original_product->categories;
 
-        if ($product->brand) {
-            $attributes['data-product-brand'] = $product->brand->name;
-        }
-
-        /**
-         * @var Collection $categories
-         */
-        $categories = $product->original_product->categories;
-
-        if ($categories->isNotEmpty()) {
-            $attributes['data-product-categories'] = $categories->pluck('name')->implode(',');
+            if ($categories->isNotEmpty()) {
+                $attributes['data-product-categories'] = $categories->pluck('name')->implode(',');
+            }
         }
 
         $attributes = [...$attributes, ...$additional];
@@ -1939,6 +1951,6 @@ class EcommerceHelper
 
     public function getAssetVersion(): string
     {
-        return '3.10.9';
+        return '3.10.11';
     }
 }

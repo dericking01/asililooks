@@ -21,8 +21,11 @@ return [
 
         'group' => 'Associated Group',
         'group_placeholder' => 'Choose any Group',
+        'name_placeholder' => 'Enter attribute name',
         'type' => 'Field Type',
+        'type_placeholder' => 'Select field type',
         'default_value' => 'Default Value',
+        'default_value_placeholder' => 'Enter default value (optional)',
         'options' => [
             'heading' => 'Options',
 
@@ -71,6 +74,9 @@ return [
             'value' => 'Attribute value',
             'hide' => 'Hide',
             'sorting' => 'Sorting',
+            'enter_value' => 'Enter value',
+            'enter_translation' => 'Enter translation',
+            'not_set' => 'Not set',
         ],
     ],
 

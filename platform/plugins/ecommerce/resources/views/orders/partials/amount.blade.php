@@ -11,6 +11,7 @@
             </p>
         </div>
     </div>
+    {!! apply_filters('ecommerce_checkout_after_subtotal', null, $products) !!}
     @if (EcommerceHelper::isTaxEnabled())
         <div class="row">
             <div class="col-6">

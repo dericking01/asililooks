@@ -77,13 +77,6 @@ class IndexNowService
                     'urls_count' => count($urls),
                 ];
             } else {
-                Log::warning("Failed to submit URLs to {$engine} via IndexNow", [
-                    'urls' => $urls,
-                    'endpoint' => $endpoint,
-                    'status_code' => $response->status(),
-                    'response_body' => $response->body(),
-                ]);
-
                 return [
                     'status' => 'error',
                     'message' => "Failed to submit to {$engine}: HTTP {$response->status()}",
@@ -91,34 +84,16 @@ class IndexNowService
                 ];
             }
         } catch (ConnectionException $e) {
-            Log::error("Connection error while submitting to {$engine} via IndexNow", [
-                'urls' => $urls,
-                'endpoint' => $endpoint,
-                'error' => $e->getMessage(),
-            ]);
-
             return [
                 'status' => 'error',
                 'message' => "Connection error while submitting to {$engine}: {$e->getMessage()}",
             ];
         } catch (RequestException $e) {
-            Log::error("Request error while submitting to {$engine} via IndexNow", [
-                'urls' => $urls,
-                'endpoint' => $endpoint,
-                'error' => $e->getMessage(),
-            ]);
-
             return [
                 'status' => 'error',
                 'message' => "Request error while submitting to {$engine}: {$e->getMessage()}",
             ];
         } catch (Exception $e) {
-            Log::error("Unexpected error while submitting to {$engine} via IndexNow", [
-                'urls' => $urls,
-                'endpoint' => $endpoint,
-                'error' => $e->getMessage(),
-            ]);
-
             return [
                 'status' => 'error',
                 'message' => "Unexpected error while submitting to {$engine}: {$e->getMessage()}",
@@ -143,14 +118,12 @@ class IndexNowService
 
     public function generateApiKey(): string
     {
-        // Remove old key file if it exists
         $this->removeOldKeyFile();
 
         $key = Str::uuid()->toString();
         setting()->set('indexnow_api_key', $key)->save();
         $this->apiKey = $key;
 
-        // Create new key file
         $this->createKeyFile($key);
 
         return $key;
@@ -180,11 +153,6 @@ class IndexNowService
             if ($result !== false) {
                 return true;
             }
-
-            Log::error('Failed to create IndexNow API key file', [
-                'file_path' => $filePath,
-                'api_key' => $apiKey,
-            ]);
 
             return false;
         } catch (Exception $e) {

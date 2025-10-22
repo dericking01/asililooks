@@ -18,13 +18,12 @@ use Botble\Sitemap\Services\IndexNowService;
 use Botble\Sitemap\Sitemap;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Foundation\Application;
 
-class SitemapServiceProvider extends ServiceProvider
+class SitemapServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     use LoadAndPublishDataTrait;
-
-    protected bool $defer = true;
 
     public function register(): void
     {
@@ -50,7 +49,8 @@ class SitemapServiceProvider extends ServiceProvider
     {
         $this
             ->setNamespace('packages/sitemap')
-            ->loadAndPublishConfigurations(['config', 'permissions'])
+            ->loadAndPublishConfigurations(['config'])
+            ->loadAndPublishConfigurations(['permissions'])
             ->loadAndPublishViews()
             ->loadAndPublishTranslations()
             ->loadRoutes()
@@ -63,7 +63,6 @@ class SitemapServiceProvider extends ServiceProvider
         ], function (): void {
             ClearCacheService::make()->clearFrameworkCache();
 
-            // Fire sitemap updated event to trigger search engine pings
             event(new SitemapUpdatedEvent());
         });
 

@@ -1,0 +1,65 @@
+<?php
+
+return [
+    'create' => 'Создать новый пост',
+    'form' => [
+        'name' => 'Название',
+        'name_placeholder' => 'Название поста (Максимум :c знаков)',
+        'description' => 'Описание',
+        'description_placeholder' => 'Краткое описание поста (Максимум :c знаков)',
+        'categories' => 'Категории',
+        'tags' => 'Теги',
+        'tags_placeholder' => 'Теги',
+        'content' => 'Содержание',
+        'is_featured' => 'Рекомендованный?',
+        'note' => 'Содержание заметки',
+        'format_type' => 'Формат',
+
+    ],
+    'cannot_delete' => 'Сообщение не может быть удалено',
+    'post_deleted' => 'Сообщение удалено',
+    'posts' => 'Посты',
+    'post' => 'Пост',
+    'edit_this_post' => 'Редактировать это сообщение',
+    'no_new_post_now' => 'Теперь нет новых сообщений!',
+    'menu_name' => 'Посты',
+    'widget_posts_recent' => 'Последние записи',
+    'categories' => 'Категории',
+    'category' => 'Категория',
+    'author' => 'Автор',
+    'export' => [
+        'description' => 'Export posts to CSV/Excel file.',
+        'total' => 'Total Posts',
+        'limit' => 'Limit',
+        'limit_placeholder' => 'Leave empty to export all',
+        'all_status' => 'All Status',
+        'all_featured' => 'All',
+        'all_categories' => 'All Categories',
+        'start_date' => 'Start Date',
+        'start_date_placeholder' => 'Start date',
+        'end_date' => 'End Date',
+        'end_date_placeholder' => 'End date',
+
+    ],
+    'import' => [
+        'description' => 'Import posts from a CSV/Excel file.',
+        'done_message' => ':created posts created and :updated posts updated.',
+        'rules' => [
+            'nullable_string_max' => 'The :attribute field accepts a string value of up to :max characters or may be left blank.',
+            'sometimes_array' => 'The :attribute field accepts an array value or may be left blank.',
+            'in' => ':attribute must be one of the following values: :values.',
+            'nullable_string' => 'The :attribute field accepts a string value or may be left blank.',
+            'nullable_string_max_in' => 'The :attribute field can be left blank, or must be a string with a maximum length of :max characters if provided and must be one of the following values: :values.',
+            'faq_schema_config' => 'FAQ schema configuration must be a valid string if provided.',
+            'faq_ids' => 'FAQ IDs must be a valid array if provided.',
+
+        ],
+
+    ],
+    'edit' => 'Редактировать пост',
+    'is_featured' => 'Is featured?',
+    'post_translations' => 'Post Translations',
+    'export_post_translations' => 'Export Post Translations',
+    'import_description' => 'Import translations for :name from a CSV/Excel file.',
+    'export_description' => 'Export translations for :name to a CSV/Excel file.',
+];

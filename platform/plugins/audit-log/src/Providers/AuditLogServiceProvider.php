@@ -11,12 +11,10 @@ use Botble\Base\PanelSections\System\SystemPanelSection;
 use Botble\Base\Supports\ServiceProvider;
 use Botble\Base\Traits\LoadAndPublishDataTrait;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Database\Console\PruneCommand;
 
-/**
- * @since 02/07/2016 09:05 AM
- */
-class AuditLogServiceProvider extends ServiceProvider
+class AuditLogServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     use LoadAndPublishDataTrait;
 
@@ -30,7 +28,10 @@ class AuditLogServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->app->register(EventServiceProvider::class);
-        $this->app->register(CommandServiceProvider::class);
+
+        if ($this->app->runningInConsole()) {
+            $this->app->register(CommandServiceProvider::class);
+        }
 
         $this
             ->setNamespace('plugins/audit-log')
@@ -65,5 +66,12 @@ class AuditLogServiceProvider extends ServiceProvider
                     ->dailyAt('00:30');
             });
         }
+    }
+
+    public function provides(): array
+    {
+        return [
+            AuditLogInterface::class,
+        ];
     }
 }

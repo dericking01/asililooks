@@ -1,8 +1,16 @@
+@php
+    use Botble\Ecommerce\Models\ProductSpecificationAttributeTranslation;
+
+    $currentLangCode = ProductSpecificationAttributeTranslation::getCurrentLanguageCode();
+
+    $visibleAttributes = $product->getVisibleSpecificationAttributes();
+@endphp
+
 <div class="row justify-content-center">
     <div class="col-xl-10">
         <table>
             <tbody>
-            @foreach($product->specificationAttributes->where('pivot.hidden', false)->sortBy('pivot.order') as $attribute)
+            @foreach($visibleAttributes as $attribute)
                 <tr>
                     <td>{{ $attribute->name }}</td>
                     <td>
@@ -13,7 +21,7 @@
                                 <x-core::icon name="ti ti-x" class="text-danger" style="font-size: 1.5rem;" />
                             @endif
                         @else
-                            {{ $attribute->pivot->value }}
+                            {{ ProductSpecificationAttributeTranslation::getDisplayValue($product, $attribute, $currentLangCode) }}
                         @endif
                     </td>
                 </tr>

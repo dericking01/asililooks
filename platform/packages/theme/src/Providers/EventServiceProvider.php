@@ -2,11 +2,13 @@
 
 namespace Botble\Theme\Providers;
 
+use Botble\Base\Events\CacheCleared;
 use Botble\Base\Events\FormRendering;
 use Botble\Base\Events\SeederPrepared;
 use Botble\Base\Events\SystemUpdateDBMigrated;
 use Botble\Base\Events\SystemUpdatePublished;
 use Botble\Theme\Listeners\AddFormJsValidation;
+use Botble\Theme\Listeners\ClearThemeCache;
 use Botble\Theme\Listeners\CoreUpdateThemeDB;
 use Botble\Theme\Listeners\PublishThemeAssets;
 use Botble\Theme\Listeners\SetDefaultTheme;
@@ -26,6 +28,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         FormRendering::class => [
             AddFormJsValidation::class,
+        ],
+        CacheCleared::class => [
+            ClearThemeCache::class,
         ],
     ];
 }

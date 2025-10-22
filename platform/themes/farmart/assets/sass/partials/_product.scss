@@ -2103,3 +2103,228 @@ html:not([dir="rtl"]) .noUi-horizontal .noUi-handle {
         100% { transform: rotate(360deg); }
     }
 }
+
+// Custom Layout for Products Page
+.ps-layout--shop {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0;
+    position: relative;
+}
+
+.ps-layout__left {
+    flex: 0 0 330px;
+    max-width: 330px;
+    padding-right: 30px;
+    position: relative;
+
+    .ps-layout__left-container {
+        position: relative;
+    }
+
+    .ps-filter__header {
+        padding: 20px 60px 20px 20px;
+        background-color: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+
+        h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #222;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ps-btn--close {
+            background: #f5f5f5;
+            border: none;
+            font-size: 20px;
+            line-height: 1;
+            cursor: pointer;
+            padding: 8px;
+            color: #666;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+
+            &:before {
+                content: "×";
+                font-weight: 300;
+            }
+
+            &:hover {
+                background-color: $color-primary;
+                color: #fff;
+                transform: translateY(-50%) rotate(90deg);
+            }
+        }
+    }
+
+    .ps-layout__left-content {
+        // Content styles are already defined in .catalog-primary-sidebar
+    }
+}
+
+.screen-darken {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.25);
+    display: none;
+}
+
+.ps-layout__right {
+    flex: 1 1 auto;
+    max-width: calc(100% - 330px);
+    width: 100%;
+}
+
+// Mobile responsiveness
+@media (max-width: 1199px) {
+    .ps-layout--shop {
+        flex-wrap: wrap;
+    }
+
+    .ps-layout__left {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        max-width: 400px;
+        height: 100%;
+        z-index: 1001;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        padding-right: 0;
+        background-color: #fff;
+
+        .ps-layout__left-container {
+            height: 100%;
+            overflow-y: auto;
+            background-color: #fff;
+            position: relative;
+            z-index: 1002;
+        }
+
+        &.active {
+            transform: translateX(0);
+
+            ~ .screen-darken {
+                display: block;
+            }
+        }
+    }
+
+    .ps-layout__right {
+        max-width: 100%;
+        flex: 1 1 100%;
+    }
+
+    // Support for admin bar
+    body.show-admin-bar .ps-layout__left {
+        top: 40px;
+        height: calc(100% - 40px);
+
+        .ps-filter__header {
+            top: 0;
+        }
+    }
+
+    body.show-admin-bar .screen-darken {
+        top: 40px;
+        height: calc(100% - 40px);
+    }
+}
+
+// Catalog Header Styles
+.header__filter {
+    button {
+        display: flex;
+        align-items: center;
+        background-color: $color-primary;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 3px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+            opacity: 0.9;
+        }
+    }
+}
+
+.products-found {
+    font-size: 14px;
+    color: #666;
+
+    strong {
+        font-weight: 700;
+        color: #000;
+    }
+}
+
+.ps-shopping__view {
+    display: flex;
+    align-items: center;
+}
+
+.products-layout {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+        margin-left: 5px;
+
+        &:first-child {
+            margin-left: 0;
+        }
+
+        a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            color: #666;
+            transition: all 0.3s ease;
+
+            &:hover {
+                background-color: $color-primary;
+                border-color: $color-primary;
+                color: #fff;
+            }
+
+            .svg-icon {
+                font-size: 16px;
+            }
+        }
+
+        &.active a {
+            background-color: $color-primary;
+            border-color: $color-primary;
+            color: #fff;
+        }
+    }
+}

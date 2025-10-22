@@ -10,17 +10,19 @@
             value="0"
         >
         @if ($isShowAddressForm)
+        <label class="form-check">
             <input
                 id="billing_address_same_as_shipping_address"
                 name="billing_address_same_as_shipping_address"
                 type="checkbox"
                 value="1"
+                class="form-check-input"
                 @checked ($billingAddressSameAsShippingAddress)
             >
-            <label
-                class="form-label"
-                for="billing_address_same_as_shipping_address"
-            >{{ __('Same as shipping information') }}</label>
+            <span
+                class="form-check-label"
+            >{{ __('Same as shipping information') }}</span>
+        </label>
         @elseif (auth('customer')->check() && $isAvailableAddress)
             <input
                 name="billing_address_same_as_shipping_address"

@@ -21,6 +21,7 @@ class DigitalProductSettingFom extends SettingForm
             ->add('is_enabled_support_digital_products', 'onOffCheckbox', [
                 'label' => trans('plugins/ecommerce::setting.digital_product.form.enable_support_digital_product'),
                 'value' => EcommerceHelper::isEnabledSupportDigitalProducts(),
+                'helper' => trans('plugins/ecommerce::setting.digital_product.form.enable_support_digital_product_helper'),
                 'attr' => [
                     'data-bb-toggle' => 'collapse',
                     'data-bb-target' => '.digital-products-settings',
@@ -38,6 +39,7 @@ class DigitalProductSettingFom extends SettingForm
                 OnOffFieldOption::make()
                     ->label(trans('plugins/ecommerce::setting.digital_product.form.allow_guest_checkout_for_digital_products'))
                     ->value(EcommerceHelper::allowGuestCheckoutForDigitalProducts())
+                    ->helperText(trans('plugins/ecommerce::setting.digital_product.form.allow_guest_checkout_for_digital_products_helper'))
             )
             ->add(
                 'disable_physical_product',
@@ -45,6 +47,7 @@ class DigitalProductSettingFom extends SettingForm
                 OnOffFieldOption::make()
                     ->label(trans('plugins/ecommerce::setting.digital_product.form.disable_physical_product'))
                     ->value(EcommerceHelper::isDisabledPhysicalProduct())
+                    ->helperText(trans('plugins/ecommerce::setting.digital_product.form.disable_physical_product_helper'))
             )
             ->add(
                 'enable_license_codes_for_digital_products',

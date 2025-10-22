@@ -3,7 +3,6 @@
 namespace Botble\Theme\Forms\Settings;
 
 use Botble\Base\Facades\BaseHelper;
-use Botble\Base\Facades\Html;
 use Botble\Base\Forms\FieldOptions\CodeEditorFieldOption;
 use Botble\Base\Forms\FieldOptions\HtmlFieldOption;
 use Botble\Base\Forms\FieldOptions\OnOffFieldOption;
@@ -64,64 +63,101 @@ class WebsiteTrackingSettingForm extends SettingForm
                     ])
                     ->selected($targetValue = old('google_tag_manager_type', $defaultType))
             )
+            ->addOpenCollapsible('google_tag_manager_type', 'gtm', $targetValue)
             ->add(
                 'gtm_description',
                 HtmlField::class,
                 HtmlFieldOption::make()
-                    ->collapsible('google_tag_manager_type', 'gtm', $targetValue)
                     ->content('<div class="alert alert-success mb-3">' . BaseHelper::renderIcon('ti ti-info-circle') . ' ' . trans('packages/theme::theme.settings.website_tracking.google_tag_manager_description') . '</div>')
+            )
+            ->add(
+                'gtm_setup_guide',
+                HtmlField::class,
+                HtmlFieldOption::make()
+                    ->view('packages/theme::partials.website-tracking.gtm-setup-guide')
             )
             ->add(
                 'gtm_container_id',
                 TextField::class,
                 TextFieldOption::make()
-                    ->collapsible('google_tag_manager_type', 'gtm', $targetValue)
                     ->label(trans('packages/theme::theme.settings.website_tracking.gtm_container_id'))
                     ->value($gtmContainerId)
                     ->placeholder(trans('packages/theme::theme.settings.website_tracking.gtm_container_id_placeholder'))
-                    ->helperText(
-                        trans('packages/theme::theme.settings.website_tracking.gtm_container_id_helper') . ' ' .
-                        Html::link('https://support.google.com/tagmanager/answer/6103696', trans('packages/theme::theme.settings.website_tracking.gtm_learn_more'), ['target' => '_blank'])
-                    )
+                    ->helperText(trans('packages/theme::theme.settings.website_tracking.gtm_container_id_helper'))
             )
+            ->add(
+                'gtm_debug_mode',
+                OnOffField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('packages/theme::theme.settings.website_tracking.gtm_debug_mode'))
+                    ->value((bool) setting('gtm_debug_mode', false))
+                    ->helperText(trans('packages/theme::theme.settings.website_tracking.gtm_debug_mode_helper'))
+            )
+            ->add(
+                'gtm_add_ga4',
+                HtmlField::class,
+                HtmlFieldOption::make()
+                    ->view('packages/theme::partials.website-tracking.gtm-add-ga4-guide')
+            )
+            ->add(
+                'gtm_verification',
+                HtmlField::class,
+                HtmlFieldOption::make()
+                    ->view('packages/theme::partials.website-tracking.gtm-verification-guide')
+            )
+            ->addCloseCollapsible('google_tag_manager_type', 'gtm')
+            ->addOpenCollapsible('google_tag_manager_type', 'id', $targetValue)
             ->add(
                 'id_description',
                 HtmlField::class,
                 HtmlFieldOption::make()
-                    ->collapsible('google_tag_manager_type', 'id', $targetValue)
                     ->content('<div class="alert alert-info mb-3">' . BaseHelper::renderIcon('ti ti-info-circle') . ' ' . trans('packages/theme::theme.settings.website_tracking.google_tag_id_description') . '</div>')
+            )
+            ->add(
+                'ga_setup_guide',
+                HtmlField::class,
+                HtmlFieldOption::make()
+                    ->view('packages/theme::partials.website-tracking.ga-setup-guide')
             )
             ->add(
                 'google_tag_manager_id',
                 TextField::class,
                 TextFieldOption::make()
-                    ->collapsible('google_tag_manager_type', 'id', $targetValue)
                     ->label(trans('packages/theme::theme.settings.website_tracking.google_tag_id'))
                     ->value($googleTagManagerId)
                     ->placeholder(trans('packages/theme::theme.settings.website_tracking.google_tag_id_placeholder'))
-                    ->helperText(
-                        Html::link('https://support.google.com/analytics/answer/9539598#find-G-ID', 'Find your Google Analytics ID', ['target' => '_blank'])
-                    )
+                    ->helperText(trans('packages/theme::theme.settings.website_tracking.google_tag_id_helper'))
             )
+            ->add(
+                'ga_verification',
+                HtmlField::class,
+                HtmlFieldOption::make()
+                    ->view('packages/theme::partials.website-tracking.ga-verification-guide')
+            )
+            ->addCloseCollapsible('google_tag_manager_type', 'id')
+            ->addOpenCollapsible('google_tag_manager_type', 'custom', $targetValue)
             ->add(
                 'custom_description',
                 HtmlField::class,
                 HtmlFieldOption::make()
-                    ->collapsible('google_tag_manager_type', 'custom', $targetValue)
                     ->content('<div class="alert alert-warning mb-3">' . BaseHelper::renderIcon('ti ti-info-circle') . ' ' . trans('packages/theme::theme.settings.website_tracking.custom_tracking_description') . '</div>')
+            )
+            ->add(
+                'custom_setup_guide',
+                HtmlField::class,
+                HtmlFieldOption::make()
+                    ->view('packages/theme::partials.website-tracking.custom-setup-guide')
             )
             ->add(
                 'custom_tracking_instruction',
                 HtmlField::class,
                 HtmlFieldOption::make()
-                    ->collapsible('google_tag_manager_type', 'custom', $targetValue)
                     ->content('<div class="form-text mb-3">' . trans('packages/theme::theme.settings.website_tracking.custom_tracking_instruction') . '</div>')
             )
             ->add(
                 'custom_tracking_header_js',
                 CodeEditorField::class,
                 CodeEditorFieldOption::make()
-                    ->collapsible('google_tag_manager_type', 'custom', $targetValue)
                     ->label(trans('packages/theme::theme.settings.website_tracking.custom_tracking_header_js'))
                     ->value($customTrackingHeaderJs)
                     ->mode('html')
@@ -131,19 +167,17 @@ class WebsiteTrackingSettingForm extends SettingForm
                 'custom_tracking_body_html',
                 CodeEditorField::class,
                 CodeEditorFieldOption::make()
-                     ->collapsible('google_tag_manager_type', 'custom', $targetValue)
                      ->label(trans('packages/theme::theme.settings.website_tracking.custom_tracking_body_html'))
                      ->value($customTrackingBodyHtml)
                      ->mode('html')
                      ->helperText(trans('packages/theme::theme.settings.website_tracking.custom_tracking_body_html_helper'))
             )
             ->add(
-                'gtm_debug_mode',
-                OnOffField::class,
-                OnOffFieldOption::make()
-                    ->label(trans('packages/theme::theme.settings.website_tracking.gtm_debug_mode'))
-                    ->value((bool) setting('gtm_debug_mode', false))
-                    ->helperText(trans('packages/theme::theme.settings.website_tracking.gtm_debug_mode_helper'))
-            );
+                'custom_verification',
+                HtmlField::class,
+                HtmlFieldOption::make()
+                    ->view('packages/theme::partials.website-tracking.custom-verification-guide')
+            )
+            ->addCloseCollapsible('google_tag_manager_type', 'custom');
     }
 }

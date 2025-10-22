@@ -98,6 +98,6 @@ class Youtube
     {
         $id = self::getYoutubeVideoID($url);
 
-        return $id ? "https://i.ytimg.com/vi_webp/$id/maxresdefault.webp" : RvMedia::getDefaultImage();
+        return $id ? "https://i.ytimg.com/vi/$id/hqdefault.jpg" : RvMedia::getDefaultImage();
     }
 }

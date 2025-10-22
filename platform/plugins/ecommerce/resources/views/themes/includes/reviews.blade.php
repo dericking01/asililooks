@@ -77,7 +77,7 @@
             @include($reviewFormView ?? EcommerceHelper::viewPath('includes.review-form'))
         </div>
 
-        @if (($reviewImagesCount = count($product->review_images)) > 0)
+        @if (EcommerceHelper::isCustomerReviewImageUploadEnabled() && get_ecommerce_setting('display_uploaded_customer_review_images_list', true) && ($reviewImagesCount = count($product->review_images)) > 0)
             <div class="review-images-container">
                 <h4 class="mb-3">{{ __('Images from customer (:count)', ['count' => number_format($reviewImagesCount)]) }}</h4>
 

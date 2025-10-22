@@ -2,7 +2,7 @@
 
 namespace Botble\Theme\Supports;
 
-use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class GoogleTagManagerEnhanced
 {
@@ -28,13 +28,7 @@ class GoogleTagManagerEnhanced
             }
 
             return $script;
-        } catch (\Throwable $e) {
-            Log::error('GTM Script Rendering Error: ' . $e->getMessage());
-
-            if (app()->hasDebugModeEnabled()) {
-                return '';
-            }
-
+        } catch (Throwable) {
             return '';
         }
     }
@@ -47,11 +41,13 @@ class GoogleTagManagerEnhanced
             return '';
         }
 
-        if ($debugMode) {
-            Log::info('GTM: Loading custom tracking code');
-        }
+        $initDataLayer = '
+        <script>
+            window.dataLayer = window.dataLayer || [];
+        </script>
+        ';
 
-        return trim($customTrackingHeaderJs);
+        return trim($initDataLayer . "\n" . $customTrackingHeaderJs);
     }
 
     protected static function renderGtmContainer(bool $debugMode): string
@@ -62,28 +58,36 @@ class GoogleTagManagerEnhanced
             return '';
         }
 
-        if ($debugMode) {
-            Log::info("GTM: Loading container ID: {$gtmContainerId}");
-        }
-
-        $debugParam = $debugMode ? '&gtm_debug=x&gtm_auth=&gtm_preview=env-1&gtm_cookies_win=x' : '';
+        $debugParam = '';
 
         $errorHandler = $debugMode ? "
+                j.onload = j.onreadystatechange = function() {
+                    if (!j.readyState || /loaded|complete/.test(j.readyState)) {
+                        setTimeout(function() {
+                            if (window.google_tag_manager && window.google_tag_manager['$gtmContainerId']) {
+                                console.log('GTM container loaded successfully: $gtmContainerId');
+                                window.gtmLoaded = true;
+                            } else if (window.dataLayer && window.dataLayer.length > 1) {
+                                console.log('GTM container initialized: $gtmContainerId (dataLayer active)');
+                                window.gtmLoaded = true;
+                            } else {
+                                console.warn('GTM container may not be fully loaded: $gtmContainerId. Check if the container is published and the ID is correct.');
+                            }
+                        }, 1000);
+                    }
+                };
                 j.onerror = function() {
-                    console.warn('GTM container could not be loaded: $gtmContainerId. This may be normal if the container ID is for testing or not yet published.');
+                    console.error('Failed to load GTM script from Google servers for container: $gtmContainerId');
                     if (window.gtmErrorCallback) {
                         window.gtmErrorCallback('$gtmContainerId');
                     }
-                };
-                j.onload = function() {
-                    console.log('GTM container loaded successfully: $gtmContainerId');
-                    window.gtmLoaded = true;
                 };" : '';
 
         return trim(
             <<<HTML
             <!-- Google Tag Manager -->
             <script>
+            window.dataLayer = window.dataLayer || [];
             (function(w,d,s,l,i){
                 w[l]=w[l]||[];
                 w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
@@ -94,7 +98,6 @@ class GoogleTagManagerEnhanced
                 f.parentNode.insertBefore(j,f);
             })(window,document,'script','dataLayer','$gtmContainerId');
             </script>
-            <!-- End Google Tag Manager -->
             HTML
         );
     }
@@ -105,10 +108,6 @@ class GoogleTagManagerEnhanced
 
         if (! $googleTagManagerId) {
             return '';
-        }
-
-        if ($debugMode) {
-            Log::info("GTM: Loading Google Analytics ID: {$googleTagManagerId}");
         }
 
         $debugConfig = $debugMode ? "gtag('config', '{$googleTagManagerId}', { 'debug_mode': true });" : "gtag('config', '{$googleTagManagerId}');";
@@ -134,7 +133,6 @@ class GoogleTagManagerEnhanced
               gtag('js', new Date());
               $debugConfig
             </script>
-            <!-- End Google Analytics -->
             HTML
         );
     }
@@ -165,7 +163,7 @@ class GoogleTagManagerEnhanced
         <script>
             window.gtmDebugMode = true;
             console.log('%c GTM Debug Mode Enabled ', 'background: #4CAF50; color: white; padding: 2px 5px; border-radius: 3px;');
-            
+
             (function() {
                 var originalPush = Array.prototype.push;
                 window.dataLayer = window.dataLayer || [];
@@ -174,19 +172,35 @@ class GoogleTagManagerEnhanced
                     return originalPush.apply(this, arguments);
                 };
             })();
-            
+
             window.addEventListener('load', function() {
                 setTimeout(function() {
-                    if (window.gtmLoaded || typeof google_tag_manager !== 'undefined') {
-                        console.log('%c ✓ GTM Loaded Successfully ', 'background: #4CAF50; color: white; padding: 2px 5px; border-radius: 3px;');
+                    var gtmContainerId = (function() {
+                        var scripts = document.getElementsByTagName('script');
+                        for (var i = 0; i < scripts.length; i++) {
+                            var src = scripts[i].src;
+                            if (src && src.includes('googletagmanager.com/gtm.js')) {
+                                var match = src.match(/[?&]id=([^&]+)/);
+                                return match ? match[1] : null;
+                            }
+                        }
+                        return null;
+                    })();
+
+                    if (window.google_tag_manager && gtmContainerId && window.google_tag_manager[gtmContainerId]) {
+                        console.log('%c ✓ GTM Container ' + gtmContainerId + ' Loaded Successfully ', 'background: #4CAF50; color: white; padding: 2px 5px; border-radius: 3px;');
+                        console.log('GTM Object:', window.google_tag_manager[gtmContainerId]);
+                    } else if (window.gtmLoaded) {
+                        console.log('%c ✓ GTM Loaded (verified by load handler) ', 'background: #4CAF50; color: white; padding: 2px 5px; border-radius: 3px;');
                     } else if (typeof gtag === 'function') {
                         console.log('%c ✓ Google Analytics Loaded Successfully ', 'background: #4CAF50; color: white; padding: 2px 5px; border-radius: 3px;');
-                    } else if (window.dataLayer && window.dataLayer.length > 0) {
-                        console.info('%c ℹ DataLayer is active but GTM/Analytics script may still be loading ', 'background: #2196F3; color: white; padding: 2px 5px; border-radius: 3px;');
+                    } else if (window.dataLayer && window.dataLayer.length > 1) {
+                        console.log('%c ✓ DataLayer is active with ' + window.dataLayer.length + ' events ', 'background: #4CAF50; color: white; padding: 2px 5px; border-radius: 3px;');
+                        console.log('DataLayer contents:', window.dataLayer);
                     } else {
-                        console.info('%c ℹ No tracking scripts detected. This is normal if tracking is disabled. ', 'background: #9E9E9E; color: white; padding: 2px 5px; border-radius: 3px;');
+                        console.info('%c ℹ GTM/Analytics may still be initializing or container may not be published ', 'background: #FF9800; color: white; padding: 2px 5px; border-radius: 3px;');
                     }
-                }, 2000);
+                }, 3000);
             });
         </script>
         $script
@@ -207,9 +221,7 @@ class GoogleTagManagerEnhanced
                 'gtm' => self::renderGtmNoscript(),
                 default => self::renderAutoDetectNoscript(),
             };
-        } catch (\Throwable $e) {
-            Log::error('GTM Noscript Rendering Error: ' . $e->getMessage());
-
+        } catch (Throwable) {
             return '';
         }
     }
@@ -231,12 +243,11 @@ class GoogleTagManagerEnhanced
 
         return trim(
             <<<HTML
-            <!-- Google Tag Manager (noscript) -->
+            <!-- Google Tag Manager -->
             <noscript>
                 <iframe src="https://www.googletagmanager.com/ns.html?id=$gtmContainerId"
                     height="0" width="0" style="display:none;visibility:hidden"></iframe>
             </noscript>
-            <!-- End Google Tag Manager (noscript) -->
             HTML
         );
     }

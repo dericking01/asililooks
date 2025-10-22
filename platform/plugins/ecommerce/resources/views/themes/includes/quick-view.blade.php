@@ -28,7 +28,7 @@
                     @csrf
 
                     <div class="row product-filters">
-                        @if ($product->variations()->count() > 0)
+                        @if ($product->has_variation)
                             {!! render_product_swatches($product, [
                                 'selected' => $selectedAttrs,
                             ]) !!}

@@ -4,6 +4,7 @@ namespace Botble\Base\Models\Concerns;
 
 use Botble\Base\Facades\MetaBox as MetaBoxSupport;
 use Botble\Base\Models\MetaBox;
+use Botble\Base\Supports\MetadataCache;
 use Botble\Media\Facades\RvMedia;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Http\Request;
@@ -25,6 +26,13 @@ trait HasMetadata
 
     public function getMetaData(string $key, bool $single = false): array|string|null
     {
+        $cacheKey = $single ? $key . '_single' : $key;
+        $cached = MetadataCache::get($cacheKey, $this);
+
+        if ($cached !== null) {
+            return $cached;
+        }
+
         $field = $this->metadata
             ->where('meta_key', apply_filters('stored_meta_box_key', $key, $this))
             ->first();
@@ -34,10 +42,16 @@ trait HasMetadata
         }
 
         if (! $field) {
-            return $single ? '' : [];
+            $result = $single ? '' : [];
+            MetadataCache::set($cacheKey, $this, $result);
+
+            return $result;
         }
 
-        return MetaBoxSupport::getMetaData($field, $key, $single);
+        $result = MetaBoxSupport::getMetaData($field, $key, $single);
+        MetadataCache::set($cacheKey, $this, $result);
+
+        return $result;
     }
 
     public function saveMetaDataFromFormRequest(array|string $fields, Request $request): void

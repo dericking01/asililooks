@@ -30,25 +30,28 @@ class Ecommerce {
 
                 const form = $(e.currentTarget)
 
-                // Create a new FormData object
                 const formData = this.#transformFormData(form.serializeArray())
                 const url = form.prop('action')
                 let nextUrl = url
 
-                // Use URLSearchParams to prevent duplicate parameters
                 const searchParams = new URLSearchParams()
 
-                // Group parameters by name to handle arrays and prevent duplicates
                 const paramsByName = {}
                 const attributeArrays = {}
 
-                // Get current URL parameters to check if search query has changed
                 const currentUrlParams = new URLSearchParams(window.location.search)
-                const currentSearchQuery = currentUrlParams.get('q') || ''
-                let newSearchQuery = ''
+
+                const currentFilterState = {}
+                for (const [key, value] of currentUrlParams.entries()) {
+                    if (key !== 'page' && key !== '_') {
+                        if (!currentFilterState[key]) {
+                            currentFilterState[key] = []
+                        }
+                        currentFilterState[key].push(value)
+                    }
+                }
 
                 formData.forEach((item) => {
-                    // Handle attribute arrays like attributes[color][]
                     if (item.name.includes('attributes[') && item.name.endsWith('[]')) {
                         if (!attributeArrays[item.name]) {
                             attributeArrays[item.name] = []
@@ -56,47 +59,70 @@ class Ecommerce {
                         attributeArrays[item.name].push(item.value)
                     } else if (!paramsByName[item.name]) {
                         paramsByName[item.name] = item.value
-                        // Track the new search query
-                        if (item.name === 'q') {
-                            newSearchQuery = item.value
-                        }
                     }
                 })
 
-                // If search query has changed, remove the page parameter
-                if (newSearchQuery !== currentSearchQuery && paramsByName['page']) {
+                const newFilterState = {}
+                Object.keys(paramsByName).forEach(name => {
+                    if (name !== 'page' && name !== '_' && paramsByName[name]) {
+                        if (!newFilterState[name]) {
+                            newFilterState[name] = []
+                        }
+                        newFilterState[name].push(paramsByName[name])
+                    }
+                })
+                Object.keys(attributeArrays).forEach(name => {
+                    if (!newFilterState[name]) {
+                        newFilterState[name] = []
+                    }
+                    newFilterState[name] = newFilterState[name].concat(attributeArrays[name])
+                })
+
+                Object.keys(currentFilterState).forEach(key => {
+                    if (Array.isArray(currentFilterState[key])) {
+                        currentFilterState[key].sort()
+                    }
+                })
+                Object.keys(newFilterState).forEach(key => {
+                    if (Array.isArray(newFilterState[key])) {
+                        newFilterState[key].sort()
+                    }
+                })
+
+                const filterStateChanged = JSON.stringify(currentFilterState) !== JSON.stringify(newFilterState)
+
+                if (filterStateChanged && paramsByName['page']) {
                     delete paramsByName['page']
                 }
 
-                // Add regular parameters to URLSearchParams
                 Object.keys(paramsByName).forEach(name => {
                     if (paramsByName[name]) {
                         searchParams.set(name, paramsByName[name])
                     }
                 })
 
-                // Add attribute arrays to URLSearchParams
                 Object.keys(attributeArrays).forEach(name => {
                     attributeArrays[name].forEach(value => {
                         searchParams.append(name, value)
                     })
                 })
 
-                // Build the URL
                 const queryString = searchParams.toString()
                 if (queryString) {
                     nextUrl += `?${queryString}`
                 }
 
-                // Add timestamp to formData for AJAX but not for URL
-                const formDataWithTimestamp = [...formData, { name: '_', value: Date.now() }]
+                let filteredFormData = formData
+                if (filterStateChanged && formData.some(item => item.name === 'page')) {
+                    filteredFormData = formData.filter(item => item.name !== 'page')
+                }
 
-                // Don't reload if URL is the same
+                const formDataWithTimestamp = [...filteredFormData, { name: '_', value: Date.now() }]
+
                 if (window.location.href === nextUrl) {
                     return
                 }
 
-                // Don't send duplicate requests with the same parameters and same action URL
                 const formDataString = JSON.stringify(formData)
                 const currentFormAction = form.prop('action')
 
@@ -107,17 +133,14 @@ class Ecommerce {
                 this.lastFilterFormData = formDataString
                 this.lastFilterFormAction = currentFormAction
 
-                // Cancel any pending AJAX request
                 if (this.filterAjax) {
                     this.filterAjax.abort()
                 }
 
-                // Clear any pending timeout
                 if (this.filterTimeout) {
                     clearTimeout(this.filterTimeout)
                 }
 
-                // Add a small delay to prevent rapid-fire requests
                 this.filterTimeout = setTimeout(() => {
                     this.#ajaxFilterForm(url, formDataWithTimestamp, nextUrl)
                 }, 100)
@@ -131,24 +154,19 @@ class Ecommerce {
                 if (inputName.includes('attributes[')) {
                     form.trigger('submit')
                 } else if (currentTarget.attr('type') === 'checkbox' && inputName && inputName.endsWith('[]')) {
-                    // Special handling for checkboxes with array notation
                     const baseName = inputName.slice(0, -2)
                     const checkboxes = form.find(`input[name="${inputName}"]`).filter(':checked')
 
-                    // Find or create the non-array input
                     let singleInput = form.find(`input[name="${baseName}"]`)
                     if (!singleInput.length) {
-                        // Create a hidden input with the base name
                         form.append(`<input type="hidden" name="${baseName}" value="">`)
                         singleInput = form.find(`input[name="${baseName}"]`)
                     }
 
-                    // Collect values from checked checkboxes
                     const values = checkboxes.map(function() {
                         return $(this).val()
                     }).get()
 
-                    // Set the comma-separated values
                     singleInput.val(values.join(','))
                 }
 
@@ -224,10 +242,8 @@ class Ecommerce {
                 const parent = currentTarget.closest('.bb-product-filter')
                 const categoryId = currentTarget.data('id')
 
-                // Check if we have existing categories input
                 let categoriesInput = form.find('input[name="categories"]')
 
-                // If we don't have a single categories input, look for array notation
                 if (!categoriesInput.length) {
                     categoriesInput = form.find('input[name="categories[]"]')
                 }
@@ -235,16 +251,13 @@ class Ecommerce {
                 parent.find('.bb-product-filter-link').removeClass('active')
                 currentTarget.addClass('active')
 
-                // Remove pagination parameters when changing categories
                 form.find('input[name="page"]').remove()
                 form.find('input[name="per-page"]').remove()
 
                 if (categoriesInput.length && categoryId) {
-                    // If using array notation
                     if (categoriesInput.attr('name') === 'categories[]') {
                         categoriesInput.val(categoryId).trigger('change')
                     } else {
-                        // If using comma-separated values
                         categoriesInput.val(categoryId).trigger('change')
                     }
                 } else {
@@ -269,12 +282,10 @@ class Ecommerce {
 
                 const form = $('.bb-product-form-filter')
 
-                // Clear all inputs
                 form.find(
                     'input[type="text"], input[type="hidden"], input[type="radio"], select'
                 ).val(null)
 
-                // Uncheck all checkboxes
                 form.find('input[type="checkbox"]').prop('checked', false)
 
                 form.trigger('submit')
@@ -343,13 +354,21 @@ class Ecommerce {
                             if (currentTarget.hasClass('active')) {
                                 document.dispatchEvent(
                                     new CustomEvent('ecommerce.compare.added', {
-                                        detail: { data, element: currentTarget },
+                                        detail: {
+                                            data,
+                                            element: currentTarget,
+                                            extraData: data.extra_data
+                                        },
                                     })
                                 )
                             } else {
                                 document.dispatchEvent(
                                     new CustomEvent('ecommerce.compare.removed', {
-                                        detail: { data, element: currentTarget },
+                                        detail: {
+                                            data,
+                                            element: currentTarget,
+                                            extraData: data.extra_data
+                                        },
                                     })
                                 )
                             }
@@ -379,16 +398,20 @@ class Ecommerce {
 
                             document.dispatchEvent(
                                 new CustomEvent('ecommerce.compare.removed', {
-                                    detail: { data, element: currentTarget },
+                                    detail: {
+                                        data,
+                                        element: currentTarget,
+                                        extraData: data.extra_data
+                                    },
                                 })
                             )
 
                             if (data.count !== undefined) {
                                 $('[data-bb-value="compare-count"]').text(data.count)
-                            }
 
-                            if (data.count > 0) {
-                                table.find(`td:nth-child(${currentTarget.closest('td').index() + 1})`).remove()
+                                if (data.count > 0) {
+                                    table.find(`td:nth-child(${currentTarget.closest('td').index() + 1})`).remove()
+                                }
                             } else {
                                 window.location.reload()
                             }
@@ -420,7 +443,12 @@ class Ecommerce {
 
                             document.dispatchEvent(
                                 new CustomEvent('ecommerce.wishlist.added', {
-                                    detail: { data, element: currentTarget },
+                                    detail: {
+                                        data,
+                                        element: currentTarget,
+                                        extraData: data.extra_data,
+                                        added: data.added
+                                    },
                                 })
                             )
                         }
@@ -445,19 +473,23 @@ class Ecommerce {
                         } else {
                             Theme.showSuccess(message)
 
-                            if (data.count !== undefined) {
-                                $('[data-bb-value="wishlist-count"]').text(data.count)
-                            }
-
                             currentTarget.closest('tr').remove()
 
-                            if (data.count === 0) {
-                                window.location.reload()
+                            if (data.count !== undefined) {
+                                $('[data-bb-value="wishlist-count"]').text(data.count)
+
+                                if (data.count === 0) {
+                                    window.location.reload()
+                                }
                             }
 
                             document.dispatchEvent(
                                 new CustomEvent('ecommerce.wishlist.removed', {
-                                    detail: { data, element: currentTarget },
+                                    detail: {
+                                        data,
+                                        element: currentTarget,
+                                        extraData: data.extra_data
+                                    },
                                 })
                             )
                         }
@@ -521,7 +553,12 @@ class Ecommerce {
 
                         document.dispatchEvent(
                             new CustomEvent('ecommerce.cart.added', {
-                                detail: { data, element: currentTarget, message },
+                                detail: {
+                                    data,
+                                    element: currentTarget,
+                                    message,
+                                    extraData: data.extra_data
+                                },
                             })
                         )
                     },
@@ -548,15 +585,19 @@ class Ecommerce {
 
                             if (data.count !== undefined) {
                                 $('[data-bb-value="cart-count"]').text(data.count)
-                            }
 
-                            if (data.count === 0) {
-                                window.location.reload()
+                                if (data.count === 0) {
+                                    window.location.reload()
+                                }
                             }
 
                             document.dispatchEvent(
                                 new CustomEvent('ecommerce.cart.removed', {
-                                    detail: { data, element: currentTarget },
+                                    detail: {
+                                        data,
+                                        element: currentTarget,
+                                        extraData: data.extra_data
+                                    },
                                 })
                             )
                         }
@@ -660,7 +701,11 @@ class Ecommerce {
 
                         document.dispatchEvent(
                             new CustomEvent('ecommerce.cart.added', {
-                                detail: { data, element: currentTarget },
+                                detail: {
+                                    data,
+                                    element: currentTarget,
+                                    extraData: data.extra_data
+                                },
                             })
                         )
                     },
@@ -678,22 +723,17 @@ class Ecommerce {
                     const baseName = name.slice(0, -2)
                     let $input = $form.find(`input[name="${baseName}"]`)
 
-                    // If we don't have a single input, create one
                     if (!$input.length) {
                         $form.append(`<input type="hidden" name="${baseName}" value="">`)
                         $input = $form.find(`input[name="${baseName}"]`)
                     }
 
-                    // Get current values as array and remove duplicates
                     let currentValues = $input.val() ? $input.val().split(',') : []
 
-                    // Use a Set to automatically remove duplicates
                     const uniqueValues = new Set(currentValues)
 
-                    // Add the new value
                     uniqueValues.add(value)
 
-                    // Convert back to array and set the comma-separated values
                     $input.val(Array.from(uniqueValues).join(','))
                 } else {
                     const isCheckbox = currentTarget.is(':checkbox')
@@ -956,12 +996,10 @@ class Ecommerce {
             const $minPrice = $priceFilter.find('input[name="min_price"]')
             const $maxPrice = $priceFilter.find('input[name="max_price"]')
 
-            // Get current values from form inputs (important for AJAX reinitialization)
             const currentMinPrice = parseInt($minPrice.val()) || $sliderRange.data('min')
             const currentMaxPrice = parseInt($maxPrice.val()) || $sliderRange.data('max')
             const isRtl = this.isRtl()
 
-            // For RTL: Initialize slider with inverted range to visually reverse it
             const sliderMin = isRtl ? -$sliderRange.data('max') : $sliderRange.data('min')
             const sliderMax = isRtl ? -$sliderRange.data('min') : $sliderRange.data('max')
             const sliderValues = isRtl ? [-currentMaxPrice, -currentMinPrice] : [currentMinPrice, currentMaxPrice]
@@ -972,7 +1010,6 @@ class Ecommerce {
                 max: sliderMax,
                 values: sliderValues,
                 slide: function (_, ui) {
-                    // Convert UI values back to real values for RTL
                     const realMin = isRtl ? -ui.values[1] : ui.values[0]
                     const realMax = isRtl ? -ui.values[0] : ui.values[1]
 
@@ -980,7 +1017,6 @@ class Ecommerce {
                     $rangeLabel.find('.to').text(this.formatPrice(realMax))
                 }.bind(this),
                 change: function (_, ui) {
-                    // Convert UI values back to real values for RTL
                     const realMin = isRtl ? -ui.values[1] : ui.values[0]
                     const realMax = isRtl ? -ui.values[0] : ui.values[1]
 
@@ -994,7 +1030,6 @@ class Ecommerce {
                 }.bind(this),
             })
 
-            // Initialize display values correctly
             const currentValues = $sliderRange.slider('values')
             const displayMin = isRtl ? -currentValues[1] : currentValues[0]
             const displayMax = isRtl ? -currentValues[0] : currentValues[1]
@@ -1050,7 +1085,6 @@ class Ecommerce {
         let groupedData = {}
         let seenParams = {}
 
-        // Group array parameters and handle duplicates
         formData.forEach((item) => {
             if (!item.value) {
                 return
@@ -1060,15 +1094,13 @@ class Ecommerce {
                 if (item.value) {
                     data.push(item)
                 }
-            } else if (item.name.endsWith('[]')) { // Check if it's an array parameter (ends with [])
+            } else if (item.name.endsWith('[]')) {
                 const baseName = item.name.slice(0, -2)
                 if (!groupedData[baseName]) {
                     groupedData[baseName] = new Set()
                 }
-                // Use a Set to automatically remove duplicates
                 groupedData[baseName].add(item.value)
             } else {
-                // For non-array parameters, only keep the first occurrence
                 if (!seenParams[item.name]) {
                     seenParams[item.name] = true
                     data.push(item)
@@ -1076,7 +1108,6 @@ class Ecommerce {
             }
         })
 
-        // Add grouped parameters as comma-separated values
         Object.keys(groupedData).forEach(key => {
             const values = Array.from(groupedData[key])
             if (values.length > 0) {
@@ -1165,29 +1196,19 @@ class Ecommerce {
     #ajaxFilterForm = (url, data, nextUrl) => {
         const form = $('.bb-product-form-filter')
 
-        // If a direct URL is provided without form data, reset the tracking variables
         if (url && !data) {
             this.lastFilterFormData = null
             this.lastFilterFormAction = null
         }
 
-        // If data is an array, convert it to a proper format for AJAX
         let ajaxData = data
         if (Array.isArray(data)) {
-            // Convert to URLSearchParams to handle duplicates and arrays
             const params = new URLSearchParams()
             const paramsByName = {}
             const attributeArrays = {}
 
-            // Get current URL parameters to check if search query has changed
-            const currentUrlParams = new URLSearchParams(window.location.search)
-            const currentSearchQuery = currentUrlParams.get('q') || ''
-            let newSearchQuery = ''
-
-            // Group by name to handle arrays and prevent duplicates
             data.forEach(item => {
                 if (item.name && item.value) {
-                    // Handle attribute arrays like attributes[color][]
                     if (item.name.includes('attributes[') && item.name.endsWith('[]')) {
                         if (!attributeArrays[item.name]) {
                             attributeArrays[item.name] = []
@@ -1195,40 +1216,26 @@ class Ecommerce {
                         attributeArrays[item.name].push(item.value)
                     } else {
                         paramsByName[item.name] = item.value
-                        // Track the new search query
-                        if (item.name === 'q') {
-                            newSearchQuery = item.value
-                        }
                     }
                 }
             })
 
-            // If search query has changed, remove the page parameter
-            if (newSearchQuery !== currentSearchQuery && paramsByName['page']) {
-                delete paramsByName['page']
-            }
-
-            // Add regular parameters to URLSearchParams
             Object.keys(paramsByName).forEach(name => {
                 params.set(name, paramsByName[name])
             })
 
-            // Add attribute arrays to URLSearchParams
             Object.keys(attributeArrays).forEach(name => {
                 attributeArrays[name].forEach(value => {
                     params.append(name, value)
                 })
             })
 
-            // Convert to object for jQuery AJAX while preserving arrays
             ajaxData = {}
 
-            // Handle regular parameters
             Object.keys(paramsByName).forEach(name => {
                 ajaxData[name] = paramsByName[name]
             })
 
-            // Handle attribute arrays - convert to array format that jQuery understands
             Object.keys(attributeArrays).forEach(name => {
                 ajaxData[name] = attributeArrays[name]
             })
@@ -1257,19 +1264,16 @@ class Ecommerce {
                     return
                 }
 
-                // Ensure the URL doesn't have duplicate parameters and handles attribute arrays
                 let finalUrl = nextUrl || url
                 if (finalUrl.includes('?')) {
                     const urlParts = finalUrl.split('?')
                     const baseUrl = urlParts[0]
                     const params = new URLSearchParams(urlParts[1])
 
-                    // Handle both regular parameters and attribute arrays
                     const uniqueParams = new URLSearchParams()
                     const attributeArrays = {}
 
                     for (const [key, value] of params.entries()) {
-                        // Handle attribute arrays like attributes[color][]
                         if (key.includes('attributes[') && key.endsWith('[]')) {
                             if (!attributeArrays[key]) {
                                 attributeArrays[key] = []
@@ -1280,7 +1284,6 @@ class Ecommerce {
                         }
                     }
 
-                    // Add attribute arrays to URLSearchParams
                     Object.keys(attributeArrays).forEach(key => {
                         attributeArrays[key].forEach(value => {
                             uniqueParams.append(key, value)
@@ -1301,7 +1304,6 @@ class Ecommerce {
                     })
                 )
 
-                // Reset filterAjax after successful request
                 this.filterAjax = null
 
                 if ($('.bb-product-price-filter').length) {
@@ -1309,14 +1311,12 @@ class Ecommerce {
                 }
             },
             error: (xhr) => {
-                // Don't show error for aborted requests
                 if (xhr.statusText !== 'abort') {
                     console.error('Filter request failed:', xhr)
                     Theme.handleError(xhr)
                 }
             },
             complete: () => {
-                // Always reset the filter timeout and AJAX request
                 this.filterTimeout = null
                 this.filterAjax = null
                 if (typeof Theme.lazyLoadInstance !== 'undefined') {
@@ -1336,20 +1336,16 @@ class Ecommerce {
 
     #initCategoriesDropdown = async () => {
         const makeRequest = (url, beforeCallback, successCallback) => {
-            // Assuming url, beforeCallback, successCallback, and Theme.handleError are already defined
-
-            // Call the beforeSend callback
             beforeCallback();
 
             fetch(url, {
                 method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json', // Requesting JSON response
-                    'Accept': 'application/json' // Requesting JSON response
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 }
             })
                 .then(response => {
-                    // Check if the response is okay and parse it as JSON
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
@@ -1360,10 +1356,8 @@ class Ecommerce {
                         return;
                     }
 
-                    // Call the success callback with the data
                     successCallback(data);
 
-                    // Dispatch a custom event after successfully fetching the data
                     document.dispatchEvent(
                         new CustomEvent('ecommerce.categories-dropdown.success', {
                             detail: {
@@ -1373,7 +1367,6 @@ class Ecommerce {
                     );
                 })
                 .catch(error => {
-                    // Handle any errors that occur during the fetch
                     Theme.handleError(error);
                 });
         }
@@ -1576,14 +1569,12 @@ class Ecommerce {
                 const $existingGalleryImages = $galleryImages.find('.bb-product-gallery-images')
                 const $existingThumbnails = $galleryImages.find('.bb-product-gallery-thumbnails')
 
-                // Preserve existing video elements
                 const existingVideoElements = $existingGalleryImages.find('.bb-product-video').clone()
                 const existingVideoThumbnails = $existingThumbnails.find('.video-thumbnail').clone()
 
                 let finalImageHtml = imageHtml
                 let finalThumbHtml = thumbHtml
 
-                // Add preserved videos back to the gallery
                 if (existingVideoElements.length > 0) {
                     existingVideoElements.each(function() {
                         finalImageHtml += $(this)[0].outerHTML
@@ -1676,7 +1667,6 @@ class Ecommerce {
 
             let copied = false
 
-            // Try modern clipboard API first
             if (navigator.clipboard && window.isSecureContext) {
                 try {
                     await navigator.clipboard.writeText(text)
@@ -1686,7 +1676,6 @@ class Ecommerce {
                 }
             }
 
-            // Fallback for older browsers or non-secure contexts
             if (!copied) {
                 const textArea = document.createElement('textarea')
                 textArea.value = text
@@ -1714,7 +1703,6 @@ class Ecommerce {
                     }
                 }
 
-                // Update button text temporarily
                 const originalHtml = target.html()
                 target.html('<i class="ti ti-check"></i> ' + (copiedMessage || 'Copied!'))
 
@@ -1803,7 +1791,6 @@ $(() => {
                 $sidebar = $defaultSidebar
             }
 
-            // Store the current active filter link before replacing the sidebar
             const activeFilterLinks = {};
             $('.bb-product-filter-link.active').each(function() {
                 const filterGroup = $(this).closest('.bb-product-filter').data('filter-group');
@@ -1812,7 +1799,6 @@ $(() => {
                 }
             });
 
-            // Store the current checkbox states before replacing the sidebar
             const checkedCheckboxes = [];
             $sidebar.find('input[type="checkbox"]:checked').each(function() {
                 const $checkbox = $(this);
@@ -1827,36 +1813,27 @@ $(() => {
                 });
             });
 
-            // Replace the sidebar and get reference to the new one
             $sidebar.replaceWith(data.additional.filters_html)
 
-            // Use setTimeout to ensure DOM is fully updated before restoring states
             setTimeout(() => {
-                // Get reference to the new sidebar after replacement
                 const $newSidebar = $('[data-bb-filter-sidebar]').length ? $('[data-bb-filter-sidebar]') : $('.bb-shop-sidebar')
 
-                // Restore active state for filter links after sidebar is replaced
                 Object.keys(activeFilterLinks).forEach(group => {
                     const id = activeFilterLinks[group];
                     $newSidebar.find(`.bb-product-filter[data-filter-group="${group}"] .bb-product-filter-link[data-id="${id}"]`).addClass('active');
                 });
 
-                // Restore checkbox states after sidebar is replaced
                 checkedCheckboxes.forEach(checkbox => {
-                    // Try multiple selectors to find the checkbox
                     let $targetCheckbox = null;
 
-                    // First try by ID if available
                     if (checkbox.id) {
                         $targetCheckbox = $newSidebar.find(`#${checkbox.id}`);
                     }
 
-                    // If not found by ID, try by name and value
                     if (!$targetCheckbox || !$targetCheckbox.length) {
                         $targetCheckbox = $newSidebar.find(`input[type="checkbox"][name="${checkbox.name}"][value="${checkbox.value}"]`);
                     }
 
-                    // If still not found, try a more general approach
                     if (!$targetCheckbox || !$targetCheckbox.length) {
                         $targetCheckbox = $newSidebar.find(`input[type="checkbox"][value="${checkbox.value}"]`).filter(function() {
                             return $(this).attr('name') === checkbox.name;

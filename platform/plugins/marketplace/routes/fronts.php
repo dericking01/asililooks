@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 Route::group([
     'namespace' => 'Botble\Marketplace\Http\Controllers\Fronts',
 ], function (): void {
-    Route::group(['middleware' => ['web', 'core']], function () {
+    Route::group(['middleware' => ['web', 'core']], function (): void {
         Route::post('ajax/stores/check-store-url', [PublicStoreController::class, 'checkStoreUrl'])
             ->name('public.ajax.check-store-url');
     });

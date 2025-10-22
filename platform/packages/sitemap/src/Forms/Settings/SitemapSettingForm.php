@@ -3,6 +3,7 @@
 namespace Botble\Sitemap\Forms\Settings;
 
 use Botble\Base\Forms\FieldOptions\CheckboxFieldOption;
+use Botble\Base\Forms\FieldOptions\HtmlFieldOption;
 use Botble\Base\Forms\FieldOptions\NumberFieldOption;
 use Botble\Base\Forms\FieldOptions\TextFieldOption;
 use Botble\Base\Forms\Fields\HtmlField;
@@ -34,9 +35,8 @@ class SitemapSettingForm extends SettingForm
             ->add(
                 'sitemap_info',
                 HtmlField::class,
-                [
-                    'html' => view('packages/sitemap::partials.sitemap-info')->render(),
-                ]
+                HtmlFieldOption::make()
+                    ->content(view('packages/sitemap::partials.sitemap-info')->render())
             )
             ->add(
                 'sitemap_items_per_page',
@@ -69,9 +69,8 @@ class SitemapSettingForm extends SettingForm
             ->add(
                 'indexnow_info',
                 HtmlField::class,
-                [
-                    'html' => view('packages/sitemap::partials.indexnow-info')->render(),
-                ]
+                HtmlFieldOption::make()
+                    ->content(view('packages/sitemap::partials.indexnow-info')->render())
             )
             ->addCloseCollapsible('indexnow_enabled', '1')
             ->addCloseCollapsible('sitemap_enabled', '1');

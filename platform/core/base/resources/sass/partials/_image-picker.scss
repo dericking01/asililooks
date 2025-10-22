@@ -83,8 +83,10 @@
         .image-picker-remove-button {
             position: absolute;
             z-index: 12;
-            top: 5px;
-            right: 5px;
+            top: 8px;
+            right: 8px;
+            background: none;
+            border: none;
 
             button {
                 height: 20px;

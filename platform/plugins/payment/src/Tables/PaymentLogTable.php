@@ -4,8 +4,8 @@ namespace Botble\Payment\Tables;
 
 use Botble\Payment\Models\PaymentLog;
 use Botble\Table\Abstracts\TableAbstract;
-use Botble\Table\Actions\Action;
 use Botble\Table\Actions\DeleteAction;
+use Botble\Table\Actions\ViewAction;
 use Botble\Table\BulkActions\DeleteBulkAction;
 use Botble\Table\Columns\Column;
 use Botble\Table\Columns\DateTimeColumn;
@@ -20,11 +20,8 @@ class PaymentLogTable extends TableAbstract
         $this
             ->model(PaymentLog::class)
             ->addActions([
-                Action::make('view')
-                    ->icon('ti ti-eye')
-                    ->color('info')
-                    ->route('payments.logs.show')
-                    ->label(trans('core/base::tables.view')),
+                ViewAction::make()
+                    ->route('payments.logs.show'),
                 DeleteAction::make()->route('payments.logs.destroy'),
             ])
             ->addColumns([

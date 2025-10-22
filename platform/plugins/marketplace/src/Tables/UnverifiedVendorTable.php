@@ -4,9 +4,9 @@ namespace Botble\Marketplace\Tables;
 
 use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Facades\Html;
-use Botble\Ecommerce\Models\Customer;
+use Botble\Marketplace\Models\Vendor;
 use Botble\Table\Abstracts\TableAbstract;
-use Botble\Table\Actions\Action;
+use Botble\Table\Actions\ViewAction;
 use Botble\Table\Columns\Column;
 use Botble\Table\Columns\CreatedAtColumn;
 use Botble\Table\Columns\IdColumn;
@@ -21,13 +21,11 @@ class UnverifiedVendorTable extends TableAbstract
     public function setup(): void
     {
         $this
-            ->model(Customer::class)
+            ->model(Vendor::class)
             ->addActions([
-                Action::make('view')
+                ViewAction::make()
                     ->route('marketplace.unverified-vendors.view')
-                    ->permission('marketplace.unverified-vendors.index')
-                    ->label(__('View'))
-                    ->icon('ti ti-eye'),
+                    ->permission('marketplace.unverified-vendors.index'),
             ]);
     }
 
@@ -35,7 +33,7 @@ class UnverifiedVendorTable extends TableAbstract
     {
         $data = $this->table
             ->eloquent($this->query())
-            ->editColumn('avatar', function (Customer $item) {
+            ->editColumn('avatar', function (Vendor $item) {
                 if ($this->request()->input('action') == 'excel' ||
                     $this->request()->input('action') == 'csv') {
                     return $item->avatar_url;
@@ -43,10 +41,10 @@ class UnverifiedVendorTable extends TableAbstract
 
                 return Html::tag('img', '', ['src' => $item->avatar_url, 'alt' => BaseHelper::clean($item->name), 'width' => 50]);
             })
-            ->editColumn('store_name', function (Customer $item) {
+            ->editColumn('store_name', function (Vendor $item) {
                 return $item->store->name ? BaseHelper::clean($item->store->name) : '&mdash;';
             })
-            ->editColumn('store_phone', function (Customer $item) {
+            ->editColumn('store_phone', function (Vendor $item) {
                 return $item->store->phone ? BaseHelper::clean($item->store->phone) : '&mdash;';
             });
 
@@ -64,11 +62,9 @@ class UnverifiedVendorTable extends TableAbstract
                 'created_at',
                 'is_vendor',
                 'avatar',
+                'vendor_verified_at',
             ])
-            ->where([
-                'is_vendor' => true,
-                'vendor_verified_at' => null,
-            ])
+            ->unverified()
             ->with(['store']);
 
         return $this->applyScopes($query);

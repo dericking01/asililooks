@@ -121,6 +121,7 @@
                                         {{ format_price($order->sub_total) }}
                                     </x-core::table.body.cell>
                                 </x-core::table.body.row>
+                                {!! apply_filters('ecommerce_admin_order_after_subtotal', null, $order) !!}
                                 <x-core::table.body.row>
                                     <x-core::table.body.cell class="text-end color-subtext mt10">
                                         <p class="mb-0">{{ trans('plugins/ecommerce::order.discount') }}</p>

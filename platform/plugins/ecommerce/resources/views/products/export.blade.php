@@ -30,8 +30,6 @@
             border-radius: 6px;
         }
 
-
-
         .export-progress-indicator {
             display: none;
             padding: 1rem;
@@ -107,10 +105,29 @@
                 />
             </div>
 
+            @if($totalItems >= 1000)
+                <div class="mb-3">
+                    <x-core::form.checkbox
+                        name="use_multi_file"
+                        :value="1"
+                        :label="trans('plugins/ecommerce::products.export.use_multi_file')"
+                        :checked="$totalItems > 20000"
+                        :helper-text="trans('plugins/ecommerce::products.export.use_multi_file_helper')"
+                    />
+                </div>
+            @endif
+
             @if($isLargeExport)
                 <div class="alert alert-success d-block">
                     <strong>{{ trans('plugins/ecommerce::products.export.streaming_enabled_title') }}</strong><br>
                     <small>{{ trans('plugins/ecommerce::products.export.streaming_enabled_message') }}</small>
+                </div>
+            @endif
+
+            @if($totalItems >= 1000 && $totalItems > 20000)
+                <div class="alert alert-info d-block mt-2">
+                    <strong>{{ trans('plugins/ecommerce::products.export.multi_file_enabled_title') }}</strong><br>
+                    <small>{{ trans('plugins/ecommerce::products.export.multi_file_enabled_message', ['count' => number_format(ceil($totalItems / 10000))]) }}</small>
                 </div>
             @endif
         </div>
@@ -158,10 +175,33 @@
                     </div>
                 </div>
             </x-core::form-group>
+
+            @if($totalItems >= 1000)
+                <x-core::form-group class="mt-3">
+                    <x-core::form.label for="records_per_file">{{ trans('plugins/ecommerce::products.export.records_per_file') }}</x-core::form.label>
+                    <x-core::form.text-input
+                        type="number"
+                        name="records_per_file"
+                        id="records_per_file"
+                        value="10000"
+                        min="1000"
+                        max="50000"
+                    />
+                    <x-core::form.helper-text>
+                        {{ trans('plugins/ecommerce::products.export.records_per_file_helper') }}
+                    </x-core::form.helper-text>
+
+                    <div class="mt-2">
+                        <div class="d-flex justify-content-between small text-muted mb-1">
+                            <span>{{ trans('plugins/ecommerce::products.export.estimated_files') }}</span>
+                            <span id="file-count-estimate">{{ ceil($totalItems / 10000) }}</span>
+                        </div>
+                    </div>
+                </x-core::form-group>
+            @endif
         </div>
     </div>
 
-    <!-- Export Progress Indicator -->
     <div class="export-progress-indicator" id="export-progress">
         <div class="d-flex align-items-center justify-content-between mb-2">
             <span class="fw-medium">{{ trans('plugins/ecommerce::products.export.export_progress') }}</span>
@@ -217,6 +257,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.querySelector('.data-synchronize-export-form');
             const chunkSizeInput = document.getElementById('chunk_size');
+            const recordsPerFileInput = document.getElementById('records_per_file');
+            const fileCountEstimate = document.getElementById('file-count-estimate');
+            const multiFileCheckbox = document.querySelector('input[name="use_multi_file"]');
             const progressIndicator = document.getElementById('export-progress');
             const progressFill = document.getElementById('progress-fill');
             const progressText = document.getElementById('progress-text');
@@ -263,6 +306,18 @@
                 });
             }
 
+            if (recordsPerFileInput && fileCountEstimate) {
+                recordsPerFileInput.addEventListener('input', function() {
+                    const recordsPerFile = parseInt(this.value) || 10000;
+                    const estimatedFiles = Math.ceil(totalItems / recordsPerFile);
+                    fileCountEstimate.textContent = estimatedFiles;
+                });
+            }
+
+            if (totalItems > 20000 && multiFileCheckbox) {
+                multiFileCheckbox.checked = true;
+            }
+
             @if($isLargeExport)
                 const excelRadio = document.querySelector('input[name="format"][value="xlsx"]');
                 const csvRadio = document.querySelector('input[name="format"][value="csv"]');
@@ -306,8 +361,6 @@
                     if (memoryCheckbox) memoryCheckbox.checked = true;
                 }
             @endif
-
-
 
             form.addEventListener('submit', function(e) {
                 const submitButton = form.querySelector('button[type="submit"]');

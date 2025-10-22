@@ -13,6 +13,7 @@ use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Models\Brand;
 use Botble\Ecommerce\Models\Product;
 use Botble\Ecommerce\Models\ProductCategory;
+use Botble\Ecommerce\Models\ProductCollection;
 use Botble\Ecommerce\Models\ProductTag;
 use Botble\Ecommerce\Services\Products\GetProductService;
 use Botble\Ecommerce\Services\Products\ProductCrossSalePriceService;
@@ -79,8 +80,10 @@ class HandleFrontPages
                             'crossSales' => function (BelongsToMany $query): void {
                                 $query->where('ec_product_cross_sale_relations.is_variant', false);
                             },
+                            'variations.product',
+                            'defaultVariation.product',
+                            'brand',
                         ],
-                        ...EcommerceHelper::withReviewsParams(),
                         'include_out_of_stock_products' => true,
                     ]
                 );
@@ -384,6 +387,75 @@ class HandleFrontPages
                     'default_view' => 'plugins/ecommerce::themes.product-tag',
                     'data' => compact('tag', 'products'),
                     'slug' => $tag->slug,
+                ];
+
+            case ProductCollection::class:
+                $condition = [
+                    'ec_product_collections.id' => $slug->reference_id,
+                    'ec_product_collections.status' => BaseStatusEnum::PUBLISHED,
+                ];
+
+                if ($isPreview) {
+                    Arr::forget($condition, 'ec_product_collections.status');
+                }
+
+                $collection = ProductCollection::query()
+                    ->with(['slugable', 'products'])
+                    ->where($condition)
+                    ->firstOrFail();
+
+                if (! EcommerceHelper::productFilterParamsValidated($request)) {
+                    $request = request();
+                }
+
+                $with = EcommerceHelper::withProductEagerLoadingRelations();
+
+                $collections = EcommerceHelper::parseFilterParams($request, 'collections');
+                $request->merge([
+                    'collections' => array_merge($collections, [$collection->getKey()]),
+                ]);
+
+                $products = app(GetProductService::class)->getProduct($request, null, null, $with);
+
+                if ($request->ajax()) {
+                    return $this->ajaxFilterProductsResponse($products, $response);
+                }
+
+                SeoHelper::setTitle($collection->name)->setDescription($collection->description);
+
+                $meta = new SeoOpenGraph();
+                if ($collection->image) {
+                    $meta->setImage(RvMedia::getImageUrl($collection->image));
+                }
+                $meta->setDescription($collection->description);
+                $meta->setUrl($collection->url);
+                $meta->setTitle($collection->name);
+
+                SeoHelper::setSeoOpenGraph($meta);
+
+                SeoHelper::meta()->setUrl($collection->url);
+
+                Theme::breadcrumb()
+                    ->add(__('Products'), route('public.products'))
+                    ->add($collection->name);
+
+                if (function_exists('admin_bar')) {
+                    admin_bar()
+                        ->registerLink(
+                            trans('plugins/ecommerce::product-collections.edit_this_product_collection'),
+                            route('product-collections.edit', $collection->getKey()),
+                            null,
+                            'product-collections.edit'
+                        );
+                }
+
+                do_action(BASE_ACTION_PUBLIC_RENDER_SINGLE, PRODUCT_COLLECTION_MODULE_SCREEN_NAME, $collection);
+
+                return [
+                    'view' => 'ecommerce.product-collection',
+                    'default_view' => 'plugins/ecommerce::themes.product-collection',
+                    'data' => compact('collection', 'products'),
+                    'slug' => $collection->slug,
                 ];
         }
 

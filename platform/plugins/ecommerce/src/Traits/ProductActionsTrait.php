@@ -6,6 +6,7 @@ use Botble\Base\Events\CreatedContentEvent;
 use Botble\Base\Events\DeletedContentEvent;
 use Botble\Base\Events\UpdatedContentEvent;
 use Botble\Base\Http\Responses\BaseHttpResponse;
+use Botble\Ecommerce\Enums\OrderStatusEnum;
 use Botble\Ecommerce\Events\ProductQuantityUpdatedEvent;
 use Botble\Ecommerce\Events\ProductVariationCreated;
 use Botble\Ecommerce\Facades\EcommerceHelper;
@@ -17,16 +18,19 @@ use Botble\Ecommerce\Http\Requests\ProductUpdateOrderByRequest;
 use Botble\Ecommerce\Http\Requests\ProductVersionRequest;
 use Botble\Ecommerce\Http\Requests\SearchProductAndVariationsRequest;
 use Botble\Ecommerce\Http\Resources\AvailableProductResource;
+use Botble\Ecommerce\Models\OrderProduct;
 use Botble\Ecommerce\Models\Product;
 use Botble\Ecommerce\Models\ProductAttribute;
 use Botble\Ecommerce\Models\ProductAttributeSet;
 use Botble\Ecommerce\Models\ProductFile;
 use Botble\Ecommerce\Models\ProductVariation;
 use Botble\Ecommerce\Models\ProductVariationItem;
+use Botble\Ecommerce\Models\ProductView;
 use Botble\Ecommerce\Services\Products\CreateProductVariationsService;
 use Botble\Ecommerce\Services\Products\StoreAttributesOfProductService;
 use Botble\Ecommerce\Services\Products\StoreProductService;
 use Botble\Media\Facades\RvMedia;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -804,5 +808,57 @@ trait ProductActionsTrait
 
         return $response
             ->setData($productAttributeSets);
+    }
+
+    protected function getProductViewData(Product $product): array
+    {
+        $productIds = [$product->id];
+        $variantIds = $product->variations()->pluck('product_id')->toArray();
+        if (! empty($variantIds)) {
+            $productIds = array_merge($productIds, $variantIds);
+        }
+
+        $totalViews = ProductView::query()
+            ->whereIn('product_id', $productIds)
+            ->sum('views');
+
+        $viewsByDate = ProductView::query()
+            ->whereIn('product_id', $productIds)
+            ->where('date', '>=', Carbon::now()->subDays(30))
+            ->select('date', DB::raw('SUM(views) as views'))
+            ->groupBy('date')
+            ->orderByDesc('date')
+            ->get();
+
+        $completedOrderProducts = OrderProduct::query()
+            ->whereIn('ec_order_product.product_id', $productIds)
+            ->join('ec_orders', 'ec_orders.id', '=', 'ec_order_product.order_id')
+            ->where('ec_orders.status', OrderStatusEnum::COMPLETED);
+
+        $totalOrders = $completedOrderProducts->count();
+        $totalSold = $completedOrderProducts->sum('ec_order_product.qty');
+        $totalRevenue = $completedOrderProducts->sum(DB::raw('ec_order_product.price * ec_order_product.qty'));
+
+        $recentOrders = OrderProduct::query()
+            ->whereIn('product_id', $productIds)
+            ->with('order')
+            ->latest()
+            ->limit(10)
+            ->get();
+
+        $totalReviews = $product->reviews_count ?? 0;
+        $averageRating = $product->reviews_avg ?? 0;
+
+        return compact(
+            'product',
+            'totalViews',
+            'viewsByDate',
+            'totalOrders',
+            'totalSold',
+            'totalRevenue',
+            'recentOrders',
+            'totalReviews',
+            'averageRating'
+        );
     }
 }

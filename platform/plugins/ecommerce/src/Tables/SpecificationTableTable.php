@@ -6,6 +6,7 @@ use Botble\Ecommerce\Models\SpecificationTable;
 use Botble\Table\Abstracts\TableAbstract;
 use Botble\Table\Actions\DeleteAction;
 use Botble\Table\Actions\EditAction;
+use Botble\Table\BulkActions\DeleteBulkAction;
 use Botble\Table\Columns\CreatedAtColumn;
 use Botble\Table\Columns\FormattedColumn;
 use Botble\Table\Columns\IdColumn;
@@ -30,10 +31,12 @@ class SpecificationTableTable extends TableAbstract
                     ->limit(50),
                 FormattedColumn::make('tables')
                     ->orderable(false)
+                    ->searchable(false)
                     ->label(trans('plugins/ecommerce::product-specification.specification_tables.fields.assigned_groups'))
                     ->getValueUsing(fn (FormattedColumn $column) => $column->getItem()->groups_count),
                 CreatedAtColumn::make(),
             ])
+            ->addBulkAction(DeleteBulkAction::make())
             ->addActions([
                 EditAction::make()->route($this->getEditRouteName()),
                 DeleteAction::make()->route($this->getDeleteRouteName()),

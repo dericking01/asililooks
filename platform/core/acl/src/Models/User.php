@@ -106,7 +106,7 @@ class User extends BaseModel implements
     protected function name(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->first_name . ' ' . $this->last_name,
+            get: fn () => trim($this->first_name . ' ' . $this->last_name),
         );
     }
 

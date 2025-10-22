@@ -33,7 +33,17 @@ class HookServiceProvider extends ServiceProvider
             && ! empty($data)
             && $data instanceof BaseModel
             && in_array($data::class, config('packages.seo-helper.general.supported', []))) {
+
             if ($data instanceof Page && BaseHelper::isHomepage($data->getKey())) {
+                MetaBox::addMetaBox(
+                    'seo_wrap',
+                    trans('packages/seo-helper::seo-helper.meta_box_header'),
+                    fn () => view('packages/seo-helper::homepage-meta-box')->render(),
+                    $data::class,
+                    'advanced',
+                    'low'
+                );
+
                 return;
             }
 

@@ -59,11 +59,16 @@ class CouponController extends BaseApiController
                 Cart::instance('cart')->store($cartId);
             }
 
-            return $this
+            $response = $this
                 ->httpResponse()
                 ->setError()
-                ->setMessage($result['message'])
-                ->toApiResponse();
+                ->setMessage($result['message']);
+
+            if (isset($result['error_code'])) {
+                $response->setData(['error_code' => $result['error_code']]);
+            }
+
+            return $response->toApiResponse();
         }
 
         $couponCode = $request->input('coupon_code');
@@ -94,7 +99,7 @@ class CouponController extends BaseApiController
         return $this
             ->httpResponse()
             ->setData($cartData)
-            ->setMessage(__('Applied coupon ":code" successfully!', ['code' => $couponCode]))
+            ->setMessage(__('plugins/ecommerce::discount.coupon_applied_successfully', ['code' => $couponCode]))
             ->toApiResponse();
     }
 
@@ -189,7 +194,7 @@ class CouponController extends BaseApiController
         return $this
             ->httpResponse()
             ->setData($cartData)
-            ->setMessage(__('Removed coupon code successfully!'))
+            ->setMessage(__('plugins/ecommerce::discount.coupon_removed_successfully'))
             ->toApiResponse();
     }
 

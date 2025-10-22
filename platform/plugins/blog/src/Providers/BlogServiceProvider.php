@@ -59,7 +59,8 @@ class BlogServiceProvider extends ServiceProvider
         $this
             ->setNamespace('plugins/blog')
             ->loadHelpers()
-            ->loadAndPublishConfigurations(['permissions', 'general'])
+            ->loadAndPublishConfigurations(['general'])
+            ->loadAndPublishConfigurations(['permissions'])
             ->loadAndPublishViews()
             ->loadAndPublishTranslations()
             ->loadRoutes()
@@ -79,7 +80,6 @@ class BlogServiceProvider extends ServiceProvider
                 'blog-posts',
             ]);
 
-            // Register monthly archive sitemaps for blog posts
             SiteMapManager::registerMonthlyArchives('blog-posts');
         });
 

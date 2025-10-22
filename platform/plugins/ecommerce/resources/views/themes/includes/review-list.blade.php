@@ -57,7 +57,7 @@
                 {{ $review->comment }}
             </div>
 
-            @if ($review->images)
+            @if (EcommerceHelper::isCustomerReviewImageUploadEnabled() && $review->images)
                 <div class="review-item__images mt-3">
                     <div class="row g-1 review-images">
                         @foreach ($review->images as $image)

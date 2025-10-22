@@ -3,7 +3,6 @@
 namespace Botble\Ecommerce\Http\Resources\API;
 
 use Botble\Ecommerce\Cart\CartItem;
-use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Models\Product;
 use Botble\Media\Facades\RvMedia;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -15,12 +14,7 @@ class WishlistItemResource extends JsonResource
 {
     public function toArray($request): array
     {
-        $reviewParams = EcommerceHelper::withReviewsParams();
-
-        $product = Product::query()
-            ->withCount($reviewParams['withCount'])
-            ->withAvg($reviewParams['withAvg'][0], $reviewParams['withAvg'][1])
-            ->find($this->id);
+        $product = Product::query()->find($this->id);
 
         if (! $product) {
             return [];

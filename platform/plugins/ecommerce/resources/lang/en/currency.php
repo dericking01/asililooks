@@ -21,4 +21,10 @@ return [
     'code' => 'Code',
     'no_api_key' => 'No API key',
     'clear_cache_rates_successfully' => 'Clear cache currency rates successfully.',
+    'number_format_style' => 'Number format',
+    'western_format' => 'Western (1,234,567.89)',
+    'indian_format' => 'Indian (12,34,567.89)',
+    'advanced' => 'Advanced',
+    'advanced_settings' => 'Advanced Settings',
+    'space_between_price_and_currency' => 'Add a space between price and currency',
 ];

@@ -197,6 +197,11 @@ Route::group([
             'as' => 'set-default-product-variation',
             'uses' => 'ProductController@setDefaultProductVariation',
         ])->wherePrimaryKey();
+
+        Route::get('view/{product}', [
+            'as' => 'view',
+            'uses' => 'ProductController@view',
+        ])->wherePrimaryKey('product');
     });
 
     Route::group(['prefix' => 'orders', 'as' => 'orders.'], function (): void {

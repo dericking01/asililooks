@@ -268,7 +268,8 @@ class MediaFile extends BaseModel
 
         $index = 1;
         $baseSlug = $slug;
-        while (File::exists(RvMedia::getRealPath(rtrim($folderPath, '/') . '/' . $slug . '.' . $extension))) {
+
+        while (File::exists(RvMedia::getRealPath(rtrim($folderPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $slug . '.' . $extension))) {
             $slug = $baseSlug . '-' . $index++;
         }
 

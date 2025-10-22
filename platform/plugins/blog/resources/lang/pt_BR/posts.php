@@ -1,0 +1,65 @@
+<?php
+
+return [
+    'create' => 'Criar novos post',
+    'form' => [
+        'categories' => 'Categorias',
+        'description' => 'Descrição',
+        'description_placeholder' => 'Pequena descrição do post (Máximo :c characteres)',
+        'format_type' => 'Formato',
+        'is_featured' => 'É destaque?',
+        'name' => 'Nome',
+        'name_placeholder' => 'Nome do Post (Máximo :c characteres)',
+        'content' => 'Conteúdo',
+        'note' => 'Conteúdo da nota',
+        'tags' => 'Etiquetas',
+        'tags_placeholder' => 'Etiquetas',
+
+    ],
+    'cannot_delete' => 'Post não pode ser apagado',
+    'post_deleted' => 'Post apagado!',
+    'posts' => 'Postagens',
+    'post' => 'Publicar',
+    'edit_this_post' => 'Editar este post',
+    'no_new_post_now' => 'Não existe nenhum novo post!',
+    'menu_name' => 'Postagens',
+    'widget_posts_recent' => 'Post recentes',
+    'categories' => 'Categorias',
+    'category' => 'Categorias',
+    'author' => 'Autor',
+    'export' => [
+        'description' => 'Exporte postagens para arquivo CSV/Excel.',
+        'total' => 'Total de postagens',
+        'limit' => 'Limit',
+        'limit_placeholder' => 'Leave empty to export all',
+        'all_status' => 'All Status',
+        'all_featured' => 'All',
+        'all_categories' => 'All Categories',
+        'start_date' => 'Start Date',
+        'start_date_placeholder' => 'Start date',
+        'end_date' => 'End Date',
+        'end_date_placeholder' => 'End date',
+
+    ],
+    'import' => [
+        'description' => 'Importe postagens de um arquivo CSV/Excel.',
+        'done_message' => ':created posts created and :updated posts updated.',
+        'rules' => [
+            'nullable_string_max' => 'The :attribute field accepts a string value of up to :max characters or may be left blank.',
+            'sometimes_array' => 'The :attribute field accepts an array value or may be left blank.',
+            'in' => ':attribute must be one of the following values: :values.',
+            'nullable_string' => 'The :attribute field accepts a string value or may be left blank.',
+            'nullable_string_max_in' => 'The :attribute field can be left blank, or must be a string with a maximum length of :max characters if provided and must be one of the following values: :values.',
+            'faq_schema_config' => 'FAQ schema configuration must be a valid string if provided.',
+            'faq_ids' => 'FAQ IDs must be a valid array if provided.',
+
+        ],
+
+    ],
+    'edit' => 'Editar post',
+    'is_featured' => 'Is featured?',
+    'post_translations' => 'Post Translations',
+    'export_post_translations' => 'Export Post Translations',
+    'import_description' => 'Import translations for :name from a CSV/Excel file.',
+    'export_description' => 'Export translations for :name to a CSV/Excel file.',
+];

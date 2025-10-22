@@ -32,12 +32,12 @@
 
                         <div class="mt-2">
                             @if($customer->confirmed_at)
-                                <span class="badge badge-success">
+                                <span class="badge bg-green text-green-fg">
                                     <x-core::icon name="ti ti-check" />
                                     {{ trans('plugins/ecommerce::customer.email_verified') }}
                                 </span>
                             @else
-                                <span class="badge badge-warning">
+                                <span class="badge bg-yellow text-yellow-fg">
                                     <x-core::icon name="ti ti-alert-circle" />
                                     {{ trans('plugins/ecommerce::customer.email_not_verified') }}
                                 </span>
@@ -118,7 +118,7 @@
                                             <div class="text-truncate">
                                                 <strong>{{ $address->name }}</strong>
                                                 @if($address->is_default)
-                                                    <span class="badge badge-primary ms-1">{{ trans('plugins/ecommerce::customer.default') }}</span>
+                                                    <span class="badge bg-blue text-blue-fg ms-1">{{ trans('plugins/ecommerce::customer.default') }}</span>
                                                 @endif
                                             </div>
                                             <div class="text-muted text-truncate mt-1">

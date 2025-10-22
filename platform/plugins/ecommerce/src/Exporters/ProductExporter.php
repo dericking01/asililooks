@@ -25,13 +25,19 @@ class ProductExporter extends Exporter
 
     protected ?string $defaultLanguage = null;
 
-    protected int $chunkSize = 400;
+    protected int $chunkSize = 200;
 
     protected bool $useChunkedExport = true;
 
     protected bool $includeVariations = true;
 
     protected bool $streamingMode = false;
+
+    protected bool $optimizeQueries = false;
+
+    protected bool $useMultiFile = false;
+
+    protected int $recordsPerFile = 10000;
 
     public function __construct()
     {
@@ -117,10 +123,6 @@ class ProductExporter extends Exporter
 
     public function collection(): Collection
     {
-        if ($this->streamingMode) {
-            return $this->getStreamingCollection();
-        }
-
         if ($this->useChunkedExport) {
             return $this->getChunkedCollection();
         }
@@ -131,64 +133,76 @@ class ProductExporter extends Exporter
     protected function getChunkedCollection(): Collection
     {
         $products = collect();
-        $with = $this->getRelationships();
+        $with = $this->getOptimizedRelationships();
 
         DB::disableQueryLog();
         ini_set('max_execution_time', 0);
+        ini_set('memory_limit', '512M');
 
         $processedCount = 0;
+        $lastId = 0;
 
-        $this->getProductQuery()
-            ->select($this->getSelectColumns())
-            ->where('is_variation', 0)
-            ->with($with)
-            ->chunk($this->chunkSize, function ($collection) use (&$products, &$processedCount): void {
-                $products = $products->concat($this->productResults($collection));
+        do {
+            $batch = $this->getProductQuery()
+                ->select($this->getSelectColumns())
+                ->where('is_variation', 0)
+                ->where('id', '>', $lastId)
+                ->with($with)
+                ->orderBy('id')
+                ->limit($this->chunkSize)
+                ->get();
 
-                $processedCount += $collection->count();
+            if ($batch->isEmpty()) {
+                break;
+            }
 
-                if ($processedCount % 1000 === 0) {
-                    $this->freeMemory();
-                }
-            });
+            $products = $products->concat($this->productResults($batch));
+            $lastId = $batch->last()->getKey();
+            $processedCount += $batch->count();
+
+            if ($processedCount % 500 === 0) {
+                $this->freeMemory();
+            }
+        } while ($batch->count() === $this->chunkSize);
 
         DB::enableQueryLog();
 
         return $products;
     }
 
-    protected function getStreamingCollection(): Collection
+    public function streamingGenerator(): \Generator
     {
-        $products = collect();
-        $with = $this->getRelationships();
+        $with = $this->getOptimizedRelationships();
+        $lastId = 0;
 
         DB::disableQueryLog();
-        ini_set('memory_limit', '1G');
+        ini_set('max_execution_time', 0);
+        ini_set('memory_limit', '256M');
 
-        $processedCount = 0;
+        do {
+            $batch = $this->getProductQuery()
+                ->select($this->getSelectColumns())
+                ->where('is_variation', 0)
+                ->where('id', '>', $lastId)
+                ->with($with)
+                ->orderBy('id')
+                ->limit($this->chunkSize)
+                ->get();
 
-        $this->getProductQuery()
-            ->select($this->getSelectColumns())
-            ->where('is_variation', 0)
-            ->with($with)
-            ->orderBy('id')
-            ->chunkById($this->chunkSize, function ($collection) use (&$products, &$processedCount): void {
-                $results = $this->productResults($collection);
+            if ($batch->isEmpty()) {
+                break;
+            }
 
-                foreach ($results as $result) {
-                    $products->push($result);
-                }
+            $results = $this->productResults($batch);
+            foreach ($results as $result) {
+                yield $result;
+            }
 
-                $processedCount += $collection->count();
-
-                if ($processedCount % 500 === 0) {
-                    $this->freeMemory();
-                }
-            });
+            $lastId = $batch->last()->getKey();
+            $this->freeMemory();
+        } while ($batch->count() === $this->chunkSize);
 
         DB::enableQueryLog();
-
-        return $products;
     }
 
     public function formatProductRow(Product $product): array
@@ -199,7 +213,7 @@ class ProductExporter extends Exporter
             $productAttributes = $product->productAttributeSets->pluck('title')->all();
         }
 
-        return [
+        $result = [
             'id' => $product->id,
             'name' => $product->name,
             'description' => $product->description,
@@ -305,9 +319,82 @@ class ProductExporter extends Exporter
         return $with;
     }
 
+    protected function getOptimizedRelationships(): array
+    {
+        if (! $this->optimizeQueries) {
+            return $this->getRelationships();
+        }
+
+        $with = [
+            'categories:id,name',
+            'slugable:id,key,prefix,reference_id',
+            'brand:id,name',
+            'taxes:id,title',
+            'productLabels:id,name',
+            'productCollections:id,name',
+            'tags:id,name',
+            'productAttributeSets:id,title',
+        ];
+
+        if ($this->includeVariations) {
+            $with[] = 'variations';
+            $with[] = 'variations.product:id,name,sku,price,sale_price,quantity,weight,length,wide,height,cost_per_item,barcode,image,images,status,stock_status,with_storehouse_management,allow_checkout_when_out_of_stock,start_date,end_date,generate_license_code,minimum_order_quantity,maximum_order_quantity,order';
+            $with[] = 'variations.configurableProduct:id';
+            $with[] = 'variations.productAttributes:id,attribute_set_id,title';
+            $with[] = 'variations.productAttributes.productAttributeSet:id,title';
+        }
+
+        if ($this->isMarketplaceActive) {
+            $with[] = 'store:id,name';
+        }
+
+        if (count($this->supportedLocales)) {
+            $with[] = 'translations:lang_code,ec_products_id,name,description,content';
+        }
+
+        return $with;
+    }
+
     protected function getSelectColumns(): array
     {
-        return ['*'];
+        if (! $this->optimizeQueries) {
+            return ['*'];
+        }
+
+        return [
+            'id',
+            'name',
+            'description',
+            'content',
+            'status',
+            'images',
+            'sku',
+            'order',
+            'quantity',
+            'allow_checkout_when_out_of_stock',
+            'with_storehouse_management',
+            'is_featured',
+            'brand_id',
+            'is_variation',
+            'sale_price',
+            'start_date',
+            'end_date',
+            'length',
+            'wide',
+            'height',
+            'weight',
+            'price',
+            'barcode',
+            'stock_status',
+            'product_type',
+            'image',
+            'cost_per_item',
+            'generate_license_code',
+            'minimum_order_quantity',
+            'maximum_order_quantity',
+            'created_at',
+            'updated_at',
+        ];
     }
 
     protected function freeMemory(): void
@@ -315,6 +402,9 @@ class ProductExporter extends Exporter
         if (gc_enabled()) {
             gc_collect_cycles();
         }
+
+        DB::disconnect();
+        DB::reconnect();
     }
 
     public function counters(): array
@@ -345,137 +435,11 @@ class ProductExporter extends Exporter
         $results = [];
 
         foreach ($products as $product) {
-            $productAttributes = [];
-
-            if (! $product->is_variation) {
-                $productAttributes = $product->productAttributeSets->pluck('title')->all();
-            }
-
-            $result = [
-                'id' => $product->id,
-                'name' => $product->name,
-                'description' => $product->description,
-                'slug' => $product->slug,
-                'url' => $product->url,
-                'sku' => $product->sku,
-                'categories' => implode(',', $product->categories->pluck('name')->all()),
-                'status' => $product->status->getValue(),
-                'is_featured' => $product->is_featured,
-                'brand' => $product->brand?->name,
-                'product_collections' => implode(',', $product->productCollections->pluck('name')->all()),
-                'labels' => implode(',', $product->productLabels->pluck('name')->all()),
-                'taxes' => implode(',', $product->taxes->pluck('title')->all()),
-                'image' => RvMedia::getImageUrl($product->image),
-                'images' => collect($product->images)->map(fn ($value) => RvMedia::getImageUrl($value))->implode(','),
-                'price' => $product->price,
-                'product_attributes' => implode(',', $productAttributes),
-                'import_type' => 'product',
-                'is_variation_default' => $product->is_variation_default ?? false,
-                'stock_status' => $product->stock_status->getValue(),
-                'with_storehouse_management' => $product->with_storehouse_management,
-                'quantity' => $product->quantity,
-                'allow_checkout_when_out_of_stock' => $product->allow_checkout_when_out_of_stock,
-                'sale_price' => $product->sale_price,
-                'start_date_sale_price' => $product->start_date,
-                'end_date_sale_price' => $product->end_date,
-                'weight' => $product->weight,
-                'length' => $product->length,
-                'wide' => $product->wide,
-                'height' => $product->height,
-                'cost_per_item' => $product->cost_per_item,
-                'barcode' => $product->barcode,
-                'content' => $product->content,
-                'tags' => implode(',', $product->tags->pluck('name')->all()),
-                'generate_license_code' => $product->generate_license_code,
-                'minimum_order_quantity' => $product->minimum_order_quantity,
-                'maximum_order_quantity' => $product->maximum_order_quantity,
-                'order' => (int) $product->order ?: 0,
-            ];
-
-            if ($this->isEnabledDigital) {
-                $result['product_type'] = $product->product_type;
-            }
-
-            if ($this->isMarketplaceActive) {
-                $result['vendor'] = $product->store?->id ? $product->store->name : null;
-            }
-
-            foreach ($this->supportedLocales as $properties) {
-                if ($properties['lang_code'] != $this->defaultLanguage) {
-                    $translation = $product->translations->where('lang_code', $properties['lang_code'])->first();
-
-                    $result['name_' . $properties['lang_code']] = $translation ? $translation->name : '';
-                    $result['description_' . $properties['lang_code']] = $translation ? $translation->description : '';
-                    $result['content_' . $properties['lang_code']] = $translation ? $translation->content : '';
-                }
-            }
-
-            $results[] = $result;
+            $results[] = $this->formatProductRow($product);
 
             if ($this->includeVariations && $product->variations->count()) {
                 foreach ($product->variations as $variation) {
-                    $productAttributes = $this->getProductAttributes($variation);
-
-                    $data = [
-                        'id' => $variation->product->id,
-                        'name' => $variation->product->name,
-                        'description' => '',
-                        'slug' => '',
-                        'url' => '',
-                        'sku' => $variation->product->sku,
-                        'categories' => '',
-                        'status' => $variation->product->status->getValue(),
-                        'is_featured' => '',
-                        'brand' => '',
-                        'product_collections' => '',
-                        'labels' => '',
-                        'taxes' => '',
-                        'image' => RvMedia::getImageUrl($variation->product->image),
-                        'images' => collect($variation->product->images)->map(fn ($value) => RvMedia::getImageUrl($value))->implode(','),
-                        'price' => $variation->product->price,
-                        'product_attributes' => implode(',', $productAttributes),
-                        'import_type' => 'variation',
-                        'is_variation_default' => $variation->is_default,
-                        'stock_status' => $variation->product->stock_status->getValue(),
-                        'with_storehouse_management' => $variation->product->with_storehouse_management,
-                        'quantity' => $variation->product->quantity,
-                        'allow_checkout_when_out_of_stock' => $variation->product->allow_checkout_when_out_of_stock,
-                        'sale_price' => $variation->product->sale_price,
-                        'start_date_sale_price' => $variation->product->start_date,
-                        'end_date_sale_price' => $variation->product->end_date,
-                        'weight' => $variation->product->weight,
-                        'length' => $variation->product->length,
-                        'wide' => $variation->product->wide,
-                        'height' => $variation->product->height,
-                        'cost_per_item' => $variation->product->cost_per_item,
-                        'barcode' => $variation->product->barcode,
-                        'content' => '',
-                        'tags' => '',
-                        'generate_license_code' => $variation->product->generate_license_code,
-                        'minimum_order_quantity' => $variation->product->minimum_order_quantity,
-                        'maximum_order_quantity' => $variation->product->maximum_order_quantity,
-                        'order' => (int) $variation->product->order ?: 0,
-                    ];
-
-                    if ($this->isEnabledDigital) {
-                        $data['product_type'] = ProductTypeEnum::PHYSICAL;
-                    }
-
-                    if ($this->isMarketplaceActive) {
-                        $data['vendor'] = '';
-                    }
-
-                    foreach ($this->supportedLocales as $properties) {
-                        if ($properties['lang_code'] != $this->defaultLanguage) {
-                            $translation = $variation->product->translations->where('lang_code', $properties['lang_code'])->first();
-
-                            $data['name_' . $properties['lang_code']] = $translation ? $translation->name : '';
-                            $data['description_' . $properties['lang_code']] = $translation ? $translation->description : '';
-                            $data['content_' . $properties['lang_code']] = '';
-                        }
-                    }
-
-                    $results[] = $data;
+                    $results[] = $this->formatVariationRow($variation);
                 }
             }
         }
@@ -552,9 +516,6 @@ class ProductExporter extends Exporter
         return $this;
     }
 
-    /**
-     * Enable streaming mode for large exports
-     */
     public function enableStreamingMode(bool $enable = true): self
     {
         $this->streamingMode = $enable;
@@ -631,43 +592,165 @@ class ProductExporter extends Exporter
 
         foreach ($this->supportedLocales as $properties) {
             if ($properties['lang_code'] != $this->defaultLanguage) {
-                $data['name_' . $properties['lang_code']] = '';
-                $data['description_' . $properties['lang_code']] = '';
+                $translation = $variation->product->translations->where('lang_code', $properties['lang_code'])->first();
+                $data['name_' . $properties['lang_code']] = $translation ? $translation->name : '';
+                $data['description_' . $properties['lang_code']] = $translation ? $translation->description : '';
                 $data['content_' . $properties['lang_code']] = '';
             }
         }
 
-        $mappedData = [];
-        foreach ($this->getAcceptedColumns() as $column) {
-            $mappedData[] = $data[$column->getName()] ?? '';
-        }
-
-        return $mappedData;
+        return $data;
     }
 
-    /**
-     * Optimize chunk size based on dataset characteristics
-     */
     protected function optimizeChunkSize(): void
     {
         $productCount = $this->getProductsCount();
         $variationCount = $this->includeVariations ? $this->getVariationsCount() : 0;
+        $totalCount = $productCount + $variationCount;
+
+        if ($totalCount > 50000) {
+            $this->chunkSize = 50;
+        } elseif ($totalCount > 20000) {
+            $this->chunkSize = 100;
+        } elseif ($totalCount > 10000) {
+            $this->chunkSize = 200;
+        } elseif ($totalCount > 5000) {
+            $this->chunkSize = 300;
+        } else {
+            $this->chunkSize = 500;
+        }
 
         if ($productCount > 0) {
             $avgVariationsPerProduct = $variationCount / $productCount;
-
-            if ($avgVariationsPerProduct > 5) {
-                $this->chunkSize = 100;
-            } elseif ($avgVariationsPerProduct > 2) {
-                $this->chunkSize = 200;
-            } else {
-                $this->chunkSize = 300;
+            if ($avgVariationsPerProduct > 10) {
+                $this->chunkSize = min($this->chunkSize, 50);
+            } elseif ($avgVariationsPerProduct > 5) {
+                $this->chunkSize = min($this->chunkSize, 100);
             }
         }
     }
 
+    public function setOptimizeQueries(bool $optimize): self
+    {
+        $this->optimizeQueries = $optimize;
+
+        return $this;
+    }
+
+    public function enableMultiFile(bool $enable = true): self
+    {
+        $this->useMultiFile = $enable;
+
+        return $this;
+    }
+
+    public function isMultiFileMode(): bool
+    {
+        return $this->useMultiFile;
+    }
+
+    public function setRecordsPerFile(int $records): self
+    {
+        $this->recordsPerFile = $records;
+
+        return $this;
+    }
+
+    public function getRecordsPerFile(): int
+    {
+        return $this->recordsPerFile;
+    }
+
+    public function getTotalRecords(): int
+    {
+        $productCount = $this->getProductsCount();
+        $variationCount = $this->includeVariations ? $this->getVariationsCount() : 0;
+
+        return $productCount + $variationCount;
+    }
+
+    public function getNumberOfFiles(): int
+    {
+        $total = $this->getTotalRecords();
+
+        return (int) ceil($total / $this->recordsPerFile);
+    }
+
+    public function streamingGeneratorForFile(int $fileNumber): \Generator
+    {
+        $with = $this->getOptimizedRelationships();
+        $offset = ($fileNumber - 1) * $this->recordsPerFile;
+        $limit = $this->recordsPerFile;
+        $processedInFile = 0;
+
+        DB::disableQueryLog();
+        ini_set('max_execution_time', 0);
+        ini_set('memory_limit', '256M');
+
+        $lastId = 0;
+        if ($offset > 0) {
+            $lastRecord = $this->getProductQuery()
+                ->where('is_variation', 0)
+                ->select(['id'])
+                ->oldest('id')
+                ->skip($offset - 1)
+                ->first();
+
+            if ($lastRecord) {
+                $lastId = $lastRecord->id;
+            }
+        }
+
+        do {
+            if ($processedInFile >= $limit) {
+                break;
+            }
+
+            $remainingInFile = $limit - $processedInFile;
+            $batchSize = min($this->chunkSize, $remainingInFile);
+
+            $batch = $this->getProductQuery()
+                ->select($this->getSelectColumns())
+                ->where('is_variation', 0)
+                ->where('id', '>', $lastId)
+                ->with($with)
+                ->orderBy('id')
+                ->limit($batchSize)
+                ->get();
+
+            if ($batch->isEmpty()) {
+                break;
+            }
+
+            $results = $this->productResults($batch);
+            foreach ($results as $result) {
+                yield $result;
+                $processedInFile++;
+
+                if ($processedInFile >= $limit) {
+                    break 2;
+                }
+            }
+
+            $lastId = $batch->last()->getKey();
+            $this->freeMemory();
+        } while ($batch->count() === $batchSize);
+
+        DB::enableQueryLog();
+    }
+
     public function map($row): array
     {
+        if (is_array($row)) {
+            $mappedData = [];
+            foreach ($this->getAcceptedColumns() as $column) {
+                $columnName = $column->getName();
+                $mappedData[] = $row[$columnName] ?? '';
+            }
+
+            return $mappedData;
+        }
+
         return parent::map($row);
     }
 }

@@ -12,8 +12,12 @@ use Botble\Base\Facades\Html;
 use Botble\Base\Facades\MetaBox;
 use Botble\Base\Forms\FieldOptions\NumberFieldOption;
 use Botble\Base\Forms\FieldOptions\OnOffFieldOption;
+use Botble\Base\Forms\FieldOptions\TextFieldOption;
 use Botble\Base\Forms\Fields\NumberField;
 use Botble\Base\Forms\Fields\OnOffCheckboxField;
+use Botble\Base\Forms\Fields\OnOffField;
+use Botble\Base\Forms\Fields\TextField;
+use Botble\Base\Forms\FormAbstract;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Base\Rules\OnOffRule;
 use Botble\Base\Supports\TwigCompiler;
@@ -42,6 +46,7 @@ use Botble\Ecommerce\Models\Product;
 use Botble\Ecommerce\Models\ProductCategory;
 use Botble\Ecommerce\Models\Review;
 use Botble\Ecommerce\Repositories\Interfaces\ProductInterface;
+use Botble\Ecommerce\Rules\FacebookPixelIdRule;
 use Botble\Ecommerce\Services\HandleFrontPages;
 use Botble\Ecommerce\Supports\TwigExtension;
 use Botble\Faq\Contracts\Faq as FaqContract;
@@ -49,6 +54,7 @@ use Botble\Faq\FaqCollection;
 use Botble\Faq\FaqItem;
 use Botble\Faq\FaqSupport;
 use Botble\Language\Facades\Language;
+use Botble\LanguageAdvanced\Supports\LanguageAdvancedManager;
 use Botble\Media\Facades\RvMedia;
 use Botble\Menu\Events\RenderingMenuOptions;
 use Botble\Menu\Facades\Menu;
@@ -68,7 +74,9 @@ use Botble\Support\Http\Requests\Request as BaseRequest;
 use Botble\Theme\Events\RenderingThemeOptionSettings;
 use Botble\Theme\Facades\Theme;
 use Botble\Theme\Facades\ThemeOption;
+use Botble\Theme\Forms\Settings\WebsiteTrackingSettingForm;
 use Botble\Theme\Http\Requests\UpdateOptionsRequest;
+use Botble\Theme\Http\Requests\WebsiteTrackingSettingRequest;
 use Botble\Theme\Supports\ThemeSupport;
 use Carbon\Carbon;
 use Exception;
@@ -91,6 +99,128 @@ class HookServiceProvider extends ServiceProvider
     {
         Menu::addMenuOptionModel(Brand::class);
         Menu::addMenuOptionModel(ProductCategory::class);
+
+        FormAbstract::beforeRendering(function (FormAbstract $form): void {
+            if (! $form instanceof WebsiteTrackingSettingForm) {
+                return;
+            }
+
+            $form
+                ->add(
+                    'ecommerce_google_tag_manager_enabled',
+                    OnOffField::class,
+                    OnOffFieldOption::make()
+                        ->label(
+                            trans('plugins/ecommerce::setting.tracking.form.enable_google_tag_manager_tracking_events')
+                        )
+                        ->value((bool) get_ecommerce_setting('google_tag_manager_enabled', false))
+                        ->helperText(trans('plugins/ecommerce::setting.tracking.form.google_tag_manager_tracking_info'))
+                )
+                ->add(
+                    'ecommerce_google_ads_conversion_id',
+                    TextField::class,
+                    TextFieldOption::make()
+                        ->label(trans('plugins/ecommerce::setting.tracking.form.google_ads_conversion_id'))
+                        ->value(get_ecommerce_setting('google_ads_conversion_id'))
+                        ->placeholder('AW-123456789/AbC-D_efG-h1_ijk-lmN')
+                        ->helperText(trans('plugins/ecommerce::setting.tracking.form.google_ads_conversion_id_helper'))
+                )
+                ->add(
+                    'ecommerce_facebook_pixel_enabled',
+                    OnOffField::class,
+                    OnOffFieldOption::make()
+                        ->label(trans('plugins/ecommerce::setting.tracking.form.enable_facebook_pixel'))
+                        ->value($targetValue = EcommerceHelper::isFacebookPixelEnabled())
+                )
+                ->addOpenCollapsible('ecommerce_facebook_pixel_enabled', '1', $targetValue)
+                ->add(
+                    'ecommerce_facebook_pixel_id',
+                    TextField::class,
+                    TextFieldOption::make()
+                        ->label(trans('plugins/ecommerce::setting.tracking.form.facebook_pixel_id'))
+                        ->value(get_ecommerce_setting('facebook_pixel_id'))
+                        ->placeholder(trans('plugins/ecommerce::setting.tracking.form.facebook_pixel_id_placeholder'))
+                        ->helperText(trans('plugins/ecommerce::setting.tracking.form.facebook_pixel_helper'))
+                )
+                ->add(
+                    'ecommerce_facebook_pixel_debug_mode',
+                    OnOffField::class,
+                    OnOffFieldOption::make()
+                        ->label(trans('plugins/ecommerce::setting.tracking.form.facebook_pixel_debug_mode'))
+                        ->value((bool) get_ecommerce_setting('facebook_pixel_debug_mode', false))
+                        ->helperText(trans('plugins/ecommerce::setting.tracking.form.facebook_pixel_debug_mode_helper'))
+                )
+                ->addCloseCollapsible('ecommerce_facebook_pixel_enabled', '1');
+        });
+
+        add_filter('core_request_rules', function (array $rules, BaseRequest $request) {
+            if ($request instanceof WebsiteTrackingSettingRequest) {
+                $onOffRule = new OnOffRule();
+
+                $rules['ecommerce_facebook_pixel_enabled'] = [$onOffRule];
+                $rules['ecommerce_google_tag_manager_enabled'] = [$onOffRule];
+                $rules['ecommerce_facebook_pixel_debug_mode'] = [$onOffRule];
+                $rules['ecommerce_google_ads_conversion_id'] = ['nullable', 'string', 'max:120'];
+
+                if ($request->input('ecommerce_facebook_pixel_enabled')) {
+                    $rules['ecommerce_facebook_pixel_id'] = ['required', 'string', 'max:120', new FacebookPixelIdRule()];
+                } else {
+                    $rules['ecommerce_facebook_pixel_id'] = ['nullable', 'string', 'max:120'];
+                }
+            }
+
+            return $rules;
+        }, 999, 2);
+
+        add_filter('core_request_messages', function (array $messages, BaseRequest $request) {
+            if ($request instanceof WebsiteTrackingSettingRequest) {
+                $messages['ecommerce_facebook_pixel_id.required'] = trans('validation.required', [
+                    'attribute' => trans('plugins/ecommerce::setting.tracking.form.facebook_pixel_id'),
+                ]);
+            }
+
+            return $messages;
+        }, 999, 2);
+
+        add_filter('core_request_attributes', function (array $attributes, BaseRequest $request) {
+            if ($request instanceof WebsiteTrackingSettingRequest) {
+                $attributes['facebook_pixel_enabled'] = trans(
+                    'plugins/ecommerce::setting.tracking.form.enable_facebook_pixel'
+                );
+                $attributes['facebook_pixel_id'] = trans('plugins/ecommerce::setting.tracking.form.facebook_pixel_id');
+                $attributes['facebook_pixel_debug_mode'] = trans(
+                    'plugins/ecommerce::setting.tracking.form.facebook_pixel_debug_mode'
+                );
+                $attributes['google_tag_manager_enabled'] = trans(
+                    'plugins/ecommerce::setting.tracking.form.enable_google_tag_manager_tracking_events'
+                );
+            }
+
+            return $attributes;
+        }, 999, 2);
+
+        if (
+            is_plugin_active('language') &&
+            is_plugin_active('language-advanced')
+        ) {
+            LanguageAdvancedManager::registerTranslationImportExport(
+                Product::class,
+                trans('plugins/ecommerce::products.product_translations'),
+                [
+                    'import' => 'product-translations.import',
+                    'export' => 'product-translations.export',
+                ]
+            );
+
+            LanguageAdvancedManager::registerTranslationImportExport(
+                ProductCategory::class,
+                trans('plugins/ecommerce::product-categories.product_category_translations'),
+                [
+                    'import' => 'product-category-translations.import',
+                    'export' => 'product-category-translations.export',
+                ]
+            );
+        }
 
         $this->app['events']->listen(RenderingMenuOptions::class, function (): void {
             add_action(MENU_ACTION_SIDEBAR_OPTIONS, [$this, 'registerMenuOptions'], 12);
@@ -533,7 +663,7 @@ class HookServiceProvider extends ServiceProvider
                         '@type' => 'Offer',
                         'price' => format_price($object->price()->getPrice(), null, true),
                         'priceCurrency' => strtoupper(cms_currency()->getDefaultCurrency()->title),
-                        'priceValidUntil' => Carbon::now()->addDay()->toDateString(),
+                        'priceValidUntil' => Carbon::today()->startOfMonth()->addDays(5)->addYears(2)->toDateString(),
                         'itemCondition' => 'https://schema.org/NewCondition',
                         'url' => $object->url,
                         'availability' => $object->isOutOfStock(
@@ -909,13 +1039,13 @@ class HookServiceProvider extends ServiceProvider
                         return '';
                     }
 
-                    $queryParams = array_merge([
+                    $queryParams = [
                         'paginate' => [
                             'per_page' => 12,
                             'current_paged' => request()->integer('page', 1) ?: 1,
                         ],
                         'with' => ['slugable'],
-                    ], EcommerceHelper::withReviewsParams());
+                    ];
 
                     $productRepository = $this->app->make(ProductInterface::class);
 
@@ -957,6 +1087,10 @@ class HookServiceProvider extends ServiceProvider
         add_action(INVOICE_PAYMENT_CREATED, function (Invoice $invoice): void {
             try {
                 $invoicePath = InvoiceHelper::generateInvoice($invoice);
+
+                if ($invoice->payment->status != PaymentStatusEnum::COMPLETED) {
+                    return;
+                }
 
                 EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME)
                     ->setVariableValues([
@@ -1156,6 +1290,10 @@ class HookServiceProvider extends ServiceProvider
         $seoFields = [];
         $seoPages = [
             'products' => __('Products'),
+            'login' => __('Login'),
+            'register' => __('Register'),
+            'reset_password' => __('Reset Password'),
+            'checkout' => __('Checkout'),
         ];
 
         if (EcommerceHelper::isOrderTrackingEnabled()) {

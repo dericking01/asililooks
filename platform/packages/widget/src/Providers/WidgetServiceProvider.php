@@ -8,6 +8,7 @@ use Botble\Base\Supports\ServiceProvider;
 use Botble\Base\Traits\LoadAndPublishDataTrait;
 use Botble\Theme\Events\RenderingAdminBar;
 use Botble\Theme\Facades\AdminBar;
+use Botble\Widget\Events\RenderingWidgetSettings;
 use Botble\Widget\Facades\WidgetGroup;
 use Botble\Widget\Factories\WidgetFactory;
 use Botble\Widget\Models\Widget;
@@ -50,37 +51,39 @@ class WidgetServiceProvider extends ServiceProvider
             ->publishAssets();
 
         $this->app->booted(function (): void {
-            WidgetGroup::setGroup([
-                'id' => 'primary_sidebar',
-                'name' => trans('packages/widget::widget.primary_sidebar_name'),
-                'description' => trans('packages/widget::widget.primary_sidebar_description'),
-            ]);
+            $this->app['events']->listen([RenderingWidgetSettings::class, 'core.widget:rendering'], function (): void {
+                WidgetGroup::setGroup([
+                    'id' => 'primary_sidebar',
+                    'name' => trans('packages/widget::widget.primary_sidebar_name'),
+                    'description' => trans('packages/widget::widget.primary_sidebar_description'),
+                ]);
 
-            register_widget(CoreSimpleMenu::class);
-            register_widget(Text::class);
-        });
+                register_widget(CoreSimpleMenu::class);
+                register_widget(Text::class);
+            });
 
-        DashboardMenu::default()->beforeRetrieving(function (): void {
-            DashboardMenu::make()
-                ->registerItem(
-                    DashboardMenuItem::make()
-                        ->id('cms-core-widget')
-                        ->parentId('cms-core-appearance')
-                        ->priority(3)
-                        ->name('packages/widget::widget.name')
-                        ->icon('ti ti-layout')
-                        ->route('widgets.index')
-                        ->permissions('widgets.index')
+            DashboardMenu::default()->beforeRetrieving(function (): void {
+                DashboardMenu::make()
+                    ->registerItem(
+                        DashboardMenuItem::make()
+                            ->id('cms-core-widget')
+                            ->parentId('cms-core-appearance')
+                            ->priority(3)
+                            ->name('packages/widget::widget.name')
+                            ->icon('ti ti-layout')
+                            ->route('widgets.index')
+                            ->permissions('widgets.index')
+                    );
+            });
+
+            $this->app['events']->listen(RenderingAdminBar::class, function (): void {
+                AdminBar::registerLink(
+                    trans('packages/widget::widget.name'),
+                    route('widgets.index'),
+                    'appearance',
+                    'widgets.index'
                 );
-        });
-
-        $this->app['events']->listen(RenderingAdminBar::class, function (): void {
-            AdminBar::registerLink(
-                trans('packages/widget::widget.name'),
-                route('widgets.index'),
-                'appearance',
-                'widgets.index'
-            );
+            });
         });
 
         $this->app->register(HookServiceProvider::class);

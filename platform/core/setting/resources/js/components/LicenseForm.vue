@@ -58,7 +58,6 @@ export default {
 
     methods: {
         async verifyLicense() {
-            // Check if we should make the license verification request
             const shouldVerifyLicense = () => {
                 const lastVerifyTime = localStorage.getItem('license_verification_time')
                 const isVerified = localStorage.getItem('license_is_verified') === 'true'
@@ -70,18 +69,15 @@ export default {
                 const now = Date.now()
                 const lastTime = parseInt(lastVerifyTime)
 
-                // If verified, check once every 3 days
                 if (isVerified) {
                     const threeDaysInMs = 3 * 24 * 60 * 60 * 1000
                     return now - lastTime > threeDaysInMs
                 } else {
-                    // If not verified, check once per day
                     const oneDayInMs = 24 * 60 * 60 * 1000
                     return now - lastTime > oneDayInMs
                 }
             }
 
-            // Try to get cached license data
             const cachedLicense = localStorage.getItem('license_data')
             const cachedVerified = localStorage.getItem('license_is_verified') === 'true'
 
@@ -104,7 +100,6 @@ export default {
                     this.verified = true
                     this.license = data.data
 
-                    // Store the verification result
                     localStorage.setItem('license_verification_time', Date.now().toString())
                     localStorage.setItem('license_is_verified', 'true')
                     localStorage.setItem('license_data', JSON.stringify(data.data))
@@ -114,7 +109,6 @@ export default {
                         Botble.showError(data.response.data.message)
                     }
 
-                    // Store that we attempted verification but it failed
                     localStorage.setItem('license_verification_time', Date.now().toString())
                     localStorage.setItem('license_is_verified', 'false')
                     localStorage.removeItem('license_data')
@@ -146,10 +140,10 @@ export default {
                 .then(() => {
                     this.verified = false
 
-                    // Update localStorage to reflect deactivation
                     localStorage.setItem('license_verification_time', Date.now().toString())
                     localStorage.setItem('license_is_verified', 'false')
                     localStorage.removeItem('license_data')
+                    localStorage.removeItem('license_check_time')
                 })
                 .finally(() => {
                     this.loading = false
@@ -171,6 +165,7 @@ export default {
                     localStorage.setItem('license_verification_time', Date.now().toString())
                     localStorage.setItem('license_is_verified', 'true')
                     localStorage.setItem('license_data', JSON.stringify(data.data))
+                    localStorage.removeItem('license_check_time')
                 })
                 .finally(() => {
                     this.loading = false
@@ -188,10 +183,10 @@ export default {
 
                     Botble.showSuccess(data.message)
 
-                    // Update localStorage to reflect reset
                     localStorage.setItem('license_verification_time', Date.now().toString())
                     localStorage.setItem('license_is_verified', 'false')
                     localStorage.removeItem('license_data')
+                    localStorage.removeItem('license_check_time')
                 })
                 .finally(() => {
                     this.loading = false

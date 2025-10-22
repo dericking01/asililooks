@@ -32,7 +32,7 @@ class PageService
 
         $page = Page::query()
             ->where($condition)
-            ->with('slugable');
+            ->with(['slugable', 'metadata']);
 
         $page = RepositoryHelper::applyBeforeExecuteQuery($page, new Page(), true)->first();
 

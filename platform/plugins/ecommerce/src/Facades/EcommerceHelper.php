@@ -126,6 +126,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static array parseFilterParams(Request $request, string $paramName)
  * @method static string getAssetVersion()
  * @method static array parseJsonParam($param)
+ * @method static float roundPrice(float $price, $currency = null)
  *
  * @see \Botble\Ecommerce\Supports\EcommerceHelper
  */

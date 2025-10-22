@@ -15,6 +15,8 @@ use Botble\Ecommerce\Models\Option;
 use Botble\Ecommerce\Models\OptionValue;
 use Botble\Ecommerce\Models\Product;
 use Botble\Ecommerce\Models\ProductFile;
+use Botble\Ecommerce\Models\ProductSpecificationAttributeTranslation;
+use Botble\Ecommerce\Models\SpecificationAttribute;
 use Botble\Media\Facades\RvMedia;
 use Botble\Media\Models\MediaFile;
 use Botble\Media\Services\UploadsManager;
@@ -34,7 +36,7 @@ class StoreProductService
     {
         $data = $request->input();
 
-        $hasVariation = $product->variations()->count() > 0;
+        $hasVariation = $product->has_variation;
 
         if ($hasVariation && ! $forceUpdateAll) {
             $excludedFields = [
@@ -54,9 +56,6 @@ class StoreProductService
                 'weight',
             ];
 
-            // For digital products, allow license code settings to be saved even with variations
-            // License codes are managed at the main product level, not variation level
-            // Physical products with variations should not have license code settings
             if (! $product->isTypeDigital()) {
                 $excludedFields[] = 'generate_license_code';
                 $excludedFields[] = 'license_code_type';
@@ -172,14 +171,42 @@ class StoreProductService
             $this->saveProductOptions((array) $request->input('options', []), $product);
         }
 
-        $specificationAttributes = $request->collect('specification_attributes')
-            ->mapWithKeys(fn ($item, $key) => [$key => [
-                'value' => $item['value'] ?? null,
-                'hidden' => $item['hidden'] ?? false,
-                'order' => $item['order'] ?? 0,
-            ]]);
+        $refLang = $request->input('ref_lang');
 
-        $product->specificationAttributes()->sync($specificationAttributes);
+        $isDefaultLanguage = ProductSpecificationAttributeTranslation::isDefaultLanguage($refLang);
+
+        if ($isDefaultLanguage) {
+            $specificationAttributes = $request->collect('specification_attributes')
+                ->mapWithKeys(fn ($item, $key) => [$key => [
+                    'value' => $item['value'] ?? null,
+                    'hidden' => $item['hidden'] ?? false,
+                    'order' => $item['order'] ?? 0,
+                ]]);
+
+            $product->specificationAttributes()->sync($specificationAttributes);
+        } else {
+            $langCode = $refLang;
+            $specificationAttributes = $request->input('specification_attributes', []);
+
+            foreach ($specificationAttributes as $attributeId => $attributeData) {
+                if (isset($attributeData['value'])) {
+                    $attribute = SpecificationAttribute::query()->find($attributeId);
+
+                    if ($attribute) {
+                        ProductSpecificationAttributeTranslation::query()->updateOrCreate(
+                            [
+                                'product_id' => $product->id,
+                                'attribute_id' => $attributeId,
+                                'lang_code' => $langCode,
+                            ],
+                            [
+                                'value' => $attributeData['value'],
+                            ]
+                        );
+                    }
+                }
+            }
+        }
 
         $this->saveLicenseCodes($request, $product);
 
@@ -190,7 +217,9 @@ class StoreProductService
 
     public function saveProductFiles(Request $request, Product $product, bool $exists = true): Product
     {
-        /** @var Collection<ProductFile> $productFiles */
+        /**
+         * @var Collection<ProductFile> $productFiles
+         */
         $productFiles = collect();
 
         if ($exists) {

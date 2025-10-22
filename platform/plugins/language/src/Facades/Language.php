@@ -36,6 +36,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string|null getCurrentAdminLocaleCode()
  * @method static string|null getDefaultLocaleCode()
  * @method static string|null getCurrentLocaleFlag()
+ * @method static string|null formatLocaleForHrefLang(?string $localeCode)
  * @method static array getSupportedLanguagesKeys()
  * @method static void setRouteName(string $routeName)
  * @method static string transRoute(string $routeName)
@@ -60,6 +61,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string|int|null getRefFrom()
  * @method static void initModelRelations()
  * @method static array getTableHeading()
+ * @method static void clearCache()
  *
  * @see \Botble\Language\LanguageManager
  */

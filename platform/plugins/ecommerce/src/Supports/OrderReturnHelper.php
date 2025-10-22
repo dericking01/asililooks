@@ -154,6 +154,15 @@ class OrderReturnHelper
                             }
                         }
                     }
+
+                    // Update restock_quantity to track that this quantity has been returned
+                    if ($item->order_product_id) {
+                        $orderProduct = OrderProduct::query()->find($item->order_product_id);
+                        if ($orderProduct) {
+                            $orderProduct->restock_quantity = ($orderProduct->restock_quantity ?? 0) + $item->qty;
+                            $orderProduct->save();
+                        }
+                    }
                 }
 
                 do_action(ACTION_AFTER_ORDER_RETURN_STATUS_COMPLETED, $orderReturn, $data);

@@ -10,8 +10,6 @@ class UserWidgetHook
 {
     public static function addUserStatsWidget(array $widgets, Collection $widgetSettings): array
     {
-        $users = fn () => User::query()->count();
-
         return (new DashboardWidgetInstance())
             ->setType('stats')
             ->setPermission('users.index')
@@ -19,7 +17,7 @@ class UserWidgetHook
             ->setKey('widget_total_users')
             ->setIcon('ti ti-users')
             ->setColor('info')
-            ->setStatsTotal($users)
+            ->setStatsTotal(fn () => User::query()->count())
             ->setRoute(route('users.index'))
             ->setColumn('col-12 col-md-6 col-lg-3')
             ->init($widgets, $widgetSettings);

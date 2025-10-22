@@ -96,7 +96,11 @@ class UploadsManager
         }
 
         if (! RvMedia::isChunkUploadEnabled() || ! $file) {
-            return $storage->put($this->cleanFolder($path), $content);
+            try {
+                return $storage->put($this->cleanFolder($path), $content, ['visibility' => $visibility]);
+            } catch (Exception|FilesystemException) {
+                return $storage->put($this->cleanFolder($path), $content);
+            }
         }
 
         $currentChunksPath = RvMedia::getConfig('chunk.storage.chunks') . '/' . $file->getFilename();
@@ -105,7 +109,13 @@ class UploadsManager
         try {
             $stream = $disk->getDriver()->readStream($currentChunksPath);
 
-            if ($result = Storage::writeStream($path, $stream, ['visibility' => $visibility])) {
+            try {
+                $result = Storage::writeStream($path, $stream, ['visibility' => $visibility]);
+            } catch (Exception|FilesystemException) {
+                $result = Storage::writeStream($path, $stream);
+            }
+
+            if ($result) {
                 $disk->delete($currentChunksPath);
             }
         } catch (Exception|FilesystemException) {

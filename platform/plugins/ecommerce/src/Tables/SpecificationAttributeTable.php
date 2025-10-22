@@ -6,11 +6,14 @@ use Botble\Ecommerce\Models\SpecificationAttribute;
 use Botble\Table\Abstracts\TableAbstract;
 use Botble\Table\Actions\DeleteAction;
 use Botble\Table\Actions\EditAction;
+use Botble\Table\BulkActions\DeleteBulkAction;
 use Botble\Table\Columns\CreatedAtColumn;
 use Botble\Table\Columns\FormattedColumn;
 use Botble\Table\Columns\IdColumn;
+use Botble\Table\Columns\LinkableColumn;
 use Botble\Table\Columns\NameColumn;
 use Botble\Table\HeaderActions\CreateHeaderAction;
+use Illuminate\Database\Eloquent\Builder;
 
 class SpecificationAttributeTable extends TableAbstract
 {
@@ -22,6 +25,19 @@ class SpecificationAttributeTable extends TableAbstract
             ->addColumns([
                 IdColumn::make(),
                 NameColumn::make()->route($this->getEditRouteName()),
+                LinkableColumn::make('group_id')
+                    ->label(trans('plugins/ecommerce::product-specification.specification_attributes.group'))
+                    ->externalLink()
+                    ->getValueUsing(function (FormattedColumn $column) {
+                        $item = $column->getItem();
+
+                        return $item->group ? $item->group->name : '—';
+                    })
+                    ->urlUsing(function (FormattedColumn $column) {
+                        $item = $column->getItem();
+
+                        return $item->group ? route('ecommerce.specification-groups.edit', $item->group->id) : null;
+                    }),
                 FormattedColumn::make('type')
                     ->label(trans('plugins/ecommerce::product-specification.specification_attributes.type'))
                     ->renderUsing(function (FormattedColumn $column) {
@@ -29,10 +45,14 @@ class SpecificationAttributeTable extends TableAbstract
                     }),
                 CreatedAtColumn::make(),
             ])
+            ->addBulkAction(DeleteBulkAction::make())
             ->addActions([
                 EditAction::make()->route($this->getEditRouteName()),
                 DeleteAction::make()->route($this->getDeleteRouteName()),
-            ]);
+            ])
+            ->queryUsing(function (Builder $query) {
+                return $query->with('group');
+            });
     }
 
     protected function getCreateRouteName(): string

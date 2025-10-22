@@ -1060,6 +1060,10 @@ class Botble {
                                     let content = ''
                                     $.each(files, (index, file) => {
                                         let link = file.full_url
+                                        // Convert absolute URL to relative URL
+                                        if (link && link.startsWith(window.location.origin)) {
+                                            link = link.replace(window.location.origin, '')
+                                        }
                                         if (file.type === 'youtube') {
                                             link = link.replace('watch?v=', 'embed/')
                                             content +=
@@ -1082,6 +1086,10 @@ class Botble {
                                     let html = ''
                                     $.each(files, (index, file) => {
                                         let link = file.full_url
+                                        // Convert absolute URL to relative URL
+                                        if (link && link.startsWith(window.location.origin)) {
+                                            link = link.replace(window.location.origin, '')
+                                        }
                                         if (file.type === 'youtube') {
                                             link = link.replace('watch?v=', 'embed/')
                                             html += `<iframe width='420' height='315' src='${link}' allowfullscreen loading='lazy'></iframe><br />`

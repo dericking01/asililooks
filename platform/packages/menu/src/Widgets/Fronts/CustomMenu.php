@@ -15,8 +15,8 @@ class CustomMenu extends AbstractWidget
     public function __construct()
     {
         parent::__construct([
-            'name' => __('Custom Menu'),
-            'description' => __('Add a custom menu to your widget area.'),
+            'name' => trans('packages/menu::menu.widget_custom_menu'),
+            'description' => trans('packages/menu::menu.widget_custom_menu_description'),
             'menu_id' => null,
         ]);
     }
@@ -29,7 +29,7 @@ class CustomMenu extends AbstractWidget
                 'menu_id',
                 SelectField::class,
                 SelectFieldOption::make()
-                    ->label(__('Menu'))
+                    ->label(trans('packages/menu::menu.select_menu'))
                     ->choices(Menu::query()->pluck('name', 'slug')->all())
                     ->searchable()
             );

@@ -22,9 +22,9 @@ class StoreStatusEnum extends Enum
     public function toHtml(): string|HtmlString
     {
         return match ($this->value) {
-            self::PENDING => Html::tag('span', self::PENDING()->label(), ['class' => 'badge bg-warning text-warning-fg']),
-            self::PUBLISHED => Html::tag('span', self::PUBLISHED()->label(), ['class' => 'badge bg-success text-success-fg']),
-            self::BLOCKED => Html::tag('span', self::BLOCKED()->label(), ['class' => 'badge bg-danger text-danger-fg']),
+            self::PENDING => Html::tag('span', self::PENDING()->label(), ['class' => 'badge bg-yellow text-yellow-fg']),
+            self::PUBLISHED => Html::tag('span', self::PUBLISHED()->label(), ['class' => 'badge bg-green text-green-fg']),
+            self::BLOCKED => Html::tag('span', self::BLOCKED()->label(), ['class' => 'badge bg-red text-red-fg']),
             default => parent::toHtml(),
         };
     }

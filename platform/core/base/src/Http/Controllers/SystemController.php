@@ -23,7 +23,7 @@ class SystemController extends BaseSystemController
 {
     public function getIndex(): View
     {
-        $this->pageTitle(trans('core/base::base.panel.system'));
+        $this->pageTitle(trans('core/base::base.panel.platform_administration'));
 
         return view('core/base::system.index');
     }
@@ -33,6 +33,89 @@ class SystemController extends BaseSystemController
         $authorization->authorize();
 
         return $this->httpResponse();
+    }
+
+    public function checkLicense(Core $core): BaseHttpResponse
+    {
+        try {
+            $cacheKey = 'license_check_time';
+
+            if (! $core->hasLicenseData()) {
+                return $this->httpResponse()
+                    ->setError()
+                    ->setCode(401)
+                    ->setData([
+                        'verified' => false,
+                        'html' => view('core/base::system.license-invalid')->render(),
+                        'redirectUrl' => route('unlicensed', ['redirect_url' => request()->headers->get('referer')]),
+                    ]);
+            }
+
+            if ($core->isLicenseFullyVerified()) {
+                return $this->httpResponse()->setData(['verified' => true]);
+            }
+
+            $lastCheckTime = session($cacheKey);
+            if ($lastCheckTime) {
+                $threeDaysInSeconds = 3 * 24 * 60 * 60;
+                if (time() - $lastCheckTime < $threeDaysInSeconds) {
+                    return $this->httpResponse()->setData(['verified' => true]);
+                }
+            }
+
+            $verified = $core->verifyLicense(true, 15);
+
+            if ($verified) {
+                session([$cacheKey => time()]);
+
+                return $this->httpResponse()->setData(['verified' => true]);
+            }
+
+            if (! $core->hasLicenseData()) {
+                return $this->httpResponse()
+                    ->setError()
+                    ->setCode(401)
+                    ->setData([
+                        'verified' => false,
+                        'html' => view('core/base::system.license-invalid')->render(),
+                        'redirectUrl' => route('unlicensed', ['redirect_url' => request()->headers->get('referer')]),
+                    ]);
+            }
+
+            return $this->httpResponse()->setData(['verified' => true]);
+
+        } catch (ConnectionException) {
+            if ($core->hasLicenseData()) {
+                $core->skipLicenseReminder();
+                session([$cacheKey => time()]);
+
+                return $this->httpResponse()->setData(['verified' => true]);
+            }
+
+            return $this->httpResponse()
+                ->setError()
+                ->setCode(401)
+                ->setData([
+                    'verified' => false,
+                    'html' => view('core/base::system.license-invalid')->render(),
+                    'redirectUrl' => route('unlicensed', ['redirect_url' => request()->headers->get('referer')]),
+                ]);
+        } catch (Exception $e) {
+            report($e);
+
+            if ($core->hasLicenseData()) {
+                return $this->httpResponse()->setData(['verified' => true]);
+            }
+
+            return $this->httpResponse()
+                ->setError()
+                ->setCode(401)
+                ->setData([
+                    'verified' => false,
+                    'html' => view('core/base::system.license-invalid')->render(),
+                    'redirectUrl' => route('unlicensed', ['redirect_url' => request()->headers->get('referer')]),
+                ]);
+        }
     }
 
     public function getMenuItemsCount(): BaseHttpResponse

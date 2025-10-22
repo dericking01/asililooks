@@ -29,7 +29,7 @@ class PageServiceProvider extends ServiceProvider
 
         $this
             ->setNamespace('packages/page')
-            ->loadAndPublishConfigurations(['permissions', 'general'])
+            ->loadAndPublishConfigurations(['permissions'])
             ->loadHelpers()
             ->loadAndPublishViews()
             ->loadAndPublishTranslations()

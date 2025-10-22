@@ -47,7 +47,8 @@ class TaxCalculatorService
             );
 
             if ($taxRate > 0) {
-                $itemTax = $quantity * ($price * $taxRate / 100);
+                $itemTax = EcommerceHelper::roundPrice($quantity * ($price * $taxRate / 100));
+
                 $taxAmount += $itemTax;
 
                 $taxRates[] = [

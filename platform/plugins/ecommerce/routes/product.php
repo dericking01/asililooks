@@ -125,7 +125,12 @@ AdminHelper::registerRoutes(function (): void {
                 'permission' => 'products.edit',
             ])->wherePrimaryKey();
 
-            // License code management routes
+            Route::get('view/{product}', [
+                'as' => 'view',
+                'uses' => 'ProductController@view',
+                'permission' => 'products.index',
+            ])->wherePrimaryKey('product');
+
             Route::group(['prefix' => '{product}/license-codes', 'as' => 'license-codes.'], function (): void {
                 Route::get('/', [
                     'as' => 'index',

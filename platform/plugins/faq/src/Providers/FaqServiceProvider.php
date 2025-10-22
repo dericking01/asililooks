@@ -18,8 +18,9 @@ use Botble\Faq\Repositories\Interfaces\FaqCategoryInterface;
 use Botble\Faq\Repositories\Interfaces\FaqInterface;
 use Botble\LanguageAdvanced\Supports\LanguageAdvancedManager;
 use Botble\Setting\PanelSections\SettingOthersPanelSection;
+use Illuminate\Contracts\Support\DeferrableProvider;
 
-class FaqServiceProvider extends ServiceProvider
+class FaqServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     use LoadAndPublishDataTrait;
 
@@ -41,7 +42,8 @@ class FaqServiceProvider extends ServiceProvider
         $this
             ->setNamespace('plugins/faq')
             ->loadHelpers()
-            ->loadAndPublishConfigurations(['permissions', 'general'])
+            ->loadAndPublishConfigurations(['general'])
+            ->loadAndPublishConfigurations(['permissions'])
             ->loadMigrations()
             ->loadAndPublishTranslations()
             ->loadRoutes()
@@ -110,5 +112,14 @@ class FaqServiceProvider extends ServiceProvider
 
         $this->app->register(HookServiceProvider::class);
         $this->app->register(EventServiceProvider::class);
+    }
+
+    public function provides(): array
+    {
+        return [
+            FaqCategoryInterface::class,
+            FaqInterface::class,
+            FaqContract::class,
+        ];
     }
 }

@@ -34,9 +34,11 @@ class RegisterController extends BaseController
     {
         abort_unless(EcommerceHelper::isCustomerRegistrationEnabled(), 404);
 
-        SeoHelper::setTitle(__('Register'));
+        $title = __('Register');
+        SeoHelper::setTitle(theme_option('ecommerce_register_seo_title') ?: $title)
+            ->setDescription(theme_option('ecommerce_register_seo_description'));
 
-        Theme::breadcrumb()->add(__('Register'), route('customer.register'));
+        Theme::breadcrumb()->add($title, route('customer.register'));
 
         if (! session()->has('url.intended') &&
             ! in_array(url()->previous(), [route('customer.login'), route('customer.register')])

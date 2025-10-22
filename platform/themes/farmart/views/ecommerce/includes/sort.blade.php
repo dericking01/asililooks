@@ -9,7 +9,7 @@
         }
     @endphp
     <div class="col-auto">
-        <div class="catalog-toolbar__ordering d-flex align-items-center me-md-4">
+        <div class="catalog-toolbar__ordering d-flex align-items-center me-md-4 gap-2">
             <input
                 name="sort-by"
                 type="hidden"

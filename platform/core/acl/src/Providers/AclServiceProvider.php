@@ -53,7 +53,8 @@ class AclServiceProvider extends ServiceProvider
 
         $this->setNamespace('core/acl')
             ->loadHelpers()
-            ->loadAndPublishConfigurations(['general', 'permissions', 'email'])
+            ->loadAndPublishConfigurations(['general', 'email'])
+            ->loadAndPublishConfigurations(['permissions'])
             ->loadAndPublishViews()
             ->loadAndPublishTranslations()
             ->publishAssets()

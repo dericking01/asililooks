@@ -6,6 +6,7 @@ use Botble\Ecommerce\Models\SpecificationGroup;
 use Botble\Table\Abstracts\TableAbstract;
 use Botble\Table\Actions\DeleteAction;
 use Botble\Table\Actions\EditAction;
+use Botble\Table\BulkActions\DeleteBulkAction;
 use Botble\Table\Columns\CreatedAtColumn;
 use Botble\Table\Columns\FormattedColumn;
 use Botble\Table\Columns\IdColumn;
@@ -28,6 +29,7 @@ class SpecificationGroupTable extends TableAbstract
                     ->limit(50),
                 CreatedAtColumn::make(),
             ])
+            ->addBulkAction(DeleteBulkAction::make())
             ->addActions([
                 EditAction::make()->route($this->getEditRouteName()),
                 DeleteAction::make()->route($this->getDeleteRouteName()),

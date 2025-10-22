@@ -303,9 +303,7 @@ class HookServiceProvider extends ServiceProvider
                         RadioField::class,
                         RadioFieldOption::make()
                             ->label(__('Register as'))
-                            ->choices([0 => __('I am a customer'),
-                                         //    1 => __('I am a vendor')
-                                      ])
+                            ->choices([0 => __('I am a customer'), 1 => __('I am a vendor')])
                             ->defaultValue(0)
                     )
                     ->addAfter(
@@ -583,6 +581,32 @@ class HookServiceProvider extends ServiceProvider
                                 'allow_thumb' => false,
                             ],
                         ],
+                    ],
+                    [
+                        'id' => 'marketplace_stores_seo_title',
+                        'type' => 'text',
+                        'label' => __('Stores listing page SEO title'),
+                        'attributes' => [
+                            'name' => 'marketplace_stores_seo_title',
+                            'value' => __('Stores'),
+                            'options' => [
+                                'class' => 'form-control',
+                            ],
+                        ],
+                    ],
+                    [
+                        'id' => 'marketplace_stores_seo_description',
+                        'type' => 'textarea',
+                        'label' => __('Stores listing page SEO description'),
+                        'attributes' => [
+                            'name' => 'marketplace_stores_seo_description',
+                            'value' => null,
+                            'options' => [
+                                'class' => 'form-control',
+                                'rows' => 3,
+                            ],
+                        ],
+                        'helper' => __('Leave it empty to use the default description.'),
                     ],
                 ],
             ]);

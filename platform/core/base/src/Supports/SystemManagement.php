@@ -4,6 +4,7 @@ namespace Botble\Base\Supports;
 
 use Botble\Base\Facades\BaseHelper;
 use Botble\Media\Facades\RvMedia;
+use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -91,6 +92,16 @@ class SystemManagement
             'imagick_or_gd' => (extension_loaded('imagick') || extension_loaded('gd')) && extension_loaded(RvMedia::getImageProcessingLibrary()),
             'zip' => extension_loaded('zip'),
             'iconv' => extension_loaded('iconv'),
+            'json' => extension_loaded('json'),
+            'opcache_enabled' => extension_loaded('Zend OPcache') && @ini_get('opcache.enable'),
+            'post_max_size' => @ini_get('post_max_size'),
+            'upload_max_filesize' => @ini_get('upload_max_filesize'),
+            'max_file_uploads' => @ini_get('max_file_uploads'),
+            'max_input_time' => @ini_get('max_input_time'),
+            'max_input_vars' => @ini_get('max_input_vars'),
+            'display_errors' => @ini_get('display_errors'),
+            'error_reporting' => error_reporting(),
+            'date_timezone' => @ini_get('date.timezone') ?: date_default_timezone_get(),
         ];
     }
 
@@ -127,5 +138,41 @@ class SystemManagement
     public static function getAppSize(): int
     {
         return self::calculateAppSize(app()->basePath());
+    }
+
+    public static function getDatabaseInfo(): array
+    {
+        $connection = DB::connection();
+        $pdo = $connection->getPdo();
+
+        $info = [
+            'driver' => $connection->getDriverName(),
+            'database' => $connection->getDatabaseName(),
+        ];
+
+        try {
+            if ($connection->getDriverName() === 'mysql') {
+                $version = $pdo->query('SELECT VERSION()')->fetchColumn();
+                $info['version'] = $version;
+
+                $variables = $pdo->query("SHOW VARIABLES LIKE '%max_connections%'")->fetch();
+                if ($variables) {
+                    $info['max_connections'] = $variables['Value'] ?? 'N/A';
+                }
+
+                $charset = $pdo->query("SHOW VARIABLES LIKE 'character_set_database'")->fetch();
+                if ($charset) {
+                    $info['charset'] = $charset['Value'] ?? 'N/A';
+                }
+
+                $collation = $pdo->query("SHOW VARIABLES LIKE 'collation_database'")->fetch();
+                if ($collation) {
+                    $info['collation'] = $collation['Value'] ?? 'N/A';
+                }
+            }
+        } catch (Exception) {
+        }
+
+        return $info;
     }
 }

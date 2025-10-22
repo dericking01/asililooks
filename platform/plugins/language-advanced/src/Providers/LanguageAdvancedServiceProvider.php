@@ -42,7 +42,8 @@ class LanguageAdvancedServiceProvider extends ServiceProvider
 
         $this
             ->loadHelpers()
-            ->loadAndPublishConfigurations(['general', 'permissions'])
+            ->loadAndPublishConfigurations(['general'])
+            ->loadAndPublishConfigurations(['permissions'])
             ->loadAndPublishViews()
             ->loadAndPublishTranslations()
             ->loadRoutes();

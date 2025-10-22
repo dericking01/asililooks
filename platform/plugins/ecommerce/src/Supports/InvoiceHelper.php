@@ -241,6 +241,8 @@ class InvoiceHelper
         $hasMultipleProducts = $invoice->items->count() > 1;
         $hasProductOptions = false;
 
+        $taxRateGroups = [];
+
         foreach ($invoice->items as $item) {
             if (! $hasProductOptions && ! empty($item->options) &&
                 (! empty($item->options['attributes']) || ! empty($item->options['product_options']) || ! empty($item->options['license_code']))) {
@@ -250,26 +252,25 @@ class InvoiceHelper
             if ($item->tax_amount > 0 && ! empty($item->options['taxClasses'])) {
                 foreach ($item->options['taxClasses'] as $taxName => $taxRate) {
                     $taxKey = $taxName . ' - ' . $taxRate . '%';
-                    if (! isset($taxGroups[$taxKey])) {
-                        $taxGroups[$taxKey] = 0;
+                    if (! isset($taxRateGroups[$taxKey])) {
+                        $taxRateGroups[$taxKey] = [
+                            'rate' => $taxRate,
+                            'subtotal' => 0,
+                            'name' => $taxName,
+                        ];
                     }
-                    $taxGroups[$taxKey] += $item->tax_amount;
+                    $taxRateGroups[$taxKey]['subtotal'] += ($item->price * $item->qty);
                 }
             }
         }
 
-        // Fix rounding discrepancies between total tax and sum of individual tax amounts
-        if ($taxGroups) {
-            $taxGroupsTotal = array_sum($taxGroups);
-            $invoiceTaxTotal = $invoice->tax_amount;
-
-            // If there's a small rounding difference (typically 0.01), adjust the largest tax group
-            $difference = round($invoiceTaxTotal - $taxGroupsTotal, 2);
-            if (abs($difference) > 0 && abs($difference) <= 0.02) {
-                // Find the largest tax group and adjust it
-                $largestTaxKey = array_keys($taxGroups, max($taxGroups))[0];
-                $taxGroups[$largestTaxKey] += $difference;
+        if ($taxRateGroups) {
+            foreach ($taxRateGroups as $taxKey => $group) {
+                $taxAmount = EcommerceHelperFacade::roundPrice($group['subtotal'] * $group['rate'] / 100);
+                $taxGroups[$taxKey] = $taxAmount;
             }
+        } elseif ($invoice->tax_amount > 0) {
+            $taxGroups = [];
         }
 
         $data = [

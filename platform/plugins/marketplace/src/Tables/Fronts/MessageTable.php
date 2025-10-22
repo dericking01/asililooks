@@ -7,6 +7,7 @@ use Botble\Marketplace\Tables\Traits\ForVendor;
 use Botble\Table\Abstracts\TableAbstract;
 use Botble\Table\Actions\Action;
 use Botble\Table\Actions\DeleteAction;
+use Botble\Table\Actions\ViewAction;
 use Botble\Table\BulkActions\DeleteBulkAction;
 use Botble\Table\Columns\Column;
 use Botble\Table\Columns\DateTimeColumn;
@@ -31,11 +32,8 @@ class MessageTable extends TableAbstract
                 DateTimeColumn::make('created_at'),
             ])
             ->addActions([
-                Action::make('view')
-                    ->label(__('View'))
-                    ->icon('ti ti-eye')
-                    ->url(fn (Action $action) => route('marketplace.vendor.messages.show', $action->getItem()))
-                    ->color('info'),
+                ViewAction::make()
+                    ->url(fn (Action $action) => route('marketplace.vendor.messages.show', $action->getItem())),
                 DeleteAction::make()
                     ->url(fn (Action $action) => route('marketplace.vendor.messages.destroy', $action->getItem())),
             ])

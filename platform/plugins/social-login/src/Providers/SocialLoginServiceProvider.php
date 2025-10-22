@@ -24,7 +24,8 @@ class SocialLoginServiceProvider extends ServiceProvider
         $this
             ->setNamespace('plugins/social-login')
             ->loadHelpers()
-            ->loadAndPublishConfigurations(['permissions', 'general'])
+            ->loadAndPublishConfigurations(['general'])
+            ->loadAndPublishConfigurations(['permissions'])
             ->loadAndPublishViews()
             ->loadAndPublishTranslations()
             ->loadMigrations()

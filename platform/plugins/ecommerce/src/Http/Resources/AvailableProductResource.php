@@ -25,7 +25,7 @@ class AvailableProductResource extends JsonResource
             'sku' => $this->sku,
             'description' => $this->description,
             'slug' => $this->slug,
-            'with_storehouse_management' => $this->with_storehouse_management,
+            'with_storehouse_management' => (bool) $this->with_storehouse_management,
             'quantity' => $this->quantity,
             'is_out_of_stock' => $this->isOutOfStock(),
             'stock_status_label' => $this->stock_status_label,

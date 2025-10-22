@@ -7,6 +7,7 @@ use Botble\Base\Facades\DashboardMenu;
 use Botble\Base\Facades\PanelSectionManager;
 use Botble\Base\PanelSections\PanelSectionItem;
 use Botble\Setting\PanelSections\SettingOthersPanelSection;
+use Closure;
 
 class PushDashboardMenuToOtherSectionPanel
 {
@@ -37,6 +38,12 @@ class PushDashboardMenuToOtherSectionPanel
 
     protected function registerPanel(array $menuItem): void
     {
+        $menuUrl = $menuItem['url'] instanceof Closure ? $menuItem['url']() : $menuItem['url'];
+
+        if (! $menuUrl) {
+            $menuUrl = '#';
+        }
+
         PanelSectionManager::default()
             ->registerItem(
                 SettingOthersPanelSection::class,
@@ -46,7 +53,7 @@ class PushDashboardMenuToOtherSectionPanel
                     ->withIcon($menuItem['icon'] ?? 'ti ti-settings')
                     ->withPriority($menuItem['priority'] ?? 500)
                     ->withPermissions($menuItem['permissions'] ?? [])
-                    ->withUrl($menuItem['url'] ?? '#')
+                    ->withUrl($menuUrl)
             );
     }
 }

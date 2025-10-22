@@ -2,6 +2,10 @@
 
 @section('title', __('Order successfully at :site_title', ['site_title' => Theme::getSiteTitle()]))
 
+@push('header')
+    @include('plugins/ecommerce::orders.partials.google-ads-conversion', ['orders' => $orders])
+@endpush
+
 @section('content')
     <div class="row">
         <div class="col-lg-7 col-md-6 col-12">

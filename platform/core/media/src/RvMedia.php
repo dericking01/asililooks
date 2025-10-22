@@ -569,7 +569,7 @@ class RvMedia
             $fileName = MediaFile::createSlug(
                 $file->name,
                 $fileExtension,
-                Storage::path($folderPath ?: '')
+                $folderPath ?: ''
             );
 
             $filePath = $fileName;
@@ -578,7 +578,6 @@ class RvMedia
                 $filePath = $folderPath . '/' . $filePath;
             }
 
-            // Add custom S3 path if using S3 driver
             if ($this->getMediaDriver() === 's3') {
                 $filePath = $this->getCustomS3Path() . $filePath;
             }
@@ -591,12 +590,18 @@ class RvMedia
                     $shouldConvertToWebp = in_array($fileExtension, ['jpg', 'jpeg', 'png'])
                         && setting('media_convert_image_to_webp', false);
 
+                    $keepOriginalQuality = setting('media_keep_original_file_size_and_quality');
+
                     if ($shouldConvertToWebp) {
                         $encoder = new WebpEncoder();
-                        $filePath = File::dirname($filePath) . '/' . File::name($filePath) . '.webp';
-                    }
 
-                    $keepOriginalQuality = setting('media_keep_original_file_size_and_quality');
+                        if ($keepOriginalQuality) {
+                            $encoder = new WebpEncoder(quality: 100);
+                        }
+
+                        $dirName = File::dirname($filePath);
+                        $filePath = ($dirName === '.' ? '' : $dirName . '/') . File::name($filePath) . '.webp';
+                    }
 
                     if ($keepOriginalQuality && ! $shouldConvertToWebp) {
                         $content = File::get($fileUpload->getRealPath());
@@ -615,10 +620,6 @@ class RvMedia
                             if ($maxWith || $maxHeight) {
                                 $image->scaleDown($maxWith, $maxHeight);
                             }
-                        }
-
-                        if ($shouldConvertToWebp && $keepOriginalQuality) {
-                            $encoder = new WebpEncoder(quality: 100);
                         }
 
                         $content = $image->encode($encoder);
@@ -753,7 +754,8 @@ class RvMedia
             }
 
             $thumbnailFileName = File::name($file->url) . '-' . $size . '.' . File::extension($file->url);
-            $thumbnailPath = File::dirname($file->url) ? File::dirname($file->url) . '/' . $thumbnailFileName : $thumbnailFileName;
+            $dirName = File::dirname($file->url);
+            $thumbnailPath = ($dirName === '.' || ! $dirName) ? $thumbnailFileName : $dirName . '/' . $thumbnailFileName;
 
             if (! $this->isUsingCloud() && Storage::exists($thumbnailPath)) {
                 continue;
@@ -1540,18 +1542,19 @@ class RvMedia
     public function responseDownloadFile(string $filePath)
     {
         $filePath = $this->getRealPath($filePath);
+        $fileName = File::basename($filePath);
 
         if (! $this->isUsingCloud()) {
             if (! File::exists($filePath)) {
                 return RvMedia::responseError(trans('core/media::media.file_not_exists'));
             }
 
-            return response()->download($filePath, File::name($filePath));
+            return response()->download($filePath, $fileName);
         }
 
         return response()->make(Http::withoutVerifying()->get($filePath)->body(), 200, [
             'Content-type' => $this->getMimeType($filePath),
-            'Content-Disposition' => sprintf('attachment; filename="%s"', File::basename($filePath)),
+            'Content-Disposition' => sprintf('attachment; filename="%s"', $fileName),
         ]);
     }
 

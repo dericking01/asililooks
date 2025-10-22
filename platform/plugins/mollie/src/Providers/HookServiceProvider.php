@@ -67,11 +67,7 @@ class HookServiceProvider extends ServiceProvider
                 try {
                     $paymentService = (new MolliePaymentService());
 
-                    do_action('payment_before_making_api_request', MOLLIE_PAYMENT_METHOD_NAME, ['payment_id' => $payment->charge_id]);
-
                     $paymentDetail = $paymentService->getPaymentDetails($payment->charge_id);
-
-                    do_action('payment_after_api_response', MOLLIE_PAYMENT_METHOD_NAME, ['payment_id' => $payment->charge_id], (array) $paymentDetail);
 
                     if ($paymentDetail) {
                         $data .= view('plugins/mollie::detail', ['payment' => $paymentDetail])->render();
@@ -118,7 +114,7 @@ class HookServiceProvider extends ServiceProvider
                 'description' => $paymentData['description'],
                 'redirectUrl' => PaymentHelper::getRedirectURL($paymentData['checkout_token']),
                 'cancelUrl' => PaymentHelper::getCancelURL($paymentData['checkout_token']),
-                'webhookUrl' => route('mollie.payment.callback', $paymentData['checkout_token']),
+                'webhookUrl' => route('mollie.payment.webhook', $paymentData['checkout_token']),
                 'metadata' => [
                     'order_id' => $paymentData['order_id'],
                     'customer_id' => $paymentData['customer_id'],

@@ -60,7 +60,7 @@
         @if (EcommerceHelper::isTaxEnabled() && $cartItem->taxRate > 0)
             <p class="mb-0">
                 <small class="text-muted">
-                    {{ __('Tax') }}: {{ format_price($cartItem->tax * $cartItem->qty) }}
+                    {{ __('Tax') }}: {{ format_price($cartItem->taxTotal) }}
                     @if ($cartItem->options && $cartItem->options->taxClasses)
                         (
                         @foreach ($cartItem->options->taxClasses as $taxName => $taxRate)

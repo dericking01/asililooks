@@ -78,6 +78,20 @@ class BaseSeeder extends Seeder
             return $path;
         }
 
+        if (File::exists($filePath)) {
+            try {
+                $uploadedFile = RvMedia::uploadFromPath($filePath, 0, dirname($path));
+                if (isset($uploadedFile['data']['url']) && $uploadedFile) {
+                    return str_replace(RvMedia::getUploadURL() . '/', '', $uploadedFile['data']['url']);
+                }
+            } catch (Throwable $exception) {
+                if (isset($this->command)) {
+                    $this->command->warn('Error uploading file: ' . $filePath);
+                    $this->command->warn($exception->getMessage());
+                }
+            }
+        }
+
         throw new FileNotFoundException('File not found: ' . $filePath);
     }
 

@@ -15,16 +15,13 @@ class Payment extends BaseModel
 {
     protected $table = 'payments';
 
-    protected static function boot()
+    protected static function booted(): void
     {
-        parent::boot();
-
-        static::deleting(function (Payment $payment) {
-            // Delete related payment logs when payment is deleted
+        static::deleting(function (Payment $payment): void {
             if ($payment->charge_id) {
                 $logQuery = PaymentLog::query()
                     ->where('payment_method', $payment->payment_channel)
-                    ->where(function ($query) use ($payment) {
+                    ->where(function ($query) use ($payment): void {
                         $query->where('request', 'LIKE', '%' . $payment->charge_id . '%')
                             ->orWhere('response', 'LIKE', '%' . $payment->charge_id . '%');
 
@@ -34,7 +31,6 @@ class Payment extends BaseModel
                         }
                     });
 
-                $logCount = $logQuery->count();
                 $deletedCount = $logQuery->delete();
 
                 if ($deletedCount > 0) {
@@ -93,18 +89,15 @@ class Payment extends BaseModel
         ]);
     }
 
-    /**
-     * Get related payment logs for this payment
-     */
     public function getPaymentLogs()
     {
         if (! $this->charge_id) {
-            return collect([]);
+            return collect();
         }
 
         return PaymentLog::query()
             ->where('payment_method', $this->payment_channel)
-            ->where(function ($query) {
+            ->where(function ($query): void {
                 $query->where('request', 'LIKE', '%' . $this->charge_id . '%')
                     ->orWhere('response', 'LIKE', '%' . $this->charge_id . '%');
 
@@ -112,8 +105,7 @@ class Payment extends BaseModel
                     $query->orWhere('request', 'LIKE', '%' . $this->order_id . '%')
                         ->orWhere('response', 'LIKE', '%' . $this->order_id . '%');
                 }
-            })
-            ->orderBy('created_at', 'desc')
+            })->latest()
             ->get();
     }
 }

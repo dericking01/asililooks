@@ -12,7 +12,6 @@ class LocalizationRedirectFilter extends LaravelLocalizationMiddlewareBase
 {
     public function handle(Request $request, Closure $next)
     {
-        // If the URL of the request is in exceptions.
         if ($this->shouldIgnore($request)) {
             return $next($request);
         }
@@ -20,7 +19,6 @@ class LocalizationRedirectFilter extends LaravelLocalizationMiddlewareBase
         $currentLocale = Language::getCurrentLocale();
         $defaultLocale = Language::getDefaultLocale();
         $params = explode('/', $request->getPathInfo());
-        // Dump the first element (empty string) as getPathInfo() always returns a leading slash
         array_shift($params);
 
         if (count($params) > 0) {
@@ -34,16 +32,12 @@ class LocalizationRedirectFilter extends LaravelLocalizationMiddlewareBase
                     $redirection = Language::getNonLocalizedURL();
                 }
             } elseif ($currentLocale !== $defaultLocale || ! $hideDefaultLocale) {
-                // If the current url does not contain any locale
-                // The system redirect the user to the very same url "localized"
-                // we use the current locale to redirect him
                 if (! Language::getActiveLanguage(['lang_id'])->isEmpty()) {
                     $redirection = Language::getLocalizedURL(Session::get('language'), $request->fullUrl(), [], false);
                 }
             }
 
             if ($redirection) {
-                // Save any flashed data for redirect
                 Session::reflash();
 
                 return new RedirectResponse($redirection, 302, ['Vary' => 'Accept-Language']);

@@ -40,7 +40,8 @@ class NewsletterServiceProvider extends ServiceProvider implements DeferrablePro
         $this
             ->setNamespace('plugins/newsletter')
             ->loadHelpers()
-            ->loadAndPublishConfigurations(['permissions', 'email'])
+            ->loadAndPublishConfigurations(['email'])
+            ->loadAndPublishConfigurations(['permissions'])
             ->loadAndPublishTranslations()
             ->loadRoutes()
             ->publishAssets()

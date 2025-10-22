@@ -4,12 +4,19 @@ namespace Botble\Ads\Http\Controllers\Settings;
 
 use Botble\Ads\Forms\Settings\AdsSettingForm;
 use Botble\Ads\Http\Requests\Settings\AdsSettingRequest;
+use Botble\Base\Supports\Breadcrumb;
 use Botble\Setting\Http\Controllers\SettingController;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 
 class AdsSettingController extends SettingController
 {
+    protected function breadcrumb(): Breadcrumb
+    {
+        return parent::breadcrumb()
+            ->add(trans('core/base::base.panel.others'));
+    }
+
     public function edit()
     {
         $this->pageTitle(trans('plugins/ads::ads.settings.title'));

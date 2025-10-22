@@ -22,8 +22,8 @@ class ReportWidgetConfigController extends BaseController
     public function store(Request $request): BaseHttpResponse
     {
         $request->validate([
-            'widgets' => 'array',
-            'widgets.*' => 'string',
+            'widgets' => ['array'],
+            'widgets.*' => ['string'],
         ]);
 
         $widgets = $request->input('widgets', []);

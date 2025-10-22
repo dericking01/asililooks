@@ -11,6 +11,8 @@ use Botble\Base\Facades\Html;
 use Botble\Base\Models\BaseModel;
 use Botble\Base\Supports\Builders\Extensible;
 use Botble\Base\Supports\Builders\RenderingExtensible;
+use Botble\Support\Repositories\Caches\CacheAbstractDecorator;
+use Botble\Support\Repositories\Eloquent\RepositoriesAbstract;
 use Botble\Table\Abstracts\Concerns\DeprecatedFunctions;
 use Botble\Table\Abstracts\Concerns\HasActions;
 use Botble\Table\Abstracts\Concerns\HasBulkActions;
@@ -73,14 +75,14 @@ abstract class TableAbstract extends DataTable implements ExtensibleContract
 
     protected int $pageLength = 10;
 
-    protected $view = 'core/table::table';
+    protected ?string $view = 'core/table::table';
 
     protected array $options = [];
 
     /**
      * @deprecated since v6.8.0
      */
-    protected $repository;
+    protected RepositoriesAbstract|CacheAbstractDecorator|null $repository = null;
 
     protected ?BaseModelContract $model = null;
 
@@ -380,7 +382,7 @@ abstract class TableAbstract extends DataTable implements ExtensibleContract
     }
 
     /**
-     * @param  BaseModel|class-string<BaseModel>  $model
+     * @param BaseModel|class-string<BaseModel> $model
      */
     public function model(BaseModelContract|string $model): static
     {

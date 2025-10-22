@@ -3,6 +3,10 @@
 @endphp
 
 <div {!! Html::attributes($wrapperAttributes) !!}>
+    @if(isset($label) && $label)
+        <label @class(['form-label', 'required' => isset($required) && $required])>{{ $label }}</label>
+        <fieldset class="form-fieldset">
+    @endif
     <div class="shortcode-tabs-field-wrapper">
         <div class="mb-3">
             <label class="form-label">{{ __('Quantity') }}</label>
@@ -71,10 +75,12 @@
                                         <label @class(['form-label', 'required' => Arr::get($field, 'required')])>{{ $title }}</label>
                                         @switch(Arr::get($field, 'type'))
                                             @case('image')
+                                            @case('mediaImage')
                                                 {!! Form::mediaImage($name, $value, $fieldAttributes) !!}
                                                 @break
 
                                             @case('file')
+                                            @case('mediaFile')
                                                 {!! Form::mediaFile($name, $value, $fieldAttributes) !!}
                                                 @break
 
@@ -164,4 +170,8 @@
         </div>
     </div>
 </div>
-<script src="{{ asset('vendor/core/packages/shortcode/js/shortcode-fields.js') }}?v={{ time() }}"></script>
+
+@if(isset($label) && $label)
+    </fieldset>
+@endif
+<script src="{{ asset('vendor/core/packages/shortcode/js/shortcode-fields.js') }}?v={{ get_cms_version() }}"></script>

@@ -3,12 +3,19 @@
 namespace Botble\Captcha\Http\Controllers\Settings;
 
 use Botble\Base\Http\Responses\BaseHttpResponse;
+use Botble\Base\Supports\Breadcrumb;
 use Botble\Captcha\Forms\CaptchaSettingForm;
 use Botble\Captcha\Http\Requests\Settings\CaptchaSettingRequest;
 use Botble\Setting\Http\Controllers\SettingController;
 
 class CaptchaSettingController extends SettingController
 {
+    protected function breadcrumb(): Breadcrumb
+    {
+        return parent::breadcrumb()
+            ->add(trans('core/base::base.panel.others'));
+    }
+
     public function edit()
     {
         $this->pageTitle(trans('plugins/captcha::captcha.settings.title'));

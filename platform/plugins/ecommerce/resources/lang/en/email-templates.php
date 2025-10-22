@@ -112,6 +112,11 @@ return [
     'customer_delivery_order_note' => 'Note',
     'customer_delivery_order_delivery_notes' => 'Delivery notes',
     'customer_delivery_order_order_summary' => 'Order Summary',
+    'customer_delivery_order_tracking_info' => 'Tracking Information',
+    'customer_delivery_order_shipping_company' => 'Shipping Company',
+    'customer_delivery_order_tracking_id' => 'Tracking ID',
+    'customer_delivery_order_tracking_link' => 'Tracking Link',
+    'customer_delivery_order_track_shipment' => 'Track Your Shipment',
 
     // Order Delivered Email
     'customer_order_delivered_title' => 'Your order has been delivered',
@@ -127,6 +132,11 @@ return [
     'customer_order_delivered_products' => 'Order detail:',
     'customer_order_delivered_note' => 'Note',
     'customer_order_delivered_order_summary' => 'Order Summary',
+    'customer_order_delivered_tracking_info' => 'Tracking Information',
+    'customer_order_delivered_shipping_company' => 'Shipping Company',
+    'customer_order_delivered_tracking_id' => 'Tracking ID',
+    'customer_order_delivered_tracking_link' => 'Tracking Link',
+    'customer_order_delivered_track_shipment' => 'View Tracking Details',
 
     // Payment Confirmation Email
     'order_confirm_payment_title' => 'Payment confirmed for order #:order_id',

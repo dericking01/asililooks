@@ -2,6 +2,7 @@
 
 namespace Botble\Ecommerce\Http\Controllers;
 
+use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Events\CreatedContentEvent;
 use Botble\Base\Facades\Assets;
 use Botble\Base\Http\Actions\DeleteResourceAction;
@@ -79,7 +80,10 @@ class ReviewController extends BaseController
                 ->setMessage(trans('plugins/ecommerce::review.review_already_exists'));
         }
 
-        $review = Review::query()->forceCreate($request->validated());
+        $review  = new Review();
+        $review->forceFill($request->validated());
+        $review->status = BaseStatusEnum::PUBLISHED;
+        $review->save();
 
         event(new CreatedContentEvent('review', $request, $review));
 

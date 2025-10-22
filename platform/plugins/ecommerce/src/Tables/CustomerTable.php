@@ -10,9 +10,9 @@ use Botble\Ecommerce\Enums\CustomerStatusEnum;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Models\Customer;
 use Botble\Table\Abstracts\TableAbstract;
-use Botble\Table\Actions\Action;
 use Botble\Table\Actions\DeleteAction;
 use Botble\Table\Actions\EditAction;
+use Botble\Table\Actions\ViewAction;
 use Botble\Table\BulkActions\DeleteBulkAction;
 use Botble\Table\BulkChanges\CreatedAtBulkChange;
 use Botble\Table\BulkChanges\EmailBulkChange;
@@ -49,11 +49,9 @@ class CustomerTable extends TableAbstract
                     ->permission('ecommerce.customers.import'),
             ])
             ->addActions([
-                Action::make('view')
+                ViewAction::make()
                     ->route('customers.view')
-                    ->permission('customers.index')
-                    ->icon('ti ti-eye')
-                    ->label(trans('core/base::tables.view')),
+                    ->permission('customers.index'),
                 EditAction::make()->route('customers.edit'),
                 DeleteAction::make()->route('customers.destroy'),
             ])

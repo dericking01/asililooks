@@ -17,7 +17,7 @@ class CheckAbandonedCartsCommand extends Command
 
     public function handle(AbandonedCartService $service): int
     {
-        $this->info('Checking for abandoned carts...');
+        $this->components->info('Checking for abandoned carts...');
 
         if ($this->option('cleanup')) {
             $deleted = $service->cleanupOldAbandonedCarts($this->option('cleanup-days'));
@@ -35,7 +35,7 @@ class CheckAbandonedCartsCommand extends Command
             return self::SUCCESS;
         }
 
-        $this->info("Found {$abandonedCarts->count()} abandoned carts.");
+        $this->components->info("Found {$abandonedCarts->count()} abandoned carts.");
 
         foreach ($abandonedCarts as $abandonedCart) {
             if (! $abandonedCart->email) {
@@ -53,7 +53,7 @@ class CheckAbandonedCartsCommand extends Command
             }
         }
 
-        $this->info('Abandoned cart check completed.');
+        $this->components->info('Abandoned cart check completed.');
 
         return self::SUCCESS;
     }

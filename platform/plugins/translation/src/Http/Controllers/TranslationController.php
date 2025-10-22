@@ -3,6 +3,7 @@
 namespace Botble\Translation\Http\Controllers;
 
 use Botble\Base\Facades\Assets;
+use Botble\Base\Supports\Breadcrumb;
 use Botble\Setting\Http\Controllers\SettingController;
 use Botble\Translation\Http\Controllers\Concerns\HasMapTranslationsTable;
 use Botble\Translation\Http\Requests\TranslationRequest;
@@ -13,6 +14,12 @@ use Illuminate\Http\Request;
 class TranslationController extends SettingController
 {
     use HasMapTranslationsTable;
+
+    protected function breadcrumb(): Breadcrumb
+    {
+        return parent::breadcrumb()
+            ->add(trans('plugins/translation::translation.localization'));
+    }
 
     public function __construct(protected Manager $manager)
     {

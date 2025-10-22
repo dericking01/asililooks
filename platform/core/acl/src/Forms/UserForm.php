@@ -8,6 +8,7 @@ use Botble\ACL\Models\User;
 use Botble\Base\Forms\FieldOptions\EmailFieldOption;
 use Botble\Base\Forms\FieldOptions\SelectFieldOption;
 use Botble\Base\Forms\FieldOptions\TextFieldOption;
+use Botble\Base\Forms\Fields\PasswordField;
 use Botble\Base\Forms\Fields\SelectField;
 use Botble\Base\Forms\Fields\TextField;
 use Botble\Base\Forms\FormAbstract;
@@ -62,7 +63,7 @@ class UserForm extends FormAbstract
             )
             ->add(
                 'password',
-                'password',
+                PasswordField::class,
                 TextFieldOption::make()
                     ->label(trans('core/acl::users.password'))
                     ->placeholder(trans('core/acl::users.password_placeholder'))
@@ -72,7 +73,7 @@ class UserForm extends FormAbstract
             )
             ->add(
                 'password_confirmation',
-                'password',
+                PasswordField::class,
                 TextFieldOption::make()
                     ->label(trans('core/acl::users.password_confirmation'))
                     ->placeholder(trans('core/acl::users.password_confirmation_placeholder'))

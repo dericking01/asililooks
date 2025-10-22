@@ -43,6 +43,10 @@ class HookServiceProvider extends ServiceProvider
         }
 
         add_filter('form_extra_fields_render', function (?string $fields = null, ?string $form = null): ?string {
+            if ($form && $form !== ContactForm::class) {
+                return $fields;
+            }
+
             $customFields = CustomField::query()
                 ->wherePublished()->with('options')
                 ->oldest('order')

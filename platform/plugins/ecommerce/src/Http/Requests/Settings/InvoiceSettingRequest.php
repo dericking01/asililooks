@@ -13,14 +13,6 @@ class InvoiceSettingRequest extends Request
 {
     public function rules(): array
     {
-        $googleFonts = config('core.base.general.google_fonts', []);
-
-        $customGoogleFonts = config('core.base.general.custom_google_fonts');
-
-        if ($customGoogleFonts) {
-            $googleFonts = array_merge($googleFonts, explode(',', $customGoogleFonts));
-        }
-
         return [
             'company_name_for_invoicing' => ['nullable', 'string', 'max:120'],
             'company_address_for_invoicing' => ['nullable', 'string', 'max:255'],
@@ -36,7 +28,7 @@ class InvoiceSettingRequest extends Request
             'enable_invoice_stamp' => $onOffRule,
             'invoice_code_prefix' => ['nullable', 'string', 'max:120'],
             'disable_order_invoice_until_order_confirmed' => $onOffRule,
-            'invoice_font_family' => ['nullable', Rule::in($googleFonts)],
+            'invoice_font_family' => ['nullable', Rule::in(BaseHelper::getFonts())],
             'invoice_date_format' => [Rule::in(InvoiceHelper::supportedDateFormats())],
             'invoice_processing_library' => ['nullable', Rule::in(['dompdf', 'mpdf'])],
         ];

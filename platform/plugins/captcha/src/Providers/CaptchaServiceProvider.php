@@ -58,7 +58,8 @@ class CaptchaServiceProvider extends ServiceProvider
     {
         $this
             ->setNamespace('plugins/captcha')
-            ->loadAndPublishConfigurations(['general', 'permissions'])
+            ->loadAndPublishConfigurations(['general'])
+            ->loadAndPublishConfigurations(['permissions'])
             ->loadRoutes()
             ->loadAndPublishViews()
             ->loadAndPublishTranslations();

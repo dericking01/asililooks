@@ -14,9 +14,16 @@ class SendShippingStatusChangedNotification
     public function handle(ShippingStatusChanged $event): void
     {
         $order = $event->shipment->order;
+        $shipment = $event->shipment;
+
+        $emailVariables = OrderHelper::getEmailVariables($order);
+
+        $emailVariables['shipping_company_name'] = $shipment->shipping_company_name;
+        $emailVariables['tracking_id'] = $shipment->tracking_id;
+        $emailVariables['tracking_link'] = $shipment->tracking_link;
 
         $mailer = EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME)
-            ->setVariableValues(OrderHelper::getEmailVariables($order));
+            ->setVariableValues($emailVariables);
 
         if ($event->shipment->status == ShippingStatusEnum::DELIVERING) {
             $mailer->sendUsingTemplate('customer_delivery_order', $order->user->email ?: $order->address->email);

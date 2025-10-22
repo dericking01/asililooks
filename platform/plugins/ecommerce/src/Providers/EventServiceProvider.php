@@ -45,6 +45,7 @@ use Botble\Ecommerce\Listeners\SendWebhookWhenOrderPlaced;
 use Botble\Ecommerce\Listeners\SendWebhookWhenOrderUpdated;
 use Botble\Ecommerce\Listeners\SendWebhookWhenPaymentStatusUpdated;
 use Botble\Ecommerce\Listeners\SendWebhookWhenShippingStatusUpdated;
+use Botble\Ecommerce\Listeners\SyncProductSlug;
 use Botble\Ecommerce\Listeners\UpdateInvoiceAndShippingWhenOrderCancelled;
 use Botble\Ecommerce\Listeners\UpdateInvoiceWhenOrderCompleted;
 use Botble\Ecommerce\Listeners\UpdateProductStockStatus;
@@ -53,6 +54,7 @@ use Botble\Ecommerce\Listeners\UpdateProductView;
 use Botble\Ecommerce\Services\HandleApplyCouponService;
 use Botble\Ecommerce\Services\HandleApplyProductCrossSaleService;
 use Botble\Ecommerce\Services\HandleRemoveCouponService;
+use Botble\Slug\Events\UpdatedSlugEvent;
 use Botble\Theme\Events\RenderingSiteMapEvent;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\Registered;
@@ -69,12 +71,17 @@ class EventServiceProvider extends ServiceProvider
             AddLanguageForVariantsListener::class,
             ClearShippingRuleCache::class,
             SaveProductFaqListener::class,
+            [SyncProductSlug::class, 'handleCreatedContent'],
         ],
         UpdatedContentEvent::class => [
             AddLanguageForVariantsListener::class,
             ClearShippingRuleCache::class,
             SaveProductFaqListener::class,
             SendWebhookWhenOrderUpdated::class,
+            [SyncProductSlug::class, 'handleUpdatedContent'],
+        ],
+        UpdatedSlugEvent::class => [
+            [SyncProductSlug::class, 'handleUpdatedSlug'],
         ],
         DeletedContentEvent::class => [
             ClearShippingRuleCache::class,

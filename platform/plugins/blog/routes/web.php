@@ -37,8 +37,6 @@ Route::group(['namespace' => 'Botble\Blog\Http\Controllers'], function (): void 
                 ]);
             });
 
-            require_once core_path('table/routes/web-actions.php');
-
             Route::group(['prefix' => 'tags', 'as' => 'tags.'], function (): void {
                 Route::resource('', 'TagController')
                     ->parameters(['' => 'tag']);

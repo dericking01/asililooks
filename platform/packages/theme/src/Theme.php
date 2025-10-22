@@ -885,9 +885,9 @@ class Theme implements ThemeContract
         require package_path('theme/routes/public.php');
     }
 
-    public function registerRoutes(Closure|callable $closure): Router
+    public function registerRoutes(Closure|callable $closure, array $middlewares = ['web', 'core']): Router
     {
-        return Route::group(['middleware' => ['web', 'core']], function () use ($closure): void {
+        return Route::group(['middleware' => $middlewares], function () use ($closure): void {
             Route::group(apply_filters(BASE_FILTER_GROUP_PUBLIC_ROUTE, []), fn () => $closure());
         });
     }
@@ -1096,7 +1096,13 @@ class Theme implements ThemeContract
         $height = theme_option('logo_height') ?: $maxHeight;
 
         if ($height) {
-            $attributes['style'] = sprintf('max-height: %s', is_numeric($height) ? "{$height}px" : $height);
+            $maxHeightStyle = 'max-height: %s';
+
+            if (setting('optimize_inline_css', 0)) {
+                $maxHeightStyle = 'max-height: %s !important';
+            }
+
+            $attributes['style'] = sprintf($maxHeightStyle, is_numeric($height) ? "{$height}px" : $height);
         }
 
         $attributes['loading'] = false;

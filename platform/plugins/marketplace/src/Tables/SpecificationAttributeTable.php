@@ -18,7 +18,8 @@ class SpecificationAttributeTable extends BaseSpecificationAttributeTableTable
         $this->queryUsing(function (Builder $query) {
             return $query
                 ->where('author_type', Customer::class)
-                ->where('author_id', auth('customer')->id());
+                ->where('author_id', auth('customer')->id())
+                ->with('group');
         });
     }
 

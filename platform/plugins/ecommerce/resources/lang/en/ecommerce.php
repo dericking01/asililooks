@@ -24,6 +24,9 @@ return [
     'payment_detail' => 'Payment detail',
     'shipping_method' => 'Shipping method',
     'payment_method' => 'Payment method',
+    'shipping_company_name' => 'Shipping company name',
+    'tracking_id' => 'Tracking ID',
+    'tracking_link' => 'Tracking link',
     'select_state' => 'Select state...',
     'select_city' => 'Select city...',
     'theme_options' => [

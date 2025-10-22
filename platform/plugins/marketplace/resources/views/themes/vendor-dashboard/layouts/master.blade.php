@@ -123,7 +123,6 @@
 
 @stack('scripts')
 @stack('footer')
-{!! apply_filters(THEME_FRONT_FOOTER, null) !!}
 </body>
 
 </html>

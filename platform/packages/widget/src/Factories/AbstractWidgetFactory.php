@@ -46,7 +46,7 @@ abstract class AbstractWidgetFactory
 
         $widgetClass = $this->widgetName;
 
-        if (! class_exists($widgetClass, false)) {
+        if (! class_exists($widgetClass)) {
             throw new Exception(sprintf('Widget "%s" does not exists.', $widgetClass));
         }
 

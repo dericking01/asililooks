@@ -68,7 +68,8 @@ class MediaServiceProvider extends ServiceProvider
         $this
             ->setNamespace('core/media')
             ->loadHelpers()
-            ->loadAndPublishConfigurations(['permissions', 'media'])
+            ->loadAndPublishConfigurations(['media'])
+            ->loadAndPublishConfigurations(['permissions'])
             ->loadMigrations()
             ->loadAndPublishTranslations()
             ->loadAndPublishViews()

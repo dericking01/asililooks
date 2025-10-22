@@ -15,6 +15,7 @@
 @import 'partials/customer';
 @import 'partials/store';
 @import 'partials/dashboard';
+@import 'partials/lazy-loading';
 
 /*! purgecss start ignore */
 
@@ -1832,6 +1833,148 @@ a.sl-button.sl-button-zalo.mt-2 {
     .widget-mobile-apps {
         background-position: top;
         background-size: cover;
+    }
+}
+
+.widget-testimonials {
+    .grey-bg-7 {
+        background-color: #f4f5f7;
+    }
+
+    .testimonials-body {
+        margin: 0 -10px;
+    }
+
+    .testimonial-item {
+        padding: 0 10px;
+        margin-bottom: 20px;
+    }
+
+    .testimonial-item-body {
+        padding: 43px 50px 52px 50px;
+        position: relative;
+        height: 100%;
+
+        @media (max-width: 991px) {
+            padding: 43px 30px 52px 30px;
+        }
+
+        @media (max-width: 575px) {
+            padding: 30px 25px 40px 25px;
+        }
+    }
+
+    .testimonial-quote {
+        img {
+            position: absolute;
+            bottom: 50px;
+            right: 50px;
+            z-index: -1;
+            opacity: 0.7;
+
+            @media (max-width: 575px) {
+                bottom: 30px;
+                right: 30px;
+                width: 30px;
+            }
+        }
+    }
+
+    .testimonial-rating {
+        margin-bottom: 11px;
+
+        span {
+            color: #fab528;
+            font-size: 14px;
+            margin-right: 2px;
+        }
+    }
+
+    .testimonial-content {
+        p {
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #55585b;
+            margin-bottom: 20px;
+
+            @media (max-width: 767px) {
+                font-size: 18px;
+            }
+
+            @media (max-width: 575px) {
+                font-size: 16px;
+            }
+        }
+    }
+
+    .testimonial-avatar {
+        img {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #d9d9d9;
+            border: 3px solid #ffffff;
+            box-shadow: 0px 1px 2px rgba(1, 15, 28, 0.3);
+        }
+    }
+
+    .testimonial-user-info {
+        h6 {
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 16px;
+            margin-bottom: 5px;
+            color: #000;
+        }
+
+        span {
+            font-size: 14px;
+            line-height: 1;
+            color: #55585b;
+        }
+    }
+}
+
+.testimonials-slider {
+    .slick-dots {
+        display: flex !important;
+        justify-content: center;
+        align-items: center;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+
+        li {
+            margin: 0 5px;
+
+            button {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                border: 1px solid #d5dae1;
+                background-color: transparent;
+                font-size: 0;
+                padding: 0;
+                cursor: pointer;
+                transition: all 0.3s ease;
+
+                &:before {
+                    width: 10px;
+                    height: 10px;
+                }
+
+                &:hover {
+                    background-color: #d5dae1;
+                }
+            }
+
+            &.slick-active button {
+                background-color: #000;
+                border-color: #000;
+            }
+        }
     }
 }
 

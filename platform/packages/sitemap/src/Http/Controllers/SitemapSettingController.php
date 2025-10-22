@@ -8,6 +8,7 @@ use Botble\Sitemap\Events\SitemapUpdatedEvent;
 use Botble\Sitemap\Forms\Settings\SitemapSettingForm;
 use Botble\Sitemap\Http\Requests\SitemapSettingRequest;
 use Botble\Sitemap\Services\IndexNowService;
+use Exception;
 use Illuminate\Http\JsonResponse;
 
 class SitemapSettingController extends SettingController
@@ -21,29 +22,23 @@ class SitemapSettingController extends SettingController
 
     public function update(SitemapSettingRequest $request)
     {
-        // Check if sitemap_items_per_page has changed
         $oldItemsPerPage = setting('sitemap_items_per_page');
         $newItemsPerPage = $request->input('sitemap_items_per_page');
 
         $response = $this->performUpdate($request->validated());
 
-        // Handle IndexNow API key file creation if key was provided
         if ($request->has('indexnow_api_key') && $request->input('indexnow_api_key')) {
             $indexNowService = app(IndexNowService::class);
             $apiKey = $request->input('indexnow_api_key');
 
-            // Create key file if it doesn't exist or is invalid
             if (! $indexNowService->keyFileExists() || ! $indexNowService->validateKeyFile()) {
                 $indexNowService->createKeyFile($apiKey);
             }
         }
 
-        // Clear sitemap cache if sitemap_enabled or sitemap_items_per_page has changed
         if ($request->has('sitemap_enabled') || ($oldItemsPerPage != $newItemsPerPage && $newItemsPerPage)) {
-            // Use the new centralized method to clear all sitemap caches
             ClearCacheService::make()->clearFrameworkCache();
 
-            // Fire sitemap updated event to trigger IndexNow submission
             event(new SitemapUpdatedEvent());
         }
 
@@ -55,7 +50,7 @@ class SitemapSettingController extends SettingController
         try {
             $apiKey = $indexNowService->generateApiKey();
             $keyFileExists = $indexNowService->keyFileExists();
-            $keyFileValid = $keyFileExists ? $indexNowService->validateKeyFile() : false;
+            $keyFileValid = $keyFileExists && $indexNowService->validateKeyFile();
 
             $message = trans('packages/sitemap::sitemap.settings.api_key_generated');
 
@@ -77,7 +72,7 @@ class SitemapSettingController extends SettingController
                 'key_file_valid' => $keyFileValid,
                 'key_file_path' => $indexNowService->getKeyFilePath(),
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => trans('packages/sitemap::sitemap.settings.generate_key_error'),
@@ -100,7 +95,7 @@ class SitemapSettingController extends SettingController
 
             $success = $indexNowService->createKeyFile($apiKey);
             $keyFileExists = $indexNowService->keyFileExists();
-            $keyFileValid = $keyFileExists ? $indexNowService->validateKeyFile() : false;
+            $keyFileValid = $keyFileExists && $indexNowService->validateKeyFile();
 
             if ($success && $keyFileValid) {
                 $message = trans('packages/sitemap::sitemap.settings.key_file_created_successfully');
@@ -120,7 +115,7 @@ class SitemapSettingController extends SettingController
                 'key_file_valid' => $keyFileValid,
                 'key_file_path' => $indexNowService->getKeyFilePath(),
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => trans('packages/sitemap::sitemap.settings.key_file_creation_error'),

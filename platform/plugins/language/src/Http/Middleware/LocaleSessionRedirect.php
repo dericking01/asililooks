@@ -14,7 +14,6 @@ class LocaleSessionRedirect extends LaravelLocalizationMiddlewareBase
 {
     public function handle(Request $request, Closure $next)
     {
-        // If the URL of the request is in exceptions.
         if ($this->shouldIgnore($request)) {
             return $next($request);
         }

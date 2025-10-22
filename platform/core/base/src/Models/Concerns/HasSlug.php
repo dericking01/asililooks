@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 
 trait HasSlug
 {
-    public static function createSlug(?string $name, int|string|null $id, string $fromColumn = 'slug'): string
+    public static function createSlug(?string $name, int|string|null $id = null, string $fromColumn = 'slug'): string
     {
         $language = apply_filters('core_slug_language', 'en');
 

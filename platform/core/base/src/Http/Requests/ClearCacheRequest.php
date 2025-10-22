@@ -16,6 +16,8 @@ class ClearCacheRequest extends Request
                 'clear_config_cache',
                 'clear_route_cache',
                 'clear_log',
+                'optimize',
+                'clear_optimize',
             ])],
         ];
     }

@@ -10,7 +10,7 @@
                         @endif
                     </div>
                     <div class="ps-4 col-auto py-2 d-none d-md-block">
-                        <a href="{{ route('public.products') }}">
+                        <a href="{{ route('public.products') }}?discounted_only=1">
                             <span class="link-text">{{ __('All Offers') }}
                                 <span class="svg-icon">
                                     <svg>

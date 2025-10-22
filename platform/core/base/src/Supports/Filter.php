@@ -7,11 +7,14 @@ class Filter extends ActionHookEvent
     public function fire(string $action, array $args)
     {
         $value = $args[0] ?? ''; // get the value, the first argument is always the value
-        if (! $this->getListeners()) {
+
+        $filters = $this->getListeners();
+
+        if (! $filters) {
             return $value;
         }
 
-        foreach ($this->getListeners() as $hook => $listeners) { // go through each of the priorities
+        foreach ($filters as $hook => $listeners) { // go through each of the priorities
             ksort($listeners);
             foreach ($listeners as $arguments) { // loop all hooks
                 if ($hook === $action) { // if the hook responds to the current filter

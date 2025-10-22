@@ -24,6 +24,7 @@ class SpecificationTableController extends BaseController
                 ->findOrFail($request->query('table'));
 
             $product = null;
+            $language = $request->query('ref_lang');
 
             if ($request->query('product')) {
                 $product = Product::query()
@@ -33,7 +34,7 @@ class SpecificationTableController extends BaseController
 
             return $this
                 ->httpResponse()
-                ->setData(view('plugins/ecommerce::products.partials.specification-table.table', compact('specificationTable', 'product'))->render());
+                ->setData(view('plugins/ecommerce::products.partials.specification-table.table', compact('specificationTable', 'product', 'language'))->render());
         }
 
         $this->pageTitle(trans('plugins/ecommerce::product-specification.specification_tables.title'));

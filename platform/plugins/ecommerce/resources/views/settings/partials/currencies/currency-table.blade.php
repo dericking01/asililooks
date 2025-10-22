@@ -6,17 +6,14 @@
         <div class="swatch-item">
             {{ trans('plugins/ecommerce::currency.symbol') }}
         </div>
-        <div class="swatch-item swatch-decimals">
-            {{ trans('plugins/ecommerce::currency.number_of_decimals') }}
-        </div>
         <div class="swatch-item swatch-exchange-rate">
             {{ trans('plugins/ecommerce::currency.exchange_rate') }}
         </div>
-        <div class="swatch-item swatch-is-prefix-symbol">
-            {{ trans('plugins/ecommerce::currency.is_prefix_symbol') }}
-        </div>
         <div class="swatch-is-default">
             {{ trans('plugins/ecommerce::currency.is_default') }}
+        </div>
+        <div class="swatch-advanced">
+            {{ trans('plugins/ecommerce::currency.advanced') }}
         </div>
         <div class="remove-item">{{ trans('plugins/ecommerce::currency.remove') }}</div>
     </div>

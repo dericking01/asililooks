@@ -38,6 +38,7 @@
                 ### {{ trans('core/base::system.server_environment') }}
 
                 - {{ trans('core/base::system.php_version') }}: {{ $serverEnv['version'] . (!$matchPHPRequirement ? '(' . trans('core/base::system.php_version_error', ['version' => $requiredPhpVersion]) . ')' : '') }}
+                - {{ trans('core/base::system.opcache_enabled') }}: {!! $serverEnv['opcache_enabled'] ? '&#10004;' : '&#10008;' !!}
                 - {{ trans('core/base::system.memory_limit') }}: {!! $serverEnv['memory_limit'] ?: '&mdash;' !!}
                 - {{ trans('core/base::system.max_execution_time') }}: {!! $serverEnv['max_execution_time'] ?: '&mdash;' !!}
                 - {{ trans('core/base::system.server_software') }}: {{ $serverEnv['server_software'] }}
@@ -58,6 +59,18 @@
                 - {{ trans('core/base::system.imagick_or_gd_ext') }}: {!! $serverEnv['imagick_or_gd'] ? '&#10004;' : '&#10008;' !!}
                 - {{ trans('core/base::system.zip') }}: {!! $serverEnv['zip'] ? '&#10004;' : '&#10008;' !!}
                 - {{ trans('core/base::system.iconv') }}: {!! $serverEnv['iconv'] ? '&#10004;' : '&#10008;' !!}
+                - {{ trans('core/base::system.json_ext') }}: {!! $serverEnv['json'] ? '&#10004;' : '&#10008;' !!}
+
+                ### {{ trans('core/base::system.php_configs') }}
+
+                - {{ trans('core/base::system.post_max_size') }}: {{ $serverEnv['post_max_size'] ?? 'N/A' }}
+                - {{ trans('core/base::system.upload_max_filesize') }}: {{ $serverEnv['upload_max_filesize'] ?? 'N/A' }}
+                - {{ trans('core/base::system.max_file_uploads') }}: {{ $serverEnv['max_file_uploads'] ?? 'N/A' }}
+                - {{ trans('core/base::system.max_input_time') }}: {{ $serverEnv['max_input_time'] ?? 'N/A' }} seconds
+                - {{ trans('core/base::system.max_input_vars') }}: {{ $serverEnv['max_input_vars'] ?? 'N/A' }}
+                - {{ trans('core/base::system.display_errors') }}: {!! $serverEnv['display_errors'] ? '&#10004;' : '&#10008;' !!}
+                - {{ trans('core/base::system.error_reporting') }}: {{ $serverEnv['error_reporting'] ?? 'N/A' }}
+                - {{ trans('core/base::system.date_timezone') }}: {{ $serverEnv['date_timezone'] ?? 'N/A' }}
 
                 ### {{ trans('core/base::system.installed_packages') }}
 
@@ -140,6 +153,9 @@
                         @endif
                     </li>
                     <li class="list-group-item">
+                        {{ trans('core/base::system.opcache_enabled') }}: @include('core/base::system.partials.status-icon', ['status' => $serverEnv['opcache_enabled']])
+                    </li>
+                    <li class="list-group-item">
                         {{ trans('core/base::system.memory_limit') }}: {!! $serverEnv['memory_limit'] ?: '&mdash;' !!}
                     </li>
                     <li class="list-group-item">
@@ -198,8 +214,80 @@
                     </li>
                     <li class="list-group-item">
                         {{ trans('core/base::system.zip') }}: @include('core/base::system.partials.status-icon', ['status' => $serverEnv['zip']])
+                    </li>
                     <li class="list-group-item">
                         {{ trans('core/base::system.iconv') }}: @include('core/base::system.partials.status-icon', ['status' => $serverEnv['iconv']])
+                    </li>
+                    <li class="list-group-item">
+                        {{ trans('core/base::system.json_ext') }}: @include('core/base::system.partials.status-icon', ['status' => $serverEnv['json']])
+                    </li>
+                </ul>
+            </x-core::card>
+
+            @if(!empty($databaseInfo))
+                <x-core::card class="mt-3 mb-3">
+                    <x-core::card.header>
+                        <x-core::card.title>{{ trans('core/base::system.database_info') }}</x-core::card.title>
+                    </x-core::card.header>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            {{ trans('core/base::system.database_driver') }}: {{ $databaseInfo['driver'] ?? 'N/A' }}
+                        </li>
+                        <li class="list-group-item">
+                            {{ trans('core/base::system.database_name') }}: {{ $databaseInfo['database'] ?? 'N/A' }}
+                        </li>
+                        @if(isset($databaseInfo['version']))
+                        <li class="list-group-item">
+                            {{ trans('core/base::system.database_version') }}: {{ $databaseInfo['version'] }}
+                        </li>
+                        @endif
+                        @if(isset($databaseInfo['max_connections']))
+                        <li class="list-group-item">
+                            {{ trans('core/base::system.database_max_connections') }}: {{ $databaseInfo['max_connections'] }}
+                        </li>
+                        @endif
+                        @if(isset($databaseInfo['charset']))
+                        <li class="list-group-item">
+                            {{ trans('core/base::system.database_charset') }}: {{ $databaseInfo['charset'] }}
+                        </li>
+                        @endif
+                        @if(isset($databaseInfo['collation']))
+                        <li class="list-group-item">
+                            {{ trans('core/base::system.database_collation') }}: {{ $databaseInfo['collation'] }}
+                        </li>
+                        @endif
+                    </ul>
+                </x-core::card>
+            @endif
+
+            <x-core::card>
+                <x-core::card.header>
+                    <x-core::card.title>{{ trans('core/base::system.php_configs') }}</x-core::card.title>
+                </x-core::card.header>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        {{ trans('core/base::system.post_max_size') }}: {{ $serverEnv['post_max_size'] ?? 'N/A' }}
+                    </li>
+                    <li class="list-group-item">
+                        {{ trans('core/base::system.upload_max_filesize') }}: {{ $serverEnv['upload_max_filesize'] ?? 'N/A' }}
+                    </li>
+                    <li class="list-group-item">
+                        {{ trans('core/base::system.max_file_uploads') }}: {{ $serverEnv['max_file_uploads'] ?? 'N/A' }}
+                    </li>
+                    <li class="list-group-item">
+                        {{ trans('core/base::system.max_input_time') }}: {{ $serverEnv['max_input_time'] ?? 'N/A' }} seconds
+                    </li>
+                    <li class="list-group-item">
+                        {{ trans('core/base::system.max_input_vars') }}: {{ $serverEnv['max_input_vars'] ?? 'N/A' }}
+                    </li>
+                    <li class="list-group-item">
+                        {{ trans('core/base::system.display_errors') }}: @include('core/base::system.partials.status-icon', ['status' => $serverEnv['display_errors']])
+                    </li>
+                    <li class="list-group-item">
+                        {{ trans('core/base::system.error_reporting') }}: {{ $serverEnv['error_reporting'] ?? 'N/A' }}
+                    </li>
+                    <li class="list-group-item">
+                        {{ trans('core/base::system.date_timezone') }}: {{ $serverEnv['date_timezone'] ?? 'N/A' }}
                     </li>
                 </ul>
             </x-core::card>

@@ -5,9 +5,11 @@ namespace Botble\Ecommerce\Forms\Settings;
 use Botble\Base\Forms\FieldOptions\CheckboxFieldOption;
 use Botble\Base\Forms\FieldOptions\OnOffFieldOption;
 use Botble\Base\Forms\FieldOptions\RadioFieldOption;
+use Botble\Base\Forms\FieldOptions\SelectFieldOption;
 use Botble\Base\Forms\FieldOptions\TextFieldOption;
 use Botble\Base\Forms\Fields\OnOffCheckboxField;
 use Botble\Base\Forms\Fields\RadioField;
+use Botble\Base\Forms\Fields\SelectField;
 use Botble\Base\Forms\Fields\TextField;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Http\Requests\Settings\ProductSettingRequest;
@@ -91,6 +93,23 @@ class ProductSettingForm extends SettingForm
                     ->selected(get_ecommerce_setting('related_products_source', 'category'))
             )
             ->addCloseCollapsible('is_enabled_related_products', '1')
+            ->add(
+                'trending_products_period_days',
+                SelectField::class,
+                SelectFieldOption::make()
+                    ->label(trans('plugins/ecommerce::setting.product.form.trending_products_period'))
+                    ->helperText(trans('plugins/ecommerce::setting.product.form.trending_products_period_helper'))
+                    ->choices([
+                        '1' => trans('plugins/ecommerce::setting.product.form.trending_products_period_1_day'),
+                        '3' => trans('plugins/ecommerce::setting.product.form.trending_products_period_3_days'),
+                        '7' => trans('plugins/ecommerce::setting.product.form.trending_products_period_7_days'),
+                        '14' => trans('plugins/ecommerce::setting.product.form.trending_products_period_14_days'),
+                        '30' => trans('plugins/ecommerce::setting.product.form.trending_products_period_30_days'),
+                        '60' => trans('plugins/ecommerce::setting.product.form.trending_products_period_60_days'),
+                        '90' => trans('plugins/ecommerce::setting.product.form.trending_products_period_90_days'),
+                    ])
+                    ->selected(get_ecommerce_setting('trending_products_period_days', '7'))
+            )
             ->add(
                 'enable_product_specification',
                 OnOffCheckboxField::class,

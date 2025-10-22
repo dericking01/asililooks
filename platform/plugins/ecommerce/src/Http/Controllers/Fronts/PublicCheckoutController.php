@@ -72,7 +72,7 @@ class PublicCheckoutController extends BaseController
         if (! EcommerceHelper::isEnabledGuestCheckout() && ! auth('customer')->check()) {
             return $this
                 ->httpResponse()
-                ->setNextUrl(route('customer.login'));
+                ->setNextUrl(route('customer.login') . '?redirect=' . urlencode($request->fullUrl()));
         }
 
         if ($token !== session('tracked_start_checkout')) {
@@ -131,7 +131,7 @@ class PublicCheckoutController extends BaseController
             return $this
                 ->httpResponse()
                 ->setError()
-                ->setNextUrl(route('customer.login'))
+                ->setNextUrl(route('customer.login') . '?redirect=' . urlencode($request->fullUrl()))
                 ->setMessage(__('Your shopping cart has digital product(s), so you need to sign in to continue!'));
         }
 
@@ -459,7 +459,7 @@ class PublicCheckoutController extends BaseController
                     'qty' => $cartItem->qty,
                     'weight' => $weight,
                     'price' => $cartItem->price,
-                    'tax_amount' => $cartItem->tax * $cartItem->qty,
+                    'tax_amount' => $cartItem->taxTotal,
                     'options' => $cartItem->options,
                     'product_type' => $product->product_type,
                 ];
@@ -563,7 +563,7 @@ class PublicCheckoutController extends BaseController
         if (! EcommerceHelper::isEnabledGuestCheckout() && ! auth('customer')->check()) {
             return $this
                 ->httpResponse()
-                ->setNextUrl(route('customer.login'));
+                ->setNextUrl(route('customer.login') . '?redirect=' . urlencode(route('public.checkout.information', $token)));
         }
 
         if (Cart::instance('cart')->isEmpty()) {
@@ -582,7 +582,7 @@ class PublicCheckoutController extends BaseController
             return $this
                 ->httpResponse()
                 ->setError()
-                ->setNextUrl(route('customer.login'))
+                ->setNextUrl(route('customer.login') . '?redirect=' . urlencode(route('public.checkout.information', $token)))
                 ->setMessage(__('Your shopping cart has digital product(s), so you need to sign in to continue!'));
         }
 
@@ -847,7 +847,7 @@ class PublicCheckoutController extends BaseController
                 'qty' => $cartItem->qty,
                 'weight' => Arr::get($cartItem->options, 'weight', 0),
                 'price' => $cartItem->price,
-                'tax_amount' => $cartItem->tax * $cartItem->qty,
+                'tax_amount' => $cartItem->taxTotal,
                 'options' => $cartItem->options,
                 'product_type' => $product->product_type,
             ];
@@ -1007,7 +1007,7 @@ class PublicCheckoutController extends BaseController
         if (! EcommerceHelper::isEnabledGuestCheckout() && ! auth('customer')->check()) {
             return $this
                 ->httpResponse()
-                ->setNextUrl(route('customer.login'));
+                ->setNextUrl(route('customer.login') . '?redirect=' . urlencode(route('public.checkout.information', $token)));
         }
 
         if (is_plugin_active('marketplace')) {

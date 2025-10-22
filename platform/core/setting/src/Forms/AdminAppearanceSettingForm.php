@@ -3,6 +3,7 @@
 namespace Botble\Setting\Forms;
 
 use Botble\Base\Facades\AdminAppearance;
+use Botble\Base\Facades\AdminHelper;
 use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Forms\FieldOptions\CodeEditorFieldOption;
 use Botble\Base\Forms\FieldOptions\NumberFieldOption;
@@ -18,7 +19,6 @@ use Botble\Base\Forms\Fields\RadioField;
 use Botble\Base\Forms\Fields\SelectField;
 use Botble\Base\Forms\Fields\TextField;
 use Botble\Base\Forms\FormAbstract;
-use Botble\Base\Supports\Language;
 use Botble\Setting\Http\Requests\AdminAppearanceRequest;
 
 class AdminAppearanceSettingForm extends SettingForm
@@ -103,16 +103,13 @@ class AdminAppearanceSettingForm extends SettingForm
                 'label' => trans('core/setting::setting.admin_appearance.form.link_hover_color'),
                 'value' => setting('admin_link_hover_color', '#1a569d'),
             ])
-            ->when(! empty($locales = Language::getAvailableLocales()), function (FormAbstract $form) use ($locales): void {
+            ->when(! empty($locales = AdminHelper::getAdminLocales()), function (FormAbstract $form) use ($locales): void {
                 $form->add(
                     AdminAppearance::getSettingKey('locale'),
                     SelectField::class,
                     SelectFieldOption::make()
                         ->label(trans('core/setting::setting.admin_appearance.form.admin_locale'))
-                        ->choices(collect($locales)
-                            ->pluck('name', 'locale')
-                            ->map(fn ($item, $key) => $item . ' - ' . $key)
-                            ->all())
+                        ->choices($locales)
                         ->selected(AdminAppearance::getSetting('locale', config('core.base.general.locale', config('app.locale'))))
                         ->searchable()
                 );

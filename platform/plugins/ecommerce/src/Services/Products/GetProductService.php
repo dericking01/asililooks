@@ -65,14 +65,14 @@ class GetProductService
             $queryVar['sort_by'] = 'date_desc';
         }
 
-        $params = array_merge([
+        $params = [
             'paginate' => [
                 'per_page' => $queryVar['num'] ?: 12,
                 'current_paged' => $request->integer('page', 1) ?: 1,
             ],
             'with' => array_merge(EcommerceHelper::withProductEagerLoadingRelations(), $with),
             'withCount' => $withCount,
-        ], EcommerceHelper::withReviewsParams());
+        ];
 
         switch ($queryVar['sort_by']) {
             case 'date_asc':

@@ -2,7 +2,6 @@
 
 namespace Botble\Location;
 
-use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Models\BaseQueryBuilder;
 use Botble\Base\Supports\Helper;
 use Botble\Base\Supports\Zipper;
@@ -21,7 +20,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
 use Throwable;
 
 class Location
@@ -57,10 +55,10 @@ class Location
             return null;
         }
 
-        return City::query()->where([
-            'id' => $cityId,
-            'status' => BaseStatusEnum::PUBLISHED,
-        ])->first();
+        return City::query()
+            ->wherePublished()
+            ->where('id', $cityId)
+            ->first();
     }
 
     public function getCityNameById(int|string|null $cityId): ?string
@@ -93,7 +91,7 @@ class Location
         }
 
         if (is_object($model)) {
-            $model = get_class($model);
+            $model = $model::class;
         }
 
         return in_array($model, $this->supportedModels());
@@ -238,7 +236,7 @@ class Location
             $state['country_id'] = $country->id;
 
             $statesForInserting[] = array_merge($state, [
-                'slug' => Str::slug($state['name']),
+                'slug' => City::createSlug($state['name']),
                 'country_id' => $country->id,
                 'created_at' => $now,
                 'updated_at' => $now,
@@ -268,7 +266,7 @@ class Location
             foreach ($item['cities'] as $cityName) {
                 $citiesForInserting[] = [
                     'name' => $cityName,
-                    'slug' => Str::slug($cityName),
+                    'slug' => City::createSlug($cityName),
                     'state_id' => $stateId,
                     'country_id' => $country->id,
                     'created_at' => $now,

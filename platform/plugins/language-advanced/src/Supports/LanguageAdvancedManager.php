@@ -247,7 +247,7 @@ class LanguageAdvancedManager
 
     public static function registerTranslationImportExport(
         string $modelClass,
-        string $name,
+        callable|string $name,
         array $permissions = []
     ): void {
         if (! self::isSupported($modelClass)) {
@@ -268,6 +268,8 @@ class LanguageAdvancedManager
                 $importPermission,
                 $itemKey
             ): void {
+                $name = is_callable($name) ? $name() : $name;
+
                 PanelSectionManager::default()
                     ->registerItem(
                         ImportPanelSection::class,

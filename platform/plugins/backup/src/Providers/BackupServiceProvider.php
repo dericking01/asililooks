@@ -7,8 +7,9 @@ use Botble\Base\PanelSections\PanelSectionItem;
 use Botble\Base\PanelSections\System\SystemPanelSection;
 use Botble\Base\Supports\ServiceProvider;
 use Botble\Base\Traits\LoadAndPublishDataTrait;
+use Illuminate\Contracts\Support\DeferrableProvider;
 
-class BackupServiceProvider extends ServiceProvider
+class BackupServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     use LoadAndPublishDataTrait;
 
@@ -16,13 +17,16 @@ class BackupServiceProvider extends ServiceProvider
     {
         $this->setNamespace('plugins/backup')
             ->loadHelpers()
-            ->loadAndPublishConfigurations(['permissions', 'general'])
+            ->loadAndPublishConfigurations(['general'])
+            ->loadAndPublishConfigurations(['permissions'])
             ->loadRoutes()
             ->loadAndPublishViews()
             ->loadAndPublishTranslations()
             ->publishAssets();
 
-        $this->app->register(CommandServiceProvider::class);
+        if ($this->app->runningInConsole()) {
+            $this->app->register(CommandServiceProvider::class);
+        }
 
         PanelSectionManager::group('system')->beforeRendering(function (): void {
             PanelSectionManager::registerItem(

@@ -13,8 +13,8 @@ class WebhookTestController extends BaseController
     public function test(Request $request, BaseHttpResponse $response)
     {
         $request->validate([
-            'webhook_url' => 'required|url',
-            'webhook_type' => 'required|in:order_placed,order_updated,order_completed,order_cancelled,shipping_status_updated,payment_status_updated,abandoned_cart',
+            'webhook_url' => ['required', 'url'],
+            'webhook_type' => ['required', 'in:order_placed,order_updated,order_completed,order_cancelled,shipping_status_updated,payment_status_updated,abandoned_cart'],
         ]);
 
         $webhookUrl = $request->input('webhook_url');

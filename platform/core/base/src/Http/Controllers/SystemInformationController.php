@@ -27,6 +27,7 @@ class SystemInformationController extends BaseSystemController
 
         $systemEnv = SystemManagement::getSystemEnv();
         $serverEnv = SystemManagement::getServerEnv();
+        $databaseInfo = SystemManagement::getDatabaseInfo();
 
         $requiredPhpVersion = Arr::get($composerArray, 'require.php', get_minimum_php_version());
         $requiredPhpVersion = str_replace('^', '', $requiredPhpVersion);
@@ -43,6 +44,7 @@ class SystemInformationController extends BaseSystemController
                 'infoTable',
                 'systemEnv',
                 'serverEnv',
+                'databaseInfo',
                 'matchPHPRequirement',
                 'requiredPhpVersion',
                 'serverIp',

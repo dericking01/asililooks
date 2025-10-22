@@ -3,9 +3,10 @@
 namespace Botble\Stripe\Providers;
 
 use Botble\Base\Traits\LoadAndPublishDataTrait;
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 
-class StripeServiceProvider extends ServiceProvider
+class StripeServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     use LoadAndPublishDataTrait;
 

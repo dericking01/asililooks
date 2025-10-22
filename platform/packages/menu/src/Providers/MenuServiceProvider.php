@@ -6,6 +6,7 @@ use Botble\Base\Facades\DashboardMenu;
 use Botble\Base\Supports\DashboardMenuItem;
 use Botble\Base\Supports\ServiceProvider;
 use Botble\Base\Traits\LoadAndPublishDataTrait;
+use Botble\Menu\Facades\Menu;
 use Botble\Menu\Models\Menu as MenuModel;
 use Botble\Menu\Models\MenuLocation;
 use Botble\Menu\Models\MenuNode;
@@ -41,7 +42,7 @@ class MenuServiceProvider extends ServiceProvider
     {
         $this
             ->setNamespace('packages/menu')
-            ->loadAndPublishConfigurations(['permissions', 'general'])
+            ->loadAndPublishConfigurations(['permissions'])
             ->loadHelpers()
             ->loadRoutes()
             ->loadAndPublishViews()
@@ -70,6 +71,10 @@ class MenuServiceProvider extends ServiceProvider
                 'appearance',
                 'menus.index'
             );
+        });
+
+        $this->app['events']->listen('cms.menu::registering-locations', function (): void {
+            Menu::addMenuLocation('main-menu', trans('packages/menu::menu.main_navigation'));
         });
 
         $this->app->register(EventServiceProvider::class);

@@ -27,7 +27,8 @@ class OptimizeServiceProvider extends ServiceProvider
     {
         $this
             ->setNamespace('packages/optimize')
-            ->loadAndPublishConfigurations(['general', 'permissions'])
+            ->loadAndPublishConfigurations(['general'])
+            ->loadAndPublishConfigurations(['permissions'])
             ->loadRoutes()
             ->loadAndPublishTranslations()
             ->loadAndPublishViews();

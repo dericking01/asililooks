@@ -6,6 +6,7 @@ use Botble\Base\Supports\BaseSeeder;
 use Botble\Ecommerce\Models\Customer;
 use Botble\Ecommerce\Models\Product;
 use Botble\Ecommerce\Models\Review;
+use Illuminate\Support\Facades\DB;
 
 class ReviewSeeder extends BaseSeeder
 {
@@ -64,5 +65,26 @@ class ReviewSeeder extends BaseSeeder
                 'updated_at' => $now,
             ]);
         }
+
+        $this->updateProductReviewStats();
+    }
+
+    protected function updateProductReviewStats(): void
+    {
+        DB::statement('
+            UPDATE ec_products p
+            LEFT JOIN (
+                SELECT
+                    product_id,
+                    COUNT(*) as review_count,
+                    AVG(star) as review_avg
+                FROM ec_reviews
+                WHERE status = "published"
+                GROUP BY product_id
+            ) r ON p.id = r.product_id
+            SET
+                p.reviews_count = COALESCE(r.review_count, 0),
+                p.reviews_avg = COALESCE(r.review_avg, 0)
+        ');
     }
 }

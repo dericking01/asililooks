@@ -15,6 +15,7 @@ class AvailableProductResource extends JsonResource
     public function toArray($request): array
     {
         $price = $this->price();
+        $thumbnailSize = $request->input('thumbnail_size', 'thumb');
 
         return [
             'id' => $this->id,
@@ -24,6 +25,7 @@ class AvailableProductResource extends JsonResource
             'sku' => $this->sku,
             'description' => Shortcode::compile((string) $this->description, true)->toHtml(),
             'content' => Shortcode::compile((string) $this->content, true)->toHtml(),
+            'with_storehouse_management' => (bool) $this->with_storehouse_management,
             'quantity' => (int) $this->quantity,
             'is_out_of_stock' => $this->isOutOfStock(),
             'stock_status_label' => $this->stock_status_label,
@@ -49,7 +51,7 @@ class AvailableProductResource extends JsonResource
             'height' => $this->height,
             'wide' => $this->wide,
             'length' => $this->length,
-            'image_url' => RvMedia::getImageUrl($this->image, 'thumb', false, RvMedia::getDefaultImage()),
+            'image_url' => RvMedia::getImageUrl($this->image, $thumbnailSize, false, RvMedia::getDefaultImage()),
             'product_options' => $this->when(! $this->is_variation, function () {
                 return ProductOptionResource::collection($this->original_product->options);
             }),

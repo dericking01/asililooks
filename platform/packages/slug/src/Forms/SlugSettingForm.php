@@ -2,6 +2,9 @@
 
 namespace Botble\Slug\Forms;
 
+use Botble\Base\Forms\FieldOptions\HtmlFieldOption;
+use Botble\Base\Forms\FieldOptions\OnOffFieldOption;
+use Botble\Base\Forms\FieldOptions\TextFieldOption;
 use Botble\Base\Forms\Fields\HtmlField;
 use Botble\Base\Forms\Fields\OnOffField;
 use Botble\Base\Forms\Fields\TextField;
@@ -26,39 +29,49 @@ class SlugSettingForm extends SettingForm
             $settingValue = SlugHelper::getPrefix($model, '', false);
 
             $form
-                ->add($settingKey, TextField::class, [
-                    'label' => trans('packages/slug::slug.prefix_for', ['name' => $name]),
-                    'value' => trim(old($settingKey, $settingValue), '/'),
-                    'help_block' => [
-                        'text' => SlugHelper::getHelperTextForPrefix($model),
-                    ],
-                ])
+                ->add(
+                    $settingKey,
+                    TextField::class,
+                    TextFieldOption::make()
+                        ->label(trans('packages/slug::slug.prefix_for', ['name' => $name]))
+                        ->value(trim(old($settingKey, $settingValue), '/'))
+                        ->helperText(SlugHelper::getHelperTextForPrefix($model))
+                        ->placeholder(trans('packages/slug::slug.settings.prefix_placeholder', ['name' => strtolower($name)]))
+                )
                 ->add($settingKey . '-model-key', 'hidden', [
                     'value' => $model,
                 ]);
         }
 
         $form
-            ->add(SlugHelper::getSettingKey('public_single_ending_url'), TextField::class, [
-                'label' => trans('packages/slug::slug.public_single_ending_url'),
-                'value' => SlugHelper::getPublicSingleEndingURL(),
-                'help_block' => [
-                    'text' => SlugHelper::getHelperText(
+            ->add(
+                SlugHelper::getSettingKey('public_single_ending_url'),
+                TextField::class,
+                TextFieldOption::make()
+                    ->label(trans('packages/slug::slug.public_single_ending_url'))
+                    ->value(SlugHelper::getPublicSingleEndingURL())
+                    ->helperText(SlugHelper::getHelperText(
                         Str::slug('your url here'),
                         SlugHelper::getPublicSingleEndingURL()
-                    ),
-                ],
-            ])
-            ->add(SlugHelper::getSettingKey('slug_turn_off_automatic_url_translation_into_latin'), OnOffField::class, [
-                'label' => trans('packages/slug::slug.settings.turn_off_automatic_url_translation_into_latin'),
-                'value' => SlugHelper::turnOffAutomaticUrlTranslationIntoLatin(),
-            ])
-            ->add('html', HtmlField::class, [
-                'html' => apply_filters(
-                    'setting_permalink_meta_boxes',
-                    null,
-                    request()->route()->parameters(),
-                ),
-            ]);
+                    ))
+                    ->placeholder('.html')
+            )
+            ->add(
+                SlugHelper::getSettingKey('slug_turn_off_automatic_url_translation_into_latin'),
+                OnOffField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('packages/slug::slug.settings.turn_off_automatic_url_translation_into_latin'))
+                    ->value(SlugHelper::turnOffAutomaticUrlTranslationIntoLatin())
+            )
+            ->add(
+                'html',
+                HtmlField::class,
+                HtmlFieldOption::make()
+                    ->content(fn () => apply_filters(
+                        'setting_permalink_meta_boxes',
+                        null,
+                        request()->route()->parameters(),
+                    ))
+            );
     }
 }

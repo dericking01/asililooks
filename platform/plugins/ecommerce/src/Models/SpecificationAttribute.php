@@ -5,6 +5,7 @@ namespace Botble\Ecommerce\Models;
 use Botble\Base\Facades\AdminHelper;
 use Botble\Base\Models\BaseModel;
 use Botble\Ecommerce\Enums\SpecificationAttributeFieldType;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class SpecificationAttribute extends BaseModel
@@ -42,5 +43,10 @@ class SpecificationAttribute extends BaseModel
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'ec_product_specification_attribute', 'attribute_id', 'product_id');
+    }
+
+    public function group(): BelongsTo
+    {
+        return $this->belongsTo(SpecificationGroup::class, 'group_id');
     }
 }

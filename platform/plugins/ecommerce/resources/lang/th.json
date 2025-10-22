@@ -1,630 +1,535 @@
 {
-    "(:count reviews)": "(:count #5'4')",
+    "(:count reviews)": "(:count รีวิว)",
     "(:count)": "(:count)",
-    "(Shipping fees not included)": "(D!H#'!H21*H)",
-    "1 Review": "1 #5'4'",
-    ":count Reviews": ":count #5'4'",
-    ":count decrease": ":count %%",
-    ":count increase": ":count @4H!6I",
-    ":count more": "-5 :count",
-    ":customer has requested return product(s)": ":customer DI-7*4I2",
-    ":number Star": ":number 2'",
-    ":number Stars": ":number 2'",
-    ":number product available": "*4I2 :number 
-4I#I-!C+I#42#",
-    ":number products available": "*4I2 :number 
-4I#I-!C+I#42#",
-    ":product is already in your compare list!": ":product -"9HC#2"2#@#5"@5"-8A%I'!",
-    ":total Product found": "*4I2 :total #2"2#",
-    ":total Products found": "*4I2 :total #2"2#",
-    ":total review(s) \":star star\" for \":product\"": ":total #5'4' \":star 2'\" *3+#1 \":product\"",
-    ":total review(s) for \":product\"": ":total #5'4'*3+#1 \":product\"",
-    "Account": "1
-5",
-    "Account Dashboard": "A
--#L1
-5",
-    "Account Menu": "@!91
-5",
-    "Account Settings": "2#1IH21
-5",
-    "Account information": "I-!9%1
-5",
-    "Action": "2#3@42#",
-    "Actions": "2#3@42#",
-    "Add Another Address": "@4H!5H-"9H-7H",
-    "Add To Cart": "@4H!%#@G",
-    "Add Wishlist": "@4H!C#2"2#B#",
-    "Add Your First Address": "@4H!5H-"9HA#-8",
-    "Add a new address": "@4H!5H-"9HC+!H",
-    "Add multiple addresses for different shipping locations or billing purposes.": "@4H!5H-"9H+%2"A+H*3+#11*H+#7-@G@45HAH21",
-    "Add new address...": "@4H!5H-"9HC+!H...",
-    "Add to Cart": "@4H!%#@G",
-    "Add to cart": "@4H!%#@G",
-    "Add your first shipping or billing address to get started.": "@4H!5H-"9H1*H+#7-@G@4A#@7H-@#4H!I",
-    "Add your review": "@4H!#5'4'-8",
-    "Added product :product successfully!": "@4H!*4I2 :product *3@#GA%I'!",
-    "Added product :product to cart successfully!": "@4H!*4I2 :product %C#@G*3@#GA%I'!",
-    "Added product :product to compare list successfully!": "@4H!*4I2 :product %C#2"2#@#5"@5"*3@#GA%I'!",
-    "Added review successfully!": "@4H!#5'4'*3@#GA%I'!",
-    "Address": "5H-"9H",
-    "Address books": "*!85H-"9H",
-    "Addresses": "5H-"9H",
-    "Admin": "9I9A%#0",
-    "After the first image": "+%12 2A#",
-    "All Categories": "+!'+!9H1I+!",
-    "All categories": "+!'+!9H1I+!",
-    "All caught up!": "-1@#A%I'!",
-    "All files": "D%L1I+!",
-    "Already have an account?": "!51
-5-"9HA%I'?",
-    "Amount": "3'@4",
-    "Applied coupon \":code\" successfully!": "C
-I9- \":code\" *3@#GA%I'!",
-    "Apply": "C
-I",
-    "Are you sure you have received your order? Please confirm that the package has been delivered to you?": "8AHC+#7-D!H'H2DI#1*4I2A%I'? #82"7"1'H21*8DI9*H68A%I'?",
-    "Are you sure you want to delete this address?": "8AHC+#7-D!H'H2I-2#%5H-"9H5I?",
-    "Available": "#I-!C+I#42#",
-    "Back to cart": "%1D5H#@G",
-    "Back to login page": "%1D+I2@I2*9H#0",
-    "Back to shopping": "%1D
-I-4I",
-    "Bank transfer amount: <strong>:amount</strong>": "3'@4B-22#: <strong>:amount</strong>",
-    "Bank transfer description: <strong>Payment for order :code</strong>": "#2"%0@-5"2#B-22#: <strong>
-3#0@4*3+#13*1H7I- :code</strong>",
-    "Barcode \":value\" has been duplicated on row #:row": "2#LBI \":value\" I31CA' #:row",
-    "Before the last image": "H- 2*8I2"",
-    "Below :toPrice": "H3'H2 :toPrice",
-    "Billing information": "I-!9%2#@#5"@G@4",
-    "Body attributes": "8*!14 body",
-    "Bottom": "I2%H2",
-    "Brands": "A#L",
-    "Browse Products": "@#5"9*4I2",
-    "Cancel": ""@%4",
-    "Cancel Order": ""@%43*1H7I-",
-    "Cancel order": ""@%43*1H7I-",
-    "Cancel return order with reason: :reason": ""@%43*1H7*4I2I'"@+8%: :reason",
-    "Cancellation Reason": "@+8%C2#"@%4",
-    "Cannot download files": "D!H*2!2#2'LB+%D%LDI",
-    "Cannot find this customer!": "D!H%9I25I!",
-    "Cannot found files": "D!HD%L",
-    "Cart": "#@G",
-    "Cart is empty": "#@G'H2@%H2",
-    "Cart item is not existed!": "*4I2C#@GD!H!5-"9H!",
-    "Cart item not found": "D!H*4I2C#@G",
-    "Cart item removed successfully": "%*4I2--2#@G*3@#GA%I'",
-    "Categories": "+!'+!9H",
-    "Change Password": "@%5H"#+1*H2",
-    "Change avatar": "@%5H"#9B#D%L",
-    "Change password": "@%5H"#+1*H2",
-    "Checkout": "
-3#0@4",
-    "Checkout error!": "I-4%2C2#
-3#0@4!",
-    "Checkout successfully!": "
-3#0@4*3@#GA%I'!",
-    "Choose Reason": "@%7-@+8%",
-    "Choose a Reason for Order Cancellation": "@%7-@+8%*3+#12#"@%43*1H7I-",
-    "Choose a reason...": "@%7-@+8%...",
-    "Choose products": "@%7-*4I2",
-    "City": "@!7-",
-    "Close": "4",
-    "Company address": "5H-"9H#4)1",
-    "Company email": "-5@!%#4)1",
-    "Company name": "
-7H-#4)1",
-    "Company tax code": "#+1* 2)5#4)1",
-    "Compare": "@#5"@5"",
-    "Completed at": "@*#G*4I@!7H-",
-    "Confirm": ""7"1",
-    "Confirm Delivery": ""7"12#1*H",
-    "Confirm password": ""7"1#+1*H2",
-    "Confirm your password": ""7"1#+1*H2-8",
-    "Continue Shopping": "
-I-4IH-",
-    "Continue shopping": "
-I-4IH-",
-    "Country": "#0@(",
-    "Coupon": "9-",
-    "Coupon code": "#+1*9-",
-    "Coupon code discount amount": "3'@4*H'%9-",
-    "Coupon code is not valid or does not apply to the products": "#+1*9-D!H9I-+#7-D!H*2!2#C
-I1*4I2DI",
-    "Coupon code: \":code\"": "#+1*9-: \":code\"",
-    "Coupon code: :code": "#+1*9-: :code",
-    "Coupon codes (:count)": "#+1*9- (:count)",
-    "Create": "*#I2",
-    "Create Address": "*#I25H-"9H",
-    "Created shipment for order": "*#I22#1*H*3+#13*1H7I-",
-    "Current password": "#+1*H2181",
-    "Customer ID must be a number!": "#+1*%9I2I-@G1'@%!",
-    "Customer Recently Viewed Products": "*4I25H%9I29%H2*8",
-    "Customer forgot password form": "A-#L!%9I2%7!#+1*H2",
-    "Customer information": "I-!9%%9I2",
-    "Customer login form": "A-#L!@I2*9H#0%9I2",
-    "Customer register form": "A-#L!*!1#*!2
-4%9I2",
-    "Customer reset password form": "A-#L!#5@G#+1*H2%9I2",
-    "Customer reviews": "#5'4'%9I2",
-    "Date": "'15H",
-    "Date Shipped": "'15H1*H",
-    "Date of birth": "'1@4",
-    "Default": "H2@#4H!I",
-    "Delete": "%",
-    "Delete Account": "%1
-5",
-    "Delete your account": "%1
-5-8",
-    "Deleted review successfully!": "%#5'4'*3@#GA%I'!",
-    "Delivery Notes": "+!2"@+82#1*H",
-    "Delivery Notes:": "+!2"@+82#1*H:",
-    "Delivery confirmed successfully": ""7"12#1*H*3@#GA%I'",
-    "Description": "3-42"",
-    "Device ID is required!": "I-#08#+1*-8#L!",
-    "Digital Product": "*4I2441%",
-    "Discount": "*H'%",
-    "Discount :amount": "*H'% :amount",
-    "Discount :percentage%": "*H'% :percentage%",
-    "Do you really want to delete the review?": "8I-2#%#5'4'5I#4+#7-D!H?",
-    "Don't have an account?": ""1D!H!51
-5?",
-    "Download all files": "2'LB+%D%L1I+!",
-    "Download invoice": "2'LB+%CAI+5I",
-    "Download product \":name\" with external links": "2'LB+%*4I2 \":name\" I'"%4L 2"-",
-    "Downloaded": "2'LB+%A%I'",
-    "Downloads": "2'LB+%",
-    "Edit": "AID",
-    "Edit Account": "AID1
-5",
-    "Edit Address #:id": "AID5H-"9H #:id",
-    "Edit your profile and account details": "AIDB#D%LA%0#2"%0@-5"1
-5-8",
-    "Either email or phone is required": "I-#08-5@!%+#7-+!2"@%B#(1L",
-    "Email": "-5@!%",
-    "Email (optional)": "-5@!% (D!H11)",
-    "Email address": "5H-"9H-5@!%",
-    "Email is required": "I-#08-5@!%",
-    "Email or Phone number": "-5@!%+#7-+!2"@%B#(1L",
-    "Email or phone": "-5@!%+#7-B#(1L",
-    "Empty cart successfully!": "%I2#@G*3@#GA%I'!",
-    "End date": "'15H*4I*8",
-    "Ensure your account is using a long, random password to stay secure.": "#'*-C+IAHC'H21
-5-8C
-I#+1*H25H"2'A%0*8H!@7H-'2!%- 1"",
-    "Enter Coupon Code": "C*H#+1*9-",
-    "Enter coupon code...": "C*H#+1*9-...",
-    "Enter the order ID": "C*H#+1*3*1H7I-",
-    "Enter your current password": "C*H#+1*H2181-8",
-    "Enter your email": "C*H-5@!%-8",
-    "Enter your phone number": "C*H+!2"@%B#(1L-8",
-    "Error": "I-4%2",
-    "Estimate Date Shipped": "'15H1*HB"#0!2",
-    "Explore and add items to get started": "*3#'A%0@4H!*4I2@7H-@#4H!I",
-    "External link downloads": "2'LB+%%4L 2"-",
-    "Failed to return the order": "D!H*2!2#73*1H7I-DI",
-    "Forgot Password": "%7!#+1*H2",
-    "Forgot password?": "%7!#+1*H2?",
-    "Free": "#5",
-    "Free shipping": "1*H#5",
-    "Free shipping for all orders": "1*H#5*3+#183*1H7I-",
-    "Free shipping to <strong>:target</strong>": "1*H#5D"1 <strong>:target</strong>",
-    "From :fromPrice to :toPrice": "2 :fromPrice 6 :toPrice",
-    "Full Name": "
-7H-@G!",
-    "Full name": "
-7H-@G!",
-    "Go To Cart": "D5H#@G",
-    "Go back home": "%1+I2A#",
-    "HTML attributes": "8*!14 HTML",
-    "Horizontal": "A'-",
-    "I agree to the :link": "	1"-!#1 :link",
-    "I agree to the Terms and Privacy Policy": "	1"-!#1I-3+A%0B"2"'2!@G*H'1'",
-    "ID number": "+!2"@%#031'",
-    "Icon image": "#9D--",
-    "Image": "#9 2",
-    "Images from customer (:count)": "#9 22%9I2 (:count)",
-    "In stock": "!5*4I2",
-    "Invalid data send": "*HI-!9%D!H9I-",
-    "Invoice detail :code": "#2"%0@-5"CAI+5I :code",
-    "Invoices": "CAI+5I",
-    "It will replace Icon Font if it is present.": "0A5H Icon Font +2!5-"9H",
-    "Items": "#2"2#",
-    "Items Count": "3'*4I2",
-    "Last update": "-1@%H2*8",
-    "Leave it empty to use the default description from Theme options -> General.": "@'I'H2D'I@7H-C
-I3-42"@#4H!I2 Theme options -> General",
-    "Left :left": "@+%7- :left",
-    "Login": "@I2*9H#0",
-    "Login to your account": "@I2*9H#01
-5-8",
-    "Logout": "--2#0",
-    "Looks like there are no reviews yet.": "9@+!7-"1D!H!5#5'4'",
-    "Lost your password? Please enter your username or email address. You will receive a link to create a new password via email.": "%7!#+1*H2? #82C*H
-7H-9IC
-I2+#7--5@!%-8 80DI#1%4L@7H-*#I2#+1*H2C+!H2-5@!%",
-    "Manage Addresses": "12#5H-"9H",
-    "Manage Invoices": "12#CAI+5I",
-    "Manage your account, view orders, and update your preferences from your personal dashboard.": "12#1
-5 93*1H7I- A%0-1@2#1IH22A
--#L*H'1'",
-    "Manage your shipping and billing addresses": "12#5H-"9H1*HA%0@#5"@G@4",
-    "Maximum order quantity is :qty, please check your cart and retry again!": "3'*1H7I-*9*87- :qty #82#'*-#@GA%0%-C+!H-5#1I!",
-    "Maximum order quantity of product :product is :quantity! ": "3'*1H7I-*9*8-*4I2 :product 7- :quantity!",
-    "Maximum quantity is :max!": "3'*9*87- :max!",
-    "Minimum order amount is :amount, you need to buy more :more to place an order!": "3'@41IH3C2#*1H7I-7- :amount 8I-7I-@4H!-5 :more @7H-*1H7I-!",
-    "Minimum order amount to use :name payment method is :amount, you need to buy more :more to place an order!": "3'@41IH3C2#C
-I'452#
-3#0@4 :name 7- :amount 8I-7I-@4H!-5 :more @7H-*1H7I-!",
-    "Minimum order amount to use Bank Transfer payment method is :amount, you need to buy more :more to place an order!": "3'@41IH3C2#C
-I'452#B-22#7- :amount 8I-7I-@4H!-5 :more @7H-*1H7I-!",
-    "Minimum order amount to use COD (Cash On Delivery) payment method is :amount, you need to buy more :more to place an order!": "3'@41IH3C2#C
-I'452#@G@4%2"2 (COD) 7- :amount 8I-7I-@4H!-5 :more @7H-*1H7I-!",
-    "Minimum order quantity is :qty, you need to buy more :more to place an order!": "3'*1H7I-1IH37- :qty 8I-7I-@4H!-5 :more @7H-*1H7I-!",
-    "Minimum order quantity of product :product is :quantity, you need to buy more :more to place an order! ": "3'*1H7I-1IH3-*4I2 :product 7- :quantity 8I-7I-@4H!-5 :more @7H-*1H7I-!",
-    "Minus": "%",
-    "Moderator's note": "+!2"@+8-9I9A%",
-    "My Profile": "B#D%L-	1",
-    "Name": "
-7H-",
-    "Name: A-Z": "
-7H-: A-Z",
-    "Name: Z-A": "
-7H-: Z-A",
-    "Need another address?": "I-2#5H-"9H-7H?",
-    "New password": "#+1*H2C+!H",
-    "Newest": "C+!H5H*8",
-    "No addresses yet!": ""1D!H!55H-"9H!",
-    "No coupon code found": "D!H#+1*9-",
-    "No digital products!": "D!H!5*4I2441%!",
-    "No files found": "D!HD%L",
-    "No order return requests yet!": ""1D!H!53-7*4I2!",
-    "No orders yet!": ""1D!H!53*1H7I-!",
-    "No products in cart": "D!H!5*4I2C#@G",
-    "No products in cart. :link!": "D!H!5*4I2C#@G :link!",
-    "No products pending review": "D!H!5*4I25H#-#5'4'",
-    "No results found!": "D!H%%1L!",
-    "No reviews yet!": ""1D!H!5#5'4'!",
-    "No reviews!": "D!H!5#5'4'!",
-    "No shipping methods were found with your provided shipping information!": "D!H'452#1*H*3+#1I-!9%2#1*H5H8#08!",
-    "Not available": "D!H#I-!C+I#42#",
-    "Not specified": "D!H#08",
-    "Note": "+!2"@+8",
-    "Notes about your order, e.g. special notes for delivery.": "+!2"@+8@5H"'13*1H7I--8 @
-H +!2"@+84@()*3+#12#1*H",
-    "Oldest": "@H25H*8",
-    "On Sale": "%#22",
-    "One or all products are not enough quantity so cannot update!": "*4I2+6H#2"2#+#7-1I+!!53'D!H@5"-6D!H*2!2#-1@DI!",
-    "Oops! Something Went Wrong.": "-8J*L! @4I-4%2",
-    "Or you can upload a new one, the old one will be replaced.": "+#7-8*2!2#-1B+%C+!H #9@H209A5H",
-    "Order": "3*1H7I-",
-    "Order Details": "#2"%0@-5"3*1H7I-",
-    "Order ID": "#+1*3*1H7I-",
-    "Order ID number": "+!2"@%#+1*3*1H7I-",
-    "Order Information": "I-!9%3*1H7I-",
-    "Order Return Request not found!": "D!H3-7*4I2!",
-    "Order Return Requests": "3-7*4I2",
-    "Order Return Requests :id": "3-7*4I2 :id",
-    "Order Tracking": "42!3*1H7I-",
-    "Order cancelled successfully": ""@%43*1H7I-*3@#GA%I'",
-    "Order code is required": "I-#08#+1*3*1H7I-",
-    "Order completed": "3*1H7I-@*#G*4I",
-    "Order detail :id": "#2"%0@-5"3*1H7I- :id",
-    "Order found successfully": "3*1H7I-*3@#GA%I'",
-    "Order information": "I-!9%3*1H7I-",
-    "Order is created from the checkout page": "3*1H7I-9*#I22+I2
-3#0@4",
-    "Order not found": "D!H3*1H7I-",
-    "Order notes": "+!2"@+83*1H7I-",
-    "Order number": "+!2"@%3*1H7I-",
-    "Order returned successfully": "7*4I2*3@#GA%I'",
-    "Order status": "*203*1H7I-",
-    "Order successfully. Order number :id": "*1H7I-*3@#G +!2"@%3*1H7I- :id",
-    "Order tracking": "42!3*1H7I-",
-    "Order tracking :code": "42!3*1H7I- :code",
-    "Order tracking is not enabled": "2#42!3*1H7I-D!HDI@4C
-I2",
-    "Order was cancelled by customer :customer": "3*1H7I-9"@%4B"%9I2 :customer",
-    "Order was cancelled by customer :customer with reason :reason": "3*1H7I-9"@%4B"%9I2 :customer I'"@+8% :reason",
-    "Order was confirmed delivery by customer :customer": "3*1H7I-DI#12#"7"12#1*HB"%9I2 :customer",
-    "Order was created from checkout page": "3*1H7I-9*#I22+I2
-3#0@4",
-    "Ordered at": "*1H7I-@!7H-",
-    "Orders": "3*1H7I-",
-    "Out of stock": "*4I2+!",
-    "Over :fromPrice": "@4 :fromPrice",
-    "Overview": " 2#'!",
-    "Password": "#+1*H2",
-    "Password confirmation": ""7"1#+1*H2",
-    "Payment Method": "'452#
-3#0@4",
-    "Payment Proof": "+%122#
-3#0@4",
-    "Payment description": "3-42"2#
-3#0@4",
-    "Payment failed! Something wrong with your payment. Please try again.": "2#
-3#0@4%I!@+%'! !51+2@5H"'12#
-3#0@4-8 #82%-C+!H-5#1I",
-    "Payment method": "'452#
-3#0@4",
-    "Payment proof upload is currently disabled.": "2#-1B+%+%122#
-3#0@494C
-I2C05I",
-    "Payment status": "*202#
-3#0@4",
-    "Permanently delete your account and all associated data.": "%1
-5A%0I-!9%5H@5H"'I-1I+!-"H22'#",
-    "Phone": "B#(1L",
-    "Phone (optional)": "B#(1L (D!H11)",
-    "Phone is required": "I-#08+!2"@%B#(1L",
-    "Phone number": "+!2"@%B#(1L",
-    "Please <a href=\":link\">login</a> to write review!": "#82 <a href=\":link\">@I2*9H#0</a> @7H-@5"#5'4'!",
-    "Please enter a valid number for quantity": "#82C*H1'@%5H9I-*3+#13'",
-    "Please enter the quantity you want to buy": "#82C*H3'5H8I-2#7I-",
-    "Please fill out all shipping information to view available shipping methods!": "#82#-I-!9%2#1*H1I+!@7H-9'452#1*H5H#I-!C
-I2!",
-    "Please provide a reason for the cancellation.": "#82#08@+8%C2#"@%4",
-    "Please purchase the product for a review!": "#827I-*4I2@7H-#5'4'!",
-    "Please select a product to add to cart": "#82@%7-*4I2@7H-@4H!%#@G",
-    "Please select at least 1 product to return!": "#82@%7-*4I2-"H2I-" 1 #2"2#@7H-7!",
-    "Please select attributes": "#82@%7-8*!14",
-    "Please select product options": "#82@%7-1'@%7-*4I2",
-    "Please select product options!": "#82@%7-1'@%7-*4I2!",
-    "Plus": "'",
-    "Price": "#22",
-    "Price: high to low": "#22: *9DH3",
-    "Price: low to high": "#22: H3D*9",
-    "Print invoice": "4!LCAI+5I",
-    "Proceed to Checkout": "3@42#
-3#0@4",
-    "Processing. Please wait...": "3%13@42# #82#-...",
-    "Product": "*4I2",
-    "Product :product is out of stock!": "*4I2 :product +!A%I'!",
-    "Product :product limited quantity allowed is :quantity": "*4I2 :product !53'315H-827- :quantity",
-    "Product FAQs": "32!5HH-"@5H"'1*4I2",
-    "Product ID is required": "I-#08#+1**4I2",
-    "Product Reviews": "#5'4'*4I2",
-    "Product categories": "+!'+!9H*4I2",
-    "Product gallery image style": "#9A#9 2A%@%-#5H*4I2",
-    "Product gallery video position": "3A+H'55B-A%@%-#5H*4I2",
-    "Product is not published yet.": "*4I2"1D!HDI@"A#H",
-    "Product is out of stock": "*4I2+!",
-    "Product name \":name\" does not exists": "
-7H-*4I2 \":name\" D!H!5-"9H",
-    "Product not found": "D!H*4I2",
-    "Product not found in compare list": "D!H*4I2C#2"2#@#5"@5"",
-    "Product not found in wishlist": "D!H*4I2C#2"2#B#",
-    "Product(s)": "*4I2",
-    "Products": "*4I2",
-    "Products you have reviewed": "*4I25H8DI#5'4'A%I'",
-    "Profile": "B#D%L",
-    "Profile Information": "I-!9%B#D%L",
-    "Promotion": "B#B!
-1H",
-    "Promotion discount amount": "3'*H'%B#B!
-1H",
-    "Quantity": "3'",
-    "Quantity is required!": "I-#083'!",
-    "Quantity must be a number!": "3'I-@G1'@%!",
-    "Rate this product:": "C+I0A*4I25I:",
-    "Rating": "0A",
-    "Rating: high to low": "0A: *9DH3",
-    "Rating: low to high": "0A: H3D*9",
-    "Ready to start shopping?": "#I-!@#4H!
-I-4I+#7-"1?",
-    "Reason": "@+8%",
-    "Reason (optional)": "@+8% (D!H11)",
-    "Refund amount": "3'@47",
-    "Register": "*!1#*!2
-4",
-    "Register an account": "*!1#1
-5",
-    "Register an account with above information?": "*!1#1
-5I'"I-!9%I2I?",
-    "Register now": "*!1#-5I",
-    "Registered successfully!": "*!1#*!2
-4*3@#GA%I'!",
-    "Related products": "*4I25H@5H"'I-",
-    "Remember me": "3	1",
-    "Remove": "%",
-    "Removed coupon :code successfully!": "%9- :code *3@#GA%I'!",
-    "Removed coupon code successfully!": "%#+1*9-*3@#GA%I'!",
-    "Removed item from cart successfully!": "%*4I2--2#@G*3@#GA%I'!",
-    "Removed product :product from compare list successfully!": "%*4I2 :product --2#2"2#@#5"@5"*3@#GA%I'!",
-    "Removed product :product from wishlist successfully!": "%*4I2 :product --2#2"2#B#*3@#GA%I'!",
-    "Request Return Product(s)": "-7*4I2",
-    "Request Return Product(s) In Order :id": "-7*4I2C3*1H7I- :id",
-    "Request number": "+!2"@%3-",
-    "Request return order with reason: :reason": "-73*1H7I-I'"@+8%: :reason",
-    "Requires company invoice (Please fill in your company information to receive the invoice)?": "I-2#C31 2)5 (#82#-I-!9%#4)1@7H-#1C31)?",
-    "Reset Password": "#5@G#+1*H2",
-    "Return Product(s)": "7*4I2",
-    "Return Reason": "@+8%C2#7",
-    "Return items": "*4I25H7",
-    "Review": "#5'4'",
-    "Review product \":product\"": "#5'4'*4I2 \":product\"",
-    "Reviews": "#5'4'",
-    "Reviews :number": "#5'4' :number",
-    "SKU": "#+1**4I2",
-    "SKU:": "#+1**4I2:",
-    "Same as shipping information": "@+!7-1I-!9%2#1*H",
-    "Same fee :amount": "H2##!@5"!@5"'1 :amount",
-    "Search": "I+2",
-    "Search for Products...": "I+2*4I2...",
-    "Search result for \":query\"": "%2#I+2*3+#1 \":query\"",
-    "Search...": "I+2...",
-    "Select :name": "@%7- :name",
-    "Select Options": "@%7-1'@%7-",
-    "Select an option": "@%7-1'@%7-",
-    "Select available addresses": "@%7-5H-"9H5H!5-"9H",
-    "Select billing address...": "@%7-5H-"9H@#5"@G@4...",
-    "Select city...": "@%7-@!7-...",
-    "Select country...": "@%7-#0@(...",
-    "Select file": "@%7-D%L",
-    "Select state...": "@%7-1+'1...",
-    "Send Password Reset Link": "*H%4L#5@G#+1*H2",
-    "Share your experience with these products": "AH1#0*2#L-81*4I2@+%H25I",
-    "Share:": "A
-#L:",
-    "Shipment status": "*202#1*H",
-    "Shipping Address": "5H-"9H1*H",
-    "Shipping Company Name": "
-7H-#4)1*H",
-    "Shipping Information": "I-!9%2#1*H",
-    "Shipping Status": "*202#1*H",
-    "Shipping fee": "H21*H",
-    "Shipping information": "I-!9%2#1*H",
-    "Shipping method": "'452#1*H",
-    "Shopping Cart": "#@G*4I2",
-    "Show only discounted products": "A*@	20*4I25H%#22",
-    "Sold by": "3+H2"B"",
-    "Something went wrong. Please try again": "@4I-4%2 #82%-C+!H-5#1I",
-    "Sorry, you can only order a maximum of :quantity units of :product at a time. Please adjust the quantity and try again.": "-- 1" 8*2!2#*1H7I-*4I2 :product DI*9*8 :quantity +H'"H-#1I #82#13'A%0%-C+!H-5#1I",
-    "Sorry, you cannot buy more than 99,999 items at once": "-- 1" 8D!H*2!2#7I-!2'H2 99,999 #2"2#C#1I@5"'",
-    "Specification": "*@",
-    "Start Shopping": "@#4H!
-I-4I",
-    "Start shopping now": "@#4H!
-I-4I-5I",
-    "State": "1+'1",
-    "Status": "*20",
-    "Submit": "*H",
-    "Submit Return Request": "*H3-7*4I2",
-    "Submit Review": "*H#5'4'",
-    "Subtotal": ""-#'!"H-"",
-    "Success": "*3@#G",
-    "Tags": "AG",
-    "Tax": " 2)5",
-    "Tax ID:": "@%5H9I@*5" 2)5:",
-    "Tax information": "I-!9% 2)5",
-    "Tell us why you want to delete your account...": "-@#2'H23D!8I-2#%1
-5...",
-    "Term and Policy": "I-3+A%0B"2"",
-    "Terms and Privacy Policy": "I-3+A%0B"2"'2!@G*H'1'",
-    "Thank you for purchasing our products!": "-85H7I-*4I2-@#2!",
-    "The given email address has not been confirmed. <a href=\":resend_link\">Resend confirmation link.</a>": "5H-"9H-5@!%5H#08"1D!HDI#12#"7"1 <a href=\":resend_link\">*H%4L"7"1-5#1I</a>",
-    "The order could not be found. Please try again or contact us if you need assistance.": "D!H3*1H7I- #82%-C+!H-5#1I+#7-4H-@#2+2I-2#'2!
-H'"@+%7-",
-    "The order is currently being processed. For expedited processing, kindly upload a copy of your payment proof:": "3*1H7I-3%13@42#-"9H @7H-2#3@42#5H#'@#G' #82-1B+%+%122#
-3#0@4:",
-    "This action cannot be undone": "2##035ID!H*2!2#"I-%1DI",
-    "This action will permanently delete your account and all associated data and is irreversible. Please be sure before proceeding.": "2##035I0%1
-5A%0I-!9%5H@5H"'I-1I+!-"H22'#A%0D!H*2!2#"I-%1DI #82#'*-C+IAHCH-3@42#",
-    "This product is not available.": "*4I25ID!H#I-!C+I#42#",
-    "This product is out of stock or not exists!": "*4I25I+!A%I'+#7-D!H!5-"9H!",
-    "Time": "@'%2",
-    "Top": "I2",
-    "Total": ""-#'!",
-    "Total Amount": "3'@4#'!",
-    "Track": "42!",
-    "Track your recent orders and order history": "42!3*1H7I-%H2*8A%0#0'143*1H7I-",
-    "Tracking ID": "#+1*42!",
-    "Tracking Link": "%4L42!",
-    "Unable to download files": "D!H*2!2#2'LB+%D%LDI",
-    "Update": "-1@",
-    "Update cart successfully!": "-1@#@G*3@#GA%I'!",
-    "Update profile successfully!": "-1@B#D%L*3@#GA%I'!",
-    "Update return order status to: :status": "-1@*203*1H7@G: :status",
-    "Update your account profile information and email address.": "-1@I-!9%B#D%L1
-5A%05H-"9H-5@!%-8",
-    "Update your shipping and billing addresses": "-1@5H-"9H1*HA%0@#5"@G@4",
-    "Updated avatar successfully!": "-1@#9B#D%L*3@#GA%I'!",
-    "Upload": "-1B+%",
-    "Upload photos": "-1B+%#9 2",
-    "Uploaded proof successfully": "-1B+%+%12*3@#GA%I'",
-    "Use this address as default.": "C
-I5H-"9H5I@GH2@#4H!I",
-    "Using coupon code": "C
-I#+1*9-",
-    "Vendor:": "9I2":",
-    "Vertical": "A'1I",
-    "View": "9",
-    "View Details": "9#2"%0@-5"",
-    "View Orders": "93*1H7I-",
-    "View Receipt:": "9C@*#G:",
-    "View all results": "9%%1L1I+!",
-    "View full details": "9#2"%0@-5"1I+!",
-    "Waiting for approval": "#-2#-8!14",
-    "Waiting for your review": "#-#5'4'-8",
-    "Warning": "3@7-",
-    "Warning: This product is on backorder and may take longer to ship.": "3@7-: *4I25I-"9HC*20*1H-A%0-2C
-I@'%21*H2'H24",
-    "We have sent you an email to verify your email. Please check and confirm your email address!": "@#2DI*H-5@!%"7"1C+I8A%I' #82#'*-A%0"7"15H-"9H-5@!%-8!",
-    "We sent you another confirmation email. You should receive it shortly.": "@#2*H-5@!%"7"1-5	1C+I8A%I' 80DI#1CD!H
-I2",
-    "We will send you an email to confirm your account deletion. Once you confirm, your account will be deleted permanently and all your data will be lost.": "@#20*H-5@!%@7H-"7"12#%1
-5 @!7H-8"7"1 1
-509%-"H22'#A%0I-!9%1I+!0+2"D",
-    "Welcome back, <strong>:name</strong>!": ""45I-#1%1!2 <strong>:name</strong>!",
-    "Wishlist": "#2"2#B#",
-    "Write your review": "@5"#5'4'-8",
-    "You can now download it by clicking the links below": "8*2!2#2'LB+%DIB"%4%4LI2%H2",
-    "You can upload the following file types: jpg, jpeg, png, pdf and max file size is 2MB.": "8*2!2#-1B+%D%L#0@ : jpg, jpeg, png, pdf A%02D%L*9*8 2MB",
-    "You can upload up to :total photos, each photo maximum size is :max MB.": "8*2!2#-1B+%DI*9*8 :total #9 AH%0#92*9*8 :max MB",
-    "You can upload up to :total photos, each photo maximum size is :max kilobytes": "8*2!2#-1B+%DI*9*8 :total #9 AH%0#92*9*8 :max 4B%DL",
-    "You cannot cancel this order": "8D!H*2!2#"@%43*1H7I-5IDI",
-    "You cannot confirm delivery for this order": "8D!H*2!2#"7"12#1*H*3+#13*1H7I-5IDI",
-    "You cannot return this order": "8D!H*2!2#73*1H7I-5IDI",
-    "You do not have permission to delete this review.": "8D!H!5*44L%#5'4'5I",
-    "You have a coupon code?": "8!5#+1*9-+#7-D!H?",
-    "You have not placed any order return requests yet.": "8"1D!HDI*H3-7*4I2C F",
-    "You have not placed any orders yet.": "8"1D!HDI*1H7I-C F",
-    "You have not purchased any digital products yet.": "8"1D!HDI7I-*4I2441%C F",
-    "You have recovered from previous orders!": "8DI9I723*1H7I-H-+I2A%I'!",
-    "You have reviewed this product already!": "8DI#5'4'*4I25IA%I'!",
-    "You have uploaded a copy of your payment proof.": "8DI-1B+%+%122#
-3#0@4A%I'",
-    "You haven't placed any orders yet. Browse our products and find something you love!": "8"1D!HDI*1H7I-C F @#5"9*4I2-@#2A%0+2*4H5H8
--!",
-    "You must agree to the terms and conditions and privacy policy.": "8I-"-!#1I-3+A%0@7H-DA%0B"2"'2!@G*H'1'",
-    "You must buy at least 1 item": "8I-7I--"H2I-" 1 #2"2#",
-    "You need to add :quantity more items to place your order. ": "8I-@4H!-5 :quantity #2"2#@7H-*1H7I-",
-    "You successfully confirmed your email address.": "8"7"15H-"9H-5@!%@#5"#I-"A%I'",
-    "Your Addresses": "5H-"9H-8",
-    "Your Reviews": "#5'4'-8",
-    "Your account has been locked, please contact the administrator.": "1
-5-89%G- #824H-9I9A%#0",
-    "Your cart is empty": "#@G-8'H2@%H2",
-    "Your compare list is empty": "#2"2#@#5"@5"-8'H2@%H2",
-    "Your email": "-5@!%-8",
-    "Your email address will not be published. Required fields are marked *": "5H-"9H-5@!%-80D!H9@"A#H 
-H-5H3@G!5@#7H-+!2" *",
-    "Your full name": "
-7H-@G!-8",
-    "Your order is successfully placed": "3*1H7I--8*3@#GA%I'",
-    "Your personal data will be used to support your experience throughout this website, to manage access to your account.": "I-!9%*H'8%-809C
-I@7H-*1*8#0*2#L-8@'GDL5I @7H-12#2#@I261
-5-8",
-    "Your rating:": "0A-8:",
-    "Your shopping cart has digital product(s), so you need to sign in to continue!": "#@G-8!5*4I2441% 8I-@I2*9H#0@7H-3@42#H-!",
-    "Your wishlist list is empty": "#2"2#B#-8'H2@%H2",
-    "Zip code": "#+1*D#)5"L",
-    "Zipcode": "#+1*D#)5"L",
-    "billion": "1%I2",
-    "centimeters": "@4@!#",
-    "for all orders": "*3+#183*1H7I-",
-    "for all product in collection :collections": "*3+#1*4I21I+!C-%@%
-1 :collections",
-    "for all products in category :categories": "*3+#1*4I21I+!C+!'+!9H :categories",
-    "for all products in collection :collections": "*3+#1*4I21I+!C-%@%
-1 :collections",
-    "for all products in order": "*3+#1*4I21I+!C3*1H7I-",
-    "for customer(s) :customers": "*3+#1%9I2 :customers",
-    "for order with amount from :price": "*3+#13*1H7I-5H!53'@42 :price",
-    "for product variant(s) :variants": "*3+#11'@%7-*4I2 :variants",
-    "for product(s) :products": "*3+#1*4I2 :products",
-    "grams": "#1!",
-    "item(s)": "*4I2",
-    "kilograms": "4B%#1!",
-    "limited to use coupon code per customer. This coupon can only be used once per customer!": "312#C
-I#+1*9-H-%9I2 9-5I*2!2#C
-IDI@5"#1I@5"'H-%9I2!",
-    "meters": "@!#",
-    "million": "%I2",
-    "times": "#1I",
-    "when shipping fee less than or equal :amount": "@!7H-H21*HI-"'H2+#7-@H21 :amount",
-    " Purchased :time": " 7I-A%I' :time",
-    "By placing an order, you agree to our Terms of Service and acknowledge that you have read our Privacy Policy. Your payment will be processed securely according to our payment provider's privacy policy.": "B"2#*1H7I- 8"-!#1I-3+2#C+I#42#A%0#1#2'H28DI-H2B"2"'2!@G*H'1'-@#2A%I' 2#
-3#0@4-80DI#12##0!'%%-"H2%- 1"2!B"2"'2!@G*H'1'-9IC+I#42#2#
-3#0@4-@#2"
+    "(Shipping fees not included)": "(ยังไม่รวมค่าจัดส่ง)",
+    "1 Review": "1 รีวิว",
+    ":count Reviews": ":count รีวิว",
+    ":count decrease": "ลด :count",
+    ":count increase": "เพิ่ม :count",
+    ":count more": "อีก :count",
+    ":customer has requested return product(s)": ":customer ได้ขอคืนสินค้า",
+    ":number Star": ":number ดาว",
+    ":number Stars": ":number ดาว",
+    ":number product available": ":number สินค้าพร้อมจำหน่าย",
+    ":number products available": ":number สินค้าพร้อมจำหน่าย",
+    ":product is already in your compare list!": ":product อยู่ในรายการเปรียบเทียบแล้ว!",
+    ":total Product found": "พบสินค้า :total รายการ",
+    ":total Products found": "พบสินค้า :total รายการ",
+    ":total review(s) \":star star\" for \":product\"": ":total รีวิว \":star ดาว\" สำหรับ \":product\"",
+    ":total review(s) for \":product\"": ":total รีวิวสำหรับ \":product\"",
+    "Account": "บัญชี",
+    "Account Dashboard": "แดชบอร์ดบัญชี",
+    "Account Menu": "เมนูบัญชี",
+    "Account Settings": "ตั้งค่าบัญชี",
+    "Account information": "ข้อมูลบัญชี",
+    "Action": "การดำเนินการ",
+    "Actions": "การดำเนินการ",
+    "Add Another Address": "เพิ่มที่อยู่อื่น",
+    "Add To Cart": "หยิบใส่ตะกร้า",
+    "Add Wishlist": "เพิ่มในรายการโปรด",
+    "Add Your First Address": "เพิ่มที่อยู่แรกของคุณ",
+    "Add a new address": "เพิ่มที่อยู่ใหม่",
+    "Add multiple addresses for different shipping locations or billing purposes.": "เพิ่มที่อยู่หลายแห่งสำหรับสถานที่จัดส่งหรือการเรียกเก็บเงินที่แตกต่างกัน",
+    "Add new address...": "เพิ่มที่อยู่ใหม่...",
+    "Add to Cart": "หยิบใส่ตะกร้า",
+    "Add to cart": "หยิบใส่ตะกร้า",
+    "Add your first shipping or billing address to get started.": "เพิ่มที่อยู่จัดส่งหรือที่อยู่เรียกเก็บเงินแรกเพื่อเริ่มต้น",
+    "Add your review": "เพิ่มรีวิวของคุณ",
+    "Added product :product successfully!": "เพิ่มสินค้า :product สำเร็จ!",
+    "Added product :product to cart successfully!": "เพิ่มสินค้า :product ลงตะกร้าสำเร็จ!",
+    "Added product :product to compare list successfully!": "เพิ่มสินค้า :product ในรายการเปรียบเทียบสำเร็จ!",
+    "Added review successfully!": "เพิ่มรีวิวสำเร็จ!",
+    "Address": "ที่อยู่",
+    "Address books": "สมุดที่อยู่",
+    "Addresses": "ที่อยู่",
+    "Admin": "ผู้ดูแลระบบ",
+    "After the first image": "หลังรูปแรก",
+    "All Categories": "หมวดหมู่ทั้งหมด",
+    "All categories": "หมวดหมู่ทั้งหมด",
+    "All caught up!": "เสร็จหมดแล้ว!",
+    "All files": "ไฟล์ทั้งหมด",
+    "Already have an account?": "มีบัญชีอยู่แล้ว?",
+    "Amount": "จำนวนเงิน",
+    "Applied coupon \":code\" successfully!": "ใช้คูปอง \":code\" สำเร็จ!",
+    "Apply": "ใช้",
+    "Are you sure you have received your order? Please confirm that the package has been delivered to you?": "คุณแน่ใจหรือไม่ว่าได้รับคำสั่งซื้อแล้ว? กรุณายืนยันว่าพัสดุได้จัดส่งถึงคุณแล้ว?",
+    "Are you sure you want to delete this address?": "คุณแน่ใจหรือไม่ว่าต้องการลบที่อยู่นี้?",
+    "Available": "พร้อมจำหน่าย",
+    "Back to cart": "กลับไปยังตะกร้า",
+    "Back to login page": "กลับไปยังหน้าเข้าสู่ระบบ",
+    "Back to shopping": "กลับไปช้อปปิ้ง",
+    "Bank transfer amount: <strong>:amount</strong>": "จำนวนเงินโอน: <strong>:amount</strong>",
+    "Bank transfer description: <strong>Payment for order :code</strong>": "รายละเอียดการโอน: <strong>ชำระเงินสำหรับคำสั่งซื้อ :code</strong>",
+    "Barcode \":value\" has been duplicated on row #:row": "บาร์โค้ด \":value\" ซ้ำกันในแถว #:row",
+    "Before the last image": "ก่อนรูปสุดท้าย",
+    "Below :toPrice": "ต่ำกว่า :toPrice",
+    "Billing information": "ข้อมูลการเรียกเก็บเงิน",
+    "Body attributes": "แอตทริบิวต์ body",
+    "Bottom": "ล่าง",
+    "Brands": "แบรนด์",
+    "Browse Products": "เรียกดูสินค้า",
+    "Cancel": "ยกเลิก",
+    "Cancel Order": "ยกเลิกคำสั่งซื้อ",
+    "Cancel order": "ยกเลิกคำสั่งซื้อ",
+    "Cancel return order with reason: :reason": "ยกเลิกการคืนสินค้าด้วยเหตุผล: :reason",
+    "Cancellation Reason": "เหตุผลในการยกเลิก",
+    "Cannot download files": "ไม่สามารถดาวน์โหลดไฟล์",
+    "Cannot find this customer!": "ไม่พบลูกค้ารายนี้!",
+    "Cannot found files": "ไม่พบไฟล์",
+    "Cart": "ตะกร้า",
+    "Cart is empty": "ตะกร้าว่างเปล่า",
+    "Cart item is not existed!": "ไม่มีสินค้าในตะกร้า!",
+    "Cart item not found": "ไม่พบสินค้าในตะกร้า",
+    "Cart item removed successfully": "ลบสินค้าออกจากตะกร้าสำเร็จ",
+    "Categories": "หมวดหมู่",
+    "Change Password": "เปลี่ยนรหัสผ่าน",
+    "Change avatar": "เปลี่ยนรูปโปรไฟล์",
+    "Change password": "เปลี่ยนรหัสผ่าน",
+    "Checkout": "ชำระเงิน",
+    "Checkout error!": "เกิดข้อผิดพลาดในการชำระเงิน!",
+    "Checkout successfully!": "ชำระเงินสำเร็จ!",
+    "Choose Reason": "เลือกเหตุผล",
+    "Choose a Reason for Order Cancellation": "เลือกเหตุผลในการยกเลิกคำสั่งซื้อ",
+    "Choose a reason...": "เลือกเหตุผล...",
+    "Choose products": "เลือกสินค้า",
+    "City": "เมือง",
+    "Close": "ปิด",
+    "Company address": "ที่อยู่บริษัท",
+    "Company email": "อีเมลบริษัท",
+    "Company name": "ชื่อบริษัท",
+    "Company tax code": "เลขประจำตัวผู้เสียภาษีบริษัท",
+    "Compare": "เปรียบเทียบ",
+    "Completed at": "เสร็จสิ้นเมื่อ",
+    "Confirm": "ยืนยัน",
+    "Confirm Delivery": "ยืนยันการรับสินค้า",
+    "Confirm password": "ยืนยันรหัสผ่าน",
+    "Confirm your password": "ยืนยันรหัสผ่านของคุณ",
+    "Continue Shopping": "ช้อปปิ้งต่อ",
+    "Continue shopping": "ช้อปปิ้งต่อ",
+    "Country": "ประเทศ",
+    "Coupon": "คูปอง",
+    "Coupon code": "รหัสคูปอง",
+    "Coupon code discount amount": "ส่วนลดจากรหัสคูปอง",
+    "Coupon code is not valid or does not apply to the products": "รหัสคูปองไม่ถูกต้องหรือไม่สามารถใช้กับสินค้านี้",
+    "Coupon code: \":code\"": "รหัสคูปอง: \":code\"",
+    "Coupon code: :code": "รหัสคูปอง: :code",
+    "Coupon codes (:count)": "รหัสคูปอง (:count)",
+    "Create": "สร้าง",
+    "Create Address": "สร้างที่อยู่",
+    "Created shipment for order": "สร้างการจัดส่งสำหรับคำสั่งซื้อ",
+    "Current password": "รหัสผ่านปัจจุบัน",
+    "Customer ID must be a number!": "รหัสลูกค้าต้องเป็นตัวเลข!",
+    "Customer Recently Viewed Products": "สินค้าที่ลูกค้าดูล่าสุด",
+    "Customer forgot password form": "แบบฟอร์มลืมรหัสผ่านของลูกค้า",
+    "Customer information": "ข้อมูลลูกค้า",
+    "Customer login form": "แบบฟอร์มเข้าสู่ระบบของลูกค้า",
+    "Customer register form": "แบบฟอร์มลงทะเบียนของลูกค้า",
+    "Customer reset password form": "แบบฟอร์มรีเซ็ตรหัสผ่านของลูกค้า",
+    "Customer reviews": "รีวิวของลูกค้า",
+    "Date": "วันที่",
+    "Date Shipped": "วันที่จัดส่ง",
+    "Date of birth": "วันเกิด",
+    "Default": "ค่าเริ่มต้น",
+    "Delete": "ลบ",
+    "Delete Account": "ลบบัญชี",
+    "Delete your account": "ลบบัญชีของคุณ",
+    "Deleted review successfully!": "ลบรีวิวสำเร็จ!",
+    "Delivery Notes": "หมายเหตุการจัดส่ง",
+    "Delivery Notes:": "หมายเหตุการจัดส่ง:",
+    "Delivery confirmed successfully": "ยืนยันการรับสินค้าสำเร็จ",
+    "Description": "คำอธิบาย",
+    "Device ID is required!": "ต้องระบุรหัสอุปกรณ์!",
+    "Digital Product": "สินค้าดิจิทัล",
+    "Discount": "ส่วนลด",
+    "Discount :amount": "ส่วนลด :amount",
+    "Discount :percentage%": "ส่วนลด :percentage%",
+    "Do you really want to delete the review?": "คุณต้องการลบรีวิวนี้จริงหรือไม่?",
+    "Don't have an account?": "ยังไม่มีบัญชี?",
+    "Download all files": "ดาวน์โหลดไฟล์ทั้งหมด",
+    "Download invoice": "ดาวน์โหลดใบแจ้งหนี้",
+    "Download product \":name\" with external links": "ดาวน์โหลดสินค้า \":name\" ด้วยลิงก์ภายนอก",
+    "Downloaded": "ดาวน์โหลดแล้ว",
+    "Downloads": "ดาวน์โหลด",
+    "Edit": "แก้ไข",
+    "Edit Account": "แก้ไขบัญชี",
+    "Edit Address #:id": "แก้ไขที่อยู่ #:id",
+    "Edit your profile and account details": "แก้ไขโปรไฟล์และรายละเอียดบัญชีของคุณ",
+    "Either email or phone is required": "ต้องระบุอีเมลหรือเบอร์โทรศัพท์",
+    "Email": "อีเมล",
+    "Email (optional)": "อีเมล (ไม่บังคับ)",
+    "Email address": "ที่อยู่อีเมล",
+    "Email is required": "ต้องระบุอีเมล",
+    "Email or Phone number": "อีเมลหรือเบอร์โทรศัพท์",
+    "Email or phone": "อีเมลหรือเบอร์โทร",
+    "Empty cart successfully!": "ล้างตะกร้าสำเร็จ!",
+    "End date": "วันสิ้นสุด",
+    "Ensure your account is using a long, random password to stay secure.": "ตรวจสอบให้แน่ใจว่าบัญชีของคุณใช้รหัสผ่านที่ยาวและสุ่มเพื่อความปลอดภัย",
+    "Enter Coupon Code": "ใส่รหัสคูปอง",
+    "Enter coupon code...": "ใส่รหัสคูปอง...",
+    "Enter the order ID": "ใส่หมายเลขคำสั่งซื้อ",
+    "Enter your current password": "ใส่รหัสผ่านปัจจุบันของคุณ",
+    "Enter your email": "ใส่อีเมลของคุณ",
+    "Enter your phone number": "ใส่เบอร์โทรศัพท์ของคุณ",
+    "Error": "ข้อผิดพลาด",
+    "Estimate Date Shipped": "วันที่จัดส่งโดยประมาณ",
+    "Explore and add items to get started": "สำรวจและเพิ่มสินค้าเพื่อเริ่มต้น",
+    "External link downloads": "ดาวน์โหลดลิงก์ภายนอก",
+    "Failed to return the order": "คืนสินค้าไม่สำเร็จ",
+    "Forgot Password": "ลืมรหัสผ่าน",
+    "Forgot password?": "ลืมรหัสผ่าน?",
+    "Free": "ฟรี",
+    "Free shipping": "จัดส่งฟรี",
+    "Free shipping for all orders": "จัดส่งฟรีสำหรับทุกคำสั่งซื้อ",
+    "Free shipping to <strong>:target</strong>": "จัดส่งฟรีไปยัง <strong>:target</strong>",
+    "From :fromPrice to :toPrice": "จาก :fromPrice ถึง :toPrice",
+    "Full Name": "ชื่อ-นามสกุล",
+    "Full name": "ชื่อ-นามสกุล",
+    "Go To Cart": "ไปที่ตะกร้า",
+    "Go back home": "กลับสู่หน้าหลัก",
+    "HTML attributes": "แอตทริบิวต์ HTML",
+    "Horizontal": "แนวนอน",
+    "I agree to the :link": "ฉันยอมรับ :link",
+    "I agree to the Terms and Privacy Policy": "ฉันยอมรับข้อกำหนดและนโยบายความเป็นส่วนตัว",
+    "ID number": "หมายเลขประจำตัว",
+    "Icon image": "ไอคอนรูปภาพ",
+    "Image": "รูปภาพ",
+    "Images from customer (:count)": "รูปภาพจากลูกค้า (:count)",
+    "In stock": "มีสินค้า",
+    "Invalid data send": "ข้อมูลที่ส่งไม่ถูกต้อง",
+    "Invoice detail :code": "รายละเอียดใบแจ้งหนี้ :code",
+    "Invoices": "ใบแจ้งหนี้",
+    "It will replace Icon Font if it is present.": "จะแทนที่ Icon Font หากมีอยู่",
+    "Items": "รายการ",
+    "Items Count": "จำนวนรายการ",
+    "Last update": "อัปเดตล่าสุด",
+    "Leave it empty to use the default description from Theme options -> General.": "เว้นว่างไว้เพื่อใช้คำอธิบายเริ่มต้นจาก Theme options -> General",
+    "Left :left": "เหลือ :left",
+    "Login": "เข้าสู่ระบบ",
+    "Login to your account": "เข้าสู่ระบบบัญชีของคุณ",
+    "Logout": "ออกจากระบบ",
+    "Looks like there are no reviews yet.": "ดูเหมือนยังไม่มีรีวิว",
+    "Lost your password? Please enter your username or email address. You will receive a link to create a new password via email.": "ลืมรหัสผ่าน? กรุณาใส่ชื่อผู้ใช้หรืออีเมล คุณจะได้รับลิงก์สำหรับสร้างรหัสผ่านใหม่ทางอีเมล",
+    "Manage Addresses": "จัดการที่อยู่",
+    "Manage Invoices": "จัดการใบแจ้งหนี้",
+    "Manage your account, view orders, and update your preferences from your personal dashboard.": "จัดการบัญชี ดูคำสั่งซื้อ และอัปเดตการตั้งค่าจากแดชบอร์ดส่วนตัว",
+    "Manage your shipping and billing addresses": "จัดการที่อยู่จัดส่งและที่อยู่เรียกเก็บเงิน",
+    "Maximum order quantity is :qty, please check your cart and retry again!": "จำนวนสูงสุดต่อคำสั่งซื้อคือ :qty กรุณาตรวจสอบตะกร้าและลองใหม่!",
+    "Maximum order quantity of product :product is :quantity! ": "จำนวนสูงสุดของสินค้า :product คือ :quantity! ",
+    "Maximum quantity is :max!": "จำนวนสูงสุดคือ :max!",
+    "Minimum order amount is :amount, you need to buy more :more to place an order!": "ยอดสั่งซื้อขั้นต่ำคือ :amount คุณต้องซื้อเพิ่มอีก :more เพื่อสั่งซื้อ!",
+    "Minimum order amount to use :name payment method is :amount, you need to buy more :more to place an order!": "ยอดสั่งซื้อขั้นต่ำสำหรับวิธีชำระเงิน :name คือ :amount คุณต้องซื้อเพิ่มอีก :more เพื่อสั่งซื้อ!",
+    "Minimum order amount to use Bank Transfer payment method is :amount, you need to buy more :more to place an order!": "ยอดสั่งซื้อขั้นต่ำสำหรับการโอนเงินผ่านธนาคารคือ :amount คุณต้องซื้อเพิ่มอีก :more เพื่อสั่งซื้อ!",
+    "Minimum order amount to use COD (Cash On Delivery) payment method is :amount, you need to buy more :more to place an order!": "ยอดสั่งซื้อขั้นต่ำสำหรับการชำระเงินปลายทาง (COD) คือ :amount คุณต้องซื้อเพิ่มอีก :more เพื่อสั่งซื้อ!",
+    "Minimum order quantity is :qty, you need to buy more :more to place an order!": "จำนวนสั่งซื้อขั้นต่ำคือ :qty คุณต้องซื้อเพิ่มอีก :more เพื่อสั่งซื้อ!",
+    "Minimum order quantity of product :product is :quantity, you need to buy more :more to place an order! ": "จำนวนสั่งซื้อขั้นต่ำของสินค้า :product คือ :quantity คุณต้องซื้อเพิ่มอีก :more เพื่อสั่งซื้อ! ",
+    "Minus": "ลบ",
+    "Moderator's note": "หมายเหตุจากผู้ดูแล",
+    "My Profile": "โปรไฟล์ของฉัน",
+    "Name": "ชื่อ",
+    "Name: A-Z": "ชื่อ: A-Z",
+    "Name: Z-A": "ชื่อ: Z-A",
+    "Need another address?": "ต้องการที่อยู่อื่นหรือไม่?",
+    "New password": "รหัสผ่านใหม่",
+    "Newest": "ใหม่ล่าสุด",
+    "No addresses yet!": "ยังไม่มีที่อยู่!",
+    "No coupon code found": "ไม่พบรหัสคูปอง",
+    "No digital products!": "ไม่มีสินค้าดิจิทัล!",
+    "No files found": "ไม่พบไฟล์",
+    "No order return requests yet!": "ยังไม่มีคำขอคืนสินค้า!",
+    "No orders yet!": "ยังไม่มีคำสั่งซื้อ!",
+    "No products in cart": "ไม่มีสินค้าในตะกร้า",
+    "No products in cart. :link!": "ไม่มีสินค้าในตะกร้า :link!",
+    "No products pending review": "ไม่มีสินค้ารอการรีวิว",
+    "No results found!": "ไม่พบผลลัพธ์!",
+    "No reviews yet!": "ยังไม่มีรีวิว!",
+    "No reviews!": "ไม่มีรีวิว!",
+    "No shipping methods were found with your provided shipping information!": "ไม่พบวิธีการจัดส่งที่เหมาะกับข้อมูลการจัดส่งของคุณ!",
+    "Not available": "ไม่พร้อมจำหน่าย",
+    "Not specified": "ไม่ระบุ",
+    "Note": "หมายเหตุ",
+    "Notes about your order, e.g. special notes for delivery.": "หมายเหตุเกี่ยวกับคำสั่งซื้อ เช่น หมายเหตุพิเศษสำหรับการจัดส่ง",
+    "Oldest": "เก่าที่สุด",
+    "On Sale": "ลดราคา",
+    "One or all products are not enough quantity so cannot update!": "สินค้าบางรายการหรือทั้งหมดมีจำนวนไม่เพียงพอ ไม่สามารถอัปเดตได้!",
+    "Oops! Something Went Wrong.": "อุ๊ย! มีบางอย่างผิดพลาด",
+    "Or you can upload a new one, the old one will be replaced.": "หรือคุณสามารถอัปโหลดใหม่ รูปเก่าจะถูกแทนที่",
+    "Order": "คำสั่งซื้อ",
+    "Order Details": "รายละเอียดคำสั่งซื้อ",
+    "Order ID": "หมายเลขคำสั่งซื้อ",
+    "Order ID number": "หมายเลขคำสั่งซื้อ",
+    "Order Information": "ข้อมูลคำสั่งซื้อ",
+    "Order Return Request not found!": "ไม่พบคำขอคืนสินค้า!",
+    "Order Return Requests": "คำขอคืนสินค้า",
+    "Order Return Requests :id": "คำขอคืนสินค้า :id",
+    "Order Tracking": "ติดตามคำสั่งซื้อ",
+    "Order cancelled successfully": "ยกเลิกคำสั่งซื้อสำเร็จ",
+    "Order code is required": "ต้องระบุรหัสคำสั่งซื้อ",
+    "Order completed": "คำสั่งซื้อเสร็จสมบูรณ์",
+    "Order detail :id": "รายละเอียดคำสั่งซื้อ :id",
+    "Order found successfully": "พบคำสั่งซื้อสำเร็จ",
+    "Order information": "ข้อมูลคำสั่งซื้อ",
+    "Order is created from the checkout page": "คำสั่งซื้อถูกสร้างจากหน้าชำระเงิน",
+    "Order not found": "ไม่พบคำสั่งซื้อ",
+    "Order notes": "หมายเหตุคำสั่งซื้อ",
+    "Order number": "หมายเลขคำสั่งซื้อ",
+    "Order returned successfully": "คืนสินค้าสำเร็จ",
+    "Order status": "สถานะคำสั่งซื้อ",
+    "Order successfully. Order number :id": "สั่งซื้อสำเร็จ หมายเลขคำสั่งซื้อ :id",
+    "Order tracking": "ติดตามคำสั่งซื้อ",
+    "Order tracking :code": "ติดตามคำสั่งซื้อ :code",
+    "Order tracking is not enabled": "ไม่ได้เปิดใช้งานการติดตามคำสั่งซื้อ",
+    "Order was cancelled by customer :customer": "คำสั่งซื้อถูกยกเลิกโดยลูกค้า :customer",
+    "Order was cancelled by customer :customer with reason :reason": "คำสั่งซื้อถูกยกเลิกโดยลูกค้า :customer ด้วยเหตุผล :reason",
+    "Order was confirmed delivery by customer :customer": "คำสั่งซื้อได้รับการยืนยันการรับสินค้าโดยลูกค้า :customer",
+    "Order was created from checkout page": "คำสั่งซื้อถูกสร้างจากหน้าชำระเงิน",
+    "Ordered at": "สั่งซื้อเมื่อ",
+    "Orders": "คำสั่งซื้อ",
+    "Out of stock": "สินค้าหมด",
+    "Over :fromPrice": "มากกว่า :fromPrice",
+    "Overview": "ภาพรวม",
+    "Password": "รหัสผ่าน",
+    "Password confirmation": "ยืนยันรหัสผ่าน",
+    "Payment Method": "วิธีชำระเงิน",
+    "Payment Proof": "หลักฐานการชำระเงิน",
+    "Payment description": "คำอธิบายการชำระเงิน",
+    "Payment failed! Something wrong with your payment. Please try again.": "การชำระเงินล้มเหลว! มีข้อผิดพลาดเกี่ยวกับการชำระเงิน กรุณาลองใหม่",
+    "Payment method": "วิธีชำระเงิน",
+    "Payment proof upload is currently disabled.": "การอัปโหลดหลักฐานการชำระเงินถูกปิดใช้งานอยู่",
+    "Payment status": "สถานะการชำระเงิน",
+    "Permanently delete your account and all associated data.": "ลบบัญชีและข้อมูลที่เกี่ยวข้องทั้งหมดอย่างถาวร",
+    "Phone": "โทรศัพท์",
+    "Phone (optional)": "โทรศัพท์ (ไม่บังคับ)",
+    "Phone is required": "ต้องระบุเบอร์โทรศัพท์",
+    "Phone number": "เบอร์โทรศัพท์",
+    "Please <a href=\":link\">login</a> to write review!": "กรุณา <a href=\":link\">เข้าสู่ระบบ</a> เพื่อเขียนรีวิว!",
+    "Please enter a valid number for quantity": "กรุณาระบุจำนวนที่ถูกต้อง",
+    "Please enter the quantity you want to buy": "กรุณาระบุจำนวนที่ต้องการซื้อ",
+    "Please fill out all shipping information to view available shipping methods!": "กรุณากรอกข้อมูลการจัดส่งทั้งหมดเพื่อดูวิธีการจัดส่งที่มี!",
+    "Please provide a reason for the cancellation.": "กรุณาระบุเหตุผลในการยกเลิก",
+    "Please purchase the product for a review!": "กรุณาซื้อสินค้าก่อนเพื่อรีวิว!",
+    "Please select a product to add to cart": "กรุณาเลือกสินค้าเพื่อเพิ่มลงตะกร้า",
+    "Please select at least 1 product to return!": "กรุณาเลือกสินค้าอย่างน้อย 1 รายการเพื่อคืน!",
+    "Please select attributes": "กรุณาเลือกคุณสมบัติ",
+    "Please select product options": "กรุณาเลือกตัวเลือกสินค้า",
+    "Please select product options!": "กรุณาเลือกตัวเลือกสินค้า!",
+    "Plus": "บวก",
+    "Price": "ราคา",
+    "Price: high to low": "ราคา: สูงไปต่ำ",
+    "Price: low to high": "ราคา: ต่ำไปสูง",
+    "Print invoice": "พิมพ์ใบแจ้งหนี้",
+    "Proceed to Checkout": "ดำเนินการชำระเงิน",
+    "Processing. Please wait...": "กำลังประมวลผล กรุณารอสักครู่...",
+    "Product": "สินค้า",
+    "Product :product is out of stock!": "สินค้า :product หมดสต็อก!",
+    "Product :product limited quantity allowed is :quantity": "สินค้า :product จำกัดจำนวนสูงสุดที่ :quantity",
+    "Product FAQs": "คำถามที่พบบ่อยเกี่ยวกับสินค้า",
+    "Product ID is required": "ต้องระบุรหัสสินค้า",
+    "Product Reviews": "รีวิวสินค้า",
+    "Product categories": "หมวดหมู่สินค้า",
+    "Product gallery image style": "รูปแบบรูปภาพแกลเลอรีสินค้า",
+    "Product gallery video position": "ตำแหน่งวิดีโอแกลเลอรีสินค้า",
+    "Product is not published yet.": "สินค้ายังไม่ได้เผยแพร่",
+    "Product is out of stock": "สินค้าหมดสต็อก",
+    "Product name \":name\" does not exists": "ไม่มีสินค้าชื่อ \":name\"",
+    "Product not found": "ไม่พบสินค้า",
+    "Product not found in compare list": "ไม่พบสินค้าในรายการเปรียบเทียบ",
+    "Product not found in wishlist": "ไม่พบสินค้าในรายการโปรด",
+    "Product(s)": "สินค้า",
+    "Products": "สินค้า",
+    "Products you have reviewed": "สินค้าที่คุณรีวิวแล้ว",
+    "Profile": "โปรไฟล์",
+    "Profile Information": "ข้อมูลโปรไฟล์",
+    "Promotion": "โปรโมชั่น",
+    "Promotion discount amount": "ส่วนลดจากโปรโมชั่น",
+    "Quantity": "จำนวน",
+    "Quantity is required!": "ต้องระบุจำนวน!",
+    "Quantity must be a number!": "จำนวนต้องเป็นตัวเลข!",
+    "Rate this product:": "ให้คะแนนสินค้านี้:",
+    "Rating": "คะแนน",
+    "Rating: high to low": "คะแนน: สูงไปต่ำ",
+    "Rating: low to high": "คะแนน: ต่ำไปสูง",
+    "Ready to start shopping?": "พร้อมเริ่มช้อปปิ้งหรือยัง?",
+    "Reason": "เหตุผล",
+    "Reason (optional)": "เหตุผล (ไม่บังคับ)",
+    "Refund amount": "จำนวนเงินคืน",
+    "Register": "ลงทะเบียน",
+    "Register an account": "ลงทะเบียนบัญชี",
+    "Register an account with above information?": "ลงทะเบียนบัญชีด้วยข้อมูลข้างต้นหรือไม่?",
+    "Register now": "ลงทะเบียนเลย",
+    "Registered successfully!": "ลงทะเบียนสำเร็จ!",
+    "Related products": "สินค้าที่เกี่ยวข้อง",
+    "Remember me": "จดจำฉัน",
+    "Remove": "ลบ",
+    "Removed coupon :code successfully!": "ลบคูปอง :code สำเร็จ!",
+    "Removed coupon code successfully!": "ลบรหัสคูปองสำเร็จ!",
+    "Removed item from cart successfully!": "ลบสินค้าออกจากตะกร้าสำเร็จ!",
+    "Removed product :product from compare list successfully!": "ลบสินค้า :product ออกจากรายการเปรียบเทียบสำเร็จ!",
+    "Removed product :product from wishlist successfully!": "ลบสินค้า :product ออกจากรายการโปรดสำเร็จ!",
+    "Request Return Product(s)": "ขอคืนสินค้า",
+    "Request Return Product(s) In Order :id": "ขอคืนสินค้าในคำสั่งซื้อ :id",
+    "Request number": "หมายเลขคำขอ",
+    "Request return order with reason: :reason": "ขอคืนสินค้าด้วยเหตุผล: :reason",
+    "Requires company invoice (Please fill in your company information to receive the invoice)?": "ต้องการใบกำกับภาษีเต็มรูปแบบ (กรุณากรอกข้อมูลบริษัทเพื่อรับใบกำกับภาษี)?",
+    "Reset Password": "รีเซ็ตรหัสผ่าน",
+    "Return Product(s)": "คืนสินค้า",
+    "Return Reason": "เหตุผลการคืนสินค้า",
+    "Return items": "รายการคืนสินค้า",
+    "Review": "รีวิว",
+    "Review product \":product\"": "รีวิวสินค้า \":product\"",
+    "Reviews": "รีวิว",
+    "Reviews :number": "รีวิว :number",
+    "SKU": "รหัสสินค้า",
+    "SKU:": "รหัสสินค้า:",
+    "Same as shipping information": "เหมือนกับข้อมูลจัดส่ง",
+    "Same fee :amount": "ค่าบริการเท่ากัน :amount",
+    "Search": "ค้นหา",
+    "Search for Products...": "ค้นหาสินค้า...",
+    "Search result for \":query\"": "ผลการค้นหาสำหรับ \":query\"",
+    "Search...": "ค้นหา...",
+    "Select :name": "เลือก :name",
+    "Select Options": "เลือกตัวเลือก",
+    "Select an option": "เลือกตัวเลือก",
+    "Select available addresses": "เลือกที่อยู่ที่มี",
+    "Select billing address...": "เลือกที่อยู่เรียกเก็บเงิน...",
+    "Select city...": "เลือกเมือง...",
+    "Select country...": "เลือกประเทศ...",
+    "Select file": "เลือกไฟล์",
+    "Select state...": "เลือกรัฐ/จังหวัด...",
+    "Send Password Reset Link": "ส่งลิงก์รีเซ็ตรหัสผ่าน",
+    "Share your experience with these products": "แบ่งปันประสบการณ์ของคุณกับสินค้าเหล่านี้",
+    "Share:": "แชร์:",
+    "Shipment status": "สถานะการจัดส่ง",
+    "Shipping Address": "ที่อยู่จัดส่ง",
+    "Shipping Company Name": "ชื่อบริษัทขนส่ง",
+    "Shipping Information": "ข้อมูลการจัดส่ง",
+    "Shipping Status": "สถานะการจัดส่ง",
+    "Shipping fee": "ค่าจัดส่ง",
+    "Shipping information": "ข้อมูลการจัดส่ง",
+    "Shipping method": "วิธีการจัดส่ง",
+    "Shopping Cart": "ตะกร้าสินค้า",
+    "Show only discounted products": "แสดงเฉพาะสินค้าลดราคา",
+    "Sold by": "จำหน่ายโดย",
+    "Something went wrong. Please try again": "เกิดข้อผิดพลาด กรุณาลองใหม่",
+    "Sorry, you can only order a maximum of :quantity units of :product at a time. Please adjust the quantity and try again.": "ขออภัย คุณสามารถสั่งซื้อสินค้า :product ได้สูงสุด :quantity ชิ้นต่อครั้ง กรุณาปรับจำนวนและลองใหม่",
+    "Sorry, you cannot buy more than 99,999 items at once": "ขออภัย คุณไม่สามารถซื้อสินค้าเกิน 99,999 ชิ้นในครั้งเดียว",
+    "Specification": "รายละเอียดสินค้า",
+    "Start Shopping": "เริ่มช้อปปิ้ง",
+    "Start shopping now": "เริ่มช้อปปิ้งเลย",
+    "State": "รัฐ/จังหวัด",
+    "Status": "สถานะ",
+    "Submit": "ส่ง",
+    "Submit Return Request": "ส่งคำขอคืนสินค้า",
+    "Submit Review": "ส่งรีวิว",
+    "Subtotal": "ยอดรวม",
+    "Success": "สำเร็จ",
+    "Tags": "แท็ก",
+    "Tax": "ภาษี",
+    "Tax ID:": "เลขประจำตัวผู้เสียภาษี:",
+    "Tax information": "ข้อมูลภาษี",
+    "Tell us why you want to delete your account...": "บอกเราว่าทำไมคุณต้องการลบบัญชี...",
+    "Term and Policy": "ข้อกำหนดและนโยบาย",
+    "Terms and Privacy Policy": "ข้อกำหนดและนโยบายความเป็นส่วนตัว",
+    "Thank you for purchasing our products!": "ขอบคุณที่ซื้อสินค้าของเรา!",
+    "The given email address has not been confirmed. <a href=\":resend_link\">Resend confirmation link.</a>": "อีเมลนี้ยังไม่ได้รับการยืนยัน <a href=\":resend_link\">ส่งลิงก์ยืนยันใหม่</a>",
+    "The order could not be found. Please try again or contact us if you need assistance.": "ไม่พบคำสั่งซื้อ กรุณาลองใหม่หรือติดต่อเราหากต้องการความช่วยเหลือ",
+    "The order is currently being processed. For expedited processing, kindly upload a copy of your payment proof:": "คำสั่งซื้อกำลังดำเนินการ เพื่อเร่งการดำเนินการ กรุณาอัปโหลดหลักฐานการชำระเงิน:",
+    "This action cannot be undone": "การดำเนินการนี้ไม่สามารถยกเลิกได้",
+    "This action will permanently delete your account and all associated data and is irreversible. Please be sure before proceeding.": "การดำเนินการนี้จะลบบัญชีและข้อมูลที่เกี่ยวข้องทั้งหมดอย่างถาวรและไม่สามารถย้อนกลับได้ กรุณาตรวจสอบให้แน่ใจก่อนดำเนินการ",
+    "This product is not available.": "สินค้านี้ไม่พร้อมจำหน่าย",
+    "This product is out of stock or not exists!": "สินค้านี้หมดสต็อกหรือไม่มีอยู่!",
+    "Time": "เวลา",
+    "Top": "บน",
+    "Total": "ทั้งหมด",
+    "Total Amount": "จำนวนเงินทั้งหมด",
+    "Track": "ติดตาม",
+    "Track your recent orders and order history": "ติดตามคำสั่งซื้อล่าสุดและประวัติการสั่งซื้อ",
+    "Tracking ID": "หมายเลขติดตาม",
+    "Tracking Link": "ลิงก์ติดตาม",
+    "Unable to download files": "ไม่สามารถดาวน์โหลดไฟล์",
+    "Update": "อัปเดต",
+    "Update cart successfully!": "อัปเดตตะกร้าสำเร็จ!",
+    "Update profile successfully!": "อัปเดตโปรไฟล์สำเร็จ!",
+    "Update return order status to: :status": "อัปเดตสถานะการคืนสินค้าเป็น: :status",
+    "Update your account profile information and email address.": "อัปเดตข้อมูลโปรไฟล์และอีเมลของคุณ",
+    "Update your shipping and billing addresses": "อัปเดตที่อยู่จัดส่งและที่อยู่เรียกเก็บเงิน",
+    "Updated avatar successfully!": "อัปเดตรูปโปรไฟล์สำเร็จ!",
+    "Upload": "อัปโหลด",
+    "Upload photos": "อัปโหลดรูปภาพ",
+    "Uploaded proof successfully": "อัปโหลดหลักฐานสำเร็จ",
+    "Use this address as default.": "ใช้ที่อยู่นี้เป็นค่าเริ่มต้น",
+    "Using coupon code": "ใช้รหัสคูปอง",
+    "Vendor:": "ผู้จำหน่าย:",
+    "Vertical": "แนวตั้ง",
+    "View": "ดู",
+    "View Details": "ดูรายละเอียด",
+    "View Orders": "ดูคำสั่งซื้อ",
+    "View Receipt:": "ดูใบเสร็จ:",
+    "View all results": "ดูผลลัพธ์ทั้งหมด",
+    "View full details": "ดูรายละเอียดทั้งหมด",
+    "Waiting for approval": "รอการอนุมัติ",
+    "Waiting for your review": "รอการรีวิวของคุณ",
+    "Warning": "คำเตือน",
+    "Warning: This product is on backorder and may take longer to ship.": "คำเตือน: สินค้านี้ต้องสั่งผลิตและอาจใช้เวลาในการจัดส่งนานกว่าปกติ",
+    "We have sent you an email to verify your email. Please check and confirm your email address!": "เราได้ส่งอีเมลเพื่อยืนยันอีเมลของคุณ กรุณาตรวจสอบและยืนยันที่อยู่อีเมล!",
+    "We sent you another confirmation email. You should receive it shortly.": "เราได้ส่งอีเมลยืนยันอีกครั้ง คุณควรได้รับในเร็วๆ นี้",
+    "We will send you an email to confirm your account deletion. Once you confirm, your account will be deleted permanently and all your data will be lost.": "เราจะส่งอีเมลเพื่อยืนยันการลบบัญชี เมื่อคุณยืนยัน บัญชีจะถูกลบอย่างถาวรและข้อมูลทั้งหมดจะสูญหาย",
+    "Welcome back, <strong>:name</strong>!": "ยินดีต้อนรับกลับ <strong>:name</strong>!",
+    "Wishlist": "รายการโปรด",
+    "Write your review": "เขียนรีวิวของคุณ",
+    "You can now download it by clicking the links below": "คุณสามารถดาวน์โหลดได้โดยคลิกลิงก์ด้านล่าง",
+    "You can upload the following file types: jpg, jpeg, png, pdf and max file size is 2MB.": "คุณสามารถอัปโหลดไฟล์ประเภท: jpg, jpeg, png, pdf และขนาดไฟล์สูงสุด 2MB",
+    "You can upload up to :total photos, each photo maximum size is :max MB.": "คุณสามารถอัปโหลดรูปภาพได้สูงสุด :total รูป แต่ละรูปขนาดสูงสุด :max MB",
+    "You can upload up to :total photos, each photo maximum size is :max kilobytes": "คุณสามารถอัปโหลดรูปภาพได้สูงสุด :total รูป แต่ละรูปขนาดสูงสุด :max กิโลไบต์",
+    "You cannot cancel this order": "คุณไม่สามารถยกเลิกคำสั่งซื้อนี้",
+    "You cannot confirm delivery for this order": "คุณไม่สามารถยืนยันการรับสินค้าสำหรับคำสั่งซื้อนี้",
+    "You cannot return this order": "คุณไม่สามารถคืนคำสั่งซื้อนี้",
+    "You do not have permission to delete this review.": "คุณไม่มีสิทธิ์ลบรีวิวนี้",
+    "You have a coupon code?": "คุณมีรหัสคูปองหรือไม่?",
+    "You have not placed any order return requests yet.": "คุณยังไม่มีคำขอคืนสินค้า",
+    "You have not placed any orders yet.": "คุณยังไม่มีคำสั่งซื้อ",
+    "You have not purchased any digital products yet.": "คุณยังไม่ได้ซื้อสินค้าดิจิทัลใดๆ",
+    "You have recovered from previous orders!": "คุณได้กู้คืนจากคำสั่งซื้อก่อนหน้า!",
+    "You have reviewed this product already!": "คุณได้รีวิวสินค้านี้แล้ว!",
+    "You have uploaded a copy of your payment proof.": "คุณได้อัปโหลดหลักฐานการชำระเงินแล้ว",
+    "You haven't placed any orders yet. Browse our products and find something you love!": "คุณยังไม่มีคำสั่งซื้อ เรียกดูสินค้าของเราและหาสิ่งที่คุณชอบ!",
+    "You must agree to the terms and conditions and privacy policy.": "คุณต้องยอมรับข้อกำหนดและเงื่อนไขและนโยบายความเป็นส่วนตัว",
+    "You must buy at least 1 item": "คุณต้องซื้ออย่างน้อย 1 ชิ้น",
+    "You need to add :quantity more items to place your order. ": "คุณต้องเพิ่มสินค้าอีก :quantity ชิ้นเพื่อสั่งซื้อ ",
+    "You successfully confirmed your email address.": "คุณยืนยันที่อยู่อีเมลสำเร็จ",
+    "Your Addresses": "ที่อยู่ของคุณ",
+    "Your Reviews": "รีวิวของคุณ",
+    "Your account has been locked, please contact the administrator.": "บัญชีของคุณถูกล็อก กรุณาติดต่อผู้ดูแลระบบ",
+    "Your cart is empty": "ตะกร้าของคุณว่างเปล่า",
+    "Your compare list is empty": "รายการเปรียบเทียบของคุณว่างเปล่า",
+    "Your email": "อีเมลของคุณ",
+    "Your email address will not be published. Required fields are marked *": "ที่อยู่อีเมลของคุณจะไม่ถูกเผยแพร่ ช่องที่ต้องกรอกมีเครื่องหมาย *",
+    "Your full name": "ชื่อ-นามสกุลของคุณ",
+    "Your order is successfully placed": "คำสั่งซื้อของคุณสำเร็จแล้ว",
+    "Your personal data will be used to support your experience throughout this website, to manage access to your account.": "ข้อมูลส่วนบุคคลของคุณจะถูกใช้เพื่อสนับสนุนประสบการณ์ของคุณทั่วทั้งเว็บไซต์ เพื่อจัดการการเข้าถึงบัญชีของคุณ",
+    "Your rating:": "คะแนนของคุณ:",
+    "Your shopping cart has digital product(s), so you need to sign in to continue!": "ตะกร้าสินค้าของคุณมีสินค้าดิจิทัล คุณต้องเข้าสู่ระบบเพื่อดำเนินการต่อ!",
+    "Your wishlist list is empty": "รายการโปรดของคุณว่างเปล่า",
+    "Zip code": "รหัสไปรษณีย์",
+    "Zipcode": "รหัสไปรษณีย์",
+    "billion": "พันล้าน",
+    "centimeters": "เซนติเมตร",
+    "for all orders": "สำหรับคำสั่งซื้อทั้งหมด",
+    "for all product in collection :collections": "สำหรับสินค้าทั้งหมดในคอลเลคชัน :collections",
+    "for all products in category :categories": "สำหรับสินค้าทั้งหมดในหมวดหมู่ :categories",
+    "for all products in collection :collections": "สำหรับสินค้าทั้งหมดในคอลเลคชัน :collections",
+    "for all products in order": "สำหรับสินค้าทั้งหมดในคำสั่งซื้อ",
+    "for customer(s) :customers": "สำหรับลูกค้า :customers",
+    "for order with amount from :price": "สำหรับคำสั่งซื้อที่มีจำนวนเงินตั้งแต่ :price",
+    "for product variant(s) :variants": "สำหรับตัวเลือกสินค้า :variants",
+    "for product(s) :products": "สำหรับสินค้า :products",
+    "grams": "กรัม",
+    "item(s)": "รายการ",
+    "kilograms": "กิโลกรัม",
+    "limited to use coupon code per customer. This coupon can only be used once per customer!": "จำกัดการใช้คูปองต่อลูกค้า คูปองนี้ใช้ได้เพียงครั้งเดียวต่อลูกค้า!",
+    "meters": "เมตร",
+    "million": "ล้าน",
+    "times": "ครั้ง",
+    "when shipping fee less than or equal :amount": "เมื่อค่าจัดส่งน้อยกว่าหรือเท่ากับ :amount",
+    "✅ Purchased :time": "✅ ซื้อแล้วเมื่อ :time",
+    "By placing an order, you agree to our Terms of Service and acknowledge that you have read our Privacy Policy. Your payment will be processed securely according to our payment provider's privacy policy.": "เมื่อสั่งซื้อ คุณยอมรับข้อกำหนดการให้บริการของเราและรับทราบว่าคุณได้อ่านนโยบายความเป็นส่วนตัวของเรา การชำระเงินของคุณจะดำเนินการอย่างปลอดภัยตามนโยบายความเป็นส่วนตัวของผู้ให้บริการชำระเงิน"
 }

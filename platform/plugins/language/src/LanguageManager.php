@@ -6,6 +6,7 @@ use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Models\BaseModel;
 use Botble\Language\Models\Language;
 use Botble\Language\Models\LanguageMeta;
+use Botble\Support\Services\Cache\Cache;
 use Botble\Table\Columns\Column;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
@@ -99,10 +100,13 @@ class LanguageManager
         }
 
         $locales = [];
+
+        $hiddenLanguages = json_decode(setting('language_hide_languages', '[]'), true);
+
         foreach ($languages as $language) {
             if (
                 is_in_admin() ||
-                ! in_array($language->lang_id, json_decode(setting('language_hide_languages', '[]'), true))
+                ! in_array($language->lang_id, $hiddenLanguages)
             ) {
                 $key = $language->lang_locale;
 
@@ -817,6 +821,15 @@ class LanguageManager
         return Arr::get($supportedLocales, $this->getDefaultLocale() . '.lang_code');
     }
 
+    public function formatLocaleForHrefLang(?string $localeCode): ?string
+    {
+        if (empty($localeCode)) {
+            return null;
+        }
+
+        return strtolower(str_replace('_', '-', $localeCode));
+    }
+
     public function getCurrentLocaleFlag(): ?string
     {
         $supportedLocales = $this->getSupportedLocales();
@@ -1088,7 +1101,9 @@ class LanguageManager
 
         $showRelated = setting('language_show_default_item_if_current_version_not_existed', true);
 
-        return $showRelated ? $this->getLocalizedURL($localeCode) : url($localeCode);
+        $url = $showRelated ? $this->getLocalizedURL($localeCode) : url($localeCode);
+
+        return apply_filters('language_switcher_get_url', $url, $localeCode, $languageCode, $this);
     }
 
     /**
@@ -1203,5 +1218,10 @@ class LanguageManager
                 ->titleAttr(trans('plugins/language::language.name'))
                 ->responsivePriority(99),
         ];
+    }
+
+    public function clearCache(): void
+    {
+        Cache::make('languages')->flush();
     }
 }

@@ -4,6 +4,7 @@ namespace Botble\Language\Commands;
 
 use Botble\Base\Commands\Traits\ValidateCommandInput;
 use Botble\Base\Supports\Language;
+use Botble\Language\Facades\Language as LanguageFacade;
 use Botble\Language\Models\Language as LanguageModel;
 use Exception;
 use Illuminate\Console\Command;
@@ -25,36 +26,42 @@ class AddLanguageCommand extends Command implements PromptsForMissingInput
             $isDefault = $this->option('default');
             $order = $this->option('order');
 
-            // Get language data from predefined list
             $languages = Language::getListLanguages();
 
             if (! isset($languages[$languageId])) {
-                $this->components->error(sprintf(
-                    'Language ID "%s" is not valid. Available language IDs: %s',
-                    $languageId,
-                    implode(', ', array_keys($languages))
-                ));
+                $matchingLanguages = $this->findMatchingLanguages($languageId, $languages);
 
-                return self::FAILURE;
+                if (empty($matchingLanguages)) {
+                    $this->components->error(sprintf(
+                        'Language ID "%s" is not valid. Available language IDs: %s',
+                        $languageId,
+                        implode(', ', array_keys($languages))
+                    ));
+
+                    return self::FAILURE;
+                } else {
+                    $selectedLanguageId = $this->selectLanguageFromMatches($languageId, $matchingLanguages);
+
+                    if ($selectedLanguageId === null) {
+                        return self::FAILURE;
+                    }
+
+                    $languageId = $selectedLanguageId;
+                }
             }
 
             $language = $languages[$languageId];
 
-            // Check if language already exists
             if ($this->languageExists($language[1], $languageId)) {
                 $this->components->error(trans('plugins/language::language.added_already'));
 
                 return self::FAILURE;
             }
 
-            // Ensure directories exist
             $this->ensureDirectoriesExist();
-
-            // Import locale if missing
             $this->importLocaleIfMissing($language[0]);
 
-            // Create the language
-            $languageModel = $this->createLanguage(
+            $this->createLanguage(
                 $language[2],
                 $language[0],
                 $language[1],
@@ -64,8 +71,8 @@ class AddLanguageCommand extends Command implements PromptsForMissingInput
                 $isDefault
             );
 
-            // Clear routes cache
             $this->clearRoutesCache();
+            LanguageFacade::clearCache();
 
             $this->components->info(sprintf('Language "%s" has been added successfully!', $language[2]));
 
@@ -122,12 +129,11 @@ class AddLanguageCommand extends Command implements PromptsForMissingInput
             LanguageModel::query()->where('lang_is_default', 1)->update(['lang_is_default' => 0]);
         }
 
-        // If no languages exist, make this one default
         if (! LanguageModel::query()->exists()) {
             $isDefault = true;
         }
 
-        $language = LanguageModel::query()->create([
+        return LanguageModel::query()->create([
             'lang_name' => $name,
             'lang_locale' => $locale,
             'lang_code' => $code,
@@ -136,13 +142,94 @@ class AddLanguageCommand extends Command implements PromptsForMissingInput
             'lang_order' => $order,
             'lang_is_default' => $isDefault,
         ]);
-
-        return $language;
     }
 
     protected function clearRoutesCache(): void
     {
         $this->call('route:clear');
+    }
+
+    protected function findMatchingLanguages(string $input, array $languages): array
+    {
+        $matches = [];
+        $input = strtolower($input);
+
+        foreach ($languages as $languageId => $languageData) {
+            $languageIdLower = strtolower($languageId);
+            $languageName = $this->normalizeString($languageData[2]);
+            $languageCode = strtolower($languageData[1]);
+
+            if (str_starts_with($languageIdLower, $input) ||
+                str_contains($languageName, $input) ||
+                str_starts_with($languageCode, $input) ||
+                str_contains($languageName, $this->normalizeString($input))) {
+                $matches[$languageId] = $languageData;
+            }
+        }
+
+        return $matches;
+    }
+
+    protected function normalizeString(string $string): string
+    {
+        $string = strtolower($string);
+
+        $accents = [
+            'à' => 'a', 'á' => 'a', 'â' => 'a', 'ã' => 'a', 'ä' => 'a', 'å' => 'a',
+            'è' => 'e', 'é' => 'e', 'ê' => 'e', 'ë' => 'e',
+            'ì' => 'i', 'í' => 'i', 'î' => 'i', 'ï' => 'i',
+            'ò' => 'o', 'ó' => 'o', 'ô' => 'o', 'õ' => 'o', 'ö' => 'o',
+            'ù' => 'u', 'ú' => 'u', 'û' => 'u', 'ü' => 'u',
+            'ç' => 'c', 'ñ' => 'n',
+        ];
+
+        return str_replace(array_keys($accents), array_values($accents), $string);
+    }
+
+    protected function selectLanguageFromMatches(string $input, array $matchingLanguages): ?string
+    {
+        $this->components->warn(sprintf('Language ID "%s" is not valid.', $input));
+        $this->components->info('Did you mean one of these languages?');
+        $this->newLine();
+
+        $languageIds = [];
+        $index = 0;
+
+        foreach ($matchingLanguages as $languageId => $languageData) {
+            $this->components->info(sprintf(
+                '  [<fg=green>%d</>] %s - %s (%s)',
+                $index,
+                $languageId,
+                $languageData[2],
+                $languageData[1]
+            ));
+            $languageIds[$index] = $languageId;
+            $index++;
+        }
+
+        $this->components->info(sprintf('  [<fg=green>%d</>] Cancel - Don\'t add any language', $index));
+        $languageIds[$index] = null;
+
+        $this->newLine();
+
+        $maxIndex = $index;
+        $selectedIndex = $this->ask(sprintf('Please select an option (0-%d)', $maxIndex));
+
+        if (! is_numeric($selectedIndex) || $selectedIndex < 0 || $selectedIndex > $maxIndex) {
+            $this->components->error('Invalid selection.');
+
+            return null;
+        }
+
+        $selectedIndex = (int) $selectedIndex;
+
+        if ($languageIds[$selectedIndex] === null) {
+            $this->components->info('Language addition cancelled.');
+
+            return null;
+        }
+
+        return $languageIds[$selectedIndex];
     }
 
     protected function configure(): void

@@ -87,8 +87,14 @@ class CKEditorUploadAdapter {
                 )
             }
 
+            // Convert absolute URL to relative URL
+            let imageUrl = response.url
+            if (imageUrl && imageUrl.startsWith(window.location.origin)) {
+                imageUrl = imageUrl.replace(window.location.origin, '')
+            }
+
             resolve({
-                default: response.url,
+                default: imageUrl,
             })
         })
 

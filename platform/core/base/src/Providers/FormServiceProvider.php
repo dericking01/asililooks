@@ -11,8 +11,6 @@ use Kris\LaravelFormBuilder\Events\FormComponentRegistering;
 
 class FormServiceProvider extends ServiceProvider
 {
-    protected bool $defer = true;
-
     public function register(): void
     {
         /**

@@ -98,6 +98,9 @@ return [
                 'order_id' => 'plugins/ecommerce::ecommerce.order_id',
                 'order_delivery_notes' => 'plugins/ecommerce::email.order_delivery_notes',
                 'product_list' => 'plugins/ecommerce::ecommerce.product_list',
+                'shipping_company_name' => 'plugins/ecommerce::ecommerce.shipping_company_name',
+                'tracking_id' => 'plugins/ecommerce::ecommerce.tracking_id',
+                'tracking_link' => 'plugins/ecommerce::ecommerce.tracking_link',
             ],
         ],
         'customer_order_delivered' => [
@@ -111,6 +114,9 @@ return [
                 'order_id' => 'plugins/ecommerce::ecommerce.order_id',
                 'order_delivery_notes' => 'plugins/ecommerce::email.order_delivery_notes',
                 'product_list' => 'plugins/ecommerce::ecommerce.product_list',
+                'shipping_company_name' => 'plugins/ecommerce::ecommerce.shipping_company_name',
+                'tracking_id' => 'plugins/ecommerce::ecommerce.tracking_id',
+                'tracking_link' => 'plugins/ecommerce::ecommerce.tracking_link',
             ],
         ],
         'admin_new_order' => [

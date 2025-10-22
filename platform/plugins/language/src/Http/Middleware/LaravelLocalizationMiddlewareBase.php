@@ -2,20 +2,19 @@
 
 namespace Botble\Language\Http\Middleware;
 
+use Botble\Base\Facades\AdminHelper;
 use Illuminate\Http\Request;
 
 class LaravelLocalizationMiddlewareBase
 {
-    /**
-     * The URIs that should not be localized.
-     */
     protected array $except = [];
 
-    /**
-     * Determine if the request has a URI that should not be localized.
-     */
     protected function shouldIgnore(Request $request): bool
     {
+        if (AdminHelper::isInAdmin(true)) {
+            return true;
+        }
+
         foreach ($this->except as $except) {
             if ($except !== '/') {
                 $except = trim($except, '/');

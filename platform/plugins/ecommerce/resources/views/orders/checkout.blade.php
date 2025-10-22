@@ -1,6 +1,6 @@
 @extends('plugins/ecommerce::orders.master')
 
-@section('title', __('Checkout'))
+@section('title', theme_option('ecommerce_checkout_seo_title') ?: __('Checkout'))
 
 @section('content')
     @if (Cart::instance('cart')->isNotEmpty())

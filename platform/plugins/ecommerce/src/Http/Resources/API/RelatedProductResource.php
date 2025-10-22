@@ -14,6 +14,7 @@ class RelatedProductResource extends JsonResource
     public function toArray($request): array
     {
         $price = $this->price();
+        $thumbnailSize = $request->input('thumbnail_size', 'thumb');
 
         return [
             'id' => $this->id,
@@ -34,7 +35,7 @@ class RelatedProductResource extends JsonResource
                 'thumb',
                 ...array_keys(RvMedia::getSizes()),
             ])) : null,
-            'image_url' => RvMedia::getImageUrl($this->image, 'thumb', false, RvMedia::getDefaultImage()),
+            'image_url' => RvMedia::getImageUrl($this->image, $thumbnailSize, false, RvMedia::getDefaultImage()),
             $this->mergeWhen(is_plugin_active('marketplace'), function () {
                 $store = $this->original_product->store;
 

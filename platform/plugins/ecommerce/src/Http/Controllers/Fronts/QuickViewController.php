@@ -25,7 +25,7 @@ class QuickViewController extends BaseController
                 'options',
                 'options.values',
             ],
-        ] + EcommerceHelper::withReviewsParams());
+        ]);
 
         if (! $product) {
             return $this

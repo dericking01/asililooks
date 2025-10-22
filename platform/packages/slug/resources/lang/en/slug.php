@@ -12,6 +12,7 @@ return [
         'available_variables' => 'Available variables',
         'permalink_structure' => 'Generate URL based on',
         'permalink_structure_helper' => 'Choose how to generate default URL for your content.',
+        'prefix_placeholder' => 'e.g., :name',
     ],
     'preview' => 'Preview',
     'prefix_for' => 'Prefix for :name',

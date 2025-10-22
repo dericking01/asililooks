@@ -208,7 +208,7 @@ class ProductCategoryTable extends TableAbstract
         $categoriesById = $categories->keyBy('id');
         $sorted = collect();
 
-        $addCategoryAndChildren = function ($parentId = null) use (&$addCategoryAndChildren, $categoriesById, $sorted) {
+        $addCategoryAndChildren = function ($parentId = null) use (&$addCategoryAndChildren, $categoriesById, $sorted): void {
             $children = $categoriesById->filter(function ($category) use ($parentId) {
                 return $category->parent_id == $parentId;
             })->sortBy('order');

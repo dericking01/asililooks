@@ -15,8 +15,8 @@ class SiteCopyright extends AbstractWidget
     public function __construct()
     {
         parent::__construct([
-            'name' => __('Site Copyright'),
-            'description' => __('Copyright text at the bottom footer.'),
+            'name' => trans('packages/widget::widget.widget_site_copyright'),
+            'description' => trans('packages/widget::widget.widget_site_copyright_description'),
         ]);
     }
 
@@ -28,8 +28,8 @@ class SiteCopyright extends AbstractWidget
                 HtmlField::class,
                 HtmlFieldOption::make()
                     ->content(
-                        __('Go to :link to change the copyright text.', [
-                            'link' => Html::link(route('theme.options'), __('Theme options')),
+                        trans('packages/widget::widget.widget_site_copyright_helper', [
+                            'link' => Html::link(route('theme.options'), trans('packages/widget::widget.theme_options')),
                         ])
                     )
             );

@@ -5,11 +5,11 @@ namespace Botble\Marketplace\Http\Controllers;
 use Botble\Base\Events\UpdatedContentEvent;
 use Botble\Base\Facades\Assets;
 use Botble\Base\Facades\EmailHandler;
+use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Base\Supports\Breadcrumb;
-use Botble\Ecommerce\Models\Customer;
 use Botble\Marketplace\Facades\MarketplaceHelper;
+use Botble\Marketplace\Models\Vendor;
 use Botble\Marketplace\Tables\UnverifiedVendorTable;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -30,12 +30,7 @@ class UnverifiedVendorController extends BaseController
 
     public function view(int|string $id)
     {
-        $vendor = Customer::query()
-            ->where([
-                'id' => $id,
-                'is_vendor' => true,
-            ])
-            ->findOrFail($id);
+        $vendor = Vendor::query()->findOrFail($id);
 
         if ($vendor->vendor_verified_at) {
             return redirect()->route('customers.edit', $vendor->getKey());
@@ -50,16 +45,11 @@ class UnverifiedVendorController extends BaseController
 
     public function approveVendor(int|string $id, Request $request)
     {
-        $vendor = Customer::query()
-            ->where([
-                'id' => $id,
-                'is_vendor' => true,
-                'vendor_verified_at' => null,
-            ])
-            ->firstOrFail();
+        $vendor = Vendor::query()
+            ->unverified()
+            ->findOrFail($id);
 
-        $vendor->vendor_verified_at = Carbon::now();
-        $vendor->save();
+        $vendor->verify();
 
         event(new UpdatedContentEvent(CUSTOMER_MODULE_SCREEN_NAME, $request, $vendor));
 
@@ -79,13 +69,9 @@ class UnverifiedVendorController extends BaseController
 
     public function rejectVendor(int|string $id)
     {
-        $vendor = Customer::query()
-            ->where([
-                'id' => $id,
-                'is_vendor' => true,
-                'vendor_verified_at' => null,
-            ])
-            ->firstOrFail();
+        $vendor = Vendor::query()
+            ->unverified()
+            ->findOrFail($id);
 
         $store = $vendor->store;
 
@@ -120,32 +106,30 @@ class UnverifiedVendorController extends BaseController
 
     public function downloadCertificate(int|string $id)
     {
-        $vendor = Customer::query()
-            ->where([
-                'id' => $id,
-                'is_vendor' => true,
-            ])
-            ->firstOrFail();
+        $vendor = Vendor::query()->findOrFail($id);
 
         $storage = Storage::disk('local');
 
-        abort_unless($storage->exists($vendor->store->certificate_file), 404);
+        if (! $storage->exists($vendor->store->certificate_file)) {
+            return BaseHttpResponse::make()
+                ->setError()
+                ->setMessage(__('File not found!'));
+        }
 
         return response()->file($storage->path($vendor->store->certificate_file));
     }
 
     public function downloadGovernmentId(int|string $id)
     {
-        $vendor = Customer::query()
-            ->where([
-                'id' => $id,
-                'is_vendor' => true,
-            ])
-            ->firstOrFail();
+        $vendor = Vendor::query()->findOrFail($id);
 
         $storage = Storage::disk('local');
 
-        abort_unless($storage->exists($vendor->store->government_id_file), 404);
+        if (! $storage->exists($vendor->store->government_id_file)) {
+            return BaseHttpResponse::make()
+                ->setError()
+                ->setMessage(__('File not found!'));
+        }
 
         return response()->file($storage->path($vendor->store->government_id_file));
     }

@@ -10,7 +10,7 @@ class BaseSystemController extends BaseController
     {
         return parent::breadcrumb()
             ->add(
-                trans('core/base::base.panel.system'),
+                trans('core/base::base.panel.platform_administration'),
                 route('system.index')
             );
     }

@@ -25,6 +25,21 @@
                     {% if order_delivery_notes %}
                         <p><i>" {{ order_delivery_notes }} "</i></p>
                     {% endif %}
+                    
+                    {% if shipping_company_name or tracking_id or tracking_link %}
+                        <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin: 20px 0; background-color: #f9f9f9;">
+                            <h4 style="margin-top: 0; color: #333;">{{ 'plugins/ecommerce::email-templates.customer_order_delivered_tracking_info' | trans }}</h4>
+                            {% if shipping_company_name %}
+                                <p><strong>{{ 'plugins/ecommerce::email-templates.customer_order_delivered_shipping_company' | trans }}:</strong> {{ shipping_company_name }}</p>
+                            {% endif %}
+                            {% if tracking_id %}
+                                <p><strong>{{ 'plugins/ecommerce::email-templates.customer_order_delivered_tracking_id' | trans }}:</strong> {{ tracking_id }}</p>
+                            {% endif %}
+                            {% if tracking_link %}
+                                <p><strong>{{ 'plugins/ecommerce::email-templates.customer_order_delivered_tracking_link' | trans }}:</strong> <a href="{{ tracking_link }}" target="_blank" style="color: #007bff; text-decoration: none;">{{ 'plugins/ecommerce::email-templates.customer_order_delivered_track_shipment' | trans }}</a></p>
+                            {% endif %}
+                        </div>
+                    {% endif %}
                 </td>
             </tr>
             {% if product_list %}

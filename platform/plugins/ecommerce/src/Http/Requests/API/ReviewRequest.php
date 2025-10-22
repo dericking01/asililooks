@@ -9,13 +9,18 @@ class ReviewRequest extends Request
 {
     public function rules(): array
     {
-        return [
+        $rules = [
             'product_id' => ['required', 'exists:ec_products,id'],
             'star' => ['required', 'numeric', 'min:1', 'max:5'],
             'comment' => ['required', 'string', 'max:5000'],
-            'images' => 'array|max:' . EcommerceHelper::reviewMaxFileNumber(),
-            'images.*' => 'image|mimes:jpg,jpeg,png|max:' . EcommerceHelper::reviewMaxFileSize(true),
         ];
+
+        if (EcommerceHelper::isCustomerReviewImageUploadEnabled()) {
+            $rules['images'] = 'array|max:' . EcommerceHelper::reviewMaxFileNumber();
+            $rules['images.*'] = 'image|mimes:jpg,jpeg,png|max:' . EcommerceHelper::reviewMaxFileSize(true);
+        }
+
+        return $rules;
     }
 
     public function bodyParameters(): array

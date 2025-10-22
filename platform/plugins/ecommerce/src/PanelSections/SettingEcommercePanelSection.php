@@ -124,7 +124,7 @@ class SettingEcommercePanelSection extends PanelSection
                     ->withIcon('ti ti-robot-face')
                     ->withDescription(trans('plugins/ecommerce::setting.tracking.description'))
                     ->withPriority(170)
-                    ->withRoute('ecommerce.settings.tracking'),
+                    ->withRoute('settings.website-tracking'),
                 PanelSectionItem::make('settings.ecommerce.standard_and_format')
                     ->setTitle(trans('plugins/ecommerce::setting.standard_and_format.name'))
                     ->withIcon('ti ti-checklist')

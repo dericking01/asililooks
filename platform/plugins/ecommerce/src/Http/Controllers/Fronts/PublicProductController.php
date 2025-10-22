@@ -71,7 +71,16 @@ class PublicProductController extends BaseController
         $products = $productService->getProduct($request, null, null, $with);
 
         if ($request->ajax()) {
-            return $this->ajaxFilterProductsResponse($products);
+            $category = null;
+
+            if ($categoryId = $request->input('categories')) {
+                $category = ProductCategory::query()
+                    ->wherePublished()
+                    ->where('id', is_array($categoryId) ? reset($categoryId) : $categoryId)
+                    ->first();
+            }
+
+            return $this->ajaxFilterProductsResponse($products, $category);
         }
 
         do_action(PRODUCT_MODULE_SCREEN_NAME);

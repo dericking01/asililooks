@@ -15,6 +15,7 @@ use Botble\Ecommerce\Models\ProductCategory;
 use Botble\Table\Abstracts\TableAbstract;
 use Botble\Table\Actions\DeleteAction;
 use Botble\Table\Actions\EditAction;
+use Botble\Table\Actions\ViewAction;
 use Botble\Table\BulkActions\DeleteBulkAction;
 use Botble\Table\BulkChanges\CreatedAtBulkChange;
 use Botble\Table\BulkChanges\IsFeaturedBulkChange;
@@ -43,6 +44,7 @@ class ProductTable extends TableAbstract
         $this
             ->model(Product::class)
             ->addActions([
+                ViewAction::make()->route('products.view'),
                 EditAction::make()->route('products.edit'),
                 DeleteAction::make()->route('products.destroy'),
             ])

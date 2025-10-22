@@ -522,3 +522,24 @@ i.icon-list {
         }
     }
 }
+
+// Custom Layout RTL Support
+body[dir='rtl'] {
+    .ps-layout__left {
+        padding-right: 0;
+        padding-left: 30px;
+    }
+
+    @media (max-width: 1199px) {
+        .ps-layout__left {
+            padding-left: 0;
+            left: auto;
+            right: 0;
+            transform: translateX(100%);
+
+            &.active {
+                transform: translateX(0);
+            }
+        }
+    }
+}

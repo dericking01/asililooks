@@ -41,7 +41,8 @@ class ContactServiceProvider extends ServiceProvider
         $this
             ->setNamespace('plugins/contact')
             ->loadHelpers()
-            ->loadAndPublishConfigurations(['permissions', 'email'])
+            ->loadAndPublishConfigurations(['email'])
+            ->loadAndPublishConfigurations(['permissions'])
             ->loadRoutes()
             ->loadAndPublishViews()
             ->loadAndPublishTranslations()

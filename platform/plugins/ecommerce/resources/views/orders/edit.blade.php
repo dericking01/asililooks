@@ -377,7 +377,7 @@
                                             type="button"
                                             color="primary"
                                             :outlined="true"
-                                            class="btn-trigger-resend-order-confirmation-modal position-absolute top-0 end-0 d-print-none"
+                                            class="btn-trigger-resend-order-confirmation-modal position-absolute top-0 end-0 d-print-none me-3"
                                             :data-action="route('orders.send-order-confirmation-email', $history->order_id)"
                                         >
                                             {{ trans('plugins/ecommerce::order.resend') }}

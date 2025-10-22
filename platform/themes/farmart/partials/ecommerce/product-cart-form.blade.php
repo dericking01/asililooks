@@ -27,7 +27,7 @@
         {!! apply_filters(ECOMMERCE_PRODUCT_DETAIL_EXTRA_HTML, null, $product) !!}
         <div class="product-button">
             @if (EcommerceHelper::isCartEnabled())
-                @if ($product->variations()->count() > 0 && empty($isQuickShop) && empty($withButtons))
+                @if ($product->has_variation && empty($isQuickShop) && empty($withButtons))
                     <button
                         class="btn btn-primary mb-2 js-quick-shop-button w-100 @if ($product->isOutOfStock()) disabled @endif"
                         type="button"
@@ -46,7 +46,7 @@
                         <span class="add-to-cart-text ms-2">{{ __('Select Options') }}</span>
                     </button>
                 @else
-                    @if (!empty($isQuickShop))
+                    @if (! empty($withButtons) || ! empty($isQuickShop))
                         {!! Theme::partial('ecommerce.product-quantity', compact('product')) !!}
                     @endif
                     <button

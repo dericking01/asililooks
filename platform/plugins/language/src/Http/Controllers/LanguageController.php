@@ -89,6 +89,8 @@ class LanguageController extends SettingController
 
             $this->clearRoutesCache();
 
+            LanguageFacade::clearCache();
+
             event(new CreatedContentEvent(LANGUAGE_MODULE_SCREEN_NAME, $request, $language));
 
             $this->cloneMenusToLanguage($language);
@@ -191,6 +193,8 @@ class LanguageController extends SettingController
 
             $this->clearRoutesCache();
 
+            LanguageFacade::clearCache();
+
             event(new UpdatedContentEvent(LANGUAGE_MODULE_SCREEN_NAME, $request, $language));
 
             return $this
@@ -277,6 +281,8 @@ class LanguageController extends SettingController
                 }
 
                 $this->clearRoutesCache();
+
+                LanguageFacade::clearCache();
 
                 $this->httpResponse()->setData($defaultLanguageId);
             });
@@ -398,6 +404,8 @@ class LanguageController extends SettingController
         $newLanguage->save();
 
         $this->clearRoutesCache();
+
+        LanguageFacade::clearCache();
 
         event(new UpdatedContentEvent(LANGUAGE_MODULE_SCREEN_NAME, $request, $newLanguage));
 

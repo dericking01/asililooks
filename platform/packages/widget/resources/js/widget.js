@@ -31,6 +31,15 @@ class WidgetManagement {
                         Botble.initResources()
                         Botble.initMediaIntegrate()
                         Botble.initTreeCheckboxes()
+
+                        // Reinitialize repeater fields after widget HTML update
+                        if (window.Botble) {
+                            window.Botble.initCoreIcon()
+                        }
+
+                        // Trigger document ready to reinitialize any other components that need it
+                        $(document).trigger('widgets:reloaded')
+
                         Botble.showSuccess(data.message)
                     })
                     .finally(() => {
@@ -47,7 +56,7 @@ class WidgetManagement {
                 disabled: false, // Disables the sortable if set to true.
                 store: null, // @see Store
                 animation: 150, // ms, animation speed moving items when sorting, `0` — without animation
-                handle: '.card-header',
+                handle: '.widget-draggable-handler',
                 ghostClass: 'sortable-ghost', // Class name for the drop placeholder
                 chosenClass: 'sortable-chosen', // Class name for the chosen item
                 dataIdAttr: 'data-id',
@@ -95,12 +104,22 @@ class WidgetManagement {
                     .then(({ data }) => {
                         Botble.showSuccess(data.message)
                         _self.closest('.sidebar-item').find('ul').html(data.data)
+
+                        // Reinitialize components after widget deletion
+                        if (window.Botble) {
+                            window.Botble.initResources()
+                            window.Botble.initMediaIntegrate()
+                            window.Botble.initCoreIcon()
+                        }
+
+                        // Trigger event for other components
+                        $(document).trigger('widgets:reloaded')
                     })
                     .finally(() => {
                         Botble.showButtonLoading(widget.find('.widget-control-delete'))
                     })
             })
-            .on('click', '.widget-item .card-header', (event) => {
+            .on('click', '.widget-item .widget-draggable-handler', (event) => {
                 let _self = $(event.currentTarget)
                 _self.closest('.widget-item').find('.widget-content').slideToggle(300)
                 if (_self.find('.ti').hasClass('ti-chevron-up')) {
@@ -110,11 +129,6 @@ class WidgetManagement {
                 } else {
                     _self.closest('.card').toggleClass('card-no-border-bottom-radius')
                 }
-                _self.find('.ti').toggleClass('ti-chevron-down').toggleClass('ti-chevron-up')
-            })
-            .on('click', '.sidebar-item .card-header .button-sidebar.btn-action', (event) => {
-                let _self = $(event.currentTarget)
-                _self.closest('.card').find('.card-body').slideToggle(300)
                 _self.find('.ti').toggleClass('ti-chevron-down').toggleClass('ti-chevron-up')
             })
             .on('click', '.widget-save', (event) => {

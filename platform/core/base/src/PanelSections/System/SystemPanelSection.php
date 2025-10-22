@@ -11,7 +11,7 @@ class SystemPanelSection extends PanelSection
     {
         $this
             ->setId('system')
-            ->setTitle(trans('core/base::base.panel.system'))
+            ->setTitle(trans('core/base::base.panel.platform_administration'))
             ->withPriority(99999)
             ->withItems([
                 PanelSectionItem::make('cache_management')

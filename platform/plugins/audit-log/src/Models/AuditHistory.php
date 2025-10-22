@@ -99,7 +99,7 @@ class AuditHistory extends BaseModel
     {
         $days = setting('audit_log_data_retention_period', DataRetentionPeriod::ONE_MONTH);
 
-        if ($days === DataRetentionPeriod::NEVER) {
+        if ($days == DataRetentionPeriod::NEVER) {
             return $this->query()->where('id', '<', 0);
         }
 

@@ -51,7 +51,7 @@ class MarketplaceHelper
 
     public function getAssetVersion(): string
     {
-        return '2.1.6';
+        return '2.1.7';
     }
 
     public function hideStorePhoneNumber(): bool
@@ -275,7 +275,7 @@ class MarketplaceHelper
         return Cache::remember($cacheKey, 3600, function () use ($storeId) {
             // Optimized query using a single query with subquery
             $categoryIds = DB::table('ec_product_category_product')
-                ->whereIn('product_id', function ($query) use ($storeId) {
+                ->whereIn('product_id', function ($query) use ($storeId): void {
                     $query->select('id')
                         ->from('ec_products')
                         ->where('store_id', $storeId)
