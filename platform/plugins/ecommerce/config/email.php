@@ -267,6 +267,17 @@ return [
                 'confirm_url' => 'plugins/ecommerce::account-deletion.confirm_url',
             ],
         ],
+        'customer-deletion-verification-code' => [
+            'title' => 'plugins/ecommerce::email.customer_deletion_verification_code_title',
+            'description' => 'plugins/ecommerce::email.customer_deletion_verification_code_description',
+            'subject' => 'plugins/ecommerce::email.customer_deletion_verification_code_subject',
+            'can_off' => false,
+            'variables' => [
+                'customer_name' => 'plugins/ecommerce::ecommerce.customer_name',
+                'customer_email' => 'plugins/ecommerce::ecommerce.customer_email',
+                'verification_code' => 'plugins/ecommerce::account-deletion.verification_code',
+            ],
+        ],
         'customer-deletion-request-completed' => [
             'title' => 'plugins/ecommerce::email.customer_deletion_request_completed_title',
             'description' => 'plugins/ecommerce::email.customer_deletion_request_completed_description',

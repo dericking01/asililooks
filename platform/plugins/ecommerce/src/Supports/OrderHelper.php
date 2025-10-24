@@ -814,14 +814,8 @@ class OrderHelper
                 Arr::forget($sessionData, 'created_order_address_id');
             }
         } elseif ($addressData && ! empty($addressData['name'])) {
-            if (! isset($sessionData['created_order_address'])) {
-                $createdOrderAddress = $this->createOrderAddress($addressData, $sessionData);
-                if ($createdOrderAddress) {
-                    $sessionData['created_order_address'] = true;
-                    $sessionData['created_order_address_id'] = $createdOrderAddress->getKey();
-                }
-            } elseif (Arr::get($sessionData, 'created_order_address_id')) {
-                $createdOrderAddress = $this->createOrderAddress($addressData, $sessionData);
+            $createdOrderAddress = $this->createOrderAddress($addressData, $sessionData);
+            if ($createdOrderAddress) {
                 $sessionData['created_order_address'] = true;
                 $sessionData['created_order_address_id'] = $createdOrderAddress->getKey();
             }
@@ -896,11 +890,10 @@ class OrderHelper
              * @var OrderAddress $orderAddress
              */
             $orderAddress = OrderAddress::query()
-                ->where([
+                ->firstOrNew([
                     'order_id' => $orderId,
                     'type' => OrderAddressTypeEnum::SHIPPING,
-                ])
-                ->firstOrNew();
+                ]);
 
             $orderAddress->fill($data);
 

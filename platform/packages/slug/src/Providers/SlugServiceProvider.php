@@ -17,10 +17,9 @@ use Botble\Slug\Repositories\Eloquent\SlugRepository;
 use Botble\Slug\Repositories\Interfaces\SlugInterface;
 use Botble\Slug\SlugCompiler;
 use Botble\Slug\SlugHelper;
-use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Database\Eloquent\Model;
 
-class SlugServiceProvider extends ServiceProvider implements DeferrableProvider
+class SlugServiceProvider extends ServiceProvider
 {
     use LoadAndPublishDataTrait;
 

@@ -16,6 +16,8 @@ class CustomerDeletionRequest extends BaseModel
         'customer_phone',
         'customer_email',
         'token',
+        'verification_code',
+        'code_expires_at',
         'status',
         'reason',
         'confirmed_at',
@@ -24,6 +26,7 @@ class CustomerDeletionRequest extends BaseModel
 
     protected $casts = [
         'status' => DeletionRequestStatusEnum::class,
+        'code_expires_at' => 'datetime',
         'confirmed_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];

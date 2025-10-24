@@ -1,12 +1,13 @@
 <?php
 
+use Botble\Ecommerce\Http\Controllers\API\AccountDeletionController;
 use Botble\Ecommerce\Http\Controllers\API\AddressController;
 use Botble\Ecommerce\Http\Controllers\API\BrandController;
 use Botble\Ecommerce\Http\Controllers\API\CartController;
 use Botble\Ecommerce\Http\Controllers\API\CheckoutController;
 use Botble\Ecommerce\Http\Controllers\API\CompareController;
-use Botble\Ecommerce\Http\Controllers\API\CouponController;
 use Botble\Ecommerce\Http\Controllers\API\CountryController;
+use Botble\Ecommerce\Http\Controllers\API\CouponController;
 use Botble\Ecommerce\Http\Controllers\API\CurrencyController;
 use Botble\Ecommerce\Http\Controllers\API\DownloadController;
 use Botble\Ecommerce\Http\Controllers\API\FilterController;
@@ -71,6 +72,13 @@ Route::group([
 
         Route::get('downloads', [DownloadController::class, 'index']);
         Route::get('downloads/{id}', [DownloadController::class, 'download'])->wherePrimaryKey();
+
+        Route::prefix('delete-account')->name('delete-account.')->group(function (): void {
+            Route::post('/', [AccountDeletionController::class, 'store'])
+                ->name('store');
+            Route::post('verify', [AccountDeletionController::class, 'verify'])
+                ->name('verify');
+        });
     });
 
     Route::group(['middleware' => ['api.optional.auth']], function (): void {
@@ -83,7 +91,7 @@ Route::group([
     });
 
     Route::get('coupons', [CouponController::class, 'index']);
-    
+
     Route::group(['middleware' => ['api.optional.auth']], function (): void {
         Route::post('coupon/apply', [CouponController::class, 'apply']);
         Route::post('coupon/remove', [CouponController::class, 'remove']);

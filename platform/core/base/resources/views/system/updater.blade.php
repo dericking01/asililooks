@@ -95,7 +95,7 @@
                     <x-core::card.title>OneClick System Updater</x-core::card.title>
                 </x-core::card.header>
 
-                <x-core::card.body dir="ltr">
+                <x-core::card.body>
                     @if (!empty($latestUpdate))
                         <system-update-component
                             update-url="{{ route('system.updater.post') }}"

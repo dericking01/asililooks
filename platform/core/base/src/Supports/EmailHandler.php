@@ -335,7 +335,7 @@ class EmailHandler
         return $value;
     }
 
-    protected function replaceVariableValue(array $variables, string $module, string $content): string
+    protected function replaceVariableValue(array $variables, ?string $module, string $content): string
     {
         do_action('email_variable_value');
 
